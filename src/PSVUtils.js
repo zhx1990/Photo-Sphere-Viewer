@@ -119,6 +119,16 @@ PSVUtils.exitFullscreen = function(elt) {
 };
 
 /**
+ * Gets an element style
+ * @param elt (HTMLElement)
+ * @param prop (string)
+ * @return mixed
+ */
+PSVUtils.getStyle = function(elt, prop) {
+  return window.getComputedStyle(elt, null)[prop];
+};
+
+/**
  * Merge the enumerable attributes of two objects.
  * @copyright Nicholas Fisher <nfisher110@gmail.com>"
  * @license MIT

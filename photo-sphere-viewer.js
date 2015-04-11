@@ -119,7 +119,9 @@ PhotoSphereViewer.DEFAULTS = {
   time_anim: 2000,
   anim_speed: '2rpm',
   navbar: false,
+  mousewheel: true,
   loading_img: null,
+  loading_txt: 'Loading...',
   size: null
 };
 
@@ -136,29 +138,15 @@ PhotoSphereViewer.prototype.load = function() {
     return;
   }
 
-  // Loading indicator (text or image if given)
-  if (!!this.config.loading_img) {
-    this.loader = document.createElement('img');
-    this.loader.src = this.config.loading_img;
-    this.loader.alt = 'Loading...';
-  }
-  else {
-    this.loader = document.createElement('div');
-    this.loader.textContent = 'Loading...';
-  }
-  this.loader.className = 'psv-loader';
-  this.container.appendChild(this.loader);
+  // Loader
+  this.loader = new PSVLoader(this);
+  this.container.appendChild(this.loader.getLoader());
+  this.loader.create();
 
   // Canvas container
   this.canvas_container = document.createElement('div');
-  this.canvas_container.className = 'psv-canvas';
+  this.canvas_container.className = 'psv-canvas-container';
   this.container.appendChild(this.canvas_container);
-
-  // Navigation bar
-  if (this.config.navbar) {
-    this.navbar = new PSVNavBar(this);
-    this.container.appendChild(this.navbar.getBar());
-  }
 
   // Adding events
   PSVUtils.addEvent(window, 'resize', this._onResize.bind(this));
@@ -168,8 +156,10 @@ PhotoSphereViewer.prototype.load = function() {
   PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
   PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
   PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
-  PSVUtils.addEvent(this.canvas_container, 'mousewheel', this._onMouseWheel.bind(this));
-  PSVUtils.addEvent(this.canvas_container, 'DOMMouseScroll', this._onMouseWheel.bind(this));
+  if (this.config.mousewheel) {
+    PSVUtils.addEvent(this.canvas_container, 'mousewheel', this._onMouseWheel.bind(this));
+    PSVUtils.addEvent(this.canvas_container, 'DOMMouseScroll', this._onMouseWheel.bind(this));
+  }
   PSVUtils.addEvent(document, 'fullscreenchange', this._fullscreenToggled.bind(this));
   PSVUtils.addEvent(document, 'mozfullscreenchange', this._fullscreenToggled.bind(this));
   PSVUtils.addEvent(document, 'webkitfullscreenchange', this._fullscreenToggled.bind(this));
@@ -180,7 +170,7 @@ PhotoSphereViewer.prototype.load = function() {
     this._loadXMP();
   }
   else {
-    this._createBuffer(false);
+    this._loadTexture(false, false);
   }
 };
 
@@ -189,48 +179,59 @@ PhotoSphereViewer.prototype.load = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype._loadXMP = function() {
-  var xhr = null;
-  var self = this;
-
-  if (window.XMLHttpRequest) {
-    xhr = new XMLHttpRequest();
-  }
-  else if (window.ActiveXObject) {
-    try {
-      xhr = new ActiveXObject('Msxml2.XMLHTTP');
-    }
-    catch (e) {
-      xhr = new ActiveXObject('Microsoft.XMLHTTP');
-    }
-  }
-  else {
+  if (!window.XMLHttpRequest) {
     this.container.textContent = 'XHR is not supported, update your browser!';
     return;
   }
 
+  var xhr = new XMLHttpRequest();
+  var self = this;
+  var progress = 0;
+
   xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4 && xhr.status == 200) {
-      var binary = xhr.responseText;
-      var a = binary.indexOf('<x:xmpmeta'), b = binary.indexOf('</x:xmpmeta>');
-      var data = binary.substring(a, b);
+    if (xhr.readyState == 4) {
+      if (xhr.status == 200) {
+        self.loader.setProgress(100);
 
-      // No data retrieved
-      if (a == -1 || b == -1 || data.indexOf('GPano:') == -1) {
-        self._createBuffer(false);
-        return;
+        var binary = xhr.responseText;
+        var a = binary.indexOf('<x:xmpmeta'), b = binary.indexOf('</x:xmpmeta>');
+        var data = binary.substring(a, b);
+
+        // No data retrieved
+        if (a == -1 || b == -1 || data.indexOf('GPano:') == -1) {
+          self._loadTexture(false, true);
+          return;
+        }
+
+        var pano_data = {
+          full_width: parseInt(PSVUtils.getAttribute(data, 'FullPanoWidthPixels')),
+          full_height: parseInt(PSVUtils.getAttribute(data, 'FullPanoHeightPixels')),
+          cropped_width: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageWidthPixels')),
+          cropped_height: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageHeightPixels')),
+          cropped_x: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaLeftPixels')),
+          cropped_y: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaTopPixels')),
+        };
+
+        self._loadTexture(pano_data, true);
       }
-
-      var pano_data = {
-        full_width: parseInt(PSVUtils.getAttribute(data, 'FullPanoWidthPixels')),
-        full_height: parseInt(PSVUtils.getAttribute(data, 'FullPanoHeightPixels')),
-        cropped_width: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageWidthPixels')),
-        cropped_height: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageHeightPixels')),
-        cropped_x: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaLeftPixels')),
-        cropped_y: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaTopPixels')),
-      };
-
-      self._createBuffer(pano_data);
+      else {
+        self.container.textContent = 'Cannot load image';
+      }
     }
+  };
+
+  xhr.onprogress = function(e) {
+    if (e.lengthComputable) {
+      var new_progress = parseInt(e.loaded / e.total * 100);
+      if (new_progress > progress) {
+        progress = new_progress;
+        self.loader.setProgress(progress);
+      }
+    }
+  };
+
+  xhr.onerror = function() {
+    self.container.textContent = 'Cannot load image';
   };
 
   xhr.open('GET', this.config.panorama, true);
@@ -238,46 +239,53 @@ PhotoSphereViewer.prototype._loadXMP = function() {
 };
 
 /**
- * Creates an image in the right dimensions
+ * Loads the sphere texture
  * @param pano_data (mixed) An object containing the panorama XMP data (false if it there is not)
+ * @param in_cache (boolean) If the image has already been loaded and should be in cache
  * @return (void)
  */
-PhotoSphereViewer.prototype._createBuffer = function(pano_data) {
-  var img = new Image();
+PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
+  var loader = new THREE.ImageLoader();
   var self = this;
+  var progress = in_cache ? 100 : 0;
 
-  img.onload = function() {
-    // Default XMP data
-    if (!pano_data) {
-      pano_data = {
-        full_width: img.width,
-        full_height: img.height,
-        cropped_width: img.width,
-        cropped_height: img.height,
-        cropped_x: 0,
-        cropped_y: 0,
-      };
-    }
+  // Default XMP data
+  if (!pano_data) {
+    pano_data = {
+      full_width: img.width,
+      full_height: img.height,
+      cropped_width: img.width,
+      cropped_height: img.height,
+      cropped_x: 0,
+      cropped_y: 0,
+    };
+  }
+
+  // CORS when the panorama is not given as a base64 string
+  if (!this.config.panorama.match(/^data:image\/[a-z]+;base64/)) {
+    loader.setCrossOrigin('anonymous');
+  }
+
+  var onload = function(img) {
+    self.loader.setProgress(100);
 
     // Size limit for mobile compatibility
-    var max_width = 2048;
+    var max_width = 4096;
     if (PSVUtils.isWebGLSupported()) {
       max_width = PSVUtils.getMaxTextureWidth();
     }
 
-    // Buffer width
     var new_width = Math.min(pano_data.full_width, max_width);
     var r = new_width / pano_data.full_width;
 
-    pano_data.full_width = new_width;
-    pano_data.cropped_width *= r;
-    pano_data.cropped_x *= r;
-    img.width = pano_data.cropped_width;
-
-    // Buffer height
+    pano_data.full_width *= r;
     pano_data.full_height *= r;
+    pano_data.cropped_width *= r;
     pano_data.cropped_height *= r;
+    pano_data.cropped_x *= r;
     pano_data.cropped_y *= r;
+
+    img.width = pano_data.cropped_width;
     img.height = pano_data.cropped_height;
 
     // Create buffer
@@ -288,41 +296,32 @@ PhotoSphereViewer.prototype._createBuffer = function(pano_data) {
     var ctx = buffer.getContext('2d');
     ctx.drawImage(img, pano_data.cropped_x, pano_data.cropped_y, pano_data.cropped_width, pano_data.cropped_height);
 
-    self._loadTexture(buffer.toDataURL('image/jpeg'));
+    self._createScene(buffer);
   };
 
-  // CORS when the panorama is not given as a base64 string
-  if (!this.config.panorama.match(/^data:image\/[a-z]+;base64/)) {
-    img.setAttribute('crossOrigin', 'anonymous');
-  }
+  var onprogress = function(e) {
+    if (e.lengthComputable) {
+      var new_progress = parseInt(e.loaded / e.total * 100);
+      if (new_progress > progress) {
+        progress = new_progress;
+        self.loader.setProgress(progress);
+      }
+    }
+  };
 
-  img.src = this.config.panorama;
-};
+  var onerror = function() {
+    self.container.textContent = 'Cannot load image';
+  };
 
-/**
- * Loads the sphere texture
- * @param data (string) Image data ofthe panorama
- * @return (void)
- */
-PhotoSphereViewer.prototype._loadTexture = function(data) {
-  var texture = new THREE.Texture();
-  var loader = new THREE.ImageLoader();
-  var self = this;
-
-  loader.load(data, function(img) {
-    texture.needsUpdate = true;
-    texture.image = img;
-
-    self._createScene(texture);
-  });
+  loader.load(this.config.panorama, onload, onprogress, onerror);
 };
 
 /**
  * Creates the 3D scene
- * @param texture (THREE.Texture) The sphere texture
+ * @param img (Canvas) The sphere texture
  * @return (void)
  */
-PhotoSphereViewer.prototype._createScene = function(texture) {
+PhotoSphereViewer.prototype._createScene = function(img) {
   this._onResize();
 
   // Renderer depends on whether WebGL is supported or not
@@ -335,17 +334,27 @@ PhotoSphereViewer.prototype._createScene = function(texture) {
   this.scene = new THREE.Scene();
   this.scene.add(this.camera);
 
+  var texture = new THREE.Texture(img);
+  texture.needsUpdate = true;
+
   var geometry = new THREE.SphereGeometry(200, 32, 32);
   var material = new THREE.MeshBasicMaterial({map: texture, overdraw: true});
   var mesh = new THREE.Mesh(geometry, material);
   mesh.scale.x = -1;
-  this.scene.add(mesh);
 
+  this.scene.add(mesh);
   this.canvas_container.appendChild(this.renderer.domElement);
 
   // Remove loader
-  this.container.removeChild(this.loader);
+  this.container.removeChild(this.loader.getLoader());
+  this.loader = null;
   PSVUtils.removeClass(this.container, 'loading');
+
+  // Navigation bar
+  if (this.config.navbar) {
+    this.navbar = new PSVNavBar(this);
+    this.container.appendChild(this.navbar.getBar());
+  }
 
   // Queue animation
   if (this.config.time_anim !== false) {
@@ -736,6 +745,79 @@ PhotoSphereViewer.prototype.trigger = function(name, arg) {
     }
   }
 };
+
+/**
+ * Loader class
+ * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ */
+var PSVLoader = function(psv) {
+  this.psv = psv;
+
+  this.container = document.createElement('div');
+  this.container.className = 'psv-loader';
+
+  this.canvas = document.createElement('canvas');
+  this.canvas.className = 'psv-loader-canvas';
+};
+
+/**
+ * Creates the loader content
+ */
+PSVLoader.prototype.create = function() {
+  this.canvas.width = this.container.clientWidth;
+  this.canvas.height = this.container.clientWidth;
+  this.container.appendChild(this.canvas);
+
+  this.tickness = (this.container.offsetWidth - this.container.clientWidth) / 2;
+
+  var inner;
+  if (this.psv.config.loading_img) {
+    inner = document.createElement('img');
+    inner.className = 'psv-loader-image';
+    inner.src = this.psv.config.loading_img;
+  }
+  else if (this.psv.config.loading_txt) {
+    inner = document.createElement('div');
+    inner.className = 'psv-loader-text';
+    inner.innerHTML = this.psv.config.loading_txt;
+  }
+  if (inner) {
+    var a = Math.round(Math.sqrt(2 * Math.pow(this.canvas.width/2-this.tickness/2, 2)));
+    inner.style.maxWidth = a + 'px';
+    inner.style.maxHeight = a + 'px';
+    this.container.appendChild(inner);
+  }
+};
+
+/**
+ * Sets the loader progression
+ * @param value (int) from 0 to 100
+ */
+PSVLoader.prototype.setProgress = function(value) {
+  var context = this.canvas.getContext('2d');
+
+  context.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
+  context.lineWidth = this.tickness;
+  context.strokeStyle = PSVUtils.getStyle(this.container, 'color');
+
+  context.beginPath();
+  context.arc(
+    this.canvas.width/2, this.canvas.height/2,
+    this.canvas.width/2 - this.tickness/2,
+    -Math.PI/2, value/100 * 2*Math.PI - Math.PI/2
+  );
+  context.stroke();
+};
+
+/**
+ * Returns the loader itself
+ * @return (HTMLElement) The loader
+ */
+PSVLoader.prototype.getLoader = function() {
+  return this.container;
+};
+
 /**
  * Navigation bar class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
@@ -800,6 +882,7 @@ PSVNavBar.prototype.setCaption = function(html) {
     this.caption.innerHTML = html;
   }
 };
+
 /**
  * Navigation bar button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
@@ -838,6 +921,7 @@ PSVNavBarButton.prototype.toggleActive = function(active) {
     PSVUtils.removeClass(this.button, 'active');
   }
 };
+
 /**
  * Navigation bar autorotate button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
@@ -869,6 +953,7 @@ PSVNavBarAutorotateButton.prototype.create = function() {
   PSVUtils.addEvent(this.button, 'click', this.psv.toggleAutorotate.bind(this.psv));
   this.psv.on('autorotate', this.toggleActive.bind(this));
 };
+
 /**
  * Navigation bar fullscreen button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
@@ -895,6 +980,7 @@ PSVNavBarFullscreenButton.prototype.create = function() {
   PSVUtils.addEvent(this.button, 'click', this.psv.toggleFullscreen.bind(this.psv));
   this.psv.on('fullscreen-updated', this.toggleActive.bind(this));
 };
+
 /**
  * Navigation bar zoom button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
@@ -1040,6 +1126,7 @@ PSVNavBarZoomButton.prototype._changeZoom = function(x) {
     this.psv.zoom(zoom_level);
   }
 };
+
 /**
  * Static utilities for PSV
  */
@@ -1158,6 +1245,16 @@ PSVUtils.requestFullscreen = function(elt) {
  */
 PSVUtils.exitFullscreen = function(elt) {
   (document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen).call(document);
+};
+
+/**
+ * Gets an element style
+ * @param elt (HTMLElement)
+ * @param prop (string)
+ * @return mixed
+ */
+PSVUtils.getStyle = function(elt, prop) {
+  return window.getComputedStyle(elt, null)[prop];
 };
 
 /**

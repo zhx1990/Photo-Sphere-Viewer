@@ -3,6 +3,7 @@ module.exports = function(grunt) {
 
   var files_in_order = [
     'src/PhotoSphereViewer.js',
+    'src/PSVLoader.js',
     'src/PSVNavBar.js',
     'src/PSVNavBarButton.js',
     'src/PSVNavBarAutorotateButton.js',
@@ -27,7 +28,7 @@ module.exports = function(grunt) {
       js: {
         options: {
           stripBanners: false,
-          separator: '\n'
+          separator: '\n\n'
         },
         src: files_in_order,
         dest: 'photo-sphere-viewer.js'

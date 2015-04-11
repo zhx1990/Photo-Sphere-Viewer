@@ -1,3 +1,9 @@
+$main-background: radial-gradient(#ffffff, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%, #efefef 66%, #dfdfdf 82%, #bfbfbf 100%);
+
+$loader-color: rgba(61, 61, 61, 0.7);
+$loader-width: 150px;
+$loader-tickness: 10px;
+
 $navbar-background: rgba(61, 61, 61, 0.5);
 
 $buttons-height: 20px;
@@ -18,35 +24,56 @@ $fullscreen-button-tickness: 2px;
 $fullscreen-button-ratio: 4/3;
 
 // CONTAINERS
+.psv-container, .psv-container * {
+  box-sizing: content-box;
+  font-family: sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
 .psv-container {
   width: 100%;
   height: 100%;
   position: relative;
-  font-family: sans-serif;
+  background: $main-background;
 }
+  .psv-container.loading {
+    text-align: center;
+  }
 
-.psv-canvas {
+.psv-canvas-container {
   position: absolute;
   z-index: 0;
 }
-  .psv-canvas canvas {
+  .psv-canvas-container canvas {
     display: block;
   }
 
+// LOADER
 .psv-loader {
-  display: inline-block;
-  vertical-align: middle;
+  position: relative;
+  color: $loader-color;
+  width: $loader-width;
+  height: $loader-width;
+  border: $loader-tickness solid transparent;
 }
+  .psv-loader-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
 
-.psv-container.loading {
-  text-align: center;
-}
-.psv-container.loading:before {
+// Pseudo element trick to vertically center elements
+.psv-container.loading:before, .psv-loader:before {
   content: '';
   display: inline-block;
   height: 100%;
   vertical-align: middle;
 }
+  .psv-loader, .psv-loader-image, .psv-loader-text {
+    display: inline-block;
+    vertical-align: middle;
+  }
 
 // NAVBAR
 .psv-navbar {
@@ -86,9 +113,8 @@ $fullscreen-button-ratio: 4/3;
     float: left;
     position: relative;
     cursor: pointer;
-    box-sizing: border-box;
-    width: #{$zoom-buttons-width + $zoom-buttons-tickness * 2};
-    height: #{$zoom-buttons-width + $zoom-buttons-tickness * 2};
+    width: #{$zoom-buttons-width};
+    height: #{$zoom-buttons-width};
     color: $buttons-color;
     margin: #{($buttons-height - $zoom-buttons-width) / 2 - $zoom-buttons-tickness} 0;
     border: $zoom-buttons-tickness solid $buttons-color;
@@ -194,9 +220,8 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
   .psv-fullscreen-button div:after {
     position:absolute;
     content: '';
-    box-sizing: border-box;
-    width: #{$fullscreen-width * 0.3};
-    height: #{$buttons-height * 0.3};
+    width: #{$fullscreen-width * 0.3 - $fullscreen-button-tickness};
+    height: #{$buttons-height * 0.3 - $fullscreen-button-tickness};
     border-style: solid;
     border-color: $buttons-color;
     border-width: $fullscreen-button-tickness;
@@ -204,8 +229,8 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
   }
     .psv-fullscreen-button:hover div:before,
     .psv-fullscreen-button:hover div:after {
-      width: #{$fullscreen-width * 0.4};
-      height: #{$buttons-height * 0.4};
+      width: #{$fullscreen-width * 0.4 - $fullscreen-button-tickness};
+      height: #{$buttons-height * 0.4 - $fullscreen-button-tickness};
     }
     .psv-fullscreen-button div:first-child:before {
       top: 0;
