@@ -1,10 +1,9 @@
 /**
  * Navigation bar zoom button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
- * @param style (Object) Style of the navigation bar
  */
-var PSVNavBarZoomButton = function(psv, style) {
-  PSVNavBarButton.call(this, psv, style);
+var PSVNavBarZoomButton = function(psv) {
+  PSVNavBarButton.call(this, psv);
 
   this.zoom_range = null;
   this.zoom_value = null;
@@ -21,70 +20,45 @@ PSVNavBarZoomButton.prototype.constructor = PSVNavBarZoomButton;
  * @return (void)
  */
 PSVNavBarZoomButton.prototype.create = function() {
-  // Zoom container
   this.button = document.createElement('div');
-  this.button.style.cssFloat = 'left';
+  this.button.className = 'psv-button psv-zoom-button';
 
-  // Zoom "-"
   var zoom_minus = document.createElement('div');
-  zoom_minus.style.cssFloat = 'left';
-  zoom_minus.style.padding = '10px';
-  zoom_minus.style.height = this.style.buttonsHeight + 'px';
-  zoom_minus.style.backgroundColor = this.style.buttonsBackgroundColor;
-  zoom_minus.style.lineHeight = this.style.buttonsHeight + 'px';
-  zoom_minus.style.color = this.style.buttonsColor;
-  zoom_minus.style.cursor = 'pointer';
+  zoom_minus.className = 'psv-zoom-minus';
   zoom_minus.textContent = '-';
-
-  PSVUtils.addEvent(zoom_minus, 'click', this.psv.zoomOut.bind(this.psv));
   this.button.appendChild(zoom_minus);
 
-  // Zoom range
   var zoom_range_bg = document.createElement('div');
-  zoom_range_bg.style.cssFloat = 'left';
-  zoom_range_bg.style.padding = (10 + (this.style.buttonsHeight - this.style.zoomRangeThickness) / 2) + 'px 5px';
-  zoom_range_bg.style.backgroundColor = this.style.buttonsBackgroundColor;
+  zoom_range_bg.className = 'psv-zoom-range';
   this.button.appendChild(zoom_range_bg);
 
   this.zoom_range = document.createElement('div');
-  this.zoom_range.style.width = this.style.zoomRangeWidth + 'px';
-  this.zoom_range.style.height = this.style.zoomRangeThickness + 'px';
-  this.zoom_range.style.backgroundColor = this.style.buttonsColor;
-  this.zoom_range.style.position = 'relative';
-  this.zoom_range.style.cursor = 'pointer';
+  this.zoom_range.className = 'psv-zoom-range-line';
   zoom_range_bg.appendChild(this.zoom_range);
 
   this.zoom_value = document.createElement('div');
-  this.zoom_value.style.position = 'absolute';
-  this.zoom_value.style.top = ((this.style.zoomRangeThickness - this.style.zoomRangeDisk) / 2) + 'px';
-  this.zoom_value.style.width = this.style.zoomRangeDisk + 'px';
-  this.zoom_value.style.height = this.style.zoomRangeDisk + 'px';
-  this.zoom_value.style.borderRadius = '50%';
-  this.zoom_value.style.backgroundColor = this.style.buttonsColor;
-  this._moveZoomValue(this.psv.prop.zoom_lvl);
+  this.zoom_value.className = 'psv-zoom-range-handle';
+  this.zoom_range.appendChild(this.zoom_value);
 
-  this.psv.on('zoom-updated', this._moveZoomValue.bind(this));
+  var zoom_plus = document.createElement('div');
+  zoom_plus.className = 'psv-zoom-plus';
+  zoom_plus.textContent = '+';
+  this.button.appendChild(zoom_plus);
+
   PSVUtils.addEvent(this.zoom_range, 'mousedown', this._initZoomChangeWithMouse.bind(this));
   PSVUtils.addEvent(this.zoom_range, 'touchstart', this._initZoomChangeByTouch.bind(this));
   PSVUtils.addEvent(document, 'mousemove', this._changeZoomWithMouse.bind(this));
   PSVUtils.addEvent(document, 'touchmove', this._changeZoomByTouch.bind(this));
   PSVUtils.addEvent(document, 'mouseup', this._stopZoomChange.bind(this));
   PSVUtils.addEvent(document, 'touchend', this._stopZoomChange.bind(this));
-  this.zoom_range.appendChild(this.zoom_value);
-
-  // Zoom "+"
-  var zoom_plus = document.createElement('div');
-  zoom_plus.style.cssFloat = 'left';
-  zoom_plus.style.padding = '10px';
-  zoom_plus.style.height = this.style.buttonsHeight + 'px';
-  zoom_plus.style.backgroundColor = this.style.buttonsBackgroundColor;
-  zoom_plus.style.lineHeight = this.style.buttonsHeight + 'px';
-  zoom_plus.style.color = this.style.buttonsColor;
-  zoom_plus.style.cursor = 'pointer';
-  zoom_plus.textContent = '+';
-
+  PSVUtils.addEvent(zoom_minus, 'click', this.psv.zoomOut.bind(this.psv));
   PSVUtils.addEvent(zoom_plus, 'click', this.psv.zoomIn.bind(this.psv));
-  this.button.appendChild(zoom_plus);
+  this.psv.on('zoom-updated', this._moveZoomValue.bind(this));
+
+  var self = this;
+  setTimeout(function() {
+    self._moveZoomValue(self.psv.prop.zoom_lvl);
+  }, 0);
 };
 
 /**
@@ -93,7 +67,7 @@ PSVNavBarZoomButton.prototype.create = function() {
  * @return (void)
  */
 PSVNavBarZoomButton.prototype._moveZoomValue = function(level) {
-  this.zoom_value.style.left = (level / 100 * this.style.zoomRangeWidth - this.style.zoomRangeDisk / 2) + 'px';
+  this.zoom_value.style.left = (level / 100 * this.zoom_range.offsetWidth - this.zoom_value.offsetWidth / 2) + 'px';
 };
 
 /**
@@ -166,7 +140,7 @@ PSVNavBarZoomButton.prototype._changeZoomByTouch = function(evt) {
 PSVNavBarZoomButton.prototype._changeZoom = function(x) {
   if (this.mousedown) {
     var user_input = x - this.zoom_range.getBoundingClientRect().left;
-    var zoom_level = user_input / this.style.zoomRangeWidth * 100;
+    var zoom_level = user_input / this.zoom_range.offsetWidth * 100;
     this.psv.zoom(zoom_level);
   }
 };

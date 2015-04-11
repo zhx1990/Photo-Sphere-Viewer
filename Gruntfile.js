@@ -24,13 +24,23 @@ module.exports = function(grunt) {
       ' */',
 
     concat: {
-      options: {
-        stripBanners: false,
-        separator: '\n'
-      },
-      dist: {
+      js: {
+        options: {
+          stripBanners: false,
+          separator: '\n'
+        },
         src: files_in_order,
         dest: 'photo-sphere-viewer.js'
+      },
+      css: {
+        options: {
+          banner: '<%= banner %>\n\n'
+        },
+        files: [{
+            expand: true,
+            src: '*.css',
+            dest: ''
+        }]
       }
     },
 
@@ -51,12 +61,30 @@ module.exports = function(grunt) {
 
     uglify: {
       options: {
-        banner: '<%= banner %>\n'
+        banner: '<%= banner %>\n\n'
       },
       dist: {
         src: 'photo-sphere-viewer.js',
         dest: 'photo-sphere-viewer.min.js'
       }
+    },
+    
+    sass: {
+      options: {
+        sourcemap: 'none',
+        style: 'expanded'
+      },
+      dist: {
+        src: 'src/photo-sphere-viewer.scss',
+        dest: 'photo-sphere-viewer.css'
+      }
+    },
+    
+    cssmin: {
+        dist: {
+            src: 'photo-sphere-viewer.css',
+            dest: 'photo-sphere-viewer.min.css'
+        }
     },
 
     jshint: {
@@ -67,7 +95,7 @@ module.exports = function(grunt) {
 
     watch: {
       js: {
-        files: ['src/*.js'],
+        files: ['src/*.js', 'src/*.scss'],
         tasks: ['default']
       }
     }
@@ -77,14 +105,19 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-wrap');
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
+  grunt.loadNpmTasks('grunt-contrib-sass');
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
 
 
   grunt.registerTask('default', [
-    'concat',
+    'concat:js',
     'wrap',
-    'uglify'
+    'uglify',
+    'sass',
+    'cssmin',
+    'concat:css'
   ]);
 
   grunt.registerTask('test', [

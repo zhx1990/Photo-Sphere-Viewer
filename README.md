@@ -28,20 +28,6 @@ You can find a basic example of use in the file `example.html`. The `example1.ht
   * `time_anim` (optional, default to `2000`): the panorama will be automatically animated after `time_anim` milliseconds (indicate `false` to deactivate it).
   * `anim_speed` (optional, default to `2rpm`): animation speed in radians/degrees/revolutions per second/minute.
   * `navbar` (optional, default to `false`): set to `true`, a navigation bar will be displayed.
-  * `navbar_style` (optional, default to `{}`): a custom style for the navigation bar. See the list below to know what properties are available.
-      * `backgroundColor`: the navigation bar background color (default to `rgba(61, 61, 61, 0.5)`).
-      * `buttonsColor`: the buttons foreground color (default to `rgba(255, 255, 255, 0.7)`).
-      * `buttonsBackgroundColor`: the buttons background color (default to `transparent`).
-      * `activeButtonsBackgroundColor`: the buttons background color when they are active (default to `rgba(255, 255, 255, 0.1)`).
-      * `buttonsHeight`: buttons height in pixels (default to `20`).
-      * `autorotateThickness`: autorotate icon thickness in pixels (default to `1`).
-      * `zoomRangeWidth`: zoom range width in pixels (default to `50`).
-      * `zoomRangeThickness`: zoom range thickness in pixels (default to `1`).
-      * `zoomRangeDisk`: zoom range disk diameter in pixels (default to `7`).
-      * `fullscreenRatio`: fullscreen icon ratio (default to `4/3`).
-      * `fullscreenThickness`: fullscreen icon thickness in pixels (default to `2`).
-
-      Colors can be in `rgb()`, `rgba()` or hexadecimal format, and the keyword `transparent` is accepted.
   * `loading_img` (optional, default to `null`): the path to the image shown during the loading.
   * `size` (optional, default to `null`): the final size of the panorama container (e.g. `{width: 500, height: 300}`).
 

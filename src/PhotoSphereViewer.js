@@ -15,7 +15,6 @@
  * - time_anim (integer) (optional) (2000) Delay before automatically animating the panorama in milliseconds, false to not animate
  * - anim_speed (string) (optional) (2rpm) Animation speed in radians/degrees/revolutions per second/minute
  * - navbar (boolean) (optional) (false) Display the navigation bar if set to true
- * - navbar_style (Object) (optional) ({}) Style of the navigation bar
  * - loading_img (string) (optional) (null) Loading image URL or path (absolute or relative)
  * - size (Object) (optional) (null) Final size of the panorama container (e.g. {width: 500, height: 300})
  */
@@ -84,7 +83,6 @@ PhotoSphereViewer.DEFAULTS = {
   time_anim: 2000,
   anim_speed: '2rpm',
   navbar: false,
-  navbar_style: {},
   loading_img: null,
   size: null
 };
@@ -106,9 +104,7 @@ PhotoSphereViewer.prototype.load = function() {
 
   // Adds a new container
   this.root = document.createElement('div');
-  this.root.style.width = '100%';
-  this.root.style.height = '100%';
-  this.root.style.position = 'relative';
+  this.root.className = 'psv-container';
 
   // Is canvas supported?
   if (!PSVUtils.isCanvasSupported()) {
@@ -118,13 +114,12 @@ PhotoSphereViewer.prototype.load = function() {
 
   // Canvas container
   this.canvas_container = document.createElement('div');
-  this.canvas_container.style.position = 'absolute';
-  this.canvas_container.style.zIndex = 0;
+  this.canvas_container.className = 'psv-canvas';
   this.root.appendChild(this.canvas_container);
 
   // Navigation bar?
   if (this.config.navbar) {
-    this.navbar = new PSVNavBar(this, this.config.navbar_style);
+    this.navbar = new PSVNavBar(this);
     this.root.appendChild(this.navbar.getBar());
   }
 
@@ -324,17 +319,14 @@ PhotoSphereViewer.prototype._createScene = function(texture) {
   mesh.scale.x = -1;
   this.scene.add(mesh);
 
-  var canvas = this.renderer.domElement;
-  canvas.style.display = 'block';
+  this.canvas_container.appendChild(this.renderer.domElement);
 
-  this.canvas_container.appendChild(canvas);
-  
   // Animation?
   if (this.config.time_anim !== false)
     this.prop.anim_timeout = setTimeout(this.startAutorotate.bind(this), this.config.time_anim);
-  
+
   this.trigger('ready');
-  
+
   this.render();
 };
 

@@ -32,7 +32,6 @@
  * - time_anim (integer) (optional) (2000) Delay before automatically animating the panorama in milliseconds, false to not animate
  * - anim_speed (string) (optional) (2rpm) Animation speed in radians/degrees/revolutions per second/minute
  * - navbar (boolean) (optional) (false) Display the navigation bar if set to true
- * - navbar_style (Object) (optional) ({}) Style of the navigation bar
  * - loading_img (string) (optional) (null) Loading image URL or path (absolute or relative)
  * - size (Object) (optional) (null) Final size of the panorama container (e.g. {width: 500, height: 300})
  */
@@ -101,7 +100,6 @@ PhotoSphereViewer.DEFAULTS = {
   time_anim: 2000,
   anim_speed: '2rpm',
   navbar: false,
-  navbar_style: {},
   loading_img: null,
   size: null
 };
@@ -123,9 +121,7 @@ PhotoSphereViewer.prototype.load = function() {
 
   // Adds a new container
   this.root = document.createElement('div');
-  this.root.style.width = '100%';
-  this.root.style.height = '100%';
-  this.root.style.position = 'relative';
+  this.root.className = 'psv-container';
 
   // Is canvas supported?
   if (!PSVUtils.isCanvasSupported()) {
@@ -135,13 +131,12 @@ PhotoSphereViewer.prototype.load = function() {
 
   // Canvas container
   this.canvas_container = document.createElement('div');
-  this.canvas_container.style.position = 'absolute';
-  this.canvas_container.style.zIndex = 0;
+  this.canvas_container.className = 'psv-canvas';
   this.root.appendChild(this.canvas_container);
 
   // Navigation bar?
   if (this.config.navbar) {
-    this.navbar = new PSVNavBar(this, this.config.navbar_style);
+    this.navbar = new PSVNavBar(this);
     this.root.appendChild(this.navbar.getBar());
   }
 
@@ -341,17 +336,14 @@ PhotoSphereViewer.prototype._createScene = function(texture) {
   mesh.scale.x = -1;
   this.scene.add(mesh);
 
-  var canvas = this.renderer.domElement;
-  canvas.style.display = 'block';
+  this.canvas_container.appendChild(this.renderer.domElement);
 
-  this.canvas_container.appendChild(canvas);
-  
   // Animation?
   if (this.config.time_anim !== false)
     this.prop.anim_timeout = setTimeout(this.startAutorotate.bind(this), this.config.time_anim);
-  
+
   this.trigger('ready');
-  
+
   this.render();
 };
 
@@ -765,8 +757,7 @@ PhotoSphereViewer.prototype.trigger = function(name, arg) {
  * Navigation bar class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVNavBar = function(psv, style) {
-  this.style = PSVUtils.deepmerge(PSVNavBar.DEFAULTS, style);
+var PSVNavBar = function(psv) {
   this.psv = psv;
   this.container = null;
   this.arrows = null;
@@ -777,41 +768,6 @@ var PSVNavBar = function(psv, style) {
   this.create();
 };
 
-PSVNavBar.DEFAULTS = {
-  // Bar background
-  backgroundColor: 'rgba(61, 61, 61, 0.5)',
-
-  // Buttons foreground color
-  buttonsColor: 'rgba(255, 255, 255, 0.7)',
-
-  // Buttons background color
-  buttonsBackgroundColor: 'transparent',
-
-  // Buttons background color when active
-  activeButtonsBackgroundColor: 'rgba(255, 255, 255, 0.1)',
-
-  // Buttons height in pixels
-  buttonsHeight: 20,
-
-  // Autorotate icon thickness in pixels
-  autorotateThickness: 1,
-
-  // Zoom range width in pixels
-  zoomRangeWidth: 50,
-
-  // Zoom range thickness in pixels
-  zoomRangeThickness: 1,
-
-  // Zoom range disk diameter in pixels
-  zoomRangeDisk: 7,
-
-  // Fullscreen icon ratio
-  fullscreenRatio: 4 / 3,
-
-  // Fullscreen icon thickness in pixels
-  fullscreenThickness: 2
-};
-
 /**
  * Creates the elements
  * @return (void)
@@ -819,23 +775,18 @@ PSVNavBar.DEFAULTS = {
 PSVNavBar.prototype.create = function() {
   // Container
   this.container = document.createElement('div');
-  this.container.style.backgroundColor = this.style.backgroundColor;
-
-  this.container.style.position = 'absolute';
-  this.container.style.zIndex = 10;
-  this.container.style.bottom = 0;
-  this.container.style.width = '100%';
+  this.container.className = 'psv-navbar';
 
   // Autorotate button
-  this.autorotate = new PSVNavBarAutorotateButton(this.psv, this.style);
+  this.autorotate = new PSVNavBarAutorotateButton(this.psv);
   this.container.appendChild(this.autorotate.getButton());
 
   // Zoom buttons
-  this.zoom = new PSVNavBarZoomButton(this.psv, this.style);
+  this.zoom = new PSVNavBarZoomButton(this.psv);
   this.container.appendChild(this.zoom.getButton());
 
   // Fullscreen button
-  this.fullscreen = new PSVNavBarFullscreenButton(this.psv, this.style);
+  this.fullscreen = new PSVNavBarFullscreenButton(this.psv);
   this.container.appendChild(this.fullscreen.getButton());
 };
 
@@ -849,10 +800,8 @@ PSVNavBar.prototype.getBar = function() {
 /**
  * Navigation bar button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
- * @param style (Object) Style of the navigation bar
  */
-var PSVNavBarButton = function(psv, style) {
-  this.style = style;
+var PSVNavBarButton = function(psv) {
   this.psv = psv;
   this.button = null;
 };
@@ -879,15 +828,17 @@ PSVNavBarButton.prototype.getButton = function() {
  * @return (void)
  */
 PSVNavBarButton.prototype.toggleActive = function(active) {
-  this.button.style.backgroundColor = active ? this.style.activeButtonsBackgroundColor : this.style.buttonsBackgroundColor;
+  if (active)
+    this.button.className+= ' active';
+  else
+    this.button.className = this.button.className.replace(/\bactive\b/,'');
 };
 /**
  * Navigation bar autorotate button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
- * @param style (Object) Style of the navigation bar
  */
-var PSVNavBarAutorotateButton = function(psv, style) {
-  PSVNavBarButton.call(this, psv, style);
+var PSVNavBarAutorotateButton = function(psv) {
+  PSVNavBarButton.call(this, psv);
   this.create();
 };
 
@@ -899,49 +850,26 @@ PSVNavBarAutorotateButton.prototype.constructor = PSVNavBarAutorotateButton;
  * @return (void)
  */
 PSVNavBarAutorotateButton.prototype.create = function() {
-  // Autorotate icon sizes
-  var autorotate_sphere_width = this.style.buttonsHeight - this.style.autorotateThickness * 2;
-  var autorotate_equator_height = autorotate_sphere_width / 10;
-
-  // Autorotate button
   this.button = document.createElement('div');
-  this.button.style.cssFloat = 'left';
-  this.button.style.padding = '10px';
-  this.button.style.width = this.style.buttonsHeight + 'px';
-  this.button.style.height = this.style.buttonsHeight + 'px';
-  this.button.style.backgroundColor = this.style.buttonsBackgroundColor;
-  this.button.style.position = 'relative';
-  this.button.style.cursor = 'pointer';
-
-  PSVUtils.addEvent(this.button, 'click', this.psv.toggleAutorotate.bind(this.psv));
+  this.button.className = 'psv-button psv-autorotate-button';
 
   var autorotate_sphere = document.createElement('div');
-  autorotate_sphere.style.width = autorotate_sphere_width + 'px';
-  autorotate_sphere.style.height = autorotate_sphere_width + 'px';
-  autorotate_sphere.style.borderRadius = '50%';
-  autorotate_sphere.style.border = this.style.autorotateThickness + 'px solid ' + this.style.buttonsColor;
+  autorotate_sphere.className = 'psv-autorotate-sphere';
   this.button.appendChild(autorotate_sphere);
 
   var autorotate_equator = document.createElement('div');
-  autorotate_equator.style.width = autorotate_sphere_width + 'px';
-  autorotate_equator.style.height = autorotate_equator_height + 'px';
-  autorotate_equator.style.borderRadius = '50%';
-  autorotate_equator.style.border = this.style.autorotateThickness + 'px solid ' + this.style.buttonsColor;
-  autorotate_equator.style.position = 'absolute';
-  autorotate_equator.style.top = '50%';
-  autorotate_equator.style.marginTop = -(autorotate_equator_height / 2 + this.style.autorotateThickness) + 'px';
+  autorotate_equator.className = 'psv-autorotate-equator';
   this.button.appendChild(autorotate_equator);
 
-  // (In)active
+  PSVUtils.addEvent(this.button, 'click', this.psv.toggleAutorotate.bind(this.psv));
   this.psv.on('autorotate', this.toggleActive.bind(this));
 };
 /**
  * Navigation bar fullscreen button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
- * @param style (Object) Style of the navigation bar
  */
-var PSVNavBarFullscreenButton = function(psv, style) {
-  PSVNavBarButton.call(this, psv, style);
+var PSVNavBarFullscreenButton = function(psv) {
+  PSVNavBarButton.call(this, psv);
   this.create();
 };
 
@@ -953,82 +881,21 @@ PSVNavBarFullscreenButton.prototype.constructor = PSVNavBarFullscreenButton;
  * @return (void)
  */
 PSVNavBarFullscreenButton.prototype.create = function() {
-  // Fullscreen icon size
-  var fullscreen_width = this.style.buttonsHeight * this.style.fullscreenRatio;
-
-  var fullscreen_vertical_space = this.style.buttonsHeight * 0.3;
-  var fullscreen_vertical_border = (this.style.buttonsHeight - fullscreen_vertical_space) / 2;
-
-  var fullscreen_horizontal_space = fullscreen_width * 0.3;
-  var fullscreen_horizontal_border = (fullscreen_width - fullscreen_horizontal_space) / 2 - this.style.fullscreenThickness;
-  var fullscreen_vertical_int = this.style.buttonsHeight - this.style.fullscreenThickness * 2;
-
-  // Fullscreen button
   this.button = document.createElement('div');
-  this.button.style.cssFloat = 'right';
-  this.button.style.padding = '10px';
-  this.button.style.width = fullscreen_width;
-  this.button.style.height = this.style.buttonsHeight;
-  this.button.style.backgroundColor = this.style.buttonsBackgroundColor;
-  this.button.style.cursor = 'pointer';
+  this.button.className = 'psv-button psv-fullscreen-button';
+
+  this.button.appendChild(document.createElement('div'));
+  this.button.appendChild(document.createElement('div'));
 
   PSVUtils.addEvent(this.button, 'click', this.psv.toggleFullscreen.bind(this.psv));
-
-  // Fullscreen icon left side
-  var fullscreen_left = document.createElement('div');
-  fullscreen_left.style.cssFloat = 'left';
-  fullscreen_left.style.width = this.style.fullscreenThickness + 'px';
-  fullscreen_left.style.height = fullscreen_vertical_space + 'px';
-  fullscreen_left.style.borderStyle = 'solid';
-  fullscreen_left.style.borderColor = this.style.buttonsColor + ' transparent';
-  fullscreen_left.style.borderWidth = fullscreen_vertical_border + 'px 0';
-  this.button.appendChild(fullscreen_left);
-
-  // Fullscreen icon top/bottom sides (first half)
-  var fullscreen_tb_1 = document.createElement('div');
-  fullscreen_tb_1.style.cssFloat = 'left';
-  fullscreen_tb_1.style.width = fullscreen_horizontal_border + 'px';
-  fullscreen_tb_1.style.height = fullscreen_vertical_int + 'px';
-  fullscreen_tb_1.style.borderStyle = 'solid';
-  fullscreen_tb_1.style.borderColor = this.style.buttonsColor + ' transparent';
-  fullscreen_tb_1.style.borderWidth = this.style.fullscreenThickness + 'px 0';
-  this.button.appendChild(fullscreen_tb_1);
-
-  // Fullscreen icon top/bottom sides (second half)
-  var fullscreen_tb_2 = document.createElement('div');
-  fullscreen_tb_2.style.cssFloat = 'left';
-  fullscreen_tb_2.style.marginLeft = fullscreen_horizontal_space + 'px';
-  fullscreen_tb_2.style.width = fullscreen_horizontal_border + 'px';
-  fullscreen_tb_2.style.height = fullscreen_vertical_int + 'px';
-  fullscreen_tb_2.style.borderStyle = 'solid';
-  fullscreen_tb_2.style.borderColor = this.style.buttonsColor + ' transparent';
-  fullscreen_tb_2.style.borderWidth = this.style.fullscreenThickness + 'px 0';
-  this.button.appendChild(fullscreen_tb_2);
-
-  // Fullscreen icon right side
-  var fullscreen_right = document.createElement('div');
-  fullscreen_right.style.cssFloat = 'left';
-  fullscreen_right.style.width = this.style.fullscreenThickness + 'px';
-  fullscreen_right.style.height = fullscreen_vertical_space + 'px';
-  fullscreen_right.style.borderStyle = 'solid';
-  fullscreen_right.style.borderColor = this.style.buttonsColor + ' transparent';
-  fullscreen_right.style.borderWidth = fullscreen_vertical_border + 'px 0';
-  this.button.appendChild(fullscreen_right);
-
-  var fullscreen_clearer = document.createElement('div');
-  fullscreen_clearer.style.clear = 'left';
-  this.button.appendChild(fullscreen_clearer);
-
-  // (In)active
   this.psv.on('fullscreen-updated', this.toggleActive.bind(this));
 };
 /**
  * Navigation bar zoom button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
- * @param style (Object) Style of the navigation bar
  */
-var PSVNavBarZoomButton = function(psv, style) {
-  PSVNavBarButton.call(this, psv, style);
+var PSVNavBarZoomButton = function(psv) {
+  PSVNavBarButton.call(this, psv);
 
   this.zoom_range = null;
   this.zoom_value = null;
@@ -1045,70 +912,45 @@ PSVNavBarZoomButton.prototype.constructor = PSVNavBarZoomButton;
  * @return (void)
  */
 PSVNavBarZoomButton.prototype.create = function() {
-  // Zoom container
   this.button = document.createElement('div');
-  this.button.style.cssFloat = 'left';
+  this.button.className = 'psv-button psv-zoom-button';
 
-  // Zoom "-"
   var zoom_minus = document.createElement('div');
-  zoom_minus.style.cssFloat = 'left';
-  zoom_minus.style.padding = '10px';
-  zoom_minus.style.height = this.style.buttonsHeight + 'px';
-  zoom_minus.style.backgroundColor = this.style.buttonsBackgroundColor;
-  zoom_minus.style.lineHeight = this.style.buttonsHeight + 'px';
-  zoom_minus.style.color = this.style.buttonsColor;
-  zoom_minus.style.cursor = 'pointer';
+  zoom_minus.className = 'psv-zoom-minus';
   zoom_minus.textContent = '-';
-
-  PSVUtils.addEvent(zoom_minus, 'click', this.psv.zoomOut.bind(this.psv));
   this.button.appendChild(zoom_minus);
 
-  // Zoom range
   var zoom_range_bg = document.createElement('div');
-  zoom_range_bg.style.cssFloat = 'left';
-  zoom_range_bg.style.padding = (10 + (this.style.buttonsHeight - this.style.zoomRangeThickness) / 2) + 'px 5px';
-  zoom_range_bg.style.backgroundColor = this.style.buttonsBackgroundColor;
+  zoom_range_bg.className = 'psv-zoom-range';
   this.button.appendChild(zoom_range_bg);
 
   this.zoom_range = document.createElement('div');
-  this.zoom_range.style.width = this.style.zoomRangeWidth + 'px';
-  this.zoom_range.style.height = this.style.zoomRangeThickness + 'px';
-  this.zoom_range.style.backgroundColor = this.style.buttonsColor;
-  this.zoom_range.style.position = 'relative';
-  this.zoom_range.style.cursor = 'pointer';
+  this.zoom_range.className = 'psv-zoom-range-line';
   zoom_range_bg.appendChild(this.zoom_range);
 
   this.zoom_value = document.createElement('div');
-  this.zoom_value.style.position = 'absolute';
-  this.zoom_value.style.top = ((this.style.zoomRangeThickness - this.style.zoomRangeDisk) / 2) + 'px';
-  this.zoom_value.style.width = this.style.zoomRangeDisk + 'px';
-  this.zoom_value.style.height = this.style.zoomRangeDisk + 'px';
-  this.zoom_value.style.borderRadius = '50%';
-  this.zoom_value.style.backgroundColor = this.style.buttonsColor;
-  this._moveZoomValue(this.psv.prop.zoom_lvl);
+  this.zoom_value.className = 'psv-zoom-range-handle';
+  this.zoom_range.appendChild(this.zoom_value);
 
-  this.psv.on('zoom-updated', this._moveZoomValue.bind(this));
+  var zoom_plus = document.createElement('div');
+  zoom_plus.className = 'psv-zoom-plus';
+  zoom_plus.textContent = '+';
+  this.button.appendChild(zoom_plus);
+
   PSVUtils.addEvent(this.zoom_range, 'mousedown', this._initZoomChangeWithMouse.bind(this));
   PSVUtils.addEvent(this.zoom_range, 'touchstart', this._initZoomChangeByTouch.bind(this));
   PSVUtils.addEvent(document, 'mousemove', this._changeZoomWithMouse.bind(this));
   PSVUtils.addEvent(document, 'touchmove', this._changeZoomByTouch.bind(this));
   PSVUtils.addEvent(document, 'mouseup', this._stopZoomChange.bind(this));
   PSVUtils.addEvent(document, 'touchend', this._stopZoomChange.bind(this));
-  this.zoom_range.appendChild(this.zoom_value);
-
-  // Zoom "+"
-  var zoom_plus = document.createElement('div');
-  zoom_plus.style.cssFloat = 'left';
-  zoom_plus.style.padding = '10px';
-  zoom_plus.style.height = this.style.buttonsHeight + 'px';
-  zoom_plus.style.backgroundColor = this.style.buttonsBackgroundColor;
-  zoom_plus.style.lineHeight = this.style.buttonsHeight + 'px';
-  zoom_plus.style.color = this.style.buttonsColor;
-  zoom_plus.style.cursor = 'pointer';
-  zoom_plus.textContent = '+';
-
+  PSVUtils.addEvent(zoom_minus, 'click', this.psv.zoomOut.bind(this.psv));
   PSVUtils.addEvent(zoom_plus, 'click', this.psv.zoomIn.bind(this.psv));
-  this.button.appendChild(zoom_plus);
+  this.psv.on('zoom-updated', this._moveZoomValue.bind(this));
+
+  var self = this;
+  setTimeout(function() {
+    self._moveZoomValue(self.psv.prop.zoom_lvl);
+  }, 0);
 };
 
 /**
@@ -1117,7 +959,7 @@ PSVNavBarZoomButton.prototype.create = function() {
  * @return (void)
  */
 PSVNavBarZoomButton.prototype._moveZoomValue = function(level) {
-  this.zoom_value.style.left = (level / 100 * this.style.zoomRangeWidth - this.style.zoomRangeDisk / 2) + 'px';
+  this.zoom_value.style.left = (level / 100 * this.zoom_range.offsetWidth - this.zoom_value.offsetWidth / 2) + 'px';
 };
 
 /**
@@ -1190,7 +1032,7 @@ PSVNavBarZoomButton.prototype._changeZoomByTouch = function(evt) {
 PSVNavBarZoomButton.prototype._changeZoom = function(x) {
   if (this.mousedown) {
     var user_input = x - this.zoom_range.getBoundingClientRect().left;
-    var zoom_level = user_input / this.style.zoomRangeWidth * 100;
+    var zoom_level = user_input / this.zoom_range.offsetWidth * 100;
     this.psv.zoom(zoom_level);
   }
 };
