@@ -80,7 +80,7 @@ var PhotoSphereViewer = function(options) {
   this.rotate(this.config.default_long, this.config.default_lat);
 
   if (this.config.size !== null)
-    this.setViewerSize(this.config.size);
+    this._setViewerSize(this.config.size);
 
   if (this.config.autoload)
     this.load();
@@ -173,17 +173,17 @@ PhotoSphereViewer.prototype.load = function() {
 
   // XMP data?
   if (this.config.usexmpdata)
-    this.loadXMP();
+    this._loadXMP();
 
   else
-    this.createBuffer(false);
+    this._createBuffer(false);
 };
 
 /**
  * Loads the XMP data with AJAX
  * @return (void)
  */
-PhotoSphereViewer.prototype.loadXMP = function() {
+PhotoSphereViewer.prototype._loadXMP = function() {
   var xhr = null;
   var self = this;
 
@@ -213,7 +213,7 @@ PhotoSphereViewer.prototype.loadXMP = function() {
 
       // No data retrieved
       if (a == -1 || b == -1 || data.indexOf('GPano:') == -1) {
-        self.createBuffer(false);
+        self._createBuffer(false);
         return;
       }
 
@@ -227,7 +227,7 @@ PhotoSphereViewer.prototype.loadXMP = function() {
           cropped_y: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaTopPixels')),
         };
 
-      self.createBuffer(pano_data);
+      self._createBuffer(pano_data);
     }
   };
 
@@ -240,7 +240,7 @@ PhotoSphereViewer.prototype.loadXMP = function() {
  * @param pano_data (mixed) An object containing the panorama XMP data (false if it there is not)
  * @return (void)
  */
-PhotoSphereViewer.prototype.createBuffer = function(pano_data) {
+PhotoSphereViewer.prototype._createBuffer = function(pano_data) {
   var img = new Image();
   var self = this;
 
@@ -286,7 +286,7 @@ PhotoSphereViewer.prototype.createBuffer = function(pano_data) {
     var ctx = buffer.getContext('2d');
     ctx.drawImage(img, pano_data.cropped_x, pano_data.cropped_y, pano_data.cropped_width, pano_data.cropped_height);
 
-    self.loadTexture(buffer.toDataURL('image/jpeg'));
+    self._loadTexture(buffer.toDataURL('image/jpeg'));
   };
 
   // CORS when the panorama is not given as a base64 string
@@ -301,7 +301,7 @@ PhotoSphereViewer.prototype.createBuffer = function(pano_data) {
  * @param path (URL) Path to the panorama
  * @return (void)
  */
-PhotoSphereViewer.prototype.loadTexture = function(path) {
+PhotoSphereViewer.prototype._loadTexture = function(path) {
   var texture = new THREE.Texture();
   var loader = new THREE.ImageLoader();
   var self = this;
@@ -310,7 +310,7 @@ PhotoSphereViewer.prototype.loadTexture = function(path) {
     texture.needsUpdate = true;
     texture.image = img;
 
-    self.createScene(texture);
+    self._createScene(texture);
   };
 
   loader.load(path, onLoad);
@@ -321,7 +321,7 @@ PhotoSphereViewer.prototype.loadTexture = function(path) {
  * @param texture (THREE.Texture) The sphere texture
  * @return (void)
  */
-PhotoSphereViewer.prototype.createScene = function(texture) {
+PhotoSphereViewer.prototype._createScene = function(texture) {
   this._onResize();
 
   // The chosen renderer depends on whether WebGL is supported or not
@@ -345,11 +345,14 @@ PhotoSphereViewer.prototype.createScene = function(texture) {
   canvas.style.display = 'block';
 
   this.canvas_container.appendChild(canvas);
-  this.render();
-
+  
   // Animation?
   if (this.config.time_anim !== false)
     this.prop.anim_timeout = setTimeout(this.startAutorotate.bind(this), this.config.time_anim);
+  
+  this.trigger('ready');
+  
+  this.render();
 };
 
 /**
@@ -386,7 +389,7 @@ PhotoSphereViewer.prototype._autorotate = function() {
  */
 PhotoSphereViewer.prototype.startAutorotate = function() {
   this._autorotate();
-  this.triggerAction('autorotate', true);
+  this.trigger('autorotate', true);
 };
 
 /**
@@ -400,7 +403,7 @@ PhotoSphereViewer.prototype.stopAutorotate = function() {
   clearTimeout(this.prop.autorotate_timeout);
   this.prop.autorotate_timeout = null;
 
-  this.triggerAction('autorotate', false);
+  this.trigger('autorotate', false);
 };
 
 /**
@@ -423,23 +426,19 @@ PhotoSphereViewer.prototype.toggleAutorotate = function() {
  */
 PhotoSphereViewer.prototype._onResize = function() {
   if (this.container.clientWidth != this.prop.size.width || this.container.clientHeight != this.prop.size.height) {
-    this.resize({
-      width: this.container.clientWidth,
-      height: this.container.clientHeight
-    });
+    this.resize(this.container.clientWidth, this.container.clientHeight);
   }
 };
 
 /**
  * Resizes the canvas
- * @param size (Object) New dimensions
- * - width (integer) (optional) (previous value) The new canvas width
- * - height (integer) (optional) (previous valus) The new canvas height
+ * @param width (integer) The new canvas width
+ * @param height (integer) The new canvas height
  * @return (void)
  */
-PhotoSphereViewer.prototype.resize = function(size) {
-  this.prop.size.width = (size.width !== undefined) ? parseInt(size.width) : this.prop.size.width;
-  this.prop.size.height = (size.height !== undefined) ? parseInt(size.height) : this.prop.size.height;
+PhotoSphereViewer.prototype.resize = function (width, height) {
+  this.prop.size.width = parseInt(width);
+  this.prop.size.height = parseInt(height);
   this.prop.size.ratio = this.prop.size.width / this.prop.size.height;
 
   if (!!this.camera) {
@@ -451,6 +450,8 @@ PhotoSphereViewer.prototype.resize = function(size) {
     this.renderer.setSize(this.prop.size.width, this.prop.size.height);
     this.render();
   }
+
+  this.trigger('size-updated', this.prop.size.width, this.prop.size.height);
 };
 
 /**
@@ -548,8 +549,10 @@ PhotoSphereViewer.prototype.rotate = function(t, p) {
   this.prop.theta = t;
   this.prop.phi = PSVUtils.stayBetween(p, -Math.PI / 2.0, Math.PI / 2.0);
 
-  if (this.camera)
+  if (this.renderer)
     this.render();
+
+  this.trigger('position-updated', this.prop.theta, this.prop.phi);
 };
 
 /**
@@ -581,7 +584,7 @@ PhotoSphereViewer.prototype.zoom = function(level) {
   this.camera.updateProjectionMatrix();
   this.render();
 
-  this.triggerAction('zoom-updated', this.prop.zoom_lvl);
+  this.trigger('zoom-updated', this.prop.zoom_lvl);
 };
 
 /**
@@ -607,7 +610,7 @@ PhotoSphereViewer.prototype.zoomOut = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype._fullscreenToggled = function() {
-  this.triggerAction('fullscreen-mode', PSVUtils.isFullscreenEnabled());
+  this.trigger('fullscreen-updated', PSVUtils.isFullscreenEnabled());
 };
 
 /**
@@ -710,7 +713,7 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
  * @param size (Object) An object containing the wanted width and height
  * @return (void)
  */
-PhotoSphereViewer.prototype.setViewerSize = function(size) {
+PhotoSphereViewer.prototype._setViewerSize = function(size) {
   // Checks all the values
   for (var dim in size) {
     // Only width and height matter
@@ -737,7 +740,7 @@ PhotoSphereViewer.prototype.setViewerSize = function(size) {
  * @param f (Function) The handler function
  * @return (void)
  */
-PhotoSphereViewer.prototype.addAction = function(name, f) {
+PhotoSphereViewer.prototype.on = function(name, f) {
   // New action?
   if (!(name in this.actions))
     this.actions[name] = [];
@@ -751,7 +754,7 @@ PhotoSphereViewer.prototype.addAction = function(name, f) {
  * @param arg (mixed) An argument to send to the handler functions
  * @return (void)
  */
-PhotoSphereViewer.prototype.triggerAction = function(name, arg) {
+PhotoSphereViewer.prototype.trigger = function(name, arg) {
   // Does the action have any function?
   if ((name in this.actions) && this.actions[name].length > 0) {
     for (var i = 0, l = this.actions[name].length; i < l; ++i)
@@ -930,7 +933,7 @@ PSVNavBarAutorotateButton.prototype.create = function() {
   this.button.appendChild(autorotate_equator);
 
   // (In)active
-  this.psv.addAction('autorotate', this.toggleActive.bind(this));
+  this.psv.on('autorotate', this.toggleActive.bind(this));
 };
 /**
  * Navigation bar fullscreen button class
@@ -1017,7 +1020,7 @@ PSVNavBarFullscreenButton.prototype.create = function() {
   this.button.appendChild(fullscreen_clearer);
 
   // (In)active
-  this.psv.addAction('fullscreen-mode', this.toggleActive.bind(this));
+  this.psv.on('fullscreen-updated', this.toggleActive.bind(this));
 };
 /**
  * Navigation bar zoom button class
@@ -1084,7 +1087,7 @@ PSVNavBarZoomButton.prototype.create = function() {
   this.zoom_value.style.backgroundColor = this.style.buttonsColor;
   this._moveZoomValue(this.psv.prop.zoom_lvl);
 
-  this.psv.addAction('zoom-updated', this._moveZoomValue.bind(this));
+  this.psv.on('zoom-updated', this._moveZoomValue.bind(this));
   PSVUtils.addEvent(this.zoom_range, 'mousedown', this._initZoomChangeWithMouse.bind(this));
   PSVUtils.addEvent(this.zoom_range, 'touchstart', this._initZoomChangeByTouch.bind(this));
   PSVUtils.addEvent(document, 'mousemove', this._changeZoomWithMouse.bind(this));

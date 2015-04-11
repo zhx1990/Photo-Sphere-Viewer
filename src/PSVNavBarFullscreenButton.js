@@ -83,5 +83,5 @@ PSVNavBarFullscreenButton.prototype.create = function() {
   this.button.appendChild(fullscreen_clearer);
 
   // (In)active
-  this.psv.addAction('fullscreen-mode', this.toggleActive.bind(this));
+  this.psv.on('fullscreen-updated', this.toggleActive.bind(this));
 };

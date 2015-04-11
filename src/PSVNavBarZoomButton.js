@@ -63,7 +63,7 @@ PSVNavBarZoomButton.prototype.create = function() {
   this.zoom_value.style.backgroundColor = this.style.buttonsColor;
   this._moveZoomValue(this.psv.prop.zoom_lvl);
 
-  this.psv.addAction('zoom-updated', this._moveZoomValue.bind(this));
+  this.psv.on('zoom-updated', this._moveZoomValue.bind(this));
   PSVUtils.addEvent(this.zoom_range, 'mousedown', this._initZoomChangeWithMouse.bind(this));
   PSVUtils.addEvent(this.zoom_range, 'touchstart', this._initZoomChangeByTouch.bind(this));
   PSVUtils.addEvent(document, 'mousemove', this._changeZoomWithMouse.bind(this));
