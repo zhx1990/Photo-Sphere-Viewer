@@ -84,8 +84,9 @@ PSVNavBarZoomButton.prototype._initZoomChangeWithMouse = function(evt) {
  */
 PSVNavBarZoomButton.prototype._initZoomChangeByTouch = function(evt) {
   var touch = evt.changedTouches[0];
-  if (touch.target == this.zoom_range || touch.target == this.zoom_value)
+  if (touch.target == this.zoom_range || touch.target == this.zoom_value) {
     this._initZoomChange(parseInt(touch.clientX));
+  }
 };
 
 /**

@@ -9,10 +9,12 @@ var PSVUtils = {};
  * @param clazz (string)
  */
 PSVUtils.addClass = function(elt, clazz) {
-  if (elt.className.length)
+  if (elt.className.length) {
     elt.className+= ' ' + clazz;
-  else
+  }
+  else {
     elt.className = clazz
+  }
 };
 
 /**
@@ -21,8 +23,9 @@ PSVUtils.addClass = function(elt, clazz) {
  * @param clazz (string)
  */
 PSVUtils.removeClass = function(elt, clazz) {
-  if (elt.className.length)
+  if (elt.className.length) {
     elt.className = elt.className.replace(new RegExp('\\b' + clazz + '\\b'), '').trim();
+  }
 };
 
 /**
@@ -61,10 +64,12 @@ PSVUtils.getMaxTextureWidth = function() {
  * @return (void)
  */
 PSVUtils.addEvent = function(elt, evt, f) {
-  if (!!elt.addEventListener)
+  if (!!elt.addEventListener) {
     elt.addEventListener(evt, f, false);
-  else
+  }
+  else {
     elt.attachEvent('on' + evt, f);
+  }
 };
 
 /**
@@ -94,7 +99,23 @@ PSVUtils.getAttribute = function(data, attr) {
  * @return (boolean) true if fullscreen is enabled, false otherwise
  */
 PSVUtils.isFullscreenEnabled = function() {
-  return (!!document.fullscreenElement || !!document.mozFullScreenElement || !!document.webkitFullscreenElement || !!document.msFullscreenElement);
+  return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+};
+
+/**
+ * Enters fullscreen mode
+ * @param elt (HTMLElement)
+ */
+PSVUtils.requestFullscreen = function(elt) {
+  (elt.requestFullscreen || elt.mozRequestFullScreen || elt.webkitRequestFullscreen || elt.msRequestFullscreen).call(elt);
+};
+
+/**
+ * Exits fullscreen mode
+ * @param elt (HTMLElement)
+ */
+PSVUtils.exitFullscreen = function(elt) {
+  (document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen).call(document);
 };
 
 /**

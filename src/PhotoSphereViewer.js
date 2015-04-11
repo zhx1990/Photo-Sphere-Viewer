@@ -26,11 +26,17 @@ var PhotoSphereViewer = function(options) {
 
   this.config = PSVUtils.deepmerge(PhotoSphereViewer.DEFAULTS, options);
 
+  // normalize config
   this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
   this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
-  if (this.config.default_fov === null) this.config.default_fov = this.config.max_fov;
-  else this.config.default_fov = PSVUtils.stayBetween(this.config.default_fov, this.config.min_fov, this.config.max_fov);
+  if (this.config.default_fov === null) {
+    this.config.default_fov = this.config.max_fov;
+  }
+  else {
+    this.config.default_fov = PSVUtils.stayBetween(this.config.default_fov, this.config.min_fov, this.config.max_fov);
+  }
 
+  // references to components
   this.container = this.config.container;
   this.loader = null;
   this.navbar = null;
@@ -38,10 +44,11 @@ var PhotoSphereViewer = function(options) {
   this.renderer = null;
   this.scene = null;
   this.camera = null;
+  this.actions = {};
 
+  // local properties
   this.prop = {
     fps: 60,
-    size: null,
     phi: 0,
     theta: 0,
     theta_offset: 0,
@@ -58,22 +65,27 @@ var PhotoSphereViewer = function(options) {
     }
   };
 
+  // compute zoom level
   this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
   this.prop.zoom_lvl-= 2* (this.prop.zoom_lvl - 50);
 
-  this.actions = {};
-
+  // init
   this.setAnimSpeed(this.config.anim_speed);
 
   this.rotate(this.config.default_long, this.config.default_lat);
 
-  if (this.config.size !== null)
+  if (this.config.size !== null) {
     this._setViewerSize(this.config.size);
+  }
 
-  if (this.config.autoload)
+  if (this.config.autoload) {
     this.load();
+  }
 };
 
+/**
+ * PhotoSphereViewer defaults
+ */
 PhotoSphereViewer.DEFAULTS = {
   panorama: null,
   container: null,
@@ -125,7 +137,7 @@ PhotoSphereViewer.prototype.load = function() {
   this.canvas_container.className = 'psv-canvas';
   this.container.appendChild(this.canvas_container);
 
-  // Navigation bar?
+  // Navigation bar
   if (this.config.navbar) {
     this.navbar = new PSVNavBar(this);
     this.container.appendChild(this.navbar.getBar());
@@ -146,12 +158,13 @@ PhotoSphereViewer.prototype.load = function() {
   PSVUtils.addEvent(document, 'webkitfullscreenchange', this._fullscreenToggled.bind(this));
   PSVUtils.addEvent(document, 'MSFullscreenChange', this._fullscreenToggled.bind(this));
 
-  // XMP data?
-  if (this.config.usexmpdata)
+  // load image
+  if (this.config.usexmpdata) {
     this._loadXMP();
-
-  else
+  }
+  else {
     this._createBuffer(false);
+  }
 };
 
 /**
@@ -162,9 +175,9 @@ PhotoSphereViewer.prototype._loadXMP = function() {
   var xhr = null;
   var self = this;
 
-  if (window.XMLHttpRequest)
+  if (window.XMLHttpRequest) {
     xhr = new XMLHttpRequest();
-
+  }
   else if (window.ActiveXObject) {
     try {
       xhr = new ActiveXObject('Msxml2.XMLHTTP');
@@ -173,7 +186,6 @@ PhotoSphereViewer.prototype._loadXMP = function() {
       xhr = new ActiveXObject('Microsoft.XMLHTTP');
     }
   }
-
   else {
     this.container.textContent = 'XHR is not supported, update your browser!';
     return;
@@ -181,7 +193,6 @@ PhotoSphereViewer.prototype._loadXMP = function() {
 
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4 && xhr.status == 200) {
-      // Metadata
       var binary = xhr.responseText;
       var a = binary.indexOf('<x:xmpmeta'), b = binary.indexOf('</x:xmpmeta>');
       var data = binary.substring(a, b);
@@ -192,15 +203,14 @@ PhotoSphereViewer.prototype._loadXMP = function() {
         return;
       }
 
-      // Useful values
       var pano_data = {
-          full_width: parseInt(PSVUtils.getAttribute(data, 'FullPanoWidthPixels')),
-          full_height: parseInt(PSVUtils.getAttribute(data, 'FullPanoHeightPixels')),
-          cropped_width: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageWidthPixels')),
-          cropped_height: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageHeightPixels')),
-          cropped_x: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaLeftPixels')),
-          cropped_y: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaTopPixels')),
-        };
+        full_width: parseInt(PSVUtils.getAttribute(data, 'FullPanoWidthPixels')),
+        full_height: parseInt(PSVUtils.getAttribute(data, 'FullPanoHeightPixels')),
+        cropped_width: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageWidthPixels')),
+        cropped_height: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageHeightPixels')),
+        cropped_x: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaLeftPixels')),
+        cropped_y: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaTopPixels')),
+      };
 
       self._createBuffer(pano_data);
     }
@@ -220,7 +230,7 @@ PhotoSphereViewer.prototype._createBuffer = function(pano_data) {
   var self = this;
 
   img.onload = function() {
-    // No XMP data?
+    // Default XMP data
     if (!pano_data) {
       pano_data = {
         full_width: img.width,
@@ -238,7 +248,7 @@ PhotoSphereViewer.prototype._createBuffer = function(pano_data) {
       max_width = PSVUtils.getMaxTextureWidth();
     }
 
-    // Buffer width (not too big)
+    // Buffer width
     var new_width = Math.min(pano_data.full_width, max_width);
     var r = new_width / pano_data.full_width;
 
@@ -247,13 +257,13 @@ PhotoSphereViewer.prototype._createBuffer = function(pano_data) {
     pano_data.cropped_x *= r;
     img.width = pano_data.cropped_width;
 
-    // Buffer height (proportional to the width)
+    // Buffer height
     pano_data.full_height *= r;
     pano_data.cropped_height *= r;
     pano_data.cropped_y *= r;
     img.height = pano_data.cropped_height;
 
-    // Buffer creation
+    // Create buffer
     var buffer = document.createElement('canvas');
     buffer.width = pano_data.full_width;
     buffer.height = pano_data.full_height;
@@ -265,30 +275,29 @@ PhotoSphereViewer.prototype._createBuffer = function(pano_data) {
   };
 
   // CORS when the panorama is not given as a base64 string
-  if (!this.config.panorama.match(/^data:image\/[a-z]+;base64/))
+  if (!this.config.panorama.match(/^data:image\/[a-z]+;base64/)) {
     img.setAttribute('crossOrigin', 'anonymous');
+  }
 
   img.src = this.config.panorama;
 };
 
 /**
  * Loads the sphere texture
- * @param path (URL) Path to the panorama
+ * @param data (string) Image data ofthe panorama
  * @return (void)
  */
-PhotoSphereViewer.prototype._loadTexture = function(path) {
+PhotoSphereViewer.prototype._loadTexture = function(data) {
   var texture = new THREE.Texture();
   var loader = new THREE.ImageLoader();
   var self = this;
 
-  var onLoad = function(img) {
+  loader.load(data, function(img) {
     texture.needsUpdate = true;
     texture.image = img;
 
     self._createScene(texture);
-  };
-
-  loader.load(path, onLoad);
+  });
 };
 
 /**
@@ -299,17 +308,16 @@ PhotoSphereViewer.prototype._loadTexture = function(path) {
 PhotoSphereViewer.prototype._createScene = function(texture) {
   this._onResize();
 
-  // The chosen renderer depends on whether WebGL is supported or not
-  this.renderer = (PSVUtils.isWebGLSupported()) ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
+  // Renderer depends on whether WebGL is supported or not
+  this.renderer = PSVUtils.isWebGLSupported() ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
   this.renderer.setSize(this.prop.size.width, this.prop.size.height);
-
-  this.scene = new THREE.Scene();
 
   this.camera = new THREE.PerspectiveCamera(this.config.default_fov, this.prop.size.ratio, 1, 300);
   this.camera.position.set(0, 0, 0);
+
+  this.scene = new THREE.Scene();
   this.scene.add(this.camera);
 
-  // Sphere
   var geometry = new THREE.SphereGeometry(200, 32, 32);
   var material = new THREE.MeshBasicMaterial({map: texture, overdraw: true});
   var mesh = new THREE.Mesh(geometry, material);
@@ -322,12 +330,12 @@ PhotoSphereViewer.prototype._createScene = function(texture) {
   this.container.removeChild(this.loader);
   PSVUtils.removeClass(this.container, 'loading');
 
-  // Animation?
-  if (this.config.time_anim !== false)
+  // Queue animation
+  if (this.config.time_anim !== false) {
     this.prop.anim_timeout = setTimeout(this.startAutorotate.bind(this), this.config.time_anim);
+  }
 
   this.trigger('ready');
-
   this.render();
 };
 
@@ -389,11 +397,12 @@ PhotoSphereViewer.prototype.stopAutorotate = function() {
 PhotoSphereViewer.prototype.toggleAutorotate = function() {
   clearTimeout(this.prop.anim_timeout);
 
-  if (!!this.prop.autorotate_timeout)
+  if (this.prop.autorotate_timeout) {
     this.stopAutorotate();
-
-  else
+  }
+  else {
     this.startAutorotate();
+  }
 };
 
 /**
@@ -417,12 +426,12 @@ PhotoSphereViewer.prototype.resize = function (width, height) {
   this.prop.size.height = parseInt(height);
   this.prop.size.ratio = this.prop.size.width / this.prop.size.height;
 
-  if (!!this.camera) {
+  if (this.camera) {
     this.camera.aspect = this.prop.size.ratio;
     this.camera.updateProjectionMatrix();
   }
 
-  if (!!this.renderer) {
+  if (this.renderer) {
     this.renderer.setSize(this.prop.size.width, this.prop.size.height);
     this.render();
   }
@@ -446,8 +455,9 @@ PhotoSphereViewer.prototype._onMouseDown = function(evt) {
  */
 PhotoSphereViewer.prototype._onTouchStart = function(evt) {
   var touch = evt.changedTouches[0];
-  if (touch.target.parentNode == this.canvas_container)
+  if (touch.target.parentNode == this.canvas_container) {
     this._startMove(parseInt(touch.clientX), parseInt(touch.clientY));
+  }
 };
 
 /**
@@ -525,8 +535,9 @@ PhotoSphereViewer.prototype.rotate = function(t, p) {
   this.prop.theta = t;
   this.prop.phi = PSVUtils.stayBetween(p, -Math.PI / 2.0, Math.PI / 2.0);
 
-  if (this.renderer)
+  if (this.renderer) {
     this.render();
+  }
 
   this.trigger('position-updated', this.prop.theta, this.prop.phi);
 };
@@ -568,8 +579,9 @@ PhotoSphereViewer.prototype.zoom = function(level) {
  * @return (void)
  */
 PhotoSphereViewer.prototype.zoomIn = function() {
-  if (this.prop.zoom_lvl < 100)
+  if (this.prop.zoom_lvl < 100) {
     this.zoom(this.prop.zoom_lvl + 1);
+  }
 };
 
 /**
@@ -577,8 +589,9 @@ PhotoSphereViewer.prototype.zoomIn = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype.zoomOut = function() {
-  if (this.prop.zoom_lvl > 0)
+  if (this.prop.zoom_lvl > 0) {
     this.zoom(this.prop.zoom_lvl - 1);
+  }
 };
 
 /**
@@ -594,34 +607,11 @@ PhotoSphereViewer.prototype._fullscreenToggled = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype.toggleFullscreen = function() {
-  // Switches to fullscreen mode
   if (!PSVUtils.isFullscreenEnabled()) {
-    if (!!this.container.requestFullscreen)
-      this.container.requestFullscreen();
-
-    else if (!!this.container.mozRequestFullScreen)
-      this.container.mozRequestFullScreen();
-
-    else if (!!this.container.webkitRequestFullscreen)
-      this.container.webkitRequestFullscreen();
-
-    else if (!!this.container.msRequestFullscreen)
-      this.container.msRequestFullscreen();
+    PSVUtils.requestFullscreen(this.container);
   }
-
-  // Switches to windowed mode
   else {
-    if (!!document.exitFullscreen)
-      document.exitFullscreen();
-
-    else if (!!document.mozCancelFullScreen)
-      document.mozCancelFullScreen();
-
-    else if (!!document.webkitExitFullscreen)
-      document.webkitExitFullscreen();
-
-    else if (!!document.msExitFullscreen)
-      document.msExitFullscreen();
+    PSVUtils.exitFullscreen();
   }
 };
 
@@ -638,8 +628,9 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
   var speed_unit = speed.replace(/^-?[0-9]+(?:\.[0-9]*)?(.*)$/, '$1').trim();
 
   // "per minute" -> "per second"
-  if (speed_unit.match(/(pm|per minute)$/))
+  if (speed_unit.match(/(pm|per minute)$/)) {
     speed_value /= 60;
+  }
 
   var rad_per_second = 0;
 
@@ -690,22 +681,13 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._setViewerSize = function(size) {
-  // Checks all the values
   for (var dim in size) {
-    // Only width and height matter
     if (dim == 'width' || dim == 'height') {
-      // Size extraction
-      var size_str = size[dim].toString().trim();
+      if (/^[0-9.]+$/.test(size[dim])) {
+        size[dim]+= 'px';
+      }
 
-      var size_value = parseFloat(size_str.replace(/^([0-9]+(?:\.[0-9]*)?).*$/, '$1'));
-      var size_unit = size_str.replace(/^[0-9]+(?:\.[0-9]*)?(.*)$/, '$1').trim();
-
-      // Only percentages and pixels are allowed
-      if (size_unit != '%')
-        size_unit = 'px';
-
-      // We're good
-      this.container.style[dim] = size_value + size_unit;
+      this.container.style[dim] = size[dim];
     }
   }
 };
@@ -717,9 +699,9 @@ PhotoSphereViewer.prototype._setViewerSize = function(size) {
  * @return (void)
  */
 PhotoSphereViewer.prototype.on = function(name, f) {
-  // New action?
-  if (!(name in this.actions))
+  if (!(name in this.actions)) {
     this.actions[name] = [];
+  }
 
   this.actions[name].push(f);
 };
@@ -731,9 +713,9 @@ PhotoSphereViewer.prototype.on = function(name, f) {
  * @return (void)
  */
 PhotoSphereViewer.prototype.trigger = function(name, arg) {
-  // Does the action have any function?
   if ((name in this.actions) && this.actions[name].length > 0) {
-    for (var i = 0, l = this.actions[name].length; i < l; ++i)
+    for (var i = 0, l = this.actions[name].length; i < l; ++i) {
       this.actions[name][i](arg);
+    }
   }
 };

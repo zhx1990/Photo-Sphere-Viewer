@@ -54,8 +54,9 @@ PSVNavBar.prototype.getBar = function() {
  * @param (string) html
  */
 PSVNavBar.prototype.setCaption = function(html) {
-  if (!html)
+  if (!html) {
     this.caption.style.display = 'none';
+  }
   else {
     this.caption.style.display = 'block';
     this.caption.innerHTML = html;
