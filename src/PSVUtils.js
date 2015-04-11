@@ -13,7 +13,7 @@ PSVUtils.addClass = function(elt, clazz) {
     elt.className+= ' ' + clazz;
   }
   else {
-    elt.className = clazz
+    elt.className = clazz;
   }
 };
 

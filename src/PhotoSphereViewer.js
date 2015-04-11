@@ -103,6 +103,7 @@ PhotoSphereViewer.DEFAULTS = {
   anim_speed: '2rpm',
   navbar: false,
   mousewheel: true,
+  mousemove: true,
   loading_img: null,
   loading_txt: 'Loading...',
   size: null
@@ -133,12 +134,14 @@ PhotoSphereViewer.prototype.load = function() {
 
   // Adding events
   PSVUtils.addEvent(window, 'resize', this._onResize.bind(this));
-  PSVUtils.addEvent(this.canvas_container, 'mousedown', this._onMouseDown.bind(this));
-  PSVUtils.addEvent(this.canvas_container, 'touchstart', this._onTouchStart.bind(this));
-  PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
-  PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
-  PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
-  PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
+  if (this.config.mousemove) {
+    PSVUtils.addEvent(this.canvas_container, 'mousedown', this._onMouseDown.bind(this));
+    PSVUtils.addEvent(this.canvas_container, 'touchstart', this._onTouchStart.bind(this));
+    PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
+    PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
+    PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
+    PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
+  }
   if (this.config.mousewheel) {
     PSVUtils.addEvent(this.canvas_container, 'mousewheel', this._onMouseWheel.bind(this));
     PSVUtils.addEvent(this.canvas_container, 'DOMMouseScroll', this._onMouseWheel.bind(this));

@@ -28,9 +28,15 @@ You can find a basic example of use in the file `example.html`. The `example1.ht
   * `lat_offset` (optional, default to `PI/360`): the latitude to travel per pixel moved by mouse/touch.
   * `time_anim` (optional, default to `2000`): the panorama will be automatically animated after `time_anim` milliseconds (indicate `false` to deactivate it).
   * `anim_speed` (optional, default to `2rpm`): animation speed in radians/degrees/revolutions per second/minute.
-  * `navbar` (optional, default to `false`): set to `true`, a navigation bar will be displayed.
+  * `navbar` (optional, default to `false`): set to `true`, a navigation bar will be displayed. You can choose which buttons to display by providing an object.
+    * `autorotate`
+    * `zoom`
+    * `fullscreen`
   * `loading_img` (optional, default to `null`): the path to the image shown during the loading.
+  * `loading_txt` (option, default to `Loading...`): the text shown during the loading, only used if no image provided.
   * `size` (optional, default to `null`): the final size of the panorama container (e.g. `{width: 500, height: 300}`).
+  * `mousewheel` (optional, default to `true`): listen to mouse wheel to zoom the view.
+  * `mousemove` (optional, default to `true`): listen to mouse click+move to rotate the view.
 
 If your panorama is taken with Google's Photo Sphere, `usexmpdata` must be set to `true`, unless it is not cropped.
 

@@ -120,6 +120,7 @@ PhotoSphereViewer.DEFAULTS = {
   anim_speed: '2rpm',
   navbar: false,
   mousewheel: true,
+  mousemove: true,
   loading_img: null,
   loading_txt: 'Loading...',
   size: null
@@ -150,12 +151,14 @@ PhotoSphereViewer.prototype.load = function() {
 
   // Adding events
   PSVUtils.addEvent(window, 'resize', this._onResize.bind(this));
-  PSVUtils.addEvent(this.canvas_container, 'mousedown', this._onMouseDown.bind(this));
-  PSVUtils.addEvent(this.canvas_container, 'touchstart', this._onTouchStart.bind(this));
-  PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
-  PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
-  PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
-  PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
+  if (this.config.mousemove) {
+    PSVUtils.addEvent(this.canvas_container, 'mousedown', this._onMouseDown.bind(this));
+    PSVUtils.addEvent(this.canvas_container, 'touchstart', this._onTouchStart.bind(this));
+    PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
+    PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
+    PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
+    PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
+  }
   if (this.config.mousewheel) {
     PSVUtils.addEvent(this.canvas_container, 'mousewheel', this._onMouseWheel.bind(this));
     PSVUtils.addEvent(this.canvas_container, 'DOMMouseScroll', this._onMouseWheel.bind(this));
@@ -824,11 +827,20 @@ PSVLoader.prototype.getLoader = function() {
  */
 var PSVNavBar = function(psv) {
   this.psv = psv;
+  this.config = this.psv.config.navbar;
   this.container = null;
   this.autorotateBtn = null;
   this.zoomBar = null;
   this.fullscreenBtn = null;
   this.caption = null;
+
+  if (typeof this.config != 'object') {
+    this.config = {
+      autorotate: true,
+      zoom: true,
+      fullscreen: true
+    };
+  }
 
   this.create();
 };
@@ -843,16 +855,22 @@ PSVNavBar.prototype.create = function() {
   this.container.className = 'psv-navbar';
 
   // Autorotate button
-  this.autorotateBtn = new PSVNavBarAutorotateButton(this.psv);
-  this.container.appendChild(this.autorotateBtn.getButton());
+  if (this.config.autorotate) {
+    this.autorotateBtn = new PSVNavBarAutorotateButton(this.psv);
+    this.container.appendChild(this.autorotateBtn.getButton());
+  }
 
   // Zoom buttons
-  this.zoomBar = new PSVNavBarZoomButton(this.psv);
-  this.container.appendChild(this.zoomBar.getButton());
+  if (this.config.zoom) {
+    this.zoomBar = new PSVNavBarZoomButton(this.psv);
+    this.container.appendChild(this.zoomBar.getButton());
+  }
 
   // Fullscreen button
-  this.fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
-  this.container.appendChild(this.fullscreenBtn.getButton());
+  if (this.config.fullscreen) {
+    this.fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
+    this.container.appendChild(this.fullscreenBtn.getButton());
+  }
 
   // Caption
   this.caption = document.createElement('div');
@@ -1142,7 +1160,7 @@ PSVUtils.addClass = function(elt, clazz) {
     elt.className+= ' ' + clazz;
   }
   else {
-    elt.className = clazz
+    elt.className = clazz;
   }
 };
 
