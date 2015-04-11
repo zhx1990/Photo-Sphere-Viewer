@@ -24,10 +24,12 @@
  * - usexmpdata (boolean) (optional) (true) true if Photo Sphere Viewer must read XMP data, false if it is not necessary
  * - min_fov (number) (optional) (30) The minimal field of view, in degrees, between 1 and 179
  * - max_fov (number) (optional) (90) The maximal field of view, in degrees, between 1 and 179
+ * - default_fov (number) (optional) (max_fov) The default field of view, in degrees, between min_fov and max_fov
+ * - default_long (number) (optional) (0) The default longitude, in radians, between 0 and 2xPI
+ * - default_lat (number) (optional) (0) The default latitude, in radians, between -PI/2 and PI/2
  * - long_offset (number) (optional) (PI/360) The longitude to travel per pixel moved by mouse/touch
  * - lat_offset (number) (optional) (PI/180) The latitude to travel per pixel moved by mouse/touch
  * - time_anim (integer) (optional) (2000) Delay before automatically animating the panorama in milliseconds, false to not animate
- * - theta_offset (integer) (optional) (1440) (deprecated) The PI fraction to add to theta during the animation
  * - anim_speed (string) (optional) (2rpm) Animation speed in radians/degrees/revolutions per second/minute
  * - navbar (boolean) (optional) (false) Display the navigation bar if set to true
  * - navbar_style (Object) (optional) ({}) Style of the navigation bar
@@ -43,7 +45,8 @@ var PhotoSphereViewer = function(options) {
 
   this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
   this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
-  this.config.theta_offset = Math.PI / this.config.theta_offset;
+  if (this.config.default_fov === null) this.config.default_fov = this.config.max_fov;
+  else this.config.default_fov = PSVUtils.stayBetween(this.config.default_fov, this.config.min_fov, this.config.max_fov);
 
   this.container = this.config.container;
   this.navbar = null;
@@ -54,9 +57,11 @@ var PhotoSphereViewer = function(options) {
   this.camera = null;
 
   this.prop = {
+    fps: 60,
     size: null,
     phi: 0,
     theta: 0,
+    theta_offset: 0,
     zoom_lvl: 0,
     mousedown: false,
     mouse_x: 0,
@@ -65,9 +70,14 @@ var PhotoSphereViewer = function(options) {
     anim_timeout: null,
   };
 
+  this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
+  this.prop.zoom_lvl-= 2* (this.prop.zoom_lvl - 50);
+
   this.actions = {};
 
   this.setAnimSpeed(this.config.anim_speed);
+
+  this.rotate(this.config.default_long, this.config.default_lat);
 
   if (this.config.size !== null)
     this.setViewerSize(this.config.size);
@@ -83,16 +93,17 @@ PhotoSphereViewer.DEFAULTS = {
   usexmpdata: true,
   min_fov: 30,
   max_fov: 90,
+  default_fov: null,
+  default_long: 0,
+  default_lat: 0,
   long_offset: Math.PI / 360.0,
   lat_offset: Math.PI / 180.0,
   time_anim: 2000,
-  theta_offset: 1440,
   anim_speed: '2rpm',
   navbar: false,
   navbar_style: {},
   loading_img: null,
-  size: null,
-  fps: 60
+  size: null
 };
 
 /**
@@ -319,7 +330,7 @@ PhotoSphereViewer.prototype.createScene = function(texture) {
 
   this.scene = new THREE.Scene();
 
-  this.camera = new THREE.PerspectiveCamera(this.config.max_fov, this.prop.size.ratio, 1, 300);
+  this.camera = new THREE.PerspectiveCamera(this.config.default_fov, this.prop.size.ratio, 1, 300);
   this.camera.position.set(0, 0, 0);
   this.scene.add(this.camera);
 
@@ -360,15 +371,13 @@ PhotoSphereViewer.prototype.render = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype._autorotate = function() {
-  // Returns to the equator (phi = 0)
-  this.prop.phi -= this.prop.phi / 200;
+  // Rotates the sphere && Returns to the equator (phi = 0)
+  this.rotate(
+    this.prop.theta + this.prop.theta_offset - Math.floor(this.prop.theta / (2.0 * Math.PI)) * 2.0 * Math.PI,
+    this.prop.phi - this.prop.phi / 200
+  );
 
-  // Rotates the sphere
-  this.prop.theta += this.config.theta_offset;
-  this.prop.theta -= Math.floor(this.prop.theta / (2.0 * Math.PI)) * 2.0 * Math.PI;
-
-  this.render();
-  this.prop.autorotate_timeout = setTimeout(this._autorotate.bind(this), 1000 / this.config.fps);
+  this.prop.autorotate_timeout = setTimeout(this._autorotate.bind(this), 1000 / this.prop.fps);
 };
 
 /**
@@ -539,7 +548,8 @@ PhotoSphereViewer.prototype.rotate = function(t, p) {
   this.prop.theta = t;
   this.prop.phi = PSVUtils.stayBetween(p, -Math.PI / 2.0, Math.PI / 2.0);
 
-  this.render();
+  if (this.camera)
+    this.render();
 };
 
 /**
@@ -692,7 +702,7 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
   }
 
   // Theta offset
-  this.config.theta_offset = rad_per_second / this.config.fps;
+  this.prop.theta_offset = rad_per_second / this.prop.fps;
 };
 
 /**
@@ -1068,11 +1078,11 @@ PSVNavBarZoomButton.prototype.create = function() {
   this.zoom_value = document.createElement('div');
   this.zoom_value.style.position = 'absolute';
   this.zoom_value.style.top = ((this.style.zoomRangeThickness - this.style.zoomRangeDisk) / 2) + 'px';
-  this.zoom_value.style.left = -(this.style.zoomRangeDisk / 2) + 'px';
   this.zoom_value.style.width = this.style.zoomRangeDisk + 'px';
   this.zoom_value.style.height = this.style.zoomRangeDisk + 'px';
   this.zoom_value.style.borderRadius = '50%';
   this.zoom_value.style.backgroundColor = this.style.buttonsColor;
+  this._moveZoomValue(this.psv.prop.zoom_lvl);
 
   this.psv.addAction('zoom-updated', this._moveZoomValue.bind(this));
   PSVUtils.addEvent(this.zoom_range, 'mousedown', this._initZoomChangeWithMouse.bind(this));

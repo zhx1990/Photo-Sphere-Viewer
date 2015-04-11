@@ -15,10 +15,12 @@ Photo Sphere Viewer uses the [Three.js](http://threejs.org) library, so nothing 
     * `usexmpdata` (optional, default to `true`): `true` if Photo Sphere Viewer must read XMP data, `false` if it is not necessary.
     * `min_fov` (optional, default to `30`): the minimal field of view, in degrees, between 1 and 179.
     * `max_fov` (optional, default to `90`): the maximal field of view, in degrees, between 1 and 179.
+    * `default_fov` (optional, default to `max_fov`): the default field of view, in degrees, between `min_fov` and `max_fov`
+    * `default_long` (optional, default to `0`): the default longitude, in radians, between `0 and `2xPI`
+    * `default_lat` (optional, default to `0`): the default latitude, in radians, between `-PI/2` and `PI/2`
     * `long_offset` (optional, default to `PI/360`): the longitude to travel per pixel moved by mouse/touch.
     * `lat_offset` (optional, default to `PI/180`): the latitude to travel per pixel moved by mouse/touch.
     * `time_anim` (optional, default to `2000`): the panorama will be automatically animated after `time_anim` milliseconds (indicate `false` to deactivate it).
-    * `theta_offset` (deprecated, optional, default to `1440`): the horizontal speed during the automatic animation (we add `PI / theta_offset` to the angle).
     * `anim_speed` (optional, default to `2rpm`): animation speed in radians/degrees/revolutions per second/minute.
     * `navbar` (optional, default to `false`): set to `true`, a navigation bar will be displayed.
     * `navbar_style` (optional, default to `{}`): a custom style for the navigation bar. See the list below to know what properties are available.

@@ -30,8 +30,11 @@
 			var PSV = new PhotoSphereViewer({
 					panorama: './sun.jpg',
 					container: div,
-					time_anim: 3000,
+					time_anim: 2000,
 					navbar: true,
+					default_fov: 50,
+					default_long: Math.PI,
+					default_lat: 15/360*Math.PI,
 					navbar_style: {
 							backgroundColor: 'rgba(58, 67, 77, 0.7)'
 						}

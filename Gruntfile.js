@@ -63,6 +63,13 @@ module.exports = function(grunt) {
       dist: {
         src: files_in_order
       }
+    },
+
+    watch: {
+      js: {
+        files: ['src/*.js'],
+        tasks: ['default']
+      }
     }
   });
 
@@ -70,6 +77,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-wrap');
+  grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-jshint');
 
 
