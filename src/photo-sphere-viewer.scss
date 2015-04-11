@@ -6,9 +6,11 @@ $buttons-background: transparent;
 $buttons-active-background: rgba(255, 255, 255, 0.1);
 $buttons-color: rgba(255, 255, 255, 0.7);
 
-$zoom-button-range-width: 50px;
-$zoom-button-range-tickness: 1px;
-$zoom-button-disk-diameter: 7px;
+$zoom-range-width: 80px;
+$zoom-range-tickness: 1px;
+$zoom-disk-diameter: 7px;
+$zoom-buttons-width: 9px;
+$zoom-buttons-tickness: 1px;
 
 $autorotate-button-tickness: 1px;
 
@@ -79,48 +81,74 @@ $fullscreen-button-ratio: 4/3;
 .psv-zoom-button {
   cursor: default;
 }
-  .psv-zoom-minus, .psv-zoom-plus {
+  .psv-zoom-minus,
+  .psv-zoom-plus {
     float: left;
-    cursor: pointer;
-    height: $buttons-height;
-    line-height: $buttons-height;
-    color: $buttons-color;
-  }
-  .psv-zoom-range {
-    float: left;
-    padding: #{($buttons-height - $zoom-button-range-tickness) / 2} 15px;
-  }
-  .psv-zoom-range-line {
     position: relative;
     cursor: pointer;
-    width: $zoom-button-range-width;
-    height: $zoom-button-range-tickness;
-    background: $buttons-color;
-    transition: all 0.3s ease;
-  }
-    .psv-zoom-button:hover .psv-zoom-range-line {
-      box-shadow: 0 0 2px $buttons-color;
-    }
-  .psv-zoom-range-handle {
-    position: absolute;
-    border-radius: 50%;
-    top: #{($zoom-button-range-tickness - $zoom-button-disk-diameter) / 2};
-    width: $zoom-button-disk-diameter;
-    height: $zoom-button-disk-diameter;
-    background: $buttons-color;
-    transform: scale(1);
+    box-sizing: border-box;
+    width: #{$zoom-buttons-width + $zoom-buttons-tickness * 2};
+    height: #{$zoom-buttons-width + $zoom-buttons-tickness * 2};
+    color: $buttons-color;
+    margin: #{($buttons-height - $zoom-buttons-width) / 2 - $zoom-buttons-tickness} 0;
+    border: $zoom-buttons-tickness solid $buttons-color;
+    border-radius: 30%;
     transition: transform 0.3s ease;
   }
-    .psv-zoom-button:hover .psv-zoom-range-handle {
-      transform: scale(1.3);
+    .psv-zoom-minus:before,
+    .psv-zoom-plus:before,
+    .psv-zoom-plus:after {
+      content: '';
+      position: absolute;
+      top: #{($zoom-buttons-width - $zoom-buttons-tickness) /2};
+      left: $zoom-buttons-tickness;
+      width: #{$zoom-buttons-width - $zoom-buttons-tickness * 2};
+      height: $zoom-buttons-tickness;
+      background: $buttons-color;
     }
+      .psv-zoom-plus:after {
+        transform: rotate(90deg);
+      }
+    .psv-zoom-button:hover .psv-zoom-minus,
+    .psv-zoom-button:hover .psv-zoom-plus {
+      transform: scale(1.2);
+    }
+  .psv-zoom-range {
+    float: left;
+    padding: #{($buttons-height - $zoom-range-tickness) / 2} 10px;
+  }
+    .psv-zoom-range-line {
+      position: relative;
+      cursor: pointer;
+      width: $zoom-range-width;
+      height: $zoom-range-tickness;
+      background: $buttons-color;
+      transition: all 0.3s ease;
+    }
+      .psv-zoom-button:hover .psv-zoom-range-line {
+        box-shadow: 0 0 2px $buttons-color;
+      }
+    .psv-zoom-range-handle {
+      position: absolute;
+      border-radius: 50%;
+      top: #{($zoom-range-tickness - $zoom-disk-diameter) / 2};
+      width: $zoom-disk-diameter;
+      height: $zoom-disk-diameter;
+      background: $buttons-color;
+      transform: scale(1);
+      transition: transform 0.3s ease;
+    }
+      .psv-zoom-button:hover .psv-zoom-range-handle {
+        transform: scale(1.3);
+      }
 
 // AUTOROTATE BUTTON
 $autorotate-sphere-width: $buttons-height - $autorotate-button-tickness * 2;
 .psv-autorotate-button {
   width: $buttons-height;
 }
-  .psv-autorotate-sphere, .psv-autorotate-equator {
+  .psv-autorotate-sphere,
+  .psv-autorotate-equator {
     border-radius: 50%;
     border-width: $autorotate-button-tickness;
     border-style: solid;
@@ -162,7 +190,8 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
     width: $fullscreen-width;
     height: $buttons-height;
   }
-  .psv-fullscreen-button div:before, .psv-fullscreen-button div:after {
+  .psv-fullscreen-button div:before,
+  .psv-fullscreen-button div:after {
     position:absolute;
     content: '';
     box-sizing: border-box;
@@ -173,7 +202,8 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
     border-width: $fullscreen-button-tickness;
     transition: all 0.2s ease;
   }
-    .psv-fullscreen-button:hover div:before, .psv-fullscreen-button:hover div:after {
+    .psv-fullscreen-button:hover div:before,
+    .psv-fullscreen-button:hover div:after {
       width: #{$fullscreen-width * 0.4};
       height: #{$buttons-height * 0.4};
     }
