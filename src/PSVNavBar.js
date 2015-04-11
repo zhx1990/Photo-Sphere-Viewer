@@ -5,10 +5,10 @@
 var PSVNavBar = function(psv) {
   this.psv = psv;
   this.container = null;
-  this.arrows = null;
-  this.autorotate = null;
-  this.zoom = null;
-  this.fullscreen = null;
+  this.autorotateBtn = null;
+  this.zoomBar = null;
+  this.fullscreenBtn = null;
+  this.caption = null;
 
   this.create();
 };
@@ -23,16 +23,22 @@ PSVNavBar.prototype.create = function() {
   this.container.className = 'psv-navbar';
 
   // Autorotate button
-  this.autorotate = new PSVNavBarAutorotateButton(this.psv);
-  this.container.appendChild(this.autorotate.getButton());
+  this.autorotateBtn = new PSVNavBarAutorotateButton(this.psv);
+  this.container.appendChild(this.autorotateBtn.getButton());
 
   // Zoom buttons
-  this.zoom = new PSVNavBarZoomButton(this.psv);
-  this.container.appendChild(this.zoom.getButton());
+  this.zoomBar = new PSVNavBarZoomButton(this.psv);
+  this.container.appendChild(this.zoomBar.getButton());
 
   // Fullscreen button
-  this.fullscreen = new PSVNavBarFullscreenButton(this.psv);
-  this.container.appendChild(this.fullscreen.getButton());
+  this.fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
+  this.container.appendChild(this.fullscreenBtn.getButton());
+
+  // Caption
+  this.caption = document.createElement('div');
+  this.caption.className = 'psv-caption';
+  this.container.appendChild(this.caption);
+  this.setCaption(this.psv.config.caption);
 };
 
 /**
@@ -41,4 +47,17 @@ PSVNavBar.prototype.create = function() {
  */
 PSVNavBar.prototype.getBar = function() {
   return this.container;
+};
+
+/**
+ * Sets the bar caption
+ * @param (string) html
+ */
+PSVNavBar.prototype.setCaption = function(html) {
+  if (!html)
+    this.caption.style.display = 'none';
+  else {
+    this.caption.style.display = 'block';
+    this.caption.innerHTML = html;
+  }
 };

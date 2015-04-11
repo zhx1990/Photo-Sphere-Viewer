@@ -20,6 +20,7 @@ $fullscreen-button-ratio: 4/3;
   width: 100%;
   height: 100%;
   position: relative;
+  font-family: sans-serif;
 }
 
 .psv-canvas {
@@ -52,6 +53,14 @@ $fullscreen-button-ratio: 4/3;
   bottom: 0;
   width: 100%;
   background: $navbar-background;
+}
+
+.psv-caption {
+  color: $buttons-color;
+  margin: $buttons-padding;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align:center;
 }
 
 .psv-button {

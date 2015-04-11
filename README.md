@@ -16,6 +16,7 @@ You can find a basic example of use in the file `example.html`. The `example1.ht
 
   * `panorama` (required): the path to the panorama.
   * `container` (required): the `div` in which the panorama will be displayed.
+  * `caption` (optional, default to `null`): a text (can contain HTML) displayed in the navbar.
   * `autoload` (optional, default to `true`): `true` to automatically load the panorama, `false` to load it later (with the `.load()` method).
   * `usexmpdata` (optional, default to `true`): `true` if Photo Sphere Viewer must read XMP data, `false` if it is not necessary.
   * `min_fov` (optional, default to `30`): the minimal field of view, in degrees, between 1 and 179.

@@ -3,6 +3,7 @@
  * @param args (Object) Viewer settings
  * - panorama (string) Panorama URL or path (absolute or relative)
  * - container (HTMLElement) Panorama container (should be a div or equivalent)
+ * - caption (string) (optional) (null) Text displayed in the navbar
  * - autoload (boolean) (optional) (true) true to automatically load the panorama, false to load it later (with the .load() method)
  * - usexmpdata (boolean) (optional) (true) true if Photo Sphere Viewer must read XMP data, false if it is not necessary
  * - min_fov (number) (optional) (30) The minimal field of view, in degrees, between 1 and 179
@@ -76,6 +77,7 @@ var PhotoSphereViewer = function(options) {
 PhotoSphereViewer.DEFAULTS = {
   panorama: null,
   container: null,
+  caption: null,
   autoload: true,
   usexmpdata: true,
   min_fov: 30,
@@ -350,7 +352,7 @@ PhotoSphereViewer.prototype.render = function() {
 PhotoSphereViewer.prototype._autorotate = function() {
   // Rotates the sphere && Returns to the equator (phi = 0)
   this.rotate(
-    this.prop.theta + this.prop.theta_offset - Math.floor(this.prop.theta / (2.0 * Math.PI)) * 2.0 * Math.PI,
+    this.prop.theta - this.prop.theta_offset - Math.floor(this.prop.theta / (2.0 * Math.PI)) * 2.0 * Math.PI,
     this.prop.phi - this.prop.phi / 200
   );
 

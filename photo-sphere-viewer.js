@@ -20,6 +20,7 @@
  * @param args (Object) Viewer settings
  * - panorama (string) Panorama URL or path (absolute or relative)
  * - container (HTMLElement) Panorama container (should be a div or equivalent)
+ * - caption (string) (optional) (null) Text displayed in the navbar
  * - autoload (boolean) (optional) (true) true to automatically load the panorama, false to load it later (with the .load() method)
  * - usexmpdata (boolean) (optional) (true) true if Photo Sphere Viewer must read XMP data, false if it is not necessary
  * - min_fov (number) (optional) (30) The minimal field of view, in degrees, between 1 and 179
@@ -93,6 +94,7 @@ var PhotoSphereViewer = function(options) {
 PhotoSphereViewer.DEFAULTS = {
   panorama: null,
   container: null,
+  caption: null,
   autoload: true,
   usexmpdata: true,
   min_fov: 30,
@@ -367,7 +369,7 @@ PhotoSphereViewer.prototype.render = function() {
 PhotoSphereViewer.prototype._autorotate = function() {
   // Rotates the sphere && Returns to the equator (phi = 0)
   this.rotate(
-    this.prop.theta + this.prop.theta_offset - Math.floor(this.prop.theta / (2.0 * Math.PI)) * 2.0 * Math.PI,
+    this.prop.theta - this.prop.theta_offset - Math.floor(this.prop.theta / (2.0 * Math.PI)) * 2.0 * Math.PI,
     this.prop.phi - this.prop.phi / 200
   );
 
@@ -759,10 +761,10 @@ PhotoSphereViewer.prototype.trigger = function(name, arg) {
 var PSVNavBar = function(psv) {
   this.psv = psv;
   this.container = null;
-  this.arrows = null;
-  this.autorotate = null;
-  this.zoom = null;
-  this.fullscreen = null;
+  this.autorotateBtn = null;
+  this.zoomBar = null;
+  this.fullscreenBtn = null;
+  this.caption = null;
 
   this.create();
 };
@@ -777,16 +779,22 @@ PSVNavBar.prototype.create = function() {
   this.container.className = 'psv-navbar';
 
   // Autorotate button
-  this.autorotate = new PSVNavBarAutorotateButton(this.psv);
-  this.container.appendChild(this.autorotate.getButton());
+  this.autorotateBtn = new PSVNavBarAutorotateButton(this.psv);
+  this.container.appendChild(this.autorotateBtn.getButton());
 
   // Zoom buttons
-  this.zoom = new PSVNavBarZoomButton(this.psv);
-  this.container.appendChild(this.zoom.getButton());
+  this.zoomBar = new PSVNavBarZoomButton(this.psv);
+  this.container.appendChild(this.zoomBar.getButton());
 
   // Fullscreen button
-  this.fullscreen = new PSVNavBarFullscreenButton(this.psv);
-  this.container.appendChild(this.fullscreen.getButton());
+  this.fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
+  this.container.appendChild(this.fullscreenBtn.getButton());
+
+  // Caption
+  this.caption = document.createElement('div');
+  this.caption.className = 'psv-caption';
+  this.container.appendChild(this.caption);
+  this.setCaption(this.psv.config.caption);
 };
 
 /**
@@ -795,6 +803,19 @@ PSVNavBar.prototype.create = function() {
  */
 PSVNavBar.prototype.getBar = function() {
   return this.container;
+};
+
+/**
+ * Sets the bar caption
+ * @param (string) html
+ */
+PSVNavBar.prototype.setCaption = function(html) {
+  if (!html)
+    this.caption.style.display = 'none';
+  else {
+    this.caption.style.display = 'block';
+    this.caption.innerHTML = html;
+  }
 };
 /**
  * Navigation bar button class
