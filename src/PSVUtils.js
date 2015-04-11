@@ -4,6 +4,28 @@
 var PSVUtils = {};
 
 /**
+ * Adds a CSS class to an element
+ * @param elt (HTMLElement)
+ * @param clazz (string)
+ */
+PSVUtils.addClass = function(elt, clazz) {
+  if (elt.className.length)
+    elt.className+= ' ' + clazz;
+  else
+    elt.className = clazz
+};
+
+/**
+ * Removes a CSS class from an element
+ * @param elt (HTMLElement)
+ * @param clazz (string)
+ */
+PSVUtils.removeClass = function(elt, clazz) {
+  if (elt.className.length)
+    elt.className = elt.className.replace(new RegExp('\\b' + clazz + '\\b'), '').trim();
+};
+
+/**
  * Detects whether canvas is supported
  * @return (boolean) true if canvas is supported, false otherwise
  */

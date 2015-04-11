@@ -23,8 +23,8 @@ You can find a basic example of use in the file `example.html`. The `example1.ht
   * `default_fov` (optional, default to `max_fov`): the default field of view, in degrees, between `min_fov` and `max_fov`.
   * `default_long` (optional, default to `0`): the default longitude, in radians, between `0 and `2xPI`.
   * `default_lat` (optional, default to `0`): the default latitude, in radians, between `-PI/2` and `PI/2`.
-  * `long_offset` (optional, default to `PI/360`): the longitude to travel per pixel moved by mouse/touch.
-  * `lat_offset` (optional, default to `PI/180`): the latitude to travel per pixel moved by mouse/touch.
+  * `long_offset` (optional, default to `PI/720`): the longitude to travel per pixel moved by mouse/touch.
+  * `lat_offset` (optional, default to `PI/360`): the latitude to travel per pixel moved by mouse/touch.
   * `time_anim` (optional, default to `2000`): the panorama will be automatically animated after `time_anim` milliseconds (indicate `false` to deactivate it).
   * `anim_speed` (optional, default to `2rpm`): animation speed in radians/degrees/revolutions per second/minute.
   * `navbar` (optional, default to `false`): set to `true`, a navigation bar will be displayed.

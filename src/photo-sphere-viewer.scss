@@ -30,6 +30,21 @@ $fullscreen-button-ratio: 4/3;
     display: block;
   }
 
+.psv-loader {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.psv-container.loading {
+  text-align: center;
+}
+.psv-container.loading:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}
+
 // NAVBAR
 .psv-navbar {
   position: absolute;

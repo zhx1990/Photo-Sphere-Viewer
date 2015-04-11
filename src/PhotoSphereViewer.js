@@ -31,8 +31,8 @@ var PhotoSphereViewer = function(options) {
   else this.config.default_fov = PSVUtils.stayBetween(this.config.default_fov, this.config.min_fov, this.config.max_fov);
 
   this.container = this.config.container;
+  this.loader = null;
   this.navbar = null;
-  this.root = null;
   this.canvas_container = null;
   this.renderer = null;
   this.scene = null;
@@ -50,6 +50,11 @@ var PhotoSphereViewer = function(options) {
     mouse_y: 0,
     autorotate_timeout: null,
     anim_timeout: null,
+    size: {
+      width: 0,
+      height: 0,
+      ratio: 0
+    }
   };
 
   this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
@@ -78,8 +83,8 @@ PhotoSphereViewer.DEFAULTS = {
   default_fov: null,
   default_long: 0,
   default_lat: 0,
-  long_offset: Math.PI / 360.0,
-  lat_offset: Math.PI / 180.0,
+  long_offset: Math.PI / 720.0,
+  lat_offset: Math.PI / 360.0,
   time_anim: 2000,
   anim_speed: '2rpm',
   navbar: false,
@@ -92,19 +97,7 @@ PhotoSphereViewer.DEFAULTS = {
  * @return (void)
  */
 PhotoSphereViewer.prototype.load = function() {
-  // Loading indicator (text or image if given)
-  if (!!this.config.loading_img) {
-    var loading = document.createElement('img');
-    loading.setAttribute('src', this.config.loading_img);
-    loading.setAttribute('alt', 'Loading...');
-    this.container.appendChild(loading);
-  }
-  else
-    this.container.textContent = 'Loading...';
-
-  // Adds a new container
-  this.root = document.createElement('div');
-  this.root.className = 'psv-container';
+  PSVUtils.addClass(this.container, 'psv-container loading');
 
   // Is canvas supported?
   if (!PSVUtils.isCanvasSupported()) {
@@ -112,15 +105,28 @@ PhotoSphereViewer.prototype.load = function() {
     return;
   }
 
+  // Loading indicator (text or image if given)
+  if (!!this.config.loading_img) {
+    this.loader = document.createElement('img');
+    this.loader.src = this.config.loading_img;
+    this.loader.alt = 'Loading...';
+  }
+  else {
+    this.loader = document.createElement('div');
+    this.loader.textContent = 'Loading...';
+  }
+  this.loader.className = 'psv-loader';
+  this.container.appendChild(this.loader);
+
   // Canvas container
   this.canvas_container = document.createElement('div');
   this.canvas_container.className = 'psv-canvas';
-  this.root.appendChild(this.canvas_container);
+  this.container.appendChild(this.canvas_container);
 
   // Navigation bar?
   if (this.config.navbar) {
     this.navbar = new PSVNavBar(this);
-    this.root.appendChild(this.navbar.getBar());
+    this.container.appendChild(this.navbar.getBar());
   }
 
   // Adding events
@@ -137,17 +143,6 @@ PhotoSphereViewer.prototype.load = function() {
   PSVUtils.addEvent(document, 'mozfullscreenchange', this._fullscreenToggled.bind(this));
   PSVUtils.addEvent(document, 'webkitfullscreenchange', this._fullscreenToggled.bind(this));
   PSVUtils.addEvent(document, 'MSFullscreenChange', this._fullscreenToggled.bind(this));
-
-  // First render
-  this.container.innerHTML = '';
-  this.container.appendChild(this.root);
-
-  // Current viewer size
-  this.prop.size = {
-    width: 0,
-    height: 0,
-    ratio: 0
-  };
 
   // XMP data?
   if (this.config.usexmpdata)
@@ -320,6 +315,10 @@ PhotoSphereViewer.prototype._createScene = function(texture) {
   this.scene.add(mesh);
 
   this.canvas_container.appendChild(this.renderer.domElement);
+
+  // Remove loader
+  this.container.removeChild(this.loader);
+  PSVUtils.removeClass(this.container, 'loading');
 
   // Animation?
   if (this.config.time_anim !== false)

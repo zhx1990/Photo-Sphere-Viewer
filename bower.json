@@ -5,6 +5,10 @@
     "name": "Jérémy Heleine",
     "email": "jeremy.heleine@gmail.com",
     "homepage": "http://jeremyheleine.me"
+  },{
+    "name": "Damien \"Mistic\" Sorel",
+    "email": "contact@git.strangeplanet.fr",
+    "homepage": "http://www.strangeplanet.fr"
   }],
   "description": "A JavaScript library to display Photo Sphere panoramas",
   "homepage": "https://github.com/JeremyHeleine/Photo-Sphere-Viewer",

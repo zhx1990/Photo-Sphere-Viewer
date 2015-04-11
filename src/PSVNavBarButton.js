@@ -30,7 +30,7 @@ PSVNavBarButton.prototype.getButton = function() {
  */
 PSVNavBarButton.prototype.toggleActive = function(active) {
   if (active)
-    this.button.className+= ' active';
+    PSVUtils.addClass(this.button, 'active');
   else
-    this.button.className = this.button.className.replace(/\bactive\b/,'');
+    PSVUtils.removeClass(this.button, 'active');
 };

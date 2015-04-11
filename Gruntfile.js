@@ -17,9 +17,9 @@ module.exports = function(grunt) {
 
     banner:
       '/*!\n'+
-      ' * Photo Sphere Viewer v<%= pkg.version %>\n'+
-      ' * http://jeremyheleine.com/#photo-sphere-viewer\n'+
-      ' * Copyright (c) 2014,<%= grunt.template.today("yyyy") %> Jérémy Heleine\n'+
+      ' * Photo Sphere Viewer <%= pkg.version %>\n'+
+      ' * Copyright (c) 2014-<%= grunt.template.today("yyyy") %> Jérémy Heleine\n'+
+      ' * Copyright (c) <%= grunt.template.today("yyyy") %> Damien "Mistic" Sorel\n'+
       ' * Licensed under MIT (http://opensource.org/licenses/MIT)\n'+
       ' */',
 
