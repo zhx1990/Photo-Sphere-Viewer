@@ -1,10 +1,8 @@
 /**
  * Navigation bar button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
- * @param style (Object) Style of the navigation bar
  */
-var PSVNavBarButton = function(psv, style) {
-  this.style = style;
+var PSVNavBarButton = function(psv) {
   this.psv = psv;
   this.button = null;
 };
@@ -31,5 +29,8 @@ PSVNavBarButton.prototype.getButton = function() {
  * @return (void)
  */
 PSVNavBarButton.prototype.toggleActive = function(active) {
-  this.button.style.backgroundColor = active ? this.style.activeButtonsBackgroundColor : this.style.buttonsBackgroundColor;
+  if (active)
+    this.button.className+= ' active';
+  else
+    this.button.className = this.button.className.replace(/\bactive\b/,'');
 };
