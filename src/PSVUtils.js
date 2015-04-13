@@ -73,6 +73,16 @@ PSVUtils.addEvent = function(elt, evt, f) {
 };
 
 /**
+ * Get the event name for mouse wheel
+ * @return (string)
+ */
+PSVUtils.mouseWheelEvent = function() {
+  return "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
+    document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
+    "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
+};
+
+/**
  * Ensures that a number is in a given interval
  * @param x (number) The number to check
  * @param min (number) First endpoint

@@ -143,13 +143,13 @@ PhotoSphereViewer.prototype.load = function() {
     PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
   }
   if (this.config.mousewheel) {
-    PSVUtils.addEvent(this.canvas_container, 'mousewheel', this._onMouseWheel.bind(this));
-    PSVUtils.addEvent(this.canvas_container, 'DOMMouseScroll', this._onMouseWheel.bind(this));
+    PSVUtils.addEvent(this.canvas_container, PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
   }
-  PSVUtils.addEvent(document, 'fullscreenchange', this._fullscreenToggled.bind(this));
-  PSVUtils.addEvent(document, 'mozfullscreenchange', this._fullscreenToggled.bind(this));
-  PSVUtils.addEvent(document, 'webkitfullscreenchange', this._fullscreenToggled.bind(this));
-  PSVUtils.addEvent(document, 'MSFullscreenChange', this._fullscreenToggled.bind(this));
+  var bindedFullscreenToggled = this._fullscreenToggled.bind(this);
+  PSVUtils.addEvent(document, 'fullscreenchange', bindedFullscreenToggled);
+  PSVUtils.addEvent(document, 'mozfullscreenchange', bindedFullscreenToggled);
+  PSVUtils.addEvent(document, 'webkitfullscreenchange', bindedFullscreenToggled);
+  PSVUtils.addEvent(document, 'MSFullscreenChange', bindedFullscreenToggled);
 
   // load image
   if (this.config.usexmpdata) {
@@ -563,7 +563,7 @@ PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
   evt.preventDefault();
   evt.stopPropagation();
 
-  var delta = (evt.detail) ? -evt.detail : evt.wheelDelta;
+  var delta = evt.deltaY!==undefined ? -evt.deltaY : (evt.wheelDelta!==undefined ? evt.wheelDelta : -evt.detail);
 
   if (delta !== 0) {
     var direction = parseInt(delta / Math.abs(delta));
