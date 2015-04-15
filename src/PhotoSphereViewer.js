@@ -15,6 +15,7 @@
  * - lat_offset (number) (optional) (PI/180) The latitude to travel per pixel moved by mouse/touch
  * - time_anim (integer) (optional) (2000) Delay before automatically animating the panorama in milliseconds, false to not animate
  * - anim_speed (string) (optional) (2rpm) Animation speed in radians/degrees/revolutions per second/minute
+ * - anim_lat (number) (optional) (default_lat) The latitude, in radians, at which the animation is done
  * - navbar (boolean) (optional) (false) Display the navigation bar if set to true
  * - loading_img (string) (optional) (null) Loading image URL or path (absolute or relative)
  * - size (Object) (optional) (null) Final size of the panorama container (e.g. {width: 500, height: 300})
@@ -35,6 +36,10 @@ var PhotoSphereViewer = function(options) {
   else {
     this.config.default_fov = PSVUtils.stayBetween(this.config.default_fov, this.config.min_fov, this.config.max_fov);
   }
+  if (this.config.anim_lat === null) {
+    this.config.anim_lat = this.config.default_lat;
+  }
+  this.config.anim_lat = PSVUtils.stayBetween(this.config.anim_lat, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
 
   // references to components
   this.container = this.config.container;
@@ -67,7 +72,7 @@ var PhotoSphereViewer = function(options) {
 
   // compute zoom level
   this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
-  this.prop.zoom_lvl-= 2* (this.prop.zoom_lvl - 50);
+  this.prop.zoom_lvl-= 2 * (this.prop.zoom_lvl - 50);
 
   // init
   this.setAnimSpeed(this.config.anim_speed);
@@ -82,6 +87,9 @@ var PhotoSphereViewer = function(options) {
     this.load();
   }
 };
+
+PhotoSphereViewer.TwoPI = Math.PI * 2.0;
+PhotoSphereViewer.HalfPI = Math.PI / 2.0;
 
 /**
  * PhotoSphereViewer defaults
@@ -101,6 +109,7 @@ PhotoSphereViewer.DEFAULTS = {
   lat_offset: Math.PI / 360.0,
   time_anim: 2000,
   anim_speed: '2rpm',
+  anim_lat: null,
   navbar: false,
   mousewheel: true,
   mousemove: true,
@@ -135,6 +144,7 @@ PhotoSphereViewer.prototype.load = function() {
   // Adding events
   PSVUtils.addEvent(window, 'resize', this._onResize.bind(this));
   if (this.config.mousemove) {
+    this.canvas_container.style.cursor = 'move';
     PSVUtils.addEvent(this.canvas_container, 'mousedown', this._onMouseDown.bind(this));
     PSVUtils.addEvent(this.canvas_container, 'touchstart', this._onTouchStart.bind(this));
     PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
@@ -235,18 +245,6 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
   var self = this;
   var progress = in_cache ? 100 : 0;
 
-  // Default XMP data
-  if (!pano_data) {
-    pano_data = {
-      full_width: img.width,
-      full_height: img.height,
-      cropped_width: img.width,
-      cropped_height: img.height,
-      cropped_x: 0,
-      cropped_y: 0,
-    };
-  }
-
   // CORS when the panorama is not given as a base64 string
   if (!this.config.panorama.match(/^data:image\/[a-z]+;base64/)) {
     loader.setCrossOrigin('anonymous');
@@ -254,6 +252,18 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
 
   var onload = function(img) {
     self.loader.setProgress(100);
+
+    // Default XMP data
+    if (!pano_data) {
+      pano_data = {
+        full_width: img.width,
+        full_height: img.height,
+        cropped_width: img.width,
+        cropped_height: img.height,
+        cropped_x: 0,
+        cropped_y: 0,
+      };
+    }
 
     // Size limit for mobile compatibility
     var max_width = 4096;
@@ -357,7 +367,7 @@ PhotoSphereViewer.prototype._createScene = function(img) {
  */
 PhotoSphereViewer.prototype.render = function() {
   var point = new THREE.Vector3();
-  point.setX(Math.cos(this.prop.phi) * Math.sin(this.prop.theta));
+  point.setX(-Math.cos(this.prop.phi) * Math.sin(this.prop.theta));
   point.setY(Math.sin(this.prop.phi));
   point.setZ(Math.cos(this.prop.phi) * Math.cos(this.prop.theta));
 
@@ -372,8 +382,8 @@ PhotoSphereViewer.prototype.render = function() {
 PhotoSphereViewer.prototype._autorotate = function() {
   // Rotates the sphere && Returns to the equator (phi = 0)
   this.rotate(
-    this.prop.theta - this.prop.theta_offset - Math.floor(this.prop.theta / (2.0 * Math.PI)) * 2.0 * Math.PI,
-    this.prop.phi - this.prop.phi / 200
+    this.prop.theta + this.prop.theta_offset,
+    this.prop.phi - (this.prop.phi - this.config.anim_lat) / 200
   );
 
   this.prop.autorotate_timeout = setTimeout(this._autorotate.bind(this), 1000 / this.prop.fps);
@@ -528,7 +538,7 @@ PhotoSphereViewer.prototype._onTouchMove = function(evt) {
 PhotoSphereViewer.prototype._move = function(x, y) {
   if (this.prop.mousedown) {
     this.rotate(
-      this.prop.theta + (x - this.prop.mouse_x) * this.config.long_offset,
+      this.prop.theta - (x - this.prop.mouse_x) * this.config.long_offset,
       this.prop.phi + (y - this.prop.mouse_y) * this.config.lat_offset
     );
 
@@ -544,8 +554,8 @@ PhotoSphereViewer.prototype._move = function(x, y) {
  * @return (void)
  */
 PhotoSphereViewer.prototype.rotate = function(t, p) {
-  this.prop.theta = t;
-  this.prop.phi = PSVUtils.stayBetween(p, -Math.PI / 2.0, Math.PI / 2.0);
+  this.prop.theta = t - Math.floor(t / PhotoSphereViewer.TwoPI) * PhotoSphereViewer.TwoPI;
+  this.prop.phi = PSVUtils.stayBetween(p, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
 
   if (this.renderer) {
     this.render();
@@ -656,7 +666,7 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
     case 'rev per second':
     case 'revolutions per second':
       // speed * 2pi
-      rad_per_second = speed_value * 2 * Math.PI;
+      rad_per_second = speed_value * PhotoSphereViewer.TwoPI;
       break;
 
     // Degrees per minute / second

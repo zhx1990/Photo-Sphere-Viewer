@@ -28,6 +28,7 @@ You can find a basic example of use in the file `example.html`. The `example1.ht
   * `lat_offset` (optional, default to `PI/360`): the latitude to travel per pixel moved by mouse/touch.
   * `time_anim` (optional, default to `2000`): the panorama will be automatically animated after `time_anim` milliseconds (indicate `false` to deactivate it).
   * `anim_speed` (optional, default to `2rpm`): animation speed in radians/degrees/revolutions per second/minute.
+  * `anim_lat` (optional, default to  `default_lat`): the latitude, in radians, at which the animation is done.
   * `navbar` (optional, default to `false`): set to `true`, a navigation bar will be displayed. You can choose which buttons to display by providing an object.
     * `autorotate`
     * `zoom`
