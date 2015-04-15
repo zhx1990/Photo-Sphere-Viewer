@@ -31,7 +31,7 @@ module.exports = function(grunt) {
           separator: '\n\n'
         },
         src: files_in_order,
-        dest: 'photo-sphere-viewer.js'
+        dest: 'dist/photo-sphere-viewer.js'
       },
       css: {
         options: {
@@ -39,7 +39,7 @@ module.exports = function(grunt) {
         },
         files: [{
             expand: true,
-            src: '*.css',
+            src: 'dist/*.css',
             dest: ''
         }]
       }
@@ -47,7 +47,7 @@ module.exports = function(grunt) {
 
     wrap: {
       dist: {
-        src: 'photo-sphere-viewer.js',
+        src: 'dist/photo-sphere-viewer.js',
         dest: '',
         options: {
           separator: '',
@@ -65,8 +65,8 @@ module.exports = function(grunt) {
         banner: '<%= banner %>\n\n'
       },
       dist: {
-        src: 'photo-sphere-viewer.js',
-        dest: 'photo-sphere-viewer.min.js'
+        src: 'dist/photo-sphere-viewer.js',
+        dest: 'dist/photo-sphere-viewer.min.js'
       }
     },
     
@@ -77,14 +77,14 @@ module.exports = function(grunt) {
       },
       dist: {
         src: 'src/photo-sphere-viewer.scss',
-        dest: 'photo-sphere-viewer.css'
+        dest: 'dist/photo-sphere-viewer.css'
       }
     },
     
     cssmin: {
         dist: {
-            src: 'photo-sphere-viewer.css',
-            dest: 'photo-sphere-viewer.min.css'
+            src: 'dist/photo-sphere-viewer.css',
+            dest: 'dist/photo-sphere-viewer.min.css'
         }
     },
 

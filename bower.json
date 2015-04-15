@@ -11,8 +11,11 @@
     "homepage": "http://www.strangeplanet.fr"
   }],
   "description": "A JavaScript library to display Photo Sphere panoramas",
-  "homepage": "https://github.com/JeremyHeleine/Photo-Sphere-Viewer",
-  "main": "photo-sphere-viewer.js",
+  "homepage": "https://github.com/mistic100/Photo-Sphere-Viewer",
+  "main": [
+    "dist/photo-sphere-viewer.js",
+    "dist/photo-sphere-viewer.css"
+  ],
   "dependencies": {
     "three.js": ">= 0.0.67"
   },
@@ -24,7 +27,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git://github.com/JeremyHeleine/Photo-Sphere-Viewer.git"
+    "url": "git://github.com/mistic100/Photo-Sphere-Viewer.git"
   },
   "ignore": [
     "**/.*",
