@@ -21,6 +21,10 @@
  * - size (Object) (optional) (null) Final size of the panorama container (e.g. {width: 500, height: 300})
  */
 var PhotoSphereViewer = function(options) {
+  if (!(this instanceof PhotoSphereViewer)) {
+    return new PhotoSphereViewer(options);
+  }
+
   if (options === undefined || options.panorama === undefined || options.container === undefined) {
     throw 'PhotoSphereViewer: no value given for panorama or container';
   }
@@ -658,39 +662,31 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
 
   // Which unit?
   switch (speed_unit) {
-    // Revolutions per minute / second
-    case 'rpm':
-    case 'rev per minute':
-    case 'revolutions per minute':
-    case 'rps':
-    case 'rev per second':
-    case 'revolutions per second':
-      // speed * 2pi
-      rad_per_second = speed_value * PhotoSphereViewer.TwoPI;
-      break;
-
     // Degrees per minute / second
     case 'dpm':
-    case 'deg per minute':
     case 'degrees per minute':
     case 'dps':
-    case 'deg per second':
     case 'degrees per second':
       // Degrees to radians (rad = deg * pi / 180)
       rad_per_second = speed_value * Math.PI / 180;
       break;
 
     // Radians per minute / second
-    case 'rad per minute':
     case 'radians per minute':
-    case 'rad per second':
     case 'radians per second':
       rad_per_second = speed_value;
       break;
 
+    // Revolutions per minute / second
+    case 'rpm':
+    case 'revolutions per minute':
+    case 'rps':
+    case 'revolutions per second':
     // Unknown unit
     default:
-      m_anim = false;
+      // speed * 2pi
+      rad_per_second = speed_value * PhotoSphereViewer.TwoPI;
+      break;
   }
 
   // Theta offset
