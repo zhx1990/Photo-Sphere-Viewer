@@ -115,6 +115,14 @@ PhotoSphereViewer.DEFAULTS = {
   anim_speed: '2rpm',
   anim_lat: null,
   navbar: false,
+  lang: {
+    autorotate: 'Automatic rotation',
+    zoom: 'Zoom',
+    zoomOut: 'Zoom out',
+    zoomIn: 'Zoom in',
+    download: 'Download',
+    fullscreen: 'Fullscreen'
+  },
   mousewheel: true,
   mousemove: true,
   loading_img: null,

@@ -25,6 +25,7 @@ PSVNavBarZoomButton.prototype.create = function() {
 
   var zoom_minus = document.createElement('div');
   zoom_minus.className = 'psv-zoom-minus';
+  zoom_minus.title = this.psv.config.lang.zoomOut;
   this.button.appendChild(zoom_minus);
 
   var zoom_range_bg = document.createElement('div');
@@ -33,14 +34,17 @@ PSVNavBarZoomButton.prototype.create = function() {
 
   this.zoom_range = document.createElement('div');
   this.zoom_range.className = 'psv-zoom-range-line';
+  this.zoom_range.title = this.psv.config.lang.zoom;
   zoom_range_bg.appendChild(this.zoom_range);
 
   this.zoom_value = document.createElement('div');
   this.zoom_value.className = 'psv-zoom-range-handle';
+  this.zoom_value.title = this.psv.config.lang.zoom;
   this.zoom_range.appendChild(this.zoom_value);
 
   var zoom_plus = document.createElement('div');
   zoom_plus.className = 'psv-zoom-plus';
+  zoom_plus.title = this.psv.config.lang.zoomIn;
   this.button.appendChild(zoom_plus);
 
   PSVUtils.addEvent(this.zoom_range, 'mousedown', this._initZoomChangeWithMouse.bind(this));

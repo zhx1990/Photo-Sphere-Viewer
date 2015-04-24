@@ -17,6 +17,7 @@ PSVNavBarAutorotateButton.prototype.constructor = PSVNavBarAutorotateButton;
 PSVNavBarAutorotateButton.prototype.create = function() {
   this.button = document.createElement('div');
   this.button.className = 'psv-button psv-autorotate-button';
+  this.button.title = this.psv.config.lang.autorotate;
 
   var autorotate_sphere = document.createElement('div');
   autorotate_sphere.className = 'psv-autorotate-sphere';
