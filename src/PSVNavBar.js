@@ -9,13 +9,15 @@ var PSVNavBar = function(psv) {
   this.autorotateBtn = null;
   this.zoomBar = null;
   this.fullscreenBtn = null;
+  this.downloadBtn = null;
   this.caption = null;
 
   if (typeof this.config != 'object') {
     this.config = {
       autorotate: true,
       zoom: true,
-      fullscreen: true
+      fullscreen: true,
+      download: true
     };
   }
 
@@ -47,6 +49,12 @@ PSVNavBar.prototype.create = function() {
   if (this.config.fullscreen) {
     this.fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
     this.container.appendChild(this.fullscreenBtn.getButton());
+  }
+
+  // Download button
+  if (this.config.download) {
+    this.downloadBtn = new PSVNavBarDownloadButton(this.psv);
+    this.container.appendChild(this.downloadBtn.getButton());
   }
 
   // Caption

@@ -23,6 +23,9 @@ $autorotate-button-tickness: 1px;
 $fullscreen-button-tickness: 2px;
 $fullscreen-button-ratio: 4/3;
 
+$download-button-tickness: 2px;
+$download-button-size: 12px;
+
 // CONTAINERS
 .psv-container, .psv-container * {
   box-sizing: content-box;
@@ -218,8 +221,8 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
   }
   .psv-fullscreen-button div:before,
   .psv-fullscreen-button div:after {
-    position:absolute;
     content: '';
+    position: absolute;
     width: #{$fullscreen-width * 0.3 - $fullscreen-button-tickness};
     height: #{$buttons-height * 0.3 - $fullscreen-button-tickness};
     border-style: solid;
@@ -255,4 +258,54 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
       right: 0;
       border-left-width: 0;
       border-top-width: 0;
+    }
+
+// DOWNLOAD BUTTON
+.psv-download-button {
+  width: $buttons-height;
+  height: $buttons-height;
+}
+  .psv-download-button:before {
+    content: '';
+    position: absolute;
+    width: $buttons-height;
+    height: round($buttons-height / 3);
+    bottom: $buttons-padding;
+    border: $download-button-tickness solid $buttons-color;
+    border-top-width: 0;
+    border-radius: 0;
+    transition: border-radius 0.2s ease;
+  }
+    .psv-download-button:hover:before {
+      border-radius: $download-button-tickness;
+    }
+  .psv-download-button div {
+    position: absolute;
+    width: $download-button-size;
+    height: $download-button-size;
+    top: 50%;
+    left: 50%;
+    margin: #{- $download-button-size / 2};
+    margin-top: #{- $download-button-size / 2 - $download-button-tickness};
+    transition: margin-top 0.2s ease;
+  }
+    .psv-download-button:hover div {
+      margin-top: #{- $download-button-size / 2};
+    }
+    .psv-download-button div:before,
+    .psv-download-button div:after {
+      content: '';
+      display: block;
+      margin: 0 auto;
+    }
+    .psv-download-button div:before {
+      width: #{2 * round($download-button-size / 4)};
+      height: #{round($download-button-size / 2)};
+      background: $buttons-color;
+    }
+    .psv-download-button div:after {
+      width: 0;
+      height: 0;
+      border: #{round($download-button-size / 2)} solid transparent;
+      border-top-color: $buttons-color;
     }

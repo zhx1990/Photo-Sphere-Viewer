@@ -9,6 +9,7 @@ module.exports = function(grunt) {
     'src/PSVNavBarAutorotateButton.js',
     'src/PSVNavBarFullscreenButton.js',
     'src/PSVNavBarZoomButton.js',
+    'src/PSVNavBarDownloadButton.js',
     'src/PSVUtils.js'
   ];
 
