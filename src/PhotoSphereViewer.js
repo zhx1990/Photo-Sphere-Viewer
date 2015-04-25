@@ -675,7 +675,6 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
     case 'degrees per minute':
     case 'dps':
     case 'degrees per second':
-      // Degrees to radians (rad = deg * pi / 180)
       rad_per_second = speed_value * Math.PI / 180;
       break;
 
@@ -690,11 +689,12 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
     case 'revolutions per minute':
     case 'rps':
     case 'revolutions per second':
-    // Unknown unit
-    default:
-      // speed * 2pi
       rad_per_second = speed_value * PhotoSphereViewer.TwoPI;
       break;
+
+    // Unknown unit
+    default:
+      throw 'PhotoSphereViewer: unknown speed unit "' + speed_unit + '"';
   }
 
   // Theta offset
@@ -735,13 +735,14 @@ PhotoSphereViewer.prototype.on = function(name, f) {
 /**
  * Triggers an action
  * @param name (string) Action name
- * @param arg (mixed) An argument to send to the handler functions
+ * @param args... (mixed) Arguments to send to the handler functions
  * @return (void)
  */
-PhotoSphereViewer.prototype.trigger = function(name, arg) {
+PhotoSphereViewer.prototype.trigger = function(name, args) {
+  args = Array.prototype.slice.call(arguments, 1);
   if ((name in this.actions) && this.actions[name].length > 0) {
     for (var i = 0, l = this.actions[name].length; i < l; ++i) {
-      this.actions[name][i](arg);
+      this.actions[name][i].apply(this, args);
     }
   }
 };

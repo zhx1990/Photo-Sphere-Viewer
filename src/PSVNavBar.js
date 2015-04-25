@@ -12,13 +12,20 @@ var PSVNavBar = function(psv) {
   this.downloadBtn = null;
   this.caption = null;
 
-  if (typeof this.config != 'object') {
+  if (this.config === true) {
     this.config = {
       autorotate: true,
       zoom: true,
       fullscreen: true,
       download: true
     };
+  }
+  else if (typeof this.config == 'string') {
+    var map = {};
+    this.config.split(/[ ,:]/).forEach(function(button) {
+      map[button] = true;
+    });
+    this.config = map;
   }
 
   this.create();
