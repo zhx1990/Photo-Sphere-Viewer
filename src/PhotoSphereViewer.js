@@ -34,7 +34,7 @@ var PhotoSphereViewer = function(options) {
   }
 
   // references to components
-  this.container = this.config.container;
+  this.container = (typeof this.config.container == 'string') ? document.getElementById(this.config.container) : this.config.container;
   this.loader = null;
   this.navbar = null;
   this.canvas_container = null;
