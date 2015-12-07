@@ -1,24 +1,6 @@
 /**
  * Viewer class
- * @param args (Object) Viewer settings
- * - panorama (string) Panorama URL or path (absolute or relative)
- * - container (HTMLElement) Panorama container (should be a div or equivalent)
- * - caption (string) (optional) (null) Text displayed in the navbar
- * - autoload (boolean) (optional) (true) true to automatically load the panorama, false to load it later (with the .load() method)
- * - usexmpdata (boolean) (optional) (true) true if Photo Sphere Viewer must read XMP data, false if it is not necessary
- * - min_fov (number) (optional) (30) The minimal field of view, in degrees, between 1 and 179
- * - max_fov (number) (optional) (90) The maximal field of view, in degrees, between 1 and 179
- * - default_fov (number) (optional) (max_fov) The default field of view, in degrees, between min_fov and max_fov
- * - default_long (number) (optional) (0) The default longitude, in radians, between 0 and 2xPI
- * - default_lat (number) (optional) (0) The default latitude, in radians, between -PI/2 and PI/2
- * - long_offset (number) (optional) (PI/360) The longitude to travel per pixel moved by mouse/touch
- * - lat_offset (number) (optional) (PI/180) The latitude to travel per pixel moved by mouse/touch
- * - time_anim (integer) (optional) (2000) Delay before automatically animating the panorama in milliseconds, false to not animate
- * - anim_speed (string) (optional) (2rpm) Animation speed in radians/degrees/revolutions per second/minute
- * - anim_lat (number) (optional) (default_lat) The latitude, in radians, at which the animation is done
- * - navbar (boolean) (optional) (false) Display the navigation bar if set to true
- * - loading_img (string) (optional) (null) Loading image URL or path (absolute or relative)
- * - size (Object) (optional) (null) Final size of the panorama container (e.g. {width: 500, height: 300})
+ * @param options (Object) Viewer settings
  */
 var PhotoSphereViewer = function(options) {
   if (!(this instanceof PhotoSphereViewer)) {
@@ -34,6 +16,8 @@ var PhotoSphereViewer = function(options) {
   // normalize config
   this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
   this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
+  this.config.tilt_up_max = PSVUtils.stayBetween(this.config.tilt_up_max, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
+  this.config.tilt_down_max = PSVUtils.stayBetween(this.config.tilt_down_max, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
   if (this.config.default_fov === null) {
     this.config.default_fov = this.config.max_fov;
   }
@@ -44,6 +28,10 @@ var PhotoSphereViewer = function(options) {
     this.config.anim_lat = this.config.default_lat;
   }
   this.config.anim_lat = PSVUtils.stayBetween(this.config.anim_lat, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
+  
+  if (this.config.tilt_up_max < this.config.tilt_down_max) {
+    throw 'PhotoSphereViewer: tilt_up_max cannot be lower than tilt_down_max';
+  }
 
   // references to components
   this.container = this.config.container;
@@ -109,10 +97,13 @@ PhotoSphereViewer.DEFAULTS = {
   default_fov: null,
   default_long: 0,
   default_lat: 0,
+  tilt_up_max: PhotoSphereViewer.HalfPI,
+  tilt_down_max: -PhotoSphereViewer.HalfPI,
   long_offset: Math.PI / 720.0,
   lat_offset: Math.PI / 360.0,
   time_anim: 2000,
   anim_speed: '2rpm',
+  anim_lat: null,
   anim_lat: null,
   navbar: false,
   lang: {
@@ -567,7 +558,7 @@ PhotoSphereViewer.prototype._move = function(x, y) {
  */
 PhotoSphereViewer.prototype.rotate = function(t, p) {
   this.prop.theta = t - Math.floor(t / PhotoSphereViewer.TwoPI) * PhotoSphereViewer.TwoPI;
-  this.prop.phi = PSVUtils.stayBetween(p, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
+  this.prop.phi = PSVUtils.stayBetween(p, this.config.tilt_down_max, this.config.tilt_up_max);
 
   if (this.renderer) {
     this.render();
