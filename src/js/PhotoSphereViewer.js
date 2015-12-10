@@ -118,7 +118,8 @@ PhotoSphereViewer.DEFAULTS = {
   mousemove: true,
   loading_img: null,
   loading_txt: 'Loading...',
-  size: null
+  size: null,
+  markers: []
 };
 
 /**
@@ -145,18 +146,19 @@ PhotoSphereViewer.prototype.load = function() {
   this.container.appendChild(this.canvas_container);
 
   // Adding events
+  // TODO : bind events to the HUD container
   PSVUtils.addEvent(window, 'resize', this._onResize.bind(this));
   if (this.config.mousemove) {
-    this.canvas_container.style.cursor = 'move';
-    PSVUtils.addEvent(this.canvas_container, 'mousedown', this._onMouseDown.bind(this));
-    PSVUtils.addEvent(this.canvas_container, 'touchstart', this._onTouchStart.bind(this));
+    this.container.style.cursor = 'move';
+    PSVUtils.addEvent(this.container, 'mousedown', this._onMouseDown.bind(this));
+    PSVUtils.addEvent(this.container, 'touchstart', this._onTouchStart.bind(this));
     PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
     PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
     PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
     PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
   }
   if (this.config.mousewheel) {
-    PSVUtils.addEvent(this.canvas_container, PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
+    PSVUtils.addEvent(this.container, PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
   }
   var bindedFullscreenToggled = this._fullscreenToggled.bind(this);
   PSVUtils.addEvent(document, 'fullscreenchange', bindedFullscreenToggled);
@@ -354,6 +356,12 @@ PhotoSphereViewer.prototype._createScene = function(img) {
     this.navbar = new PSVNavBar(this);
     this.container.appendChild(this.navbar.getBar());
   }
+  
+  // HUD
+  if (true) {
+    this.hud = new PSVHUD(this);
+    this.container.appendChild(this.hud.getHUD());
+  }
 
   // Queue animation
   if (this.config.time_anim !== false) {
@@ -376,6 +384,7 @@ PhotoSphereViewer.prototype.render = function() {
 
   this.camera.lookAt(point);
   this.renderer.render(this.scene, this.camera);
+  this.trigger('render');
 };
 
 /**
