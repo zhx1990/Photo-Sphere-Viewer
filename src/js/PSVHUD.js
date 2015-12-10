@@ -54,6 +54,12 @@ PSVHUD.prototype.addMarker = function(marker) {
   marker.$el.className = 'marker';
   marker.$el.style.display = 'none';
   
+  marker.position = new THREE.Vector3(
+    Math.cos(marker.longitude) * Math.sin(marker.latitude),
+    Math.sin(marker.longitude),
+    Math.cos(marker.longitude) * Math.cos(marker.latitude)
+  );
+  
   // TODO : clean coordinates
   
   this.container.appendChild(marker.$el);
@@ -82,6 +88,8 @@ PSVHUD.prototype.updatePositions = function() {
     this.prop.visible.left+= PhotoSphereViewer.TwoPI;
     this.prop.onEdge = 'l';
   }
+  
+  this.psv.camera.updateProjectionMatrix();
 
   // update each marker
   this.markers.forEach(function(marker) {
@@ -126,11 +134,11 @@ PSVHUD.prototype.isMarkerVisible = function(marker) {
  * @return (Object) top and left position
  */
 PSVHUD.prototype.getMarkerPosition = function(marker) {
-  var hPos = PhotoSphereViewer.TwoPI - this.prop.visible.left + marker.latitude;
-  var vPos = this.prop.visible.top - marker.longitude;
-  
+  var vector = marker.position.clone();
+  vector.project(this.psv.camera);
+
   return {
-    top: vPos / this.prop.vFov * this.psv.prop.size.height,
-    left: hPos / this.prop.hFov * this.psv.prop.size.width,
+    top: (1 - vector.y) / 2 * this.psv.prop.size.height,
+    left: (vector.x + 1) / 2 * this.psv.prop.size.width
   };
 };

@@ -377,10 +377,11 @@ PhotoSphereViewer.prototype._createScene = function(img) {
  * @return (void)
  */
 PhotoSphereViewer.prototype.render = function() {
-  var point = new THREE.Vector3();
-  point.setX(-Math.cos(this.prop.phi) * Math.sin(this.prop.theta));
-  point.setY(Math.sin(this.prop.phi));
-  point.setZ(Math.cos(this.prop.phi) * Math.cos(this.prop.theta));
+  var point = new THREE.Vector3(
+    -Math.cos(this.prop.phi) * Math.sin(this.prop.theta),
+    Math.sin(this.prop.phi),
+    Math.cos(this.prop.phi) * Math.cos(this.prop.theta)
+  );
 
   this.camera.lookAt(point);
   this.renderer.render(this.scene, this.camera);
