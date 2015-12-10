@@ -17,7 +17,7 @@ PSVNavBarDownloadButton.prototype.constructor = PSVNavBarDownloadButton;
  */
 PSVNavBarDownloadButton.prototype.create = function() {
   this.button = document.createElement('div');
-  this.button.className = 'psv-button psv-download-button';
+  this.button.className = 'psv-button download-button';
   this.button.title = this.psv.config.lang.download;
 
   this.button.appendChild(document.createElement('div'));

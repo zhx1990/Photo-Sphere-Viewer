@@ -66,7 +66,7 @@ PSVNavBar.prototype.create = function() {
 
   // Caption
   this.caption = document.createElement('div');
-  this.caption.className = 'psv-caption';
+  this.caption.className = 'caption';
   this.container.appendChild(this.caption);
   this.setCaption(this.psv.config.caption);
 };

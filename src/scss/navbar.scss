@@ -1,0 +1,33 @@
+.psv-navbar {
+  position: absolute;
+  z-index: 10;
+  bottom: 0;
+  width: 100%;
+  background: $navbar-background;
+
+  .caption {
+    color: $buttons-color;
+    margin: $buttons-padding;
+    white-space: nowrap;
+    overflow: hidden;
+    text-align:center;
+  }
+
+  .psv-button {
+    float: left;
+    padding: $buttons-padding;
+    position: relative;
+    cursor: pointer;
+    height: $buttons-height;
+    background: $buttons-background;
+    
+    &.active {
+      background: $buttons-active-background;
+    }
+  }
+}
+
+@import "buttons/autorotate";
+@import "buttons/download";
+@import "buttons/fullscreen";
+@import "buttons/zoom";

@@ -1,0 +1,26 @@
+.psv-loader {
+  position: relative;
+  color: $loader-color;
+  width: $loader-width;
+  height: $loader-width;
+  border: $loader-tickness solid transparent;
+  
+  .loader-canvas {
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+  
+  &, .loader-image, .loader-text {
+    display: inline-block;
+    vertical-align: middle;
+  }
+}
+
+// Pseudo element trick to vertically center elements
+.psv-container.loading:before, .psv-loader:before {
+  content: '';
+  display: inline-block;
+  height: 100%;
+  vertical-align: middle;
+}

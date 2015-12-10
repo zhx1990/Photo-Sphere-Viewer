@@ -1,0 +1,71 @@
+.psv-navbar  .zoom-button {
+  cursor: default;
+
+  .minus, .plus {
+    float: left;
+    position: relative;
+    cursor: pointer;
+    width: #{$zoom-buttons-width};
+    height: #{$zoom-buttons-width};
+    color: $buttons-color;
+    margin: #{($buttons-height - $zoom-buttons-width) / 2 - $zoom-buttons-tickness} 0;
+    border: $zoom-buttons-tickness solid $buttons-color;
+    border-radius: 30%;
+    transition: transform 0.3s ease;
+  
+    &.minus:before,
+    &.plus:before,
+    &.plus:after {
+      content: '';
+      position: absolute;
+      top: #{($zoom-buttons-width - $zoom-buttons-tickness) /2};
+      left: $zoom-buttons-tickness;
+      width: #{$zoom-buttons-width - $zoom-buttons-tickness * 2};
+      height: $zoom-buttons-tickness;
+      background: $buttons-color;
+    }
+    &.plus:after {
+      transform: rotate(90deg);
+    }
+  }
+  
+  .range {
+    float: left;
+    padding: #{($buttons-height - $zoom-range-tickness) / 2} 10px;
+    
+    .line {
+      position: relative;
+      cursor: pointer;
+      width: $zoom-range-width;
+      height: $zoom-range-tickness;
+      background: $buttons-color;
+      transition: all 0.3s ease;
+    }
+    
+    .handle {
+      position: absolute;
+      border-radius: 50%;
+      top: #{($zoom-range-tickness - $zoom-disk-diameter) / 2};
+      width: $zoom-disk-diameter;
+      height: $zoom-disk-diameter;
+      background: $buttons-color;
+      transform: scale(1);
+      transition: transform 0.3s ease;
+    }
+  }
+
+  &:hover {
+    .minus, .plus {
+      transform: scale(1.2);
+    }
+    
+    .range {
+      .line {
+        box-shadow: 0 0 2px $buttons-color;
+      }
+      .handle {
+        transform: scale(1.3);
+      }
+    }
+  }
+}

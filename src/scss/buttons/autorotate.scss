@@ -1,0 +1,41 @@
+$autorotate-sphere-width: $buttons-height - $autorotate-button-tickness * 2;
+
+.psv-navbar .autorotate-button {
+  width: $buttons-height;
+
+  .sphere, .equator {
+    border-radius: 50%;
+    border-width: $autorotate-button-tickness;
+    border-style: solid;
+    border-color: $buttons-color;
+  }
+  
+  .sphere {
+    width: $autorotate-sphere-width;
+    height: $autorotate-sphere-width;
+    transform: rotateY(0deg);
+    transition: all 0.3s ease;
+  }
+  
+  .equator  {
+    position: absolute;
+    top: 50%;
+    width: $autorotate-sphere-width;
+    height: #{$autorotate-sphere-width / 10};
+    margin-top: #{- $autorotate-sphere-width / 20 - $autorotate-button-tickness};
+    transform: rotateY(0deg);
+    transition: all 0.3s ease;
+  }
+
+  &:hover {
+    .sphere  {
+      transform: rotateY(180deg);
+    }
+    
+    .equator  {
+      transform: rotateY(180deg);
+      height: #{$autorotate-sphere-width / 4};
+      margin-top: #{- $autorotate-sphere-width / 8 - $autorotate-button-tickness};
+    }
+  }
+}

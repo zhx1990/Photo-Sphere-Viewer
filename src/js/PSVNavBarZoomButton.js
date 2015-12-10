@@ -21,29 +21,29 @@ PSVNavBarZoomButton.prototype.constructor = PSVNavBarZoomButton;
  */
 PSVNavBarZoomButton.prototype.create = function() {
   this.button = document.createElement('div');
-  this.button.className = 'psv-button psv-zoom-button';
+  this.button.className = 'psv-button zoom-button';
 
   var zoom_minus = document.createElement('div');
-  zoom_minus.className = 'psv-zoom-minus';
+  zoom_minus.className = 'minus';
   zoom_minus.title = this.psv.config.lang.zoomOut;
   this.button.appendChild(zoom_minus);
 
   var zoom_range_bg = document.createElement('div');
-  zoom_range_bg.className = 'psv-zoom-range';
+  zoom_range_bg.className = 'range';
   this.button.appendChild(zoom_range_bg);
 
   this.zoom_range = document.createElement('div');
-  this.zoom_range.className = 'psv-zoom-range-line';
+  this.zoom_range.className = 'line';
   this.zoom_range.title = this.psv.config.lang.zoom;
   zoom_range_bg.appendChild(this.zoom_range);
 
   this.zoom_value = document.createElement('div');
-  this.zoom_value.className = 'psv-zoom-range-handle';
+  this.zoom_value.className = 'handle';
   this.zoom_value.title = this.psv.config.lang.zoom;
   this.zoom_range.appendChild(this.zoom_value);
 
   var zoom_plus = document.createElement('div');
-  zoom_plus.className = 'psv-zoom-plus';
+  zoom_plus.className = 'plus';
   zoom_plus.title = this.psv.config.lang.zoomIn;
   this.button.appendChild(zoom_plus);
 

@@ -16,15 +16,15 @@ PSVNavBarAutorotateButton.prototype.constructor = PSVNavBarAutorotateButton;
  */
 PSVNavBarAutorotateButton.prototype.create = function() {
   this.button = document.createElement('div');
-  this.button.className = 'psv-button psv-autorotate-button';
+  this.button.className = 'psv-button autorotate-button';
   this.button.title = this.psv.config.lang.autorotate;
 
   var autorotate_sphere = document.createElement('div');
-  autorotate_sphere.className = 'psv-autorotate-sphere';
+  autorotate_sphere.className = 'sphere';
   this.button.appendChild(autorotate_sphere);
 
   var autorotate_equator = document.createElement('div');
-  autorotate_equator.className = 'psv-autorotate-equator';
+  autorotate_equator.className = 'equator';
   this.button.appendChild(autorotate_equator);
 
   PSVUtils.addEvent(this.button, 'click', this.psv.toggleAutorotate.bind(this.psv));

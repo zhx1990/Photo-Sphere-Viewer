@@ -16,7 +16,7 @@ PSVNavBarFullscreenButton.prototype.constructor = PSVNavBarFullscreenButton;
  */
 PSVNavBarFullscreenButton.prototype.create = function() {
   this.button = document.createElement('div');
-  this.button.className = 'psv-button psv-fullscreen-button';
+  this.button.className = 'psv-button fullscreen-button';
   this.button.title = this.psv.config.lang.fullscreen;
 
   this.button.appendChild(document.createElement('div'));

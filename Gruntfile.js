@@ -2,15 +2,16 @@ module.exports = function(grunt) {
   grunt.util.linefeed = '\n';
 
   var files_in_order = [
-    'src/PhotoSphereViewer.js',
-    'src/PSVLoader.js',
-    'src/PSVNavBar.js',
-    'src/PSVNavBarButton.js',
-    'src/PSVNavBarAutorotateButton.js',
-    'src/PSVNavBarFullscreenButton.js',
-    'src/PSVNavBarZoomButton.js',
-    'src/PSVNavBarDownloadButton.js',
-    'src/PSVUtils.js'
+    'src/js/PhotoSphereViewer.js',
+    'src/js/PSVLoader.js',
+    'src/js/PSVHUD.js',
+    'src/js/PSVNavBar.js',
+    'src/js/PSVNavBarButton.js',
+    'src/js/PSVNavBarAutorotateButton.js',
+    'src/js/PSVNavBarFullscreenButton.js',
+    'src/js/PSVNavBarZoomButton.js',
+    'src/js/PSVNavBarDownloadButton.js',
+    'src/js/PSVUtils.js'
   ];
 
 
@@ -53,7 +54,7 @@ module.exports = function(grunt) {
         options: {
           separator: '',
           wrapper: function() {
-            var wrapper = grunt.file.read('src/.wrapper.js').replace(/\r\n/g, '\n').split(/@@js\n/);
+            var wrapper = grunt.file.read('src/js/.wrapper.js').replace(/\r\n/g, '\n').split(/@@js\n/);
             wrapper[0] = grunt.template.process('<%= banner %>\n\n') + wrapper[0];
             return wrapper;
           }
@@ -77,7 +78,7 @@ module.exports = function(grunt) {
         style: 'expanded'
       },
       dist: {
-        src: 'src/photo-sphere-viewer.scss',
+        src: 'src/scss/photo-sphere-viewer.scss',
         dest: 'dist/photo-sphere-viewer.css'
       }
     },
@@ -97,7 +98,7 @@ module.exports = function(grunt) {
 
     watch: {
       js: {
-        files: ['src/*.js', 'src/*.scss'],
+        files: ['src/js/*.js', 'src/scss/*.scss'],
         tasks: ['default']
       }
     }

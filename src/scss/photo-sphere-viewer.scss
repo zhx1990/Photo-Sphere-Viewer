@@ -1,0 +1,58 @@
+$main-background: radial-gradient(#ffffff, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%, #efefef 66%, #dfdfdf 82%, #bfbfbf 100%);
+
+$loader-color: rgba(61, 61, 61, 0.7);
+$loader-width: 150px;
+$loader-tickness: 10px;
+
+$navbar-background: rgba(61, 61, 61, 0.5);
+
+$buttons-height: 20px;
+$buttons-padding: 10px;
+$buttons-background: transparent;
+$buttons-active-background: rgba(255, 255, 255, 0.1);
+$buttons-color: rgba(255, 255, 255, 0.7);
+
+$zoom-range-width: 80px;
+$zoom-range-tickness: 1px;
+$zoom-disk-diameter: 7px;
+$zoom-buttons-width: 9px;
+$zoom-buttons-tickness: 1px;
+
+$autorotate-button-tickness: 1px;
+
+$fullscreen-button-tickness: 2px;
+$fullscreen-button-ratio: 4/3;
+
+$download-button-tickness: 2px;
+$download-button-size: 12px;
+
+
+.psv-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  background: $main-background;
+  
+  &, & * {
+    box-sizing: content-box;
+    font-family: sans-serif;
+    margin: 0;
+    padding: 0;
+  }
+  
+  &.loading {
+    text-align: center;
+  }
+}
+
+.psv-canvas-container {
+  position: absolute;
+  z-index: 0;
+ 
+  canvas {
+    display: block;
+  }
+}
+
+@import "loader";
+@import "navbar";

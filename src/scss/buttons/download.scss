@@ -1,0 +1,57 @@
+.psv-navbar .download-button {
+  width: $buttons-height;
+  height: $buttons-height;
+
+  &:before {
+    content: '';
+    position: absolute;
+    width: $buttons-height;
+    height: round($buttons-height / 3);
+    left: #{$buttons-padding - $download-button-tickness};
+    bottom: $buttons-padding;
+    border: $download-button-tickness solid $buttons-color;
+    border-top-width: 0;
+    border-radius: 0;
+    transition: border-radius 0.2s ease;
+  }
+  
+  div {
+    position: absolute;
+    width: $download-button-size;
+    height: $download-button-size;
+    top: 50%;
+    left: 50%;
+    margin: #{- $download-button-size / 2};
+    margin-top: #{- $download-button-size / 2 - $download-button-tickness};
+    transition: margin-top 0.2s ease;
+    
+    &:before, &:after {
+      content: '';
+      display: block;
+      margin: 0 auto;
+    }
+    
+    &:before {
+      width: #{2 * round($download-button-size / 4)};
+      height: #{round($download-button-size / 2)};
+      background: $buttons-color;
+    }
+    
+    &:after {
+      width: 0;
+      height: 0;
+      border: #{round($download-button-size / 2)} solid transparent;
+      border-top-color: $buttons-color;
+    }
+  }
+    
+  &:hover {
+    &:before {
+      border-radius: $download-button-tickness;
+    }
+    
+    div {
+      margin-top: #{- $download-button-size / 2};
+    }
+  }
+}

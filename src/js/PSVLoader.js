@@ -9,7 +9,7 @@ var PSVLoader = function(psv) {
   this.container.className = 'psv-loader';
 
   this.canvas = document.createElement('canvas');
-  this.canvas.className = 'psv-loader-canvas';
+  this.canvas.className = 'loader-canvas';
 };
 
 /**
@@ -25,12 +25,12 @@ PSVLoader.prototype.create = function() {
   var inner;
   if (this.psv.config.loading_img) {
     inner = document.createElement('img');
-    inner.className = 'psv-loader-image';
+    inner.className = 'loader-image';
     inner.src = this.psv.config.loading_img;
   }
   else if (this.psv.config.loading_txt) {
     inner = document.createElement('div');
-    inner.className = 'psv-loader-text';
+    inner.className = 'loader-text';
     inner.innerHTML = this.psv.config.loading_txt;
   }
   if (inner) {
