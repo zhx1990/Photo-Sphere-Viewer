@@ -139,6 +139,26 @@ PSVUtils.getStyle = function(elt, prop) {
 };
 
 /**
+ * Translate CSS values like "top center" or "10% 50%" as top and left positions
+ * @param value (String)
+ * @return Object
+ */
+PSVUtils.parsePosition = function(value) {
+  if (!value) {
+    return {top: 0.5, left: 0.5};
+  }
+  
+  var e = document.createElement('div');
+  e.style.backgroundPosition = value;
+  var parsed = PSVUtils.getStyle(e, 'background-position').match(/^([0-9.]+)% ([0-9.]+)%$/);
+  
+  return {
+    left: parsed[1]/100,
+    top: parsed[2]/100
+  };
+};
+
+/**
  * Merge the enumerable attributes of two objects.
  * @copyright Nicholas Fisher <nfisher110@gmail.com>"
  * @license MIT

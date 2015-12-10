@@ -6,17 +6,6 @@ var PSVHUD = function(psv) {
   this.psv = psv;
   this.container = null;
   this.markers = [];
-  this.prop = {
-    onEdge: false,
-    hFov: 0,
-    vFov: 0,
-    visible: {
-      top: 0,
-      right: 0,
-      bottom: 0,
-      left: 0
-    }
-  };
   
   this.create();
   this.psv.config.markers.forEach(this.addMarker.bind(this));
@@ -52,15 +41,23 @@ PSVHUD.prototype.addMarker = function(marker) {
   
   marker.$el = document.createElement('div');
   marker.$el.className = 'marker';
-  marker.$el.style.display = 'none';
+  
+  var style = marker.$el.style;
+  style.display = 'none';
+  style.width = marker.width + 'px';
+  style.height = marker.height + 'px';
+  style.backgroundImage = 'url(' + marker.image + ')';
+  
+  // TODO : texture coordinates to polar coordinates
+  // TODO : get image size
+  
+  marker.Anchor = PSVUtils.parsePosition(marker.anchor);
   
   marker.position = new THREE.Vector3(
-    Math.cos(marker.longitude) * Math.sin(marker.latitude),
+    -Math.cos(marker.longitude) * Math.sin(marker.latitude),
     Math.sin(marker.longitude),
     Math.cos(marker.longitude) * Math.cos(marker.latitude)
   );
-  
-  // TODO : clean coordinates
   
   this.container.appendChild(marker.$el);
 };
@@ -69,34 +66,17 @@ PSVHUD.prototype.addMarker = function(marker) {
  * Update visibility and position of all markers
  */
 PSVHUD.prototype.updatePositions = function() {
-  // compute visible camera "cone"
-  this.prop.onEdge = false;
-  
-  this.prop.vFov = this.psv.camera.fov * Math.PI / 180;
-  this.prop.hFov = 2 * Math.atan(Math.tan(this.prop.vFov / 2) * this.psv.camera.aspect);
-  
-  this.prop.visible.top = this.psv.prop.phi + this.prop.vFov/2;
-  this.prop.visible.right = this.psv.prop.theta + this.prop.hFov/2;
-  this.prop.visible.bottom = this.psv.prop.phi - this.prop.vFov/2;
-  this.prop.visible.left = this.psv.prop.theta - this.prop.hFov/2;
-  
-  if (this.prop.visible.right >= PhotoSphereViewer.TwoPI) {
-    this.prop.visible.right-= PhotoSphereViewer.TwoPI;
-    this.prop.onEdge = 'r';
-  }
-  if (this.prop.visible.left < 0) {
-    this.prop.visible.left+= PhotoSphereViewer.TwoPI;
-    this.prop.onEdge = 'l';
-  }
-  
   this.psv.camera.updateProjectionMatrix();
 
-  // update each marker
   this.markers.forEach(function(marker) {
-    if (this.isMarkerVisible(marker)) {
-      var position = this.getMarkerPosition(marker);
+    var position = this.getMarkerPosition(marker);
+    
+    if (this.isMarkerVisible(marker, position)) {
       marker.$el.style.display = 'block';
-      marker.$el.style.transform = 'translate3D(' + position.left + 'px, ' + position.top + 'px, 0px)';
+      marker.$el.style.transform = 'translate3D(' + 
+        (position.left - marker.width * marker.Anchor.left) + 'px, ' + 
+        (position.top - marker.height * marker.Anchor.top) + 'px, ' +
+        '0px)';
     }
     else {
       marker.$el.style.display = 'none';
@@ -106,26 +86,15 @@ PSVHUD.prototype.updatePositions = function() {
 
 /**
  * Determine if a marker is visible
- * @param marker (Obkect)
+ * @param marker (Object)
+ * @param position (Object)
  * @return (Boolean)
  */
-PSVHUD.prototype.isMarkerVisible = function(marker) {
-  return marker.longitude >= this.prop.visible.bottom &&
-    marker.longitude <= this.prop.visible.top &&
-    (
-      (
-        this.prop.onEdge &&
-        (
-          marker.latitude <= this.prop.visible.right ||
-          marker.latitude >= this.prop.visible.left
-        )
-      ) ||
-      (
-        !this.prop.onEdge &&
-        marker.latitude <= this.prop.visible.right &&
-        marker.latitude >= this.prop.visible.left
-      )
-    );
+PSVHUD.prototype.isMarkerVisible = function(marker, position) {
+  return position.left - marker.width * marker.Anchor.left >= 0 && 
+    position.left + marker.width * (1-marker.Anchor.left) <= this.psv.prop.size.width &&
+    position.top - marker.height * marker.Anchor.top >= 0 && 
+    position.top + marker.height * (1-marker.Anchor.top) <= this.psv.prop.size.height;
 };
 
 /**
