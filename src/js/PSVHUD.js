@@ -35,8 +35,7 @@ PSVHUD.prototype.getHUD = function() {
  * @param marker (Object)
  */
 PSVHUD.prototype.addMarker = function(marker) {
-  // Clone
-  marker = PSVUtils.deepmerge({}, marker);
+  marker = PSVUtils.deepmerge({}, marker); // clone
   this.markers.push(marker);
   
   marker.$el = document.createElement('div');
@@ -51,7 +50,12 @@ PSVHUD.prototype.addMarker = function(marker) {
   // TODO : texture coordinates to polar coordinates
   // TODO : get image size
   
-  marker.Anchor = PSVUtils.parsePosition(marker.anchor);
+  marker.anchor = PSVUtils.parsePosition(marker.anchor);
+  
+  if (marker.hasOwnProperty('x') && marker.hasOwnProperty('y')) {
+    marker.latitude = marker.x / this.psv.prop.size.image_width * PhotoSphereViewer.TwoPI;
+    marker.longitude = (PhotoSphereViewer.HalfPI - marker.y) / this.psv.prop.size.image_height * Math.PI;
+  }
   
   marker.position = new THREE.Vector3(
     -Math.cos(marker.longitude) * Math.sin(marker.latitude),
@@ -74,8 +78,8 @@ PSVHUD.prototype.updatePositions = function() {
     if (this.isMarkerVisible(marker, position)) {
       marker.$el.style.display = 'block';
       marker.$el.style.transform = 'translate3D(' + 
-        (position.left - marker.width * marker.Anchor.left) + 'px, ' + 
-        (position.top - marker.height * marker.Anchor.top) + 'px, ' +
+        (position.left - marker.width * marker.anchor.left) + 'px, ' + 
+        (position.top - marker.height * marker.anchor.top) + 'px, ' +
         '0px)';
     }
     else {
@@ -91,10 +95,10 @@ PSVHUD.prototype.updatePositions = function() {
  * @return (Boolean)
  */
 PSVHUD.prototype.isMarkerVisible = function(marker, position) {
-  return position.left - marker.width * marker.Anchor.left >= 0 && 
-    position.left + marker.width * (1-marker.Anchor.left) <= this.psv.prop.size.width &&
-    position.top - marker.height * marker.Anchor.top >= 0 && 
-    position.top + marker.height * (1-marker.Anchor.top) <= this.psv.prop.size.height;
+  return position.left - marker.width * marker.anchor.left >= 0 && 
+    position.left + marker.width * (1-marker.anchor.left) <= this.psv.prop.size.width &&
+    position.top - marker.height * marker.anchor.top >= 0 && 
+    position.top + marker.height * (1-marker.anchor.top) <= this.psv.prop.size.height;
 };
 
 /**

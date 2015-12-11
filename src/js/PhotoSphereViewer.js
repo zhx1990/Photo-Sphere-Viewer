@@ -37,6 +37,7 @@ var PhotoSphereViewer = function(options) {
   this.container = (typeof this.config.container == 'string') ? document.getElementById(this.config.container) : this.config.container;
   this.loader = null;
   this.navbar = null;
+  this.hud = null;
   this.canvas_container = null;
   this.renderer = null;
   this.scene = null;
@@ -58,7 +59,9 @@ var PhotoSphereViewer = function(options) {
     size: {
       width: 0,
       height: 0,
-      ratio: 0
+      ratio: 0,
+      image_width: 0,
+      image_height: 0
     }
   };
 
@@ -144,27 +147,6 @@ PhotoSphereViewer.prototype.load = function() {
   this.canvas_container = document.createElement('div');
   this.canvas_container.className = 'psv-canvas-container';
   this.container.appendChild(this.canvas_container);
-
-  // Adding events
-  // TODO : bind events to the HUD container
-  PSVUtils.addEvent(window, 'resize', this._onResize.bind(this));
-  if (this.config.mousemove) {
-    this.container.style.cursor = 'move';
-    PSVUtils.addEvent(this.container, 'mousedown', this._onMouseDown.bind(this));
-    PSVUtils.addEvent(this.container, 'touchstart', this._onTouchStart.bind(this));
-    PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
-    PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
-    PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
-    PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
-  }
-  if (this.config.mousewheel) {
-    PSVUtils.addEvent(this.container, PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
-  }
-  var bindedFullscreenToggled = this._fullscreenToggled.bind(this);
-  PSVUtils.addEvent(document, 'fullscreenchange', bindedFullscreenToggled);
-  PSVUtils.addEvent(document, 'mozfullscreenchange', bindedFullscreenToggled);
-  PSVUtils.addEvent(document, 'webkitfullscreenchange', bindedFullscreenToggled);
-  PSVUtils.addEvent(document, 'MSFullscreenChange', bindedFullscreenToggled);
 
   // load image
   if (this.config.usexmpdata) {
@@ -296,6 +278,9 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
 
     var ctx = buffer.getContext('2d');
     ctx.drawImage(img, pano_data.cropped_x, pano_data.cropped_y, pano_data.cropped_width, pano_data.cropped_height);
+    
+    self.prop.size.image_width = pano_data.cropped_width;
+    self.prop.size.image_height = pano_data.cropped_height;
 
     self._createScene(buffer);
   };
@@ -358,18 +343,40 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   }
   
   // HUD
-  if (true) {
-    this.hud = new PSVHUD(this);
-    this.container.appendChild(this.hud.getHUD());
-  }
+  this.hud = new PSVHUD(this);
+  this.container.appendChild(this.hud.getHUD());
 
   // Queue animation
   if (this.config.time_anim !== false) {
     this.prop.anim_timeout = setTimeout(this.startAutorotate.bind(this), this.config.time_anim);
   }
 
+  this._bindEvents();
   this.trigger('ready');
   this.render();
+};
+
+/**
+ * Add all needed event listeners
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._bindEvents = function() {
+  PSVUtils.addEvent(window, 'resize', this._onResize.bind(this));
+  PSVUtils.addEvent(document, PSVUtils.fullscreenEvent(), this._fullscreenToggled.bind(this));
+  
+  if (this.config.mousemove) {
+    this.hud.getHUD().style.cursor = 'move';
+    PSVUtils.addEvent(this.hud.getHUD(), 'mousedown', this._onMouseDown.bind(this));
+    PSVUtils.addEvent(this.hud.getHUD(), 'touchstart', this._onTouchStart.bind(this));
+    PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
+    PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
+    PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
+    PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
+  }
+  
+  if (this.config.mousewheel) {
+    PSVUtils.addEvent(this.hud.getHUD(), PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
+  }
 };
 
 /**

@@ -83,6 +83,16 @@ PSVUtils.mouseWheelEvent = function() {
 };
 
 /**
+ * Get the event name for fullscreen event
+ * @return (string)
+ */
+PSVUtils.fullscreenEvent = function() {
+  var map = {'exitFullscreen': 'fullscreenchange', 'webkitExitFullscreen': 'webkitfullscreenchange', 'mozCancelFullScreen': 'mozfullscreenchange', 'msExitFullscreen': 'msFullscreenEnabled'};
+  for (var exit in map) if (exit in document) return map[exit];
+  return 'fullscreenchange';
+};
+
+/**
  * Ensures that a number is in a given interval
  * @param x (number) The number to check
  * @param min (number) First endpoint
