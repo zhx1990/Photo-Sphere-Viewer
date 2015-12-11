@@ -26,6 +26,16 @@ $fullscreen-button-ratio: 4/3;
 $download-button-tickness: 2px;
 $download-button-size: 12px;
 
+$tooltip-background: rgba(61, 61, 61, 0.7);
+$tooltip-color: rgba(255, 255, 255, 0.9);
+$tooltip-padding: 0.25em 0.5em; // must be symetrical (top=bottom, right=left)
+$tooltip-arrow-size: 10px;
+$tooltip-offset: 5px;
+$tooltip-font-size: 14px;
+$tooltip-line-height: 1.25em; // should be 1em + bottom padding
+$tooltip-nb-lines: 1;
+$tooltip-max-width: 100px;
+
 
 .psv-container {
   width: 100%;

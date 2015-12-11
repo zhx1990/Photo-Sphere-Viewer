@@ -45,6 +45,7 @@
       for (var i=0; i<Math.PI*2; i+=Math.PI/4) {
         for (var j=-Math.PI/2+Math.PI/4; j<Math.PI/2; j+=Math.PI/4) {
           a.push({
+            tooltip: '#' + a.length,
             latitude: i,
             longitude: j,
             image: 'pin.png',
@@ -56,12 +57,22 @@
       }
       
       a.push({
-        x: 500,
-        y: 1000,
+        tooltip: 'path',
+        x: 3900,
+        y: 1650,
         image: 'pin2.png',
         width: 32,
         height: 32,
         anchor: 'bottom center'
+      });
+      
+      a.push({
+        tooltip: 'sun',
+        latitude: 5.28,
+        longitude: 0.56,
+        image: 'pin2.png',
+        width: 32,
+        height: 32
       });
       return a;
     }())

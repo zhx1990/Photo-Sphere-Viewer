@@ -54,6 +54,7 @@ var PhotoSphereViewer = function(options) {
     mousedown: false,
     mouse_x: 0,
     mouse_y: 0,
+    direction: null,
     autorotate_timeout: null,
     anim_timeout: null,
     size: {
@@ -323,7 +324,8 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   var texture = new THREE.Texture(img);
   texture.needsUpdate = true;
 
-  var geometry = new THREE.SphereGeometry(200, 32, 32);
+  // default texture origin is at 1/4 (phiStart=0) of the panorama, I set it at 1/2 (phiStart=PI/2)
+  var geometry = new THREE.SphereGeometry(200, 32, 32, -PhotoSphereViewer.HalfPI);
   var material = new THREE.MeshBasicMaterial({map: texture, overdraw: true});
   var mesh = new THREE.Mesh(geometry, material);
   mesh.scale.x = -1;
@@ -344,6 +346,7 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   
   // HUD
   this.hud = new PSVHUD(this);
+  this.config.markers.forEach(this.hud.addMarker, this.hud);
   this.container.appendChild(this.hud.getHUD());
 
   // Queue animation
@@ -384,13 +387,13 @@ PhotoSphereViewer.prototype._bindEvents = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype.render = function() {
-  var point = new THREE.Vector3(
+  this.prop.direction = new THREE.Vector3(
     -Math.cos(this.prop.phi) * Math.sin(this.prop.theta),
     Math.sin(this.prop.phi),
     Math.cos(this.prop.phi) * Math.cos(this.prop.theta)
   );
 
-  this.camera.lookAt(point);
+  this.camera.lookAt(this.prop.direction);
   this.renderer.render(this.scene, this.camera);
   this.trigger('render');
 };
