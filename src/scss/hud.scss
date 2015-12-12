@@ -3,98 +3,23 @@
   z-index: 50;
   width: 100%;
   height: 100%;
+  overflow: hidden;
   
   .marker {
     position: absolute;
+    z-index: 50;
     top: 0;
     left: 0;
     background-size: contain;
     background-repeat: no-repeat;
     cursor: pointer;
-  }
-  
-  .psv-tooltip {
-    position: absolute;
-    box-sizing: border-box;
-    max-width: $tooltip-max-width;
-    background-color: $tooltip-background-color;
-    border-radius: $tooltip-radius;
-    padding: $tooltip-padding;
+    display: none;
     
-    .content {
-      color: $tooltip-text-color;
-      font: $tooltip-font;
-    }
-    
-    .arrow{
-      position: absolute;
-      height: 0;
-      width: 0;
-      border: $tooltip-arrow-size solid transparent;
-    }
-    
-    &.top-center{
-      box-shadow: 0px $tooltip-shadow-offset 0px $tooltip-shadow-color;
-      
-      .arrow {
-        border-bottom-color: $tooltip-background-color;
-      }
-    }
-    
-    &.center-right{
-      box-shadow: #{-$tooltip-shadow-offset} 0px 0px $tooltip-shadow-color;
-      
-      .arrow {
-        border-left-color: $tooltip-background-color;
-      }
-    }
-    
-    &.bottom-center{
-      box-shadow: 0px #{-$tooltip-shadow-offset} 0px $tooltip-shadow-color;
-      
-      .arrow {
-        border-top-color: $tooltip-background-color;
-      }
-    }
-    
-    &.center-left{
-      box-shadow: $tooltip-shadow-offset 0px 0px $tooltip-shadow-color;
-      
-      .arrow {
-        border-right-color: $tooltip-background-color;
-      }
-    }
-    
-    &.top-right{
-      box-shadow: #{-$tooltip-shadow-offset} $tooltip-shadow-offset 0px $tooltip-shadow-color;
-      
-      .arrow {
-        border-bottom-color: $tooltip-background-color;
-      }
-    }
-    
-    &.top-left{
-      box-shadow: $tooltip-shadow-offset $tooltip-shadow-offset 0px $tooltip-shadow-color;
-      
-      .arrow {
-        border-bottom-color: $tooltip-background-color;
-      }
-    }
-    
-    &.bottom-right{
-      box-shadow: #{-$tooltip-shadow-offset} #{-$tooltip-shadow-offset} 0px $tooltip-shadow-color;
-      
-      .arrow {
-        border-top-color: $tooltip-background-color;
-      }
-    }
-    
-    &.bottom-left{
-      box-shadow: $tooltip-shadow-offset #{-$tooltip-shadow-offset} 0px $tooltip-shadow-color;
-      
-      .arrow {
-        border-top-color: $tooltip-background-color;
-      }
+    &.visible {
+      display: block;
     }
   }
 }
+
+@import "panel";
+@import "tooltip";

@@ -7,12 +7,16 @@ var PSVHUD = function(psv) {
   this.config = this.psv.config.tooltip;
   this.container = null;
   this.tooltip = null;
+  this.panel = null;
   this.markers = [];
   
   this.create();
   
   this.psv.on('render', this.updatePositions.bind(this));
 };
+
+PSVHUD.leftMap = {0: 'left', 0.5: 'center', 1: 'right'};
+PSVHUD.topMap = {0: 'top', 0.5: 'center', 1: 'bottom'};
 
 /**
  * Creates the elements
@@ -27,12 +31,66 @@ PSVHUD.prototype.create = function() {
   this.tooltip = document.createElement('div');
   this.tooltip.innerHTML = '<div class="arrow"></div><div class="content"></div>';
   this.tooltip.className = 'psv-tooltip';
-  this.tooltip.style.display = 'none';
   this.container.appendChild(this.tooltip);
+  
+  // Panel
+  this.panel = document.createElement('aside');
+  this.panel.className = 'psv-panel';
+  this.container.appendChild(this.panel);
   
   // Markers events via delegation
   this.container.addEventListener('mouseenter', this._onMouseEnter.bind(this), true);
   this.container.addEventListener('mouseleave', this._onMouseLeave.bind(this), true);
+  this.container.addEventListener('mousedown', this._onMouseClick.bind(this), true);
+  
+  // Prevent event bubling from panel
+  var stopPropagation = function(e) {
+    e.stopPropagation();
+  };
+  
+  if (this.psv.config.mousewheel) {
+    this.panel.addEventListener(PSVUtils.mouseWheelEvent(), stopPropagation);
+  }
+  
+  if (this.psv.config.mousemove) {
+    PSVUtils.addEvents(this.panel, 'mousedown touchstart mouseup touchend mousemove touchmove', stopPropagation);
+  }
+};
+
+/**
+ * The mouse enters a marker
+ * @param e (Event)
+ * @return (void)
+ */
+PSVHUD.prototype._onMouseEnter = function(e) {
+  if (e.target && e.target.psvMarker && e.target.psvMarker.tooltip) {
+    this.showTooltip(e.target.psvMarker);
+  }
+};
+
+/**
+ * The mouse leaves a marker
+ * @param e (Event)
+ * @return (void)
+ */
+PSVHUD.prototype._onMouseLeave = function(e) {
+  if (e.target && e.target.psvMarker) {
+    this.hideTooltip();
+  }
+};
+
+/**
+ * Click on a marker or outside a marker
+ * @param e (Event)
+ * @return (void)
+ */
+PSVHUD.prototype._onMouseClick = function(e) {
+  if (e.target && e.target.psvMarker && e.target.psvMarker.content) {
+    this.showPanel(e.target.psvMarker);
+  }
+  else if (!PSVUtils.hasParent(e.target, this.panel)) {
+    this.hidePanel();
+  }
 };
 
 /**
@@ -69,7 +127,6 @@ PSVHUD.prototype.addMarker = function(marker) {
   marker.$el.className = 'marker ' + (marker.className||'');
   
   var style = marker.$el.style;
-  style.display = 'none';
   style.width = marker.width + 'px';
   style.height = marker.height + 'px';
   style.backgroundImage = 'url(' + marker.image + ')';
@@ -85,20 +142,18 @@ PSVHUD.prototype.addMarker = function(marker) {
     // parse position
     if (marker.tooltip.position) {
       var tempPos = PSVUtils.parsePosition(marker.tooltip.position);
-      var leftMap = {0: 'left', 0.5: 'center', 1: 'right'};
-      var topMap = {0: 'top', 0.5: 'center', 1: 'bottom'};
       
-      if (!(tempPos.left in leftMap) || !(tempPos.top in topMap)) {
+      if (!(tempPos.left in PSVHUD.leftMap) || !(tempPos.top in PSVHUD.topMap)) {
         throw 'PhotoSphereViewer: unable to parse tooltip position "' + marker.tooltip.position + '"';
       }
       
-      marker.tooltip.position = [topMap[tempPos.top], leftMap[tempPos.left]];
+      marker.tooltip.position = [PSVHUD.topMap[tempPos.top], PSVHUD.leftMap[tempPos.left]];
     }
     else {
-      marker.tooltip.position = ['bottom', 'center'];
+      marker.tooltip.position = ['top', 'center'];
     }
     
-    PSVUtils.addClass(marker.$el, 'has-tooltip');
+    marker.$el.classList.add('has-tooltip');
   }
   
   // parse anchor
@@ -134,15 +189,19 @@ PSVHUD.prototype.updatePositions = function() {
     
     if (this.isMarkerVisible(marker, position)) {
       marker.position2D = position;
-      marker.$el.style.display = 'block';
+      
       marker.$el.style.transform = 'translate3D(' + 
         position.left + 'px, ' + 
         position.top + 'px, ' +
         '0px)';
+      
+      if (!marker.$el.classList.contains('visible')) {
+        marker.$el.classList.add('visible');
+      }
     }
     else {
       marker.position2D = null;
-      marker.$el.style.display = 'none';
+      marker.$el.classList.remove('visible');
     }
   }, this);
 };
@@ -178,28 +237,6 @@ PSVHUD.prototype.getMarkerPosition = function(marker) {
 };
 
 /**
- * The mouse enters a marker
- * @param e (Event)
- * @return (void)
- */
-PSVHUD.prototype._onMouseEnter = function(e) {
-  if (e.target && e.target.psvMarker && e.target.psvMarker.tooltip) {
-    this.showTooltip(e.target.psvMarker);
-  }
-};
-
-/**
- * The mouse leaves a marker
- * @param e (Event)
- * @return (void)
- */
-PSVHUD.prototype._onMouseLeave = function(e) {
-  if (e.target && e.target.psvMarker) {
-    this.hideTooltip();
-  }
-};
-
-/**
  * Show the tooltip for a specific marker
  * @param marker (Object)
  * @return (void)
@@ -214,9 +251,7 @@ PSVHUD.prototype.showTooltip = function(marker) {
     t.classList.add(marker.tooltip.className);
   }
 
-  // display the tooltip, ready for computation
   c.innerHTML = marker.tooltip.content;
-  t.style.display = 'block';
   t.style.top = '0px';
   t.style.left = '0px';
   
@@ -238,19 +273,19 @@ PSVHUD.prototype.showTooltip = function(marker) {
   // correct position if overflow
   var refresh = false;
   if (style.top < this.config.offset) {
-    style.posClass[0] = 'top';
-    refresh = true;
-  }
-  else if (style.top + style.height > this.psv.prop.size.height - this.config.offset) {
     style.posClass[0] = 'bottom';
     refresh = true;
   }
+  else if (style.top + style.height > this.psv.prop.size.height - this.config.offset) {
+    style.posClass[0] = 'top';
+    refresh = true;
+  }
   if (style.left < this.config.offset) {
-    style.posClass[1] = 'left';
+    style.posClass[1] = 'right';
     refresh = true;
   }
   else if (style.left + style.width > this.psv.prop.size.width - this.config.offset) {
-    style.posClass[1] = 'right';
+    style.posClass[1] = 'left';
     refresh = true;
   }
   if (refresh) {
@@ -265,10 +300,15 @@ PSVHUD.prototype.showTooltip = function(marker) {
   a.style.left = style.arrow_left + 'px';
   
   t.classList.add(style.posClass.join('-'));
+  
+  // delay for correct transition between the two classes
+  setTimeout(function() {
+    t.classList.add('visible');
+  }, 100);
 };
 
 /**
- * Compute the position of the tooltip and it's arrow
+ * Compute the position of the tooltip and its arrow
  * @param style (Object) tooltip style
  * @param marker (Object)
  * @return (void)
@@ -277,7 +317,7 @@ PSVHUD.prototype._computeTooltipPosition = function(style, marker) {
   var topBottom = false;
   
   switch (style.posClass[0]) {
-    case 'top':
+    case 'bottom':
       style.top = marker.position2D.top + marker.height + this.config.offset + this.config.arrow_size;
       style.arrow_top = - this.config.arrow_size * 2;
       topBottom = true;
@@ -288,7 +328,7 @@ PSVHUD.prototype._computeTooltipPosition = function(style, marker) {
       style.arrow_top = style.height/2 - this.config.arrow_size;
       break;
     
-    case 'bottom':
+    case 'top':
       style.top = marker.position2D.top - style.height - this.config.offset - this.config.arrow_size;
       style.arrow_top = style.height;
       topBottom = true;
@@ -296,7 +336,7 @@ PSVHUD.prototype._computeTooltipPosition = function(style, marker) {
   }
   
   switch (style.posClass[1]) {
-    case 'left':
+    case 'right':
       if (topBottom) {
         style.left = marker.position2D.left;
         style.arrow_left = marker.width/2 - this.config.arrow_size;
@@ -312,7 +352,7 @@ PSVHUD.prototype._computeTooltipPosition = function(style, marker) {
       style.arrow_left = style.width/2 - this.config.arrow_size;
       break;
     
-    case 'right':
+    case 'left':
       if (topBottom) {
         style.left = marker.position2D.left - style.width + marker.width;
         style.arrow_left = style.width - marker.width/2 - this.config.arrow_size;
@@ -330,5 +370,27 @@ PSVHUD.prototype._computeTooltipPosition = function(style, marker) {
  * @return (void)
  */
 PSVHUD.prototype.hideTooltip = function() {
-  this.tooltip.style.display = 'none';
+  this.tooltip.classList.remove('visible');
+};
+
+/**
+ * Show the panel for a specific marker
+ * @param marker (Object)
+ * @return (void)
+ */
+PSVHUD.prototype.showPanel = function(marker) {
+  var p = this.panel;
+  
+  p.innerHTML = marker.content;
+  p.classList.add('open');
+  p.scrollTop = 0;
+};
+
+
+/**
+ * Hide the panel
+ * @return (void)
+ */
+PSVHUD.prototype.hidePanel = function() {
+  this.panel.classList.remove('open');
 };

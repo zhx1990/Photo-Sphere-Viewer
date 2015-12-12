@@ -1,0 +1,29 @@
+.psv-panel {
+  position: absolute;
+  z-index: 100;
+  right: 0;
+  box-sizing: border-box;
+  height: 100%;
+  width: $panel-width;
+  max-width: 100%;
+  padding: $panel-padding;
+  background: $panel-background;
+  color: $panel-text-color;
+  font: $panel-font;
+  overflow: auto;
+  transform: translate3D(100%, 0, 0);
+  opacity: 0;
+  transition-property: opacity, transform;
+  transition-timing-function: ease-in-out;
+  transition-duration: 0.1s;
+  
+  &.open {
+    transform: translate3D(0, 0, 0);
+    opacity: 1;
+    transition-duration: 0.2s;
+  }
+
+  .psv-container.has-navbar &{
+    height: calc(100% - #{$buttons-height + 2*$buttons-padding});
+  }
+}

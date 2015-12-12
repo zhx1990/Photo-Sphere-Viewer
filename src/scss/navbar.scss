@@ -4,13 +4,18 @@
   bottom: 0;
   width: 100%;
   background: $navbar-background;
+  
+  &, & * {
+    box-sizing: content-box;
+  }
 
   .caption {
-    color: $buttons-color;
+    color: $caption-color;
     margin: $buttons-padding;
     white-space: nowrap;
     overflow: hidden;
-    text-align:center;
+    text-align: center;
+    font-family: $caption-font;
   }
 
   .psv-button {

@@ -22,9 +22,9 @@ PSVNavBarDownloadButton.prototype.create = function() {
 
   this.button.appendChild(document.createElement('div'));
 
-  PSVUtils.addEvent(this.button, 'mouseenter', this.toggleActive.bind(this, true));
-  PSVUtils.addEvent(this.button, 'mouseleave', this.toggleActive.bind(this, false));
-  PSVUtils.addEvent(this.button, 'click', this.download.bind(this));
+  this.button.addEventListener('mouseenter', this.toggleActive.bind(this, true));
+  this.button.addEventListener('mouseleave', this.toggleActive.bind(this, false));
+  this.button.addEventListener('click', this.download.bind(this));
 };
 
 /**

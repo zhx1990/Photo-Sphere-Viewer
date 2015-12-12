@@ -136,7 +136,7 @@ PhotoSphereViewer.DEFAULTS = {
  * @return (void)
  */
 PhotoSphereViewer.prototype.load = function() {
-  PSVUtils.addClass(this.container, 'psv-container loading');
+  this.container.classList.add('psv-container', 'loading');
 
   // Is canvas supported?
   if (!PSVUtils.isCanvasSupported()) {
@@ -341,10 +341,11 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   // Remove loader
   this.container.removeChild(this.loader.getLoader());
   this.loader = null;
-  PSVUtils.removeClass(this.container, 'loading');
+  this.container.classList.remove('loading');
 
   // Navigation bar
   if (this.config.navbar) {
+    this.container.classList.add('has-navbar');
     this.navbar = new PSVNavBar(this);
     this.container.appendChild(this.navbar.getBar());
   }
@@ -369,21 +370,20 @@ PhotoSphereViewer.prototype._createScene = function(img) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._bindEvents = function() {
-  PSVUtils.addEvent(window, 'resize', this._onResize.bind(this));
-  PSVUtils.addEvent(document, PSVUtils.fullscreenEvent(), this._fullscreenToggled.bind(this));
+  window.addEventListener('resize', this._onResize.bind(this));
+  document.addEventListener(PSVUtils.fullscreenEvent(), this._fullscreenToggled.bind(this));
   
   if (this.config.mousemove) {
     this.hud.getHUD().style.cursor = 'move';
-    PSVUtils.addEvent(this.hud.getHUD(), 'mousedown', this._onMouseDown.bind(this));
-    PSVUtils.addEvent(this.hud.getHUD(), 'touchstart', this._onTouchStart.bind(this));
-    PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
-    PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
-    PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
-    PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
+    this.hud.getHUD().addEventListener('mousedown', this._onMouseDown.bind(this));
+    this.hud.getHUD().addEventListener('touchstart', this._onTouchStart.bind(this));
+    PSVUtils.addEvents(document, 'mouseup touchend', this._onMouseUp.bind(this));
+    document.addEventListener('mousemove', this._onMouseMove.bind(this));
+    document.addEventListener('touchmove', this._onTouchMove.bind(this));
   }
   
   if (this.config.mousewheel) {
-    PSVUtils.addEvent(this.hud.getHUD(), PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
+    this.hud.getHUD().addEventListener(PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
   }
 };
 

@@ -27,6 +27,7 @@ PSVNavBarAutorotateButton.prototype.create = function() {
   autorotate_equator.className = 'equator';
   this.button.appendChild(autorotate_equator);
 
-  PSVUtils.addEvent(this.button, 'click', this.psv.toggleAutorotate.bind(this.psv));
+  this.button.addEventListener('click', this.psv.toggleAutorotate.bind(this.psv));
+  
   this.psv.on('autorotate', this.toggleActive.bind(this));
 };

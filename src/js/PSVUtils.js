@@ -4,31 +4,6 @@
 var PSVUtils = {};
 
 /**
- * Adds a CSS class to an element
- * @param elt (HTMLElement)
- * @param clazz (string)
- */
-PSVUtils.addClass = function(elt, clazz) {
-  if (elt.className.length) {
-    elt.className+= ' ' + clazz;
-  }
-  else {
-    elt.className = clazz;
-  }
-};
-
-/**
- * Removes a CSS class from an element
- * @param elt (HTMLElement)
- * @param clazz (string)
- */
-PSVUtils.removeClass = function(elt, clazz) {
-  if (elt.className.length) {
-    elt.className = elt.className.replace(new RegExp('\\b' + clazz + '\\b'), '').trim();
-  }
-};
-
-/**
  * Detects whether canvas is supported
  * @return (boolean) true if canvas is supported, false otherwise
  */
@@ -59,17 +34,31 @@ PSVUtils.getMaxTextureWidth = function() {
 /**
  * Attaches an event handler function to an elemnt
  * @param elt (HTMLElement) The element
- * @param evt (string) The event name
+ * @param evt (string) The event name(s)
  * @param f (Function) The handler function
+ * @param cap (Boolean) use capture
  * @return (void)
  */
-PSVUtils.addEvent = function(elt, evt, f) {
-  if (!!elt.addEventListener) {
-    elt.addEventListener(evt, f, false);
-  }
-  else {
-    elt.attachEvent('on' + evt, f);
-  }
+PSVUtils.addEvents = function(elt, evt, f, cap) {
+  evt.split(' ').forEach(function(e) {
+    elt.addEventListener(e, f, cap);
+  });
+};
+
+/**
+ * Search if an element has a particular, at any level
+ * @param el (HTMLElement)
+ * @param parent (HTMLElement)
+ * @return (Boolean)
+ */
+PSVUtils.hasParent = function(el, parent) {
+  do {
+    if (el === parent) {
+      return true;
+    }
+  } while (el = el.parentNode);
+
+  return false;
 };
 
 /**

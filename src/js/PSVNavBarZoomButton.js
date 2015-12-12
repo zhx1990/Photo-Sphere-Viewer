@@ -47,14 +47,14 @@ PSVNavBarZoomButton.prototype.create = function() {
   zoom_plus.title = this.psv.config.lang.zoomIn;
   this.button.appendChild(zoom_plus);
 
-  PSVUtils.addEvent(this.zoom_range, 'mousedown', this._initZoomChangeWithMouse.bind(this));
-  PSVUtils.addEvent(this.zoom_range, 'touchstart', this._initZoomChangeByTouch.bind(this));
-  PSVUtils.addEvent(document, 'mousemove', this._changeZoomWithMouse.bind(this));
-  PSVUtils.addEvent(document, 'touchmove', this._changeZoomByTouch.bind(this));
-  PSVUtils.addEvent(document, 'mouseup', this._stopZoomChange.bind(this));
-  PSVUtils.addEvent(document, 'touchend', this._stopZoomChange.bind(this));
-  PSVUtils.addEvent(zoom_minus, 'click', this.psv.zoomOut.bind(this.psv));
-  PSVUtils.addEvent(zoom_plus, 'click', this.psv.zoomIn.bind(this.psv));
+  this.zoom_range.addEventListener('mousedown', this._initZoomChangeWithMouse.bind(this));
+  this.zoom_range.addEventListener('touchstart', this._initZoomChangeByTouch.bind(this));
+  document.addEventListener('mousemove', this._changeZoomWithMouse.bind(this));
+  document.addEventListener('touchmove', this._changeZoomByTouch.bind(this));
+  PSVUtils.addEvents(document, 'mouseup touchend', this._stopZoomChange.bind(this));
+  zoom_minus.addEventListener('click', this.psv.zoomOut.bind(this.psv));
+  zoom_plus.addEventListener('click', this.psv.zoomIn.bind(this.psv));
+  
   this.psv.on('zoom-updated', this._moveZoomValue.bind(this));
 
   var self = this;
