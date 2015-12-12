@@ -84,6 +84,7 @@ var PhotoSphereViewer = function(options) {
   }
 };
 
+PhotoSphereViewer.PI = Math.PI;
 PhotoSphereViewer.TwoPI = Math.PI * 2.0;
 PhotoSphereViewer.HalfPI = Math.PI / 2.0;
 
@@ -110,6 +111,10 @@ PhotoSphereViewer.DEFAULTS = {
   anim_lat: null,
   anim_lat: null,
   navbar: false,
+  tooltip: {
+    offset: 5,
+    arrow_size: 7
+  },
   lang: {
     autorotate: 'Automatic rotation',
     zoom: 'Zoom',

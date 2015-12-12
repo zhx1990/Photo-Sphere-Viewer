@@ -159,8 +159,10 @@ PSVUtils.parsePosition = function(value) {
   }
   
   var e = document.createElement('div');
+  document.body.appendChild(e);
   e.style.backgroundPosition = value;
   var parsed = PSVUtils.getStyle(e, 'background-position').match(/^([0-9.]+)% ([0-9.]+)%$/);
+  document.body.removeChild(e);
   
   return {
     left: parsed[1]/100,

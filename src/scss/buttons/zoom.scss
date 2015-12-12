@@ -12,21 +12,20 @@
     border: $zoom-buttons-tickness solid $buttons-color;
     border-radius: 30%;
     transition: transform 0.3s ease;
-  
-    &.minus:before,
-    &.plus:before,
-    &.plus:after {
-      content: '';
-      position: absolute;
-      top: #{($zoom-buttons-width - $zoom-buttons-tickness) /2};
-      left: $zoom-buttons-tickness;
-      width: #{$zoom-buttons-width - $zoom-buttons-tickness * 2};
-      height: $zoom-buttons-tickness;
-      background: $buttons-color;
-    }
-    &.plus:after {
-      transform: rotate(90deg);
-    }
+  }
+  .minus:before,
+  .plus:before,
+  .plus:after {
+    content: '';
+    position: absolute;
+    top: #{($zoom-buttons-width - $zoom-buttons-tickness) /2};
+    left: $zoom-buttons-tickness;
+    width: #{$zoom-buttons-width - $zoom-buttons-tickness * 2};
+    height: $zoom-buttons-tickness;
+    background: $buttons-color;
+  }
+  .plus:after {
+    transform: rotate(90deg);
   }
   
   .range {
