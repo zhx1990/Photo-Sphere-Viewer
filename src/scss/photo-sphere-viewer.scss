@@ -49,6 +49,11 @@ $panel-text-color: rgb(220, 220, 220);
 $panel-width: 400px;
 $panel-padding: 1em;
 
+$panel-resizer-width: 9px; // must be odd
+$panel-resizer-background: rgba(0, 0, 0, 0.9);
+$panel-resizer-grip-color: white;
+$panel-resizer-grip-height: 29px; // must be odd;
+
 $panel-font: 16px sans-serif;
 
 $markers-list-image-size: 20px;
@@ -60,9 +65,6 @@ $markers-list-even-background: transparent;
 
 $markers-list-title-shadow: 2px 1px black;
 $markers-list-title-font: 24px sans-serif;
-
-
-@import "mixins";
 
 
 .psv-container {

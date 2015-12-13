@@ -68,7 +68,7 @@ PSVNavBarMarkersButton.prototype.showMarkers = function() {
   </div>';
   
   this.prop.panelOpening = true;
-  this.psv.panel.showPanel(html);
+  this.psv.panel.showPanel(html, true);
   
   this.psv.panel.container.querySelector('.psv-markers-list').addEventListener('click', this._onClickItem.bind(this));
 };
