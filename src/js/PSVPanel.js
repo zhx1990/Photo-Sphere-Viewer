@@ -38,9 +38,9 @@ PSVPanel.prototype.create = function() {
   // Event for panel resizing + stop bubling
   this.container.addEventListener('mousedown', this._onMouseDown.bind(this));
   this.container.addEventListener('touchstart', this._onTouchStart.bind(this));
-  PSVUtils.addEvents(document, 'mouseup touchend', this._onMouseUp.bind(this));
-  document.addEventListener('mousemove', this._onMouseMove.bind(this));
-  document.addEventListener('touchmove', this._onTouchMove.bind(this));
+  PSVUtils.addEvents(this.container, 'mouseup touchend', this._onMouseUp.bind(this));
+  this.container.addEventListener('mousemove', this._onMouseMove.bind(this));
+  this.container.addEventListener('touchmove', this._onTouchMove.bind(this));
 };
 
 /**
@@ -129,7 +129,6 @@ PSVPanel.prototype._onMouseUp = function(evt) {
  * @return (void)
  */
 PSVPanel.prototype._onMouseMove = function(evt) {
-  evt.preventDefault();
   evt.stopPropagation();
   this._resize(evt);
 };
@@ -140,7 +139,6 @@ PSVPanel.prototype._onMouseMove = function(evt) {
  * @return (void)
  */
 PSVPanel.prototype._onTouchMove = function(evt) {
-  evt.preventDefault();
   evt.stopPropagation();
   this._resize(evt.changedTouches[0]);
 };

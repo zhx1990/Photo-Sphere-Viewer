@@ -52,9 +52,11 @@ var PhotoSphereViewer = function(options) {
     theta: 0,
     theta_offset: 0,
     zoom_lvl: 0,
-    mousedown: false,
+    moving: false,
+    zooming: false,
     mouse_x: 0,
     mouse_y: 0,
+    touches: [],
     direction: null,
     autorotate_timeout: null,
     animation_timeout: null,
@@ -108,8 +110,8 @@ PhotoSphereViewer.DEFAULTS = {
   default_lat: 0,
   tilt_up_max: PhotoSphereViewer.HalfPI,
   tilt_down_max: -PhotoSphereViewer.HalfPI,
-  long_offset: Math.PI / 720.0,
-  lat_offset: Math.PI / 360.0,
+  long_offset: Math.PI / 1440.0,
+  lat_offset: Math.PI / 720.0,
   time_anim: 2000,
   anim_speed: '2rpm',
   anim_lat: null,
@@ -383,12 +385,12 @@ PhotoSphereViewer.prototype._bindEvents = function() {
   document.addEventListener(PSVUtils.fullscreenEvent(), this._fullscreenToggled.bind(this));
   
   if (this.config.mousemove) {
-    this.hud.getHUD().style.cursor = 'move';
-    this.hud.getHUD().addEventListener('mousedown', this._onMouseDown.bind(this));
-    this.hud.getHUD().addEventListener('touchstart', this._onTouchStart.bind(this));
-    PSVUtils.addEvents(document, 'mouseup touchend', this._onMouseUp.bind(this));
-    document.addEventListener('mousemove', this._onMouseMove.bind(this));
-    document.addEventListener('touchmove', this._onTouchMove.bind(this));
+    this.hud.container.style.cursor = 'move';
+    this.hud.container.addEventListener('mousedown', this._onMouseDown.bind(this));
+    this.hud.container.addEventListener('touchstart', this._onTouchStart.bind(this));
+    PSVUtils.addEvents(this.hud.container, 'mouseup touchend', this._onMouseUp.bind(this));
+    this.hud.container.addEventListener('mousemove', this._onMouseMove.bind(this));
+    this.hud.container.addEventListener('touchmove', this._onTouchMove.bind(this));
   }
   
   if (this.config.mousewheel) {
@@ -516,7 +518,12 @@ PhotoSphereViewer.prototype._onMouseDown = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._onTouchStart = function(evt) {
-  this._startMove(evt.changedTouches[0]);
+  if (evt.touches.length === 1) {
+    this._startMove(evt.touches[0]);
+  }
+  else if (evt.touches.length === 2) {
+    this._startZoom(evt);
+  }
 };
 
 /**
@@ -527,7 +534,8 @@ PhotoSphereViewer.prototype._onTouchStart = function(evt) {
 PhotoSphereViewer.prototype._startMove = function(evt) {
   this.prop.mouse_x = parseInt(evt.clientX);
   this.prop.mouse_y = parseInt(evt.clientY);
-  this.prop.mousedown = true;
+  this.prop.moving = true;
+  this.prop.zooming = false;
 
   this.stopAutorotate();
   this.stopAnimation();
@@ -536,12 +544,31 @@ PhotoSphereViewer.prototype._startMove = function(evt) {
 };
 
 /**
+ * Initializes the zoom
+ * @param evt (Event) The event
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._startZoom = function(evt) {
+  var t = this.prop.touches = [
+    {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
+    {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
+  ];
+  t[2] = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
+  this.prop.moving = false;
+  this.prop.zooming = true;
+
+  this.stopAutorotate();
+  this.stopAnimation();
+};
+
+/**
  * The user wants to stop moving
  * @param evt (Event) The event
  * @return (void)
  */
 PhotoSphereViewer.prototype._onMouseUp = function(evt) {
-  this.prop.mousedown = false;
+  this.prop.moving = false;
+  this.prop.zooming = false;
   
   this.trigger('__mouseup', evt);
 };
@@ -562,8 +589,17 @@ PhotoSphereViewer.prototype._onMouseMove = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._onTouchMove = function(evt) {
-  evt.preventDefault();
-  this._move(evt.changedTouches[0]);
+  if (evt.touches.length === 1) {
+    evt.preventDefault();
+    this._move(evt.touches[0]);
+  }
+  else if (evt.touches.length === 2) {
+    evt.preventDefault();
+    this._zoom(evt);
+  }
+  else {
+    this._onMouseUp();
+  }
 };
 
 /**
@@ -572,7 +608,7 @@ PhotoSphereViewer.prototype._onTouchMove = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._move = function(evt) {
-  if (this.prop.mousedown) {
+  if (this.prop.moving) {
     var x = parseInt(evt.clientX);
     var y = parseInt(evt.clientY);
   
@@ -585,6 +621,27 @@ PhotoSphereViewer.prototype._move = function(evt) {
     this.prop.mouse_y = y;
 
     this.trigger('__mousemove', evt);
+  }
+};
+
+/**
+ * Zoom
+ * @param evt (Event) The event
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._zoom = function(evt) {
+  if (this.prop.zooming) {
+    var t = [
+      {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
+      {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
+    ];
+    t[2] = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
+    
+    var delta = 80 * (t[2] - this.prop.touches[2]) / this.prop.size.width;
+  
+    this.zoom(this.prop.zoom_lvl + delta);
+
+    this.prop.touches = t;
   }
 };
 
