@@ -189,7 +189,7 @@ PhotoSphereViewer.prototype._loadXMP = function() {
 
   xhr.onreadystatechange = function() {
     if (xhr.readyState == 4) {
-      if (xhr.status == 200) {
+      if (xhr.status == 200 || xhr.status == 201 || xhr.status == 202 || xhr.status == 0) {
         self.loader.setProgress(100);
 
         var binary = xhr.responseText;
@@ -216,6 +216,10 @@ PhotoSphereViewer.prototype._loadXMP = function() {
       else {
         self.container.textContent = 'Cannot load image';
       }
+    }else if (xhr.readyState == 3) {
+        
+      self.loader.setProgress(progress += 10);
+      
     }
   };
 
