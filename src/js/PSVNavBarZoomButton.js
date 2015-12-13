@@ -26,6 +26,7 @@ PSVNavBarZoomButton.prototype.create = function() {
   var zoom_minus = document.createElement('div');
   zoom_minus.className = 'minus';
   zoom_minus.title = this.psv.config.lang.zoomOut;
+  zoom_minus.innerHTML = PhotoSphereViewer.ICONS['zoom-out.svg'];
   this.button.appendChild(zoom_minus);
 
   var zoom_range_bg = document.createElement('div');
@@ -45,6 +46,7 @@ PSVNavBarZoomButton.prototype.create = function() {
   var zoom_plus = document.createElement('div');
   zoom_plus.className = 'plus';
   zoom_plus.title = this.psv.config.lang.zoomIn;
+  zoom_plus.innerHTML = PhotoSphereViewer.ICONS['zoom-in.svg'];
   this.button.appendChild(zoom_plus);
 
   this.zoom_range.addEventListener('mousedown', this._initZoomChangeWithMouse.bind(this));

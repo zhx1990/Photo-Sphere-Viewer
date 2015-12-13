@@ -5,32 +5,18 @@
     float: left;
     position: relative;
     cursor: pointer;
-    width: #{$zoom-buttons-width};
-    height: #{$zoom-buttons-width};
-    color: $buttons-color;
-    margin: #{($buttons-height - $zoom-buttons-width) / 2 - $zoom-buttons-tickness} 0;
-    border: $zoom-buttons-tickness solid $buttons-color;
-    border-radius: 30%;
-    transition: transform 0.3s ease;
-  }
-  .minus:before,
-  .plus:before,
-  .plus:after {
-    content: '';
-    position: absolute;
-    top: #{($zoom-buttons-width - $zoom-buttons-tickness) /2};
-    left: $zoom-buttons-tickness;
-    width: #{$zoom-buttons-width - $zoom-buttons-tickness * 2};
-    height: $zoom-buttons-tickness;
-    background: $buttons-color;
-  }
-  .plus:after {
-    transform: rotate(90deg);
+    width: $zoom-buttons-width;
+    height: $zoom-buttons-width;
+    
+    svg {
+      position: relative;
+      top: 20%;
+    }
   }
   
   .range {
     float: left;
-    padding: #{($buttons-height - $zoom-range-tickness) / 2} 10px;
+    padding: #{($buttons-height - $zoom-range-tickness) / 2} #{$zoom-buttons-width / 2};
     
     .line {
       position: relative;
@@ -54,10 +40,6 @@
   }
 
   &:hover {
-    .minus, .plus {
-      transform: scale(1.2);
-    }
-    
     .range {
       .line {
         box-shadow: 0 0 2px $buttons-color;

@@ -4,10 +4,6 @@
   svg {
     transform: scale(1);
     transition: transform 0.3s ease;
-    
-    path {
-      fill: $buttons-color;
-    }
   }
   
   &:hover svg {

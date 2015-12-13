@@ -29,6 +29,13 @@
     &.active {
       background: $buttons-active-background;
     }
+    
+    svg {
+      width: 100%;
+      * {
+        fill: $buttons-color;
+      }
+    }
   }
 }
 
