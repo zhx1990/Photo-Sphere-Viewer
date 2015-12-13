@@ -56,7 +56,7 @@ var PhotoSphereViewer = function(options) {
     zooming: false,
     mouse_x: 0,
     mouse_y: 0,
-    touches: [],
+    pinch_dist: 0,
     direction: null,
     autorotate_timeout: null,
     animation_timeout: null,
@@ -549,16 +549,19 @@ PhotoSphereViewer.prototype._startMove = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._startZoom = function(evt) {
-  var t = this.prop.touches = [
+  var t = [
     {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
     {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
   ];
-  t[2] = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
+  
+  this.prop.pinch_dist = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
   this.prop.moving = false;
   this.prop.zooming = true;
 
   this.stopAutorotate();
   this.stopAnimation();
+  
+  this.trigger('__mousedown', evt.touches[0]);
 };
 
 /**
@@ -635,13 +638,15 @@ PhotoSphereViewer.prototype._zoom = function(evt) {
       {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
       {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
     ];
-    t[2] = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
     
-    var delta = 80 * (t[2] - this.prop.touches[2]) / this.prop.size.width;
+    var p = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
+    var delta = 80 * (p - this.prop.pinch_dist) / this.prop.size.width;
   
     this.zoom(this.prop.zoom_lvl + delta);
 
-    this.prop.touches = t;
+    this.prop.pinch_dist = p;
+    
+    this.trigger('__mousemove', evt.touches[0]);
   }
 };
 

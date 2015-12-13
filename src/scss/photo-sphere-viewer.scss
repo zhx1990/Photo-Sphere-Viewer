@@ -52,6 +52,9 @@ $panel-resizer-width: 9px; // must be odd
 $panel-resizer-background: rgba(0, 0, 0, 0.9);
 $panel-resizer-grip-color: white;
 $panel-resizer-grip-height: 29px; // must be odd;
+$panel-close-button-width: 24px;
+$panel-close-button-background: $panel-resizer-background;
+$panel-close-button-color: white;
 
 $panel-font: 16px sans-serif;
 

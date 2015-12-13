@@ -24,9 +24,16 @@ var PSVPanel = function(psv) {
 PSVPanel.prototype.create = function() {
   this.container = document.createElement('aside');
   this.container.className = 'psv-panel';
-  this.container.innerHTML = '<div class="resizer"></div><div class="content"></div>';
+  this.container.innerHTML = '\
+<div class="resizer"></div>\
+<div class="close-button"></div>\
+<div class="content"></div>';
+  
   this.resizer = this.container.querySelector('.resizer');
   this.content = this.container.querySelector('.content');
+  
+  var closeBtn = this.container.querySelector('.close-button');
+  closeBtn.addEventListener('click', this.hidePanel.bind(this));
   
   // Prevent event bubling from panel
   if (this.psv.config.mousewheel) {
@@ -38,9 +45,9 @@ PSVPanel.prototype.create = function() {
   // Event for panel resizing + stop bubling
   this.container.addEventListener('mousedown', this._onMouseDown.bind(this));
   this.container.addEventListener('touchstart', this._onTouchStart.bind(this));
-  PSVUtils.addEvents(this.container, 'mouseup touchend', this._onMouseUp.bind(this));
-  this.container.addEventListener('mousemove', this._onMouseMove.bind(this));
-  this.container.addEventListener('touchmove', this._onTouchMove.bind(this));
+  PSVUtils.addEvents(document, 'mouseup touchend', this._onMouseUp.bind(this));
+  document.addEventListener('mousemove', this._onMouseMove.bind(this));
+  document.addEventListener('touchmove', this._onTouchMove.bind(this));
 };
 
 /**
@@ -118,9 +125,11 @@ PSVPanel.prototype._startResize = function(evt) {
  * @return (void)
  */
 PSVPanel.prototype._onMouseUp = function(evt) {
-  evt.stopPropagation();
-  this.prop.mousedown = false;
-  this.content.classList.remove('no-interaction');
+  if (this.prop.mousedown) {
+    evt.stopPropagation();
+    this.prop.mousedown = false;
+    this.content.classList.remove('no-interaction');
+  }
 };
 
 /**
@@ -129,8 +138,10 @@ PSVPanel.prototype._onMouseUp = function(evt) {
  * @return (void)
  */
 PSVPanel.prototype._onMouseMove = function(evt) {
-  evt.stopPropagation();
-  this._resize(evt);
+  if (this.prop.mousedown) {
+    evt.stopPropagation();
+    this._resize(evt);
+  }
 };
 
 /**
@@ -139,8 +150,10 @@ PSVPanel.prototype._onMouseMove = function(evt) {
  * @return (void)
  */
 PSVPanel.prototype._onTouchMove = function(evt) {
-  evt.stopPropagation();
-  this._resize(evt.changedTouches[0]);
+  if (this.prop.mousedown) {
+    evt.stopPropagation();
+    this._resize(evt.changedTouches[0]);
+  }
 };
 
 /**
@@ -149,13 +162,11 @@ PSVPanel.prototype._onTouchMove = function(evt) {
  * @return (void)
  */
 PSVPanel.prototype._resize = function(evt) {
-  if (this.prop.mousedown) {
-    var x = parseInt(evt.clientX);
-    var y = parseInt(evt.clientY);
-    
-    this.container.style.width = (this.container.offsetWidth - (x - this.prop.mouse_x)) + 'px';
+  var x = parseInt(evt.clientX);
+  var y = parseInt(evt.clientY);
+  
+  this.container.style.width = (this.container.offsetWidth - (x - this.prop.mouse_x)) + 'px';
 
-    this.prop.mouse_x = x;
-    this.prop.mouse_y = y;
-  }
+  this.prop.mouse_x = x;
+  this.prop.mouse_y = y;
 };
