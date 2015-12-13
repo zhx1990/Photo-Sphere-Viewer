@@ -44,12 +44,25 @@ $tooltip-shadow-color: rgba(90, 90, 90, 0.7);
 $tooltip-shadow-offset: 3px; // the shadow is always at the opposite side of the arrow
 
 $panel-background: rgba(10, 10, 10, 0.7);
-$panel-text-color: rgb(255, 255, 255);
+$panel-text-color: rgb(220, 220, 220);
 
 $panel-width: 400px;
 $panel-padding: 1em;
 
 $panel-font: 16px sans-serif;
+
+$markers-list-image-size: 20px;
+$markers-list-padding: 0.5em 1em;
+$markers-list-hover-translation: 10px;
+
+$markers-list-odd-background: rgba(255,255,255,0.1);
+$markers-list-even-background: transparent;
+
+$markers-list-title-shadow: 2px 1px black;
+$markers-list-title-font: 24px sans-serif;
+
+
+@import "mixins";
 
 
 .psv-container {
@@ -59,6 +72,7 @@ $panel-font: 16px sans-serif;
   padding: 0;
   position: relative;
   background: $main-background;
+  overflow: hidden;
   
   &.loading {
     text-align: center;
@@ -77,3 +91,4 @@ $panel-font: 16px sans-serif;
 @import "loader";
 @import "navbar";
 @import "hud";
+@import "panel";

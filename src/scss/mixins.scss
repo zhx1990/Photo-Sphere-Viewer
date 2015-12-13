@@ -1,0 +1,14 @@
+/**
+ * Invert all values of a list
+ * @param list
+ * @return list
+ */
+@function invert-list($list) {
+  $result: ();
+  
+  @for $i from 0 to length($list) {
+    $result: append($result, - nth($list, $i+1));
+  }
+  
+  @return $result;
+}

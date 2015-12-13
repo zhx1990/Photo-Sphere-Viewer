@@ -11,6 +11,7 @@ module.exports = function(grunt) {
     'src/js/PSVNavBarFullscreenButton.js',
     'src/js/PSVNavBarZoomButton.js',
     'src/js/PSVNavBarDownloadButton.js',
+    'src/js/PSVNavBarMarkersButton.js',
     'src/js/PSVUtils.js'
   ];
 
@@ -30,9 +31,18 @@ module.exports = function(grunt) {
       js: {
         options: {
           stripBanners: false,
-          separator: '\n\n'
+          separator: '\n\n',
+          process: function(src, path) {
+            if (path.match(/\.svg$/)) {
+              var filename = path.split('/').pop();
+              return 'PhotoSphereViewer.ICONS[\'' + filename + '\'] = \'' + src + '\';';
+            }
+            else {
+              return src;
+            }
+          }
         },
-        src: files_in_order,
+        src: files_in_order.concat(['src/icons/*.svg']),
         dest: 'dist/photo-sphere-viewer.js'
       },
       css: {
@@ -56,6 +66,7 @@ module.exports = function(grunt) {
           wrapper: function() {
             var wrapper = grunt.file.read('src/js/.wrapper.js').replace(/\r\n/g, '\n').split(/@@js\n/);
             wrapper[0] = grunt.template.process('<%= banner %>\n\n') + wrapper[0];
+            wrapper[1] = '\n' + wrapper[1];
             return wrapper;
           }
         }
@@ -92,13 +103,13 @@ module.exports = function(grunt) {
 
     jshint: {
       dist: {
-        src: files_in_order
+        src: ['src/js/*.js']
       }
     },
 
     watch: {
-      js: {
-        files: ['src/js/**/*.js', 'src/scss/**/*.scss'],
+      all: {
+        files: ['src/**'],
         tasks: ['default']
       }
     }

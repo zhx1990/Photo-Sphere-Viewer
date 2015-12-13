@@ -1,0 +1,82 @@
+.psv-navbar  .markers-button {
+  width: $buttons-height;
+  
+  svg {
+    transform: scale(1);
+    transition: transform 0.3s ease;
+    
+    path {
+      fill: $buttons-color;
+    }
+  }
+  
+  &:hover svg {
+    transform: scale(1.2);
+  }
+}
+
+.psv-markers-list {
+  margin: invert-list($panel-padding);
+  
+  h1 {
+    font: $markers-list-title-font;
+    margin: 1em 0;
+    text-align: center;
+    text-shadow: $markers-list-title-shadow;
+  }
+  
+  ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    
+    li {
+      clear: both;
+      min-height: $markers-list-image-size;
+      padding: $markers-list-padding;
+      cursor: pointer;
+      transform: translateX(0px);
+      transition: transform 0.3s ease-in-out;
+      
+      // pseudo-element used to fill the gap of the hover translation
+      &:before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: $markers-list-hover-translation;
+        margin-left: -$markers-list-hover-translation;
+      }
+      
+      &:nth-child(odd) {
+        &, &:before {
+          background: $markers-list-odd-background;
+        }
+      }
+      
+      &:nth-child(even) {
+        &, &:before {
+          background: $markers-list-even-background;
+        }
+      }
+      
+      &:hover {
+        transform: translateX($markers-list-hover-translation);
+        transition: transform 0.1s ease-in-out;
+      }
+      
+      img {
+        float: left;
+        width: $markers-list-image-size;
+      }
+      
+      p {
+        margin: 0;
+        padding: 0;
+        padding-left: calc(#{$markers-list-image-size} + #{nth($markers-list-padding, 1)});
+      }
+    }
+  }
+}

@@ -7,12 +7,18 @@ var PSVHUD = function(psv) {
   this.config = this.psv.config.tooltip;
   this.container = null;
   this.tooltip = null;
-  this.panel = null;
   this.markers = [];
+  
+  this.prop = {
+    mouse_x: 0,
+    mouse_y: 0,
+    moved: false
+  };
   
   this.create();
   
   this.psv.on('render', this.updatePositions.bind(this));
+  this.psv.on('render', this.hideTooltip.bind(this));
 };
 
 PSVHUD.leftMap = {0: 'left', 0.5: 'center', 1: 'right'};
@@ -33,32 +39,18 @@ PSVHUD.prototype.create = function() {
   this.tooltip.className = 'psv-tooltip';
   this.container.appendChild(this.tooltip);
   
-  // Panel
-  this.panel = document.createElement('aside');
-  this.panel.className = 'psv-panel';
-  this.container.appendChild(this.panel);
-  
   // Markers events via delegation
   this.container.addEventListener('mouseenter', this._onMouseEnter.bind(this), true);
   this.container.addEventListener('mouseleave', this._onMouseLeave.bind(this), true);
-  this.container.addEventListener('mousedown', this._onMouseClick.bind(this), true);
   
-  // Prevent event bubling from panel
-  var stopPropagation = function(e) {
-    e.stopPropagation();
-  };
-  
-  if (this.psv.config.mousewheel) {
-    this.panel.addEventListener(PSVUtils.mouseWheelEvent(), stopPropagation);
-  }
-  
-  if (this.psv.config.mousemove) {
-    PSVUtils.addEvents(this.panel, 'mousedown touchstart mouseup touchend mousemove touchmove', stopPropagation);
-  }
+  // Mouse events (internal)
+  this.psv.on('__mousedown', this._onMouseDown.bind(this), true);
+  this.psv.on('__mousemove', this._onMouseMove.bind(this), true);
+  this.psv.on('__mouseup', this._onMouseUp.bind(this), true);
 };
 
 /**
- * The mouse enters a marker
+ * The mouse enters a marker : show the tooltip
  * @param e (Event)
  * @return (void)
  */
@@ -69,7 +61,7 @@ PSVHUD.prototype._onMouseEnter = function(e) {
 };
 
 /**
- * The mouse leaves a marker
+ * The mouse leaves a marker : hide the tooltip
  * @param e (Event)
  * @return (void)
  */
@@ -80,16 +72,41 @@ PSVHUD.prototype._onMouseLeave = function(e) {
 };
 
 /**
- * Click on a marker or outside a marker
+ * The mouse button is pressed : save start position
  * @param e (Event)
  * @return (void)
  */
-PSVHUD.prototype._onMouseClick = function(e) {
-  if (e.target && e.target.psvMarker && e.target.psvMarker.content) {
-    this.showPanel(e.target.psvMarker);
+PSVHUD.prototype._onMouseDown = function(e) {
+  this.prop.mouse_x = e.clientX;
+  this.prop.mouse_y = e.clientY;
+  this.prop.moved = false;
+};
+
+/**
+ * The mouse moves (while button is pressed) : flag as move if threeshold reached
+ * @param e (Event)
+ * @return (void)
+ */
+PSVHUD.prototype._onMouseMove = function(e) {
+  if (Math.abs(e.clientX - this.prop.mouse_x) > 5 || Math.abs(e.clientY - this.prop.mouse_y) > 5) {
+    this.prop.moved = true;
   }
-  else if (!PSVUtils.hasParent(e.target, this.panel)) {
-    this.hidePanel();
+};
+
+/**
+ * The mouse button is release : show/hide the panel if threeshold was not reached, or do nothing
+ * @param e (Event)
+ * @return (void)
+ */
+PSVHUD.prototype._onMouseUp = function(e) {
+  if (!this.prop.moved) {
+    if (e.target && e.target.psvMarker && e.target.psvMarker.content) {
+      this.psv.panel.showPanel(e.target.psvMarker.content);
+    }
+    // only hide the panel if we clicked on something else than the panel itself or the navbar
+    else if (!PSVUtils.hasParent(e.target, this.psv.panel.container) && (!this.psv.navbar || !PSVUtils.hasParent(e.target, this.psv.navbar.container))) {
+      this.psv.panel.hidePanel();
+    }
   }
 };
 
@@ -371,26 +388,4 @@ PSVHUD.prototype._computeTooltipPosition = function(style, marker) {
  */
 PSVHUD.prototype.hideTooltip = function() {
   this.tooltip.classList.remove('visible');
-};
-
-/**
- * Show the panel for a specific marker
- * @param marker (Object)
- * @return (void)
- */
-PSVHUD.prototype.showPanel = function(marker) {
-  var p = this.panel;
-  
-  p.innerHTML = marker.content;
-  p.classList.add('open');
-  p.scrollTop = 0;
-};
-
-
-/**
- * Hide the panel
- * @return (void)
- */
-PSVHUD.prototype.hidePanel = function() {
-  this.panel.classList.remove('open');
 };

@@ -16,6 +16,7 @@
   transition-property: opacity, transform;
   transition-timing-function: ease-in-out;
   transition-duration: 0.1s;
+  cursor: default;
   
   &.open {
     transform: translate3D(0, 0, 0);

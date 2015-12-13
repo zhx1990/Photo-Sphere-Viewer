@@ -46,7 +46,7 @@ PSVUtils.addEvents = function(elt, evt, f, cap) {
 };
 
 /**
- * Search if an element has a particular, at any level
+ * Search if an element has a particular, at any level including itself
  * @param el (HTMLElement)
  * @param parent (HTMLElement)
  * @return (Boolean)
@@ -59,6 +59,24 @@ PSVUtils.hasParent = function(el, parent) {
   } while (el = el.parentNode);
 
   return false;
+};
+
+/**
+ * Get closest parent (can by itself)
+ * @param el (HTMLElement)
+ * @param selector (String)
+ * @return (HTMLElement)
+ */
+PSVUtils.getClosest = function(el, selector) {
+  var matches = el.matches || el.msMatchesSelector
+  
+  do {
+    if (matches.bind(el)(selector)) {
+      return el;
+    }
+  } while (el = el.parentElement);
+
+  return null;
 };
 
 /**
