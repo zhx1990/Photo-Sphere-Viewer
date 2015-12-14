@@ -3,6 +3,7 @@ $main-background: radial-gradient(#ffffff, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%
 $loader-color: rgba(61, 61, 61, 0.7);
 $loader-width: 150px;
 $loader-tickness: 10px;
+$loader-font: 14px sans-serif;
 
 $navbar-background: rgba(61, 61, 61, 0.5);
 $caption-font: sans-serif;
@@ -96,3 +97,4 @@ $markers-list-title-font: 24px sans-serif;
 @import "navbar";
 @import "hud";
 @import "panel";
+@import "tooltip";

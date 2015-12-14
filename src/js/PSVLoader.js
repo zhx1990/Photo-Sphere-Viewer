@@ -4,18 +4,24 @@
  */
 var PSVLoader = function(psv) {
   this.psv = psv;
-
-  this.container = document.createElement('div');
-  this.container.className = 'psv-loader';
-
-  this.canvas = document.createElement('canvas');
-  this.canvas.className = 'loader-canvas';
+  this.container = null;
+  this.canvas = null;
+  
+  this.create();
 };
 
 /**
  * Creates the loader content
  */
 PSVLoader.prototype.create = function() {
+  this.container = document.createElement('div');
+  this.container.className = 'psv-loader';
+  
+  this.psv.container.appendChild(this.container);
+
+  this.canvas = document.createElement('canvas');
+  this.canvas.className = 'loader-canvas';
+  
   this.canvas.width = this.container.clientWidth;
   this.canvas.height = this.container.clientWidth;
   this.container.appendChild(this.canvas);
@@ -60,12 +66,4 @@ PSVLoader.prototype.setProgress = function(value) {
     -Math.PI/2, value/100 * 2*Math.PI - Math.PI/2
   );
   context.stroke();
-};
-
-/**
- * Returns the loader itself
- * @return (HTMLElement) The loader
- */
-PSVLoader.prototype.getLoader = function() {
-  return this.container;
 };

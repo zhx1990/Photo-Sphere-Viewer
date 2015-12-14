@@ -39,6 +39,7 @@ var PhotoSphereViewer = function(options) {
   this.navbar = null;
   this.hud = null;
   this.panel = null;
+  this.tooltip = null;
   this.canvas_container = null;
   this.renderer = null;
   this.scene = null;
@@ -153,8 +154,6 @@ PhotoSphereViewer.prototype.load = function() {
 
   // Loader
   this.loader = new PSVLoader(this);
-  this.container.appendChild(this.loader.getLoader());
-  this.loader.create();
 
   // Canvas container
   this.canvas_container = document.createElement('div');
@@ -346,7 +345,7 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   this.canvas_container.appendChild(this.renderer.domElement);
 
   // Remove loader
-  this.container.removeChild(this.loader.getLoader());
+  this.container.removeChild(this.loader.container);
   this.loader = null;
   this.container.classList.remove('loading');
 
@@ -354,7 +353,7 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   if (this.config.navbar) {
     this.container.classList.add('has-navbar');
     this.navbar = new PSVNavBar(this);
-    this.container.appendChild(this.navbar.getBar());
+    this.container.appendChild(this.navbar.container);
   }
   
   // HUD
@@ -367,6 +366,10 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   // Panel
   this.panel = new PSVPanel(this);
   this.container.appendChild(this.panel.container);
+  
+  // Tooltip
+  this.tooltip = new PSVTooltip(this);
+  this.container.appendChild(this.tooltip.container);
 
   // Queue animation
   if (this.config.time_anim !== false) {

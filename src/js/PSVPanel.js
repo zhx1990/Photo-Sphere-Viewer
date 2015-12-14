@@ -76,7 +76,7 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
     this.content.classList.remove('no-margin');
   }
   
-  this.psv.trigger('panel-open', true);
+  this.psv.trigger('open-panel');
 };
 
 
@@ -86,7 +86,7 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
  */
 PSVPanel.prototype.hidePanel = function() {
   this.container.classList.remove('open');
-  this.psv.trigger('panel-open', false);
+  this.psv.trigger('close-panel');
 };
 
 /**

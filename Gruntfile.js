@@ -6,6 +6,7 @@ module.exports = function(grunt) {
     'src/js/PSVLoader.js',
     'src/js/PSVHUD.js',
     'src/js/PSVPanel.js',
+    'src/js/PSVTooltip.js',
     'src/js/PSVNavBar.js',
     'src/js/PSVNavBarButton.js',
     'src/js/PSVNavBarAutorotateButton.js',
