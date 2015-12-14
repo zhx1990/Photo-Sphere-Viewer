@@ -15,7 +15,14 @@ var PSVPanel = function(psv) {
   };
   
   this.create();
+  
+  // expose some methods to the viewer
+  PSVPanel.publicMethods.forEach(function(method) {
+    this.psv[method] = this[method].bind(this);
+  }, this);
 };
+
+PSVPanel.publicMethods = ['showPanel', 'hidePanel'];
 
 /**
  * Creates the elements

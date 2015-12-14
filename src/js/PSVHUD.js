@@ -7,7 +7,8 @@ var PSVHUD = function(psv) {
   this.config = this.psv.config.tooltip;
   this.container = null;
   this.tooltip = null;
-  this.markers = [];
+  this.markers = {};
+  this.currentMarker = null;
   
   this.prop = {
     mouse_x: 0,
@@ -19,10 +20,16 @@ var PSVHUD = function(psv) {
   
   this.psv.on('render', this.updatePositions.bind(this));
   this.psv.on('render', this.hideTooltip.bind(this));
+  
+  // expose some methods to the viewer
+  PSVHUD.publicMethods.forEach(function(method) {
+    this.psv[method] = this[method].bind(this);
+  }, this);
 };
 
 PSVHUD.leftMap = {0: 'left', 0.5: 'center', 1: 'right'};
 PSVHUD.topMap = {0: 'top', 0.5: 'center', 1: 'bottom'};
+PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'getMarker', 'getCurrentMarker', 'hideMarker', 'showMarker', 'toggleMarker', 'showTooltip', 'hideTooltip'];
 
 /**
  * Creates the elements
@@ -56,7 +63,7 @@ PSVHUD.prototype.create = function() {
  */
 PSVHUD.prototype._onMouseEnter = function(e) {
   if (e.target && e.target.psvMarker && e.target.psvMarker.tooltip) {
-    this.showTooltip(e.target.psvMarker);
+    this.showTooltip(e.target.psvMarker.tooltip, e.target.psvMarker);
   }
 };
 
@@ -111,21 +118,22 @@ PSVHUD.prototype._onMouseUp = function(e) {
 };
 
 /**
- * Returns the HUD itself
- * @return (HTMLElement)
- */
-PSVHUD.prototype.getHUD = function() {
-  return this.container;
-};
-
-/**
  * Add a new marker to HUD
  * @param marker (Object)
+ * @param noRender (Boolean) disable immediate render
  * @return (void)
  */
-PSVHUD.prototype.addMarker = function(marker) {
+PSVHUD.prototype.addMarker = function(marker, noRender) {
+  if (!marker.id) {
+    throw 'PhotoSphereViewer: missing marker id';
+  }
+  
+  if (this.markers[marker.id]) {
+    throw 'PhotoSphereViewer: marker "' + marker.id + '" already exists';
+  }
+  
   if (!marker.width || !marker.height) {
-    throw 'PhotoSphereViewer: missing marker width and/or height';
+    throw 'PhotoSphereViewer: missing marker width/height';
   }
   
   if (!marker.image) {
@@ -189,9 +197,101 @@ PSVHUD.prototype.addMarker = function(marker) {
     Math.cos(marker.longitude) * Math.cos(marker.latitude)
   );
   
+  if (!marker.hasOwnProperty('visible')) {
+    marker.visible = true;
+  }
+  
   // save
-  this.markers.push(marker);
+  this.markers[marker.id] = marker;
   this.container.appendChild(marker.$el);
+  
+  if (!noRender) {
+    this.updatePositions();
+  }
+};
+
+/**
+ * Remove a marker
+ * @param marker (Mixed)
+ * @param noRender (Boolean)
+ * @return (void)
+ */
+PSVHUD.prototype.removeMarker = function(marker, noRender) {
+  var id = typeof marker === 'object' ? marker.id : marker;
+  
+  if (!this.markers[id]) {
+    throw 'PhotoSphereViewer: cannot find marker "' + id + '"';
+  }
+  
+  delete this.markers[id];
+  
+  if (!noRender) {
+    this.updatePositions();
+  }
+};
+
+/**
+ * Get a marker by it's id or external object
+ * @param marker (Mixed)
+ * @return (Object)
+ */
+PSVHUD.prototype.getMarker = function(marker) {
+  var id = typeof marker === 'object' ? marker.id : marker;
+  
+  if (!this.markers[id]) {
+    throw 'PhotoSphereViewer: cannot find marker "' + id + '"';
+  }
+  
+  return this.markers[id];
+};
+
+/**
+ * Get the current selected marker
+ * @return (Object)
+ */
+PSVHUD.prototype.getCurrentMarker = function() {
+  return this.currentMarker;
+};
+
+/**
+ * Go to a specific marker
+ * @param marker (Mixed)
+ * @param duration (Mixed)
+ * @return (void)
+ */
+PSVHUD.prototype.gotoMarker = function(marker, duration) {
+  marker = this.getMarker(marker);
+  this.psv.animate(marker.latitude, marker.longitude, duration);
+};
+
+/**
+ * Hide a marker
+ * @param marker (Mixed)
+ * @return (void)
+ */
+PSVHUD.prototype.hideMarker = function(marker) {
+  this.getMarker(marker).visible = false;
+  this.updatePositions();
+};
+
+/**
+ * Show a marker
+ * @param marker (Mixed)
+ * @return (void)
+ */
+PSVHUD.prototype.showMarker = function(marker) {
+  this.getMarker(marker).visible = true;
+  this.updatePositions();
+};
+
+/**
+ * Toggle a marker
+ * @param marker (Mixed)
+ * @return (void)
+ */
+PSVHUD.prototype.toggleMarker = function(marker) {
+  this.getMarker(marker).visible^= true;
+  this.updatePositions();
 };
 
 /**
@@ -201,10 +301,11 @@ PSVHUD.prototype.addMarker = function(marker) {
 PSVHUD.prototype.updatePositions = function() {
   this.psv.camera.updateProjectionMatrix();
 
-  this.markers.forEach(function(marker) {
-    var position = this.getMarkerPosition(marker);
+  for (var id in this.markers) {
+    var marker = this.markers[id];
+    var position = this._getMarkerPosition(marker);
     
-    if (this.isMarkerVisible(marker, position)) {
+    if (this._isMarkerVisible(marker, position)) {
       marker.position2D = position;
       
       marker.$el.style.transform = 'translate3D(' + 
@@ -220,7 +321,7 @@ PSVHUD.prototype.updatePositions = function() {
       marker.position2D = null;
       marker.$el.classList.remove('visible');
     }
-  }, this);
+  }
 };
 
 /**
@@ -230,8 +331,9 @@ PSVHUD.prototype.updatePositions = function() {
  * @param position (Object)
  * @return (Boolean)
  */
-PSVHUD.prototype.isMarkerVisible = function(marker, position) {
-  return marker.position3D.dot(this.psv.prop.direction) > 0 &&
+PSVHUD.prototype._isMarkerVisible = function(marker, position) {
+  return marker.visible &&
+    marker.position3D.dot(this.psv.prop.direction) > 0 &&
     position.left >= 0 && 
     position.left + marker.width <= this.psv.prop.size.width &&
     position.top >= 0 && 
@@ -243,7 +345,7 @@ PSVHUD.prototype.isMarkerVisible = function(marker, position) {
  * @param marker (Object)
  * @return (Object) top and left position
  */
-PSVHUD.prototype.getMarkerPosition = function(marker) {
+PSVHUD.prototype._getMarkerPosition = function(marker) {
   var vector = marker.position3D.clone();
   vector.project(this.psv.camera);
 
@@ -255,27 +357,28 @@ PSVHUD.prototype.getMarkerPosition = function(marker) {
 
 /**
  * Show the tooltip for a specific marker
- * @param marker (Object)
+ * @param tooltip (Object) content, className, position
+ * @param marker (Object) target for positioning: width, height, position2D(top, left)
  * @return (void)
  */
-PSVHUD.prototype.showTooltip = function(marker) {
+PSVHUD.prototype.showTooltip = function(tooltip, marker) {
   var t = this.tooltip;
   var c = t.querySelector('.content');
   var a = t.querySelector('.arrow');
   
   t.className = 'psv-tooltip'; // reset the class
-  if (marker.tooltip.className) {
-    t.classList.add(marker.tooltip.className);
+  if (tooltip.className) {
+    t.classList.add(tooltip.className);
   }
 
-  c.innerHTML = marker.tooltip.content;
+  c.innerHTML = tooltip.content;
   t.style.top = '0px';
   t.style.left = '0px';
   
   // compute size
   var rect = t.getBoundingClientRect();
   var style = {
-    posClass: marker.tooltip.position.slice(),
+    posClass: tooltip.position.slice(),
     width: rect.right - rect.left,
     height: rect.bottom - rect.top,
     top: 0,

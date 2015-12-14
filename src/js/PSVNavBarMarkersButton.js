@@ -52,17 +52,19 @@ PSVNavBarMarkersButton.prototype.showMarkers = function() {
     <h1>' + this.psv.config.lang.markers + '</h1> \
     <ul>';
 
-    this.psv.hud.markers.forEach(function(marker, i) {
-      var name = 'Marker #' + (i+1);
+    for (var id in this.hud.markers) {
+      var marker = this.hud.markers[id];
+      
+      var name = marker.name || marker.id;
       if (marker.tooltip) {
         name = marker.tooltip.content;
       }
       
-      html+= '<li data-psv-index="' + i + '"> \
+      html+= '<li data-psv-marker="' + marker.id + '"> \
         <img src="' + marker.image + '"/> \
         <p>' + name + '</p> \
       </li>';
-    }, this);
+    }
   
   html+= '</ul> \
   </div>';
@@ -88,10 +90,8 @@ PSVNavBarMarkersButton.prototype.hideMarkers = function() {
  */
 PSVNavBarMarkersButton.prototype._onClickItem = function(e) {
   var li;
-  if (e.target && (li = PSVUtils.getClosest(e.target, 'li')) && li.dataset.psvIndex) {
-    var marker = this.psv.hud.markers[li.dataset.psvIndex];
-    
-    this.psv.animate(marker.latitude, marker.longitude, 1000);
+  if (e.target && (li = PSVUtils.getClosest(e.target, 'li')) && li.dataset.psvMarker) {
+    this.psv.hud.gotoMarker(li.dataset.psvMarker, 1000);
   }
 };
 

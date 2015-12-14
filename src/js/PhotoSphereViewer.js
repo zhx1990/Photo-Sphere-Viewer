@@ -359,8 +359,10 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   
   // HUD
   this.hud = new PSVHUD(this);
-  this.config.markers.forEach(this.hud.addMarker, this.hud);
-  this.container.appendChild(this.hud.getHUD());
+  this.config.markers.forEach(function(marker) {
+    this.hud.addMarker(marker, true);
+  }, this);
+  this.container.appendChild(this.hud.container);
   
   // Panel
   this.panel = new PSVPanel(this);
@@ -394,7 +396,7 @@ PhotoSphereViewer.prototype._bindEvents = function() {
   }
   
   if (this.config.mousewheel) {
-    this.hud.getHUD().addEventListener(PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
+    this.hud.container.addEventListener(PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
   }
 };
 
@@ -675,6 +677,11 @@ PhotoSphereViewer.prototype.rotate = function(t, p) {
  * @return (void)
  */
 PhotoSphereViewer.prototype.animate = function(t, p, s) {
+  if (!s) {
+    this.rotate(t, p);
+    return;
+  }
+  
   t = t - Math.floor(t / PhotoSphereViewer.TwoPI) * PhotoSphereViewer.TwoPI;
   p = PSVUtils.stayBetween(p, this.config.tilt_down_max, this.config.tilt_up_max);
 
