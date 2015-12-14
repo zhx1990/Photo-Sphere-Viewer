@@ -1,16 +1,21 @@
 .psv-navbar {
   position: absolute;
-  z-index: 10;
+  z-index: 100;
   bottom: 0;
   width: 100%;
   background: $navbar-background;
+  
+  &, & * {
+    box-sizing: content-box;
+  }
 
   .caption {
-    color: $buttons-color;
+    color: $caption-color;
     margin: $buttons-padding;
     white-space: nowrap;
     overflow: hidden;
-    text-align:center;
+    text-align: center;
+    font-family: $caption-font;
   }
 
   .psv-button {
@@ -24,6 +29,13 @@
     &.active {
       background: $buttons-active-background;
     }
+    
+    svg {
+      width: 100%;
+      * {
+        fill: $buttons-color;
+      }
+    }
   }
 }
 
@@ -31,3 +43,4 @@
 @import "buttons/download";
 @import "buttons/fullscreen";
 @import "buttons/zoom";
+@import "buttons/markers";

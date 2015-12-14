@@ -37,6 +37,9 @@ var PhotoSphereViewer = function(options) {
   this.container = (typeof this.config.container == 'string') ? document.getElementById(this.config.container) : this.config.container;
   this.loader = null;
   this.navbar = null;
+  this.hud = null;
+  this.panel = null;
+  this.tooltip = null;
   this.canvas_container = null;
   this.renderer = null;
   this.scene = null;
@@ -50,15 +53,21 @@ var PhotoSphereViewer = function(options) {
     theta: 0,
     theta_offset: 0,
     zoom_lvl: 0,
-    mousedown: false,
+    moving: false,
+    zooming: false,
     mouse_x: 0,
     mouse_y: 0,
+    pinch_dist: 0,
+    direction: null,
     autorotate_timeout: null,
-    anim_timeout: null,
+    animation_timeout: null,
+    start_timeout: null,
     size: {
       width: 0,
       height: 0,
-      ratio: 0
+      ratio: 0,
+      image_width: 0,
+      image_height: 0
     }
   };
 
@@ -80,8 +89,11 @@ var PhotoSphereViewer = function(options) {
   }
 };
 
+PhotoSphereViewer.PI = Math.PI;
 PhotoSphereViewer.TwoPI = Math.PI * 2.0;
 PhotoSphereViewer.HalfPI = Math.PI / 2.0;
+
+PhotoSphereViewer.ICONS = {};
 
 /**
  * PhotoSphereViewer defaults
@@ -99,26 +111,32 @@ PhotoSphereViewer.DEFAULTS = {
   default_lat: 0,
   tilt_up_max: PhotoSphereViewer.HalfPI,
   tilt_down_max: -PhotoSphereViewer.HalfPI,
-  long_offset: Math.PI / 720.0,
-  lat_offset: Math.PI / 360.0,
+  long_offset: Math.PI / 1440.0,
+  lat_offset: Math.PI / 720.0,
   time_anim: 2000,
   anim_speed: '2rpm',
   anim_lat: null,
   anim_lat: null,
   navbar: false,
+  tooltip: {
+    offset: 5,
+    arrow_size: 7
+  },
   lang: {
     autorotate: 'Automatic rotation',
     zoom: 'Zoom',
     zoomOut: 'Zoom out',
     zoomIn: 'Zoom in',
     download: 'Download',
-    fullscreen: 'Fullscreen'
+    fullscreen: 'Fullscreen',
+    markers: 'Markers'
   },
   mousewheel: true,
   mousemove: true,
   loading_img: null,
   loading_txt: 'Loading...',
-  size: null
+  size: null,
+  markers: []
 };
 
 /**
@@ -126,7 +144,7 @@ PhotoSphereViewer.DEFAULTS = {
  * @return (void)
  */
 PhotoSphereViewer.prototype.load = function() {
-  PSVUtils.addClass(this.container, 'psv-container loading');
+  this.container.classList.add('psv-container', 'loading');
 
   // Is canvas supported?
   if (!PSVUtils.isCanvasSupported()) {
@@ -136,33 +154,11 @@ PhotoSphereViewer.prototype.load = function() {
 
   // Loader
   this.loader = new PSVLoader(this);
-  this.container.appendChild(this.loader.getLoader());
-  this.loader.create();
 
   // Canvas container
   this.canvas_container = document.createElement('div');
   this.canvas_container.className = 'psv-canvas-container';
   this.container.appendChild(this.canvas_container);
-
-  // Adding events
-  PSVUtils.addEvent(window, 'resize', this._onResize.bind(this));
-  if (this.config.mousemove) {
-    this.canvas_container.style.cursor = 'move';
-    PSVUtils.addEvent(this.canvas_container, 'mousedown', this._onMouseDown.bind(this));
-    PSVUtils.addEvent(this.canvas_container, 'touchstart', this._onTouchStart.bind(this));
-    PSVUtils.addEvent(document, 'mouseup', this._onMouseUp.bind(this));
-    PSVUtils.addEvent(document, 'touchend', this._onMouseUp.bind(this));
-    PSVUtils.addEvent(document, 'mousemove', this._onMouseMove.bind(this));
-    PSVUtils.addEvent(document, 'touchmove', this._onTouchMove.bind(this));
-  }
-  if (this.config.mousewheel) {
-    PSVUtils.addEvent(this.canvas_container, PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
-  }
-  var bindedFullscreenToggled = this._fullscreenToggled.bind(this);
-  PSVUtils.addEvent(document, 'fullscreenchange', bindedFullscreenToggled);
-  PSVUtils.addEvent(document, 'mozfullscreenchange', bindedFullscreenToggled);
-  PSVUtils.addEvent(document, 'webkitfullscreenchange', bindedFullscreenToggled);
-  PSVUtils.addEvent(document, 'MSFullscreenChange', bindedFullscreenToggled);
 
   // load image
   if (this.config.usexmpdata) {
@@ -298,6 +294,9 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
 
     var ctx = buffer.getContext('2d');
     ctx.drawImage(img, pano_data.cropped_x, pano_data.cropped_y, pano_data.cropped_width, pano_data.cropped_height);
+    
+    self.prop.size.image_width = pano_data.cropped_width;
+    self.prop.size.image_height = pano_data.cropped_height;
 
     self._createScene(buffer);
   };
@@ -340,7 +339,8 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   var texture = new THREE.Texture(img);
   texture.needsUpdate = true;
 
-  var geometry = new THREE.SphereGeometry(200, 32, 32);
+  // default texture origin is at 1/4 (phiStart=0) of the panorama, I set it at 1/2 (phiStart=PI/2)
+  var geometry = new THREE.SphereGeometry(200, 32, 32, -PhotoSphereViewer.HalfPI);
   var material = new THREE.MeshBasicMaterial({map: texture, overdraw: true});
   var mesh = new THREE.Mesh(geometry, material);
   mesh.scale.x = -1;
@@ -349,23 +349,62 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   this.canvas_container.appendChild(this.renderer.domElement);
 
   // Remove loader
-  this.container.removeChild(this.loader.getLoader());
+  this.container.removeChild(this.loader.container);
   this.loader = null;
-  PSVUtils.removeClass(this.container, 'loading');
+  this.container.classList.remove('loading');
 
   // Navigation bar
   if (this.config.navbar) {
+    this.container.classList.add('has-navbar');
     this.navbar = new PSVNavBar(this);
-    this.container.appendChild(this.navbar.getBar());
+    this.container.appendChild(this.navbar.container);
   }
+  
+  // HUD
+  this.hud = new PSVHUD(this);
+  this.config.markers.forEach(function(marker) {
+    this.hud.addMarker(marker, true);
+  }, this);
+  this.container.appendChild(this.hud.container);
+  
+  // Panel
+  this.panel = new PSVPanel(this);
+  this.container.appendChild(this.panel.container);
+  
+  // Tooltip
+  this.tooltip = new PSVTooltip(this);
+  this.container.appendChild(this.tooltip.container);
 
   // Queue animation
   if (this.config.time_anim !== false) {
-    this.prop.anim_timeout = setTimeout(this.startAutorotate.bind(this), this.config.time_anim);
+    this.prop.start_timeout = setTimeout(this.startAutorotate.bind(this), this.config.time_anim);
   }
 
+  this._bindEvents();
   this.trigger('ready');
   this.render();
+};
+
+/**
+ * Add all needed event listeners
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._bindEvents = function() {
+  window.addEventListener('resize', this._onResize.bind(this));
+  document.addEventListener(PSVUtils.fullscreenEvent(), this._fullscreenToggled.bind(this));
+  
+  if (this.config.mousemove) {
+    this.hud.container.style.cursor = 'move';
+    this.hud.container.addEventListener('mousedown', this._onMouseDown.bind(this));
+    this.hud.container.addEventListener('touchstart', this._onTouchStart.bind(this));
+    PSVUtils.addEvents(this.hud.container, 'mouseup touchend', this._onMouseUp.bind(this));
+    this.hud.container.addEventListener('mousemove', this._onMouseMove.bind(this));
+    this.hud.container.addEventListener('touchmove', this._onTouchMove.bind(this));
+  }
+  
+  if (this.config.mousewheel) {
+    this.hud.container.addEventListener(PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
+  }
 };
 
 /**
@@ -373,13 +412,15 @@ PhotoSphereViewer.prototype._createScene = function(img) {
  * @return (void)
  */
 PhotoSphereViewer.prototype.render = function() {
-  var point = new THREE.Vector3();
-  point.setX(-Math.cos(this.prop.phi) * Math.sin(this.prop.theta));
-  point.setY(Math.sin(this.prop.phi));
-  point.setZ(Math.cos(this.prop.phi) * Math.cos(this.prop.theta));
+  this.prop.direction = new THREE.Vector3(
+    -Math.cos(this.prop.phi) * Math.sin(this.prop.theta),
+    Math.sin(this.prop.phi),
+    Math.cos(this.prop.phi) * Math.cos(this.prop.theta)
+  );
 
-  this.camera.lookAt(point);
+  this.camera.lookAt(this.prop.direction);
   this.renderer.render(this.scene, this.camera);
+  this.trigger('render');
 };
 
 /**
@@ -389,7 +430,7 @@ PhotoSphereViewer.prototype.render = function() {
 PhotoSphereViewer.prototype._autorotate = function() {
   // Rotates the sphere && Returns to the equator (phi = 0)
   this.rotate(
-    this.prop.theta + this.prop.theta_offset,
+    this.prop.theta + this.prop.theta_offset / this.prop.fps,
     this.prop.phi - (this.prop.phi - this.config.anim_lat) / 200
   );
 
@@ -401,6 +442,11 @@ PhotoSphereViewer.prototype._autorotate = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype.startAutorotate = function() {
+  clearTimeout(this.prop.start_timeout);
+  this.prop.start_timeout = null;
+  
+  this.stopAnimation();
+  
   this._autorotate();
   this.trigger('autorotate', true);
 };
@@ -410,8 +456,8 @@ PhotoSphereViewer.prototype.startAutorotate = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype.stopAutorotate = function() {
-  clearTimeout(this.prop.anim_timeout);
-  this.prop.anim_timeout = null;
+  clearTimeout(this.prop.start_timeout);
+  this.prop.start_timeout = null;
 
   clearTimeout(this.prop.autorotate_timeout);
   this.prop.autorotate_timeout = null;
@@ -424,8 +470,6 @@ PhotoSphereViewer.prototype.stopAutorotate = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype.toggleAutorotate = function() {
-  clearTimeout(this.prop.anim_timeout);
-
   if (this.prop.autorotate_timeout) {
     this.stopAutorotate();
   }
@@ -474,7 +518,7 @@ PhotoSphereViewer.prototype.resize = function (width, height) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._onMouseDown = function(evt) {
-  this._startMove(parseInt(evt.clientX), parseInt(evt.clientY));
+  this._startMove(evt);
 };
 
 /**
@@ -483,25 +527,50 @@ PhotoSphereViewer.prototype._onMouseDown = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._onTouchStart = function(evt) {
-  var touch = evt.changedTouches[0];
-  if (touch.target.parentNode == this.canvas_container) {
-    this._startMove(parseInt(touch.clientX), parseInt(touch.clientY));
+  if (evt.touches.length === 1) {
+    this._startMove(evt.touches[0]);
+  }
+  else if (evt.touches.length === 2) {
+    this._startZoom(evt);
   }
 };
 
 /**
  * Initializes the movement
- * @param x (integer) Horizontal coordinate
- * @param y (integer) Vertical coordinate
+ * @param evt (Event) The event
  * @return (void)
  */
-PhotoSphereViewer.prototype._startMove = function(x, y) {
-  this.prop.mouse_x = x;
-  this.prop.mouse_y = y;
+PhotoSphereViewer.prototype._startMove = function(evt) {
+  this.prop.mouse_x = parseInt(evt.clientX);
+  this.prop.mouse_y = parseInt(evt.clientY);
+  this.prop.moving = true;
+  this.prop.zooming = false;
 
   this.stopAutorotate();
+  this.stopAnimation();
+  
+  this.trigger('__mousedown', evt);
+};
 
-  this.prop.mousedown = true;
+/**
+ * Initializes the zoom
+ * @param evt (Event) The event
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._startZoom = function(evt) {
+  var t = [
+    {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
+    {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
+  ];
+  
+  this.prop.pinch_dist = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
+  this.prop.moving = false;
+  this.prop.zooming = true;
+
+  this.stopAutorotate();
+  this.stopAnimation();
+  
+  this.trigger('__mousedown', evt.touches[0]);
 };
 
 /**
@@ -510,7 +579,10 @@ PhotoSphereViewer.prototype._startMove = function(x, y) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._onMouseUp = function(evt) {
-  this.prop.mousedown = false;
+  this.prop.moving = false;
+  this.prop.zooming = false;
+  
+  this.trigger('__mouseup', evt);
 };
 
 /**
@@ -520,7 +592,7 @@ PhotoSphereViewer.prototype._onMouseUp = function(evt) {
  */
 PhotoSphereViewer.prototype._onMouseMove = function(evt) {
   evt.preventDefault();
-  this._move(parseInt(evt.clientX), parseInt(evt.clientY));
+  this._move(evt);
 };
 
 /**
@@ -529,21 +601,29 @@ PhotoSphereViewer.prototype._onMouseMove = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._onTouchMove = function(evt) {
-  var touch = evt.changedTouches[0];
-  if (touch.target.parentNode == this.canvas_container) {
+  if (evt.touches.length === 1) {
     evt.preventDefault();
-    this._move(parseInt(touch.clientX), parseInt(touch.clientY));
+    this._move(evt.touches[0]);
+  }
+  else if (evt.touches.length === 2) {
+    evt.preventDefault();
+    this._zoom(evt);
+  }
+  else {
+    this._onMouseUp();
   }
 };
 
 /**
  * Movement
- * @param x (integer) Horizontal coordinate
- * @param y (integer) Vertical coordinate
+ * @param evt (Event) The event
  * @return (void)
  */
-PhotoSphereViewer.prototype._move = function(x, y) {
-  if (this.prop.mousedown) {
+PhotoSphereViewer.prototype._move = function(evt) {
+  if (this.prop.moving) {
+    var x = parseInt(evt.clientX);
+    var y = parseInt(evt.clientY);
+  
     this.rotate(
       this.prop.theta - (x - this.prop.mouse_x) * this.config.long_offset,
       this.prop.phi + (y - this.prop.mouse_y) * this.config.lat_offset
@@ -551,13 +631,38 @@ PhotoSphereViewer.prototype._move = function(x, y) {
 
     this.prop.mouse_x = x;
     this.prop.mouse_y = y;
+
+    this.trigger('__mousemove', evt);
+  }
+};
+
+/**
+ * Zoom
+ * @param evt (Event) The event
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._zoom = function(evt) {
+  if (this.prop.zooming) {
+    var t = [
+      {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
+      {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
+    ];
+    
+    var p = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
+    var delta = 80 * (p - this.prop.pinch_dist) / this.prop.size.width;
+  
+    this.zoom(this.prop.zoom_lvl + delta);
+
+    this.prop.pinch_dist = p;
+    
+    this.trigger('__mousemove', evt.touches[0]);
   }
 };
 
 /**
  * Rotate the camera
- * @param x (integer) Horizontal angle (rad)
- * @param y (integer) Vertical angle (rad)
+ * @param t (integer) Horizontal angle (rad)
+ * @param p (integer) Vertical angle (rad)
  * @return (void)
  */
 PhotoSphereViewer.prototype.rotate = function(t, p) {
@@ -569,6 +674,93 @@ PhotoSphereViewer.prototype.rotate = function(t, p) {
   }
 
   this.trigger('position-updated', this.prop.theta, this.prop.phi);
+};
+
+/**
+ * Rotate the camera with animation
+ * @param t (integer) Horizontal angle (rad)
+ * @param p (integer) Vertical angle (rad)
+ * @param s (mixed) Optional. Animation speed or duration (milliseconds)
+ * @return (void)
+ */
+PhotoSphereViewer.prototype.animate = function(t, p, s) {
+  if (!s) {
+    this.rotate(t, p);
+    return;
+  }
+  
+  t = t - Math.floor(t / PhotoSphereViewer.TwoPI) * PhotoSphereViewer.TwoPI;
+  p = PSVUtils.stayBetween(p, this.config.tilt_down_max, this.config.tilt_up_max);
+
+  var t0 = this.prop.theta;
+  var p0 = this.prop.phi;
+  
+  // get duration of animation
+  var duration;
+  if (s && typeof s === 'number') {
+    duration = s / 1000;
+  }
+  else {
+    // desired radial speed
+    var speed = s ? this.parseAnimSpeed(s) : this.prop.theta_offset;
+    // get the angle between current position and target
+    var angle = Math.acos(Math.cos(p0) * Math.cos(p) * Math.cos(t0-t) + Math.sin(p0) * Math.sin(p));
+    duration = angle / speed;
+  }
+  
+  var steps = duration * this.prop.fps;
+  
+  // latitude offset for shortest arc
+  var tCandidates = [
+    t - t0, // direct
+    PhotoSphereViewer.TwoPI - t0 + t, // clock-wise cross zero
+    t - t0 - PhotoSphereViewer.TwoPI // counter-clock-wise cross zero
+  ];
+  
+  var tOffset = tCandidates.reduce(function(value, candidate) {
+    return Math.abs(candidate) < Math.abs(value) ? candidate : value;
+  }, Infinity);
+  
+  // longitude offset
+  var pOffset = p - p0;
+  
+  this.stopAutorotate();
+  this.stopAnimation();
+  
+  this._animate(tOffset / steps, pOffset / steps, t, p);
+};
+
+/**
+ * Automatically rotates the panorama
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._animate = function(tStep, pStep, tTarget, pTarget) {
+  if (tStep !== 0 && Math.abs(this.prop.theta - tTarget) <= Math.abs(tStep) * 2) {
+    tStep = 0;
+    this.prop.theta = tTarget;
+  }
+  if (pStep !== 0 && Math.abs(this.prop.phi - pTarget) <= Math.abs(pStep) * 2) {
+    pStep = 0;
+    this.prop.phi = pTarget;
+  }
+  
+  this.rotate(
+    this.prop.theta + tStep,
+    this.prop.phi + pStep
+  );
+  
+  if (tStep !== 0 || pStep !== 0) {
+    this.prop.animation_timeout = setTimeout(this._animate.bind(this, tStep, pStep, tTarget, pTarget), 1000 / this.prop.fps);
+  }
+};
+
+/**
+ * Stop the ongoing animation
+ * @return (void)
+ */
+PhotoSphereViewer.prototype.stopAnimation = function() {
+  clearTimeout(this.prop.animation_timeout);
+  this.prop.animation_timeout = null;
 };
 
 /**
@@ -645,11 +837,11 @@ PhotoSphereViewer.prototype.toggleFullscreen = function() {
 };
 
 /**
- * Sets the animation speed
+ * Parse the animation speed
  * @param speed (string) The speed, in radians/degrees/revolutions per second/minute
- * @return (void)
+ * @return (double)
  */
-PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
+PhotoSphereViewer.prototype.parseAnimSpeed = function(speed) {
   speed = speed.toString().trim();
 
   // Speed extraction
@@ -691,9 +883,17 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
     default:
       throw 'PhotoSphereViewer: unknown speed unit "' + speed_unit + '"';
   }
+  
+  return rad_per_second;
+};
 
-  // Theta offset
-  this.prop.theta_offset = rad_per_second / this.prop.fps;
+/**
+ * Sets the animation speed
+ * @param speed (string) The speed, in radians/degrees/revolutions per second/minute
+ * @return (void)
+ */
+PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
+  this.prop.theta_offset = this.parseAnimSpeed(speed);
 };
 
 /**

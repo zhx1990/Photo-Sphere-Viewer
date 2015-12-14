@@ -8,13 +8,14 @@ $autorotate-sphere-width: $buttons-height - $autorotate-button-tickness * 2;
     border-width: $autorotate-button-tickness;
     border-style: solid;
     border-color: $buttons-color;
+    transition: 0.3s ease;
+    transition-property: transform, height, margin;
   }
   
   .sphere {
     width: $autorotate-sphere-width;
     height: $autorotate-sphere-width;
     transform: rotateY(0deg);
-    transition: all 0.3s ease;
   }
   
   .equator  {
@@ -24,7 +25,6 @@ $autorotate-sphere-width: $buttons-height - $autorotate-button-tickness * 2;
     height: #{$autorotate-sphere-width / 10};
     margin-top: #{- $autorotate-sphere-width / 20 - $autorotate-button-tickness};
     transform: rotateY(0deg);
-    transition: all 0.3s ease;
   }
 
   &:hover {

@@ -22,9 +22,9 @@ PSVNavBarDownloadButton.prototype.create = function() {
 
   this.button.appendChild(document.createElement('div'));
 
-  PSVUtils.addEvent(this.button, 'mouseenter', this.toggleActive.bind(this, true));
-  PSVUtils.addEvent(this.button, 'mouseleave', this.toggleActive.bind(this, false));
-  PSVUtils.addEvent(this.button, 'click', this.download.bind(this));
+  this.button.addEventListener('mouseenter', this.toggleActive.bind(this, true));
+  this.button.addEventListener('mouseleave', this.toggleActive.bind(this, false));
+  this.button.addEventListener('click', this.download.bind(this));
 };
 
 /**
@@ -34,7 +34,6 @@ PSVNavBarDownloadButton.prototype.download = function() {
   var link = document.createElement('a');
   link.href = this.psv.config.panorama;
   link.download = this.psv.config.panorama;
-  this.psv.config.container.appendChild(link);
+  this.psv.container.appendChild(link);
   link.click();
-  this.psv.config.container.removeChild(link);
 };

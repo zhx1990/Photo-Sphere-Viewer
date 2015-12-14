@@ -22,6 +22,7 @@ PSVNavBarFullscreenButton.prototype.create = function() {
   this.button.appendChild(document.createElement('div'));
   this.button.appendChild(document.createElement('div'));
 
-  PSVUtils.addEvent(this.button, 'click', this.psv.toggleFullscreen.bind(this.psv));
+  this.button.addEventListener('click', this.psv.toggleFullscreen.bind(this.psv));
+  
   this.psv.on('fullscreen-updated', this.toggleActive.bind(this));
 };

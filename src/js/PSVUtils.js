@@ -4,31 +4,6 @@
 var PSVUtils = {};
 
 /**
- * Adds a CSS class to an element
- * @param elt (HTMLElement)
- * @param clazz (string)
- */
-PSVUtils.addClass = function(elt, clazz) {
-  if (elt.className.length) {
-    elt.className+= ' ' + clazz;
-  }
-  else {
-    elt.className = clazz;
-  }
-};
-
-/**
- * Removes a CSS class from an element
- * @param elt (HTMLElement)
- * @param clazz (string)
- */
-PSVUtils.removeClass = function(elt, clazz) {
-  if (elt.className.length) {
-    elt.className = elt.className.replace(new RegExp('\\b' + clazz + '\\b'), '').trim();
-  }
-};
-
-/**
  * Detects whether canvas is supported
  * @return (boolean) true if canvas is supported, false otherwise
  */
@@ -59,17 +34,49 @@ PSVUtils.getMaxTextureWidth = function() {
 /**
  * Attaches an event handler function to an elemnt
  * @param elt (HTMLElement) The element
- * @param evt (string) The event name
+ * @param evt (string) The event name(s)
  * @param f (Function) The handler function
+ * @param cap (Boolean) use capture
  * @return (void)
  */
-PSVUtils.addEvent = function(elt, evt, f) {
-  if (!!elt.addEventListener) {
-    elt.addEventListener(evt, f, false);
-  }
-  else {
-    elt.attachEvent('on' + evt, f);
-  }
+PSVUtils.addEvents = function(elt, evt, f, cap) {
+  evt.split(' ').forEach(function(e) {
+    elt.addEventListener(e, f, cap);
+  });
+};
+
+/**
+ * Search if an element has a particular, at any level including itself
+ * @param el (HTMLElement)
+ * @param parent (HTMLElement)
+ * @return (Boolean)
+ */
+PSVUtils.hasParent = function(el, parent) {
+  do {
+    if (el === parent) {
+      return true;
+    }
+  } while (el = el.parentNode);
+
+  return false;
+};
+
+/**
+ * Get closest parent (can by itself)
+ * @param el (HTMLElement)
+ * @param selector (String)
+ * @return (HTMLElement)
+ */
+PSVUtils.getClosest = function(el, selector) {
+  var matches = el.matches || el.msMatchesSelector
+  
+  do {
+    if (matches.bind(el)(selector)) {
+      return el;
+    }
+  } while (el = el.parentElement);
+
+  return null;
 };
 
 /**
@@ -80,6 +87,16 @@ PSVUtils.mouseWheelEvent = function() {
   return "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
     document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
     "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
+};
+
+/**
+ * Get the event name for fullscreen event
+ * @return (string)
+ */
+PSVUtils.fullscreenEvent = function() {
+  var map = {'exitFullscreen': 'fullscreenchange', 'webkitExitFullscreen': 'webkitfullscreenchange', 'mozCancelFullScreen': 'mozfullscreenchange', 'msExitFullscreen': 'msFullscreenEnabled'};
+  for (var exit in map) if (exit in document) return map[exit];
+  return 'fullscreenchange';
 };
 
 /**
@@ -136,6 +153,28 @@ PSVUtils.exitFullscreen = function(elt) {
  */
 PSVUtils.getStyle = function(elt, prop) {
   return window.getComputedStyle(elt, null)[prop];
+};
+
+/**
+ * Translate CSS values like "top center" or "10% 50%" as top and left positions
+ * @param value (String)
+ * @return Object
+ */
+PSVUtils.parsePosition = function(value) {
+  if (!value) {
+    return {top: 0.5, left: 0.5};
+  }
+  
+  var e = document.createElement('div');
+  document.body.appendChild(e);
+  e.style.backgroundPosition = value;
+  var parsed = PSVUtils.getStyle(e, 'background-position').match(/^([0-9.]+)% ([0-9.]+)%$/);
+  document.body.removeChild(e);
+  
+  return {
+    left: parsed[1]/100,
+    top: parsed[2]/100
+  };
 };
 
 /**

@@ -6,10 +6,6 @@ var PSVNavBar = function(psv) {
   this.psv = psv;
   this.config = this.psv.config.navbar;
   this.container = null;
-  this.autorotateBtn = null;
-  this.zoomBar = null;
-  this.fullscreenBtn = null;
-  this.downloadBtn = null;
   this.caption = null;
 
   if (this.config === true) {
@@ -17,7 +13,8 @@ var PSVNavBar = function(psv) {
       autorotate: true,
       zoom: true,
       fullscreen: true,
-      download: true
+      download: true,
+      markers: true
     };
   }
   else if (typeof this.config == 'string') {
@@ -29,7 +26,14 @@ var PSVNavBar = function(psv) {
   }
 
   this.create();
+  
+  // expose some methods to the viewer
+  PSVNavBar.publicMethods.forEach(function(method) {
+    this.psv[method] = this[method].bind(this);
+  }, this);
 };
+
+PSVNavBar.publicMethods = ['setCaption'];
 
 /**
  * Creates the elements
@@ -52,16 +56,22 @@ PSVNavBar.prototype.create = function() {
     this.container.appendChild(this.zoomBar.getButton());
   }
 
-  // Fullscreen button
-  if (this.config.fullscreen) {
-    this.fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
-    this.container.appendChild(this.fullscreenBtn.getButton());
-  }
-
   // Download button
   if (this.config.download) {
     this.downloadBtn = new PSVNavBarDownloadButton(this.psv);
     this.container.appendChild(this.downloadBtn.getButton());
+  }
+
+  // Markers button
+  if (this.config.markers) {
+    this.markersBtn = new PSVNavBarMarkersButton(this.psv);
+    this.container.appendChild(this.markersBtn.getButton());
+  }
+
+  // Fullscreen button
+  if (this.config.fullscreen) {
+    this.fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
+    this.container.appendChild(this.fullscreenBtn.getButton());
   }
 
   // Caption
@@ -69,14 +79,6 @@ PSVNavBar.prototype.create = function() {
   this.caption.className = 'caption';
   this.container.appendChild(this.caption);
   this.setCaption(this.psv.config.caption);
-};
-
-/**
- * Returns the bar itself
- * @return (HTMLElement) The bar
- */
-PSVNavBar.prototype.getBar = function() {
-  return this.container;
 };
 
 /**
