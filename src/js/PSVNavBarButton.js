@@ -12,7 +12,7 @@ var PSVNavBarButton = function(psv) {
  * @return (void)
  */
 PSVNavBarButton.prototype.create = function() {
-  throw "Not implemented";
+  throw new PSVError('Not implemented');
 };
 
 /**

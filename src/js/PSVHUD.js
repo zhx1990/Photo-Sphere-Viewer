@@ -53,23 +53,23 @@ PSVHUD.prototype.create = function() {
  */
 PSVHUD.prototype.addMarker = function(marker, noRender) {
   if (!marker.id) {
-    throw 'PhotoSphereViewer: missing marker id';
+    throw new PSVError('missing marker id');
   }
   
   if (this.markers[marker.id]) {
-    throw 'PhotoSphereViewer: marker "' + marker.id + '" already exists';
+    throw new PSVError('marker "' + marker.id + '" already exists');
   }
   
   if (!marker.width || !marker.height) {
-    throw 'PhotoSphereViewer: missing marker width/height';
+    throw new PSVError('missing marker width/height');
   }
   
   if (!marker.image) {
-    throw 'PhotoSphereViewer: missing marker image';
+    throw new PSVError('missing marker image');
   }
   
   if ((!marker.hasOwnProperty('x') || !marker.hasOwnProperty('y')) & (!marker.hasOwnProperty('latitude') || !marker.hasOwnProperty('longitude'))) {
-    throw 'PhotoSphereViewer: missing marker position, latitude/longitude or x/y';
+    throw new PSVError('missing marker position, latitude/longitude or x/y');
   }
 
   marker = PSVUtils.deepmerge({}, marker); // clone
@@ -97,15 +97,15 @@ PSVHUD.prototype.addMarker = function(marker, noRender) {
   
   // convert texture coordinates to spherical coordinates
   if (marker.hasOwnProperty('x') && marker.hasOwnProperty('y')) {
-    marker.latitude = PhotoSphereViewer.PI + marker.x / this.psv.prop.size.image_width * PhotoSphereViewer.TwoPI;
-    marker.longitude = PhotoSphereViewer.HalfPI - marker.y / this.psv.prop.size.image_height * PhotoSphereViewer.PI;
+    marker.longitude = PhotoSphereViewer.PI + marker.x / this.psv.prop.size.image_width * PhotoSphereViewer.TwoPI;
+    marker.latitude = PhotoSphereViewer.HalfPI - marker.y / this.psv.prop.size.image_height * PhotoSphereViewer.PI;
   }
   
   // compute x/y/z position
   marker.position3D = new THREE.Vector3(
-    -Math.cos(marker.longitude) * Math.sin(marker.latitude),
-    Math.sin(marker.longitude),
-    Math.cos(marker.longitude) * Math.cos(marker.latitude)
+    -Math.cos(marker.latitude) * Math.sin(marker.longitude),
+    Math.sin(marker.latitude),
+    Math.cos(marker.latitude) * Math.cos(marker.longitude)
   );
   
   if (!marker.hasOwnProperty('visible')) {
@@ -145,7 +145,7 @@ PSVHUD.prototype.getMarker = function(marker) {
   var id = typeof marker === 'object' ? marker.id : marker;
   
   if (!this.markers[id]) {
-    throw 'PhotoSphereViewer: cannot find marker "' + id + '"';
+    throw new PSVError('cannot find marker "' + id + '"');
   }
   
   return this.markers[id];
@@ -167,7 +167,7 @@ PSVHUD.prototype.getCurrentMarker = function() {
  */
 PSVHUD.prototype.gotoMarker = function(marker, duration) {
   marker = this.getMarker(marker);
-  this.psv.animate(marker.latitude, marker.longitude, duration);
+  this.psv.animate(marker.longitude, marker.latitude, duration);
 };
 
 /**

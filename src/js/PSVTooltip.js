@@ -55,7 +55,7 @@ PSVTooltip.prototype.showTooltip = function(tooltip, marker) {
     var tempPos = PSVUtils.parsePosition(tooltip.position);
     
     if (!(tempPos.left in PSVTooltip.leftMap) || !(tempPos.top in PSVTooltip.topMap)) {
-      throw 'PhotoSphereViewer: unable to parse tooltip position "' + tooltip.position + '"';
+      throw new PSVError('unable to parse tooltip position "' + tooltip.position + '"');
     }
     
     tooltip.position = [PSVTooltip.topMap[tempPos.top], PSVTooltip.leftMap[tempPos.left]];

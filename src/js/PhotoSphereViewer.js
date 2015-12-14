@@ -8,7 +8,7 @@ var PhotoSphereViewer = function(options) {
   }
 
   if (options === undefined || options.panorama === undefined || options.container === undefined) {
-    throw 'PhotoSphereViewer: no value given for panorama or container';
+    throw new PSVError('no value given for panorama or container');
   }
 
   this.config = PSVUtils.deepmerge(PhotoSphereViewer.DEFAULTS, options);
@@ -30,7 +30,7 @@ var PhotoSphereViewer = function(options) {
   this.config.anim_lat = PSVUtils.stayBetween(this.config.anim_lat, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
   
   if (this.config.tilt_up_max < this.config.tilt_down_max) {
-    throw 'PhotoSphereViewer: tilt_up_max cannot be lower than tilt_down_max';
+    throw new PSVError('tilt_up_max cannot be lower than tilt_down_max');
   }
 
   // references to components
@@ -49,9 +49,9 @@ var PhotoSphereViewer = function(options) {
   // local properties
   this.prop = {
     fps: 60,
-    phi: 0,
-    theta: 0,
-    theta_offset: 0,
+    latitude: 0,
+    longitude: 0,
+    anim_speed: 0,
     zoom_lvl: 0,
     moving: false,
     zooming: false,
@@ -81,7 +81,8 @@ var PhotoSphereViewer = function(options) {
   this.rotate(this.config.default_long, this.config.default_lat);
 
   if (this.config.size !== null) {
-    this._setViewerSize(this.config.size);
+    this.container.style.width = this.config.size.width;
+    this.container.style.height = this.config.size.height;
   }
 
   if (this.config.autoload) {
@@ -212,10 +213,9 @@ PhotoSphereViewer.prototype._loadXMP = function() {
       else {
         self.container.textContent = 'Cannot load image';
       }
-    }else if (xhr.readyState == 3) {
-        
-      self.loader.setProgress(progress += 10);
-      
+    }
+    else if (xhr.readyState == 3) {
+      self.loader.setProgress(progress + 10);
     }
   };
 
@@ -319,7 +319,7 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
 };
 
 /**
- * Creates the 3D scene
+ * Creates the 3D scene and GUI compoents
  * @param img (Canvas) The sphere texture
  * @return (void)
  */
@@ -413,9 +413,9 @@ PhotoSphereViewer.prototype._bindEvents = function() {
  */
 PhotoSphereViewer.prototype.render = function() {
   this.prop.direction = new THREE.Vector3(
-    -Math.cos(this.prop.phi) * Math.sin(this.prop.theta),
-    Math.sin(this.prop.phi),
-    Math.cos(this.prop.phi) * Math.cos(this.prop.theta)
+    -Math.cos(this.prop.latitude) * Math.sin(this.prop.longitude),
+    Math.sin(this.prop.latitude),
+    Math.cos(this.prop.latitude) * Math.cos(this.prop.longitude)
   );
 
   this.camera.lookAt(this.prop.direction);
@@ -424,14 +424,14 @@ PhotoSphereViewer.prototype.render = function() {
 };
 
 /**
- * Automatically rotates the panorama
+ * Internal method for automatic infinite rotation
  * @return (void)
  */
 PhotoSphereViewer.prototype._autorotate = function() {
-  // Rotates the sphere && Returns to the equator (phi = 0)
+  // Rotates the sphere && Returns to the equator (latitude = 0)
   this.rotate(
-    this.prop.theta + this.prop.theta_offset / this.prop.fps,
-    this.prop.phi - (this.prop.phi - this.config.anim_lat) / 200
+    this.prop.longitude + this.prop.anim_speed / this.prop.fps,
+    this.prop.latitude - (this.prop.latitude - this.config.anim_lat) / 200
   );
 
   this.prop.autorotate_timeout = setTimeout(this._autorotate.bind(this), 1000 / this.prop.fps);
@@ -625,8 +625,8 @@ PhotoSphereViewer.prototype._move = function(evt) {
     var y = parseInt(evt.clientY);
   
     this.rotate(
-      this.prop.theta - (x - this.prop.mouse_x) * this.config.long_offset,
-      this.prop.phi + (y - this.prop.mouse_y) * this.config.lat_offset
+      this.prop.longitude - (x - this.prop.mouse_x) * this.config.long_offset,
+      this.prop.latitude + (y - this.prop.mouse_y) * this.config.lat_offset
     );
 
     this.prop.mouse_x = x;
@@ -661,25 +661,25 @@ PhotoSphereViewer.prototype._zoom = function(evt) {
 
 /**
  * Rotate the camera
- * @param t (integer) Horizontal angle (rad)
- * @param p (integer) Vertical angle (rad)
+ * @param t (double) Horizontal angle (rad)
+ * @param p (double) Vertical angle (rad)
  * @return (void)
  */
 PhotoSphereViewer.prototype.rotate = function(t, p) {
-  this.prop.theta = t - Math.floor(t / PhotoSphereViewer.TwoPI) * PhotoSphereViewer.TwoPI;
-  this.prop.phi = PSVUtils.stayBetween(p, this.config.tilt_down_max, this.config.tilt_up_max);
+  this.prop.longitude = t - Math.floor(t / PhotoSphereViewer.TwoPI) * PhotoSphereViewer.TwoPI;
+  this.prop.latitude = PSVUtils.stayBetween(p, this.config.tilt_down_max, this.config.tilt_up_max);
 
   if (this.renderer) {
     this.render();
   }
 
-  this.trigger('position-updated', this.prop.theta, this.prop.phi);
+  this.trigger('position-updated', this.prop.longitude, this.prop.latitude);
 };
 
 /**
  * Rotate the camera with animation
- * @param t (integer) Horizontal angle (rad)
- * @param p (integer) Vertical angle (rad)
+ * @param t (double) Horizontal angle (rad)
+ * @param p (double) Vertical angle (rad)
  * @param s (mixed) Optional. Animation speed or duration (milliseconds)
  * @return (void)
  */
@@ -692,8 +692,8 @@ PhotoSphereViewer.prototype.animate = function(t, p, s) {
   t = t - Math.floor(t / PhotoSphereViewer.TwoPI) * PhotoSphereViewer.TwoPI;
   p = PSVUtils.stayBetween(p, this.config.tilt_down_max, this.config.tilt_up_max);
 
-  var t0 = this.prop.theta;
-  var p0 = this.prop.phi;
+  var t0 = this.prop.longitude;
+  var p0 = this.prop.latitude;
   
   // get duration of animation
   var duration;
@@ -702,7 +702,7 @@ PhotoSphereViewer.prototype.animate = function(t, p, s) {
   }
   else {
     // desired radial speed
-    var speed = s ? this.parseAnimSpeed(s) : this.prop.theta_offset;
+    var speed = s ? this.parseAnimSpeed(s) : this.prop.anim_speed;
     // get the angle between current position and target
     var angle = Math.acos(Math.cos(p0) * Math.cos(p) * Math.cos(t0-t) + Math.sin(p0) * Math.sin(p));
     duration = angle / speed;
@@ -710,7 +710,7 @@ PhotoSphereViewer.prototype.animate = function(t, p, s) {
   
   var steps = duration * this.prop.fps;
   
-  // latitude offset for shortest arc
+  // longitude offset for shortest arc
   var tCandidates = [
     t - t0, // direct
     PhotoSphereViewer.TwoPI - t0 + t, // clock-wise cross zero
@@ -721,7 +721,7 @@ PhotoSphereViewer.prototype.animate = function(t, p, s) {
     return Math.abs(candidate) < Math.abs(value) ? candidate : value;
   }, Infinity);
   
-  // longitude offset
+  // latitude offset
   var pOffset = p - p0;
   
   this.stopAutorotate();
@@ -731,26 +731,33 @@ PhotoSphereViewer.prototype.animate = function(t, p, s) {
 };
 
 /**
- * Automatically rotates the panorama
+ * Internal method for animation
+ * @param tStep (double) horizontal angle to move the view each tick
+ * @param pStep (double) vertical angle to move the view each tick
+ * @param tTarget (double) target horizontal angle
+ * @param pTarget (double) target vertical angle
  * @return (void)
  */
 PhotoSphereViewer.prototype._animate = function(tStep, pStep, tTarget, pTarget) {
-  if (tStep !== 0 && Math.abs(this.prop.theta - tTarget) <= Math.abs(tStep) * 2) {
+  if (tStep !== 0 && Math.abs(this.prop.longitude - tTarget) <= Math.abs(tStep) * 2) {
     tStep = 0;
-    this.prop.theta = tTarget;
+    this.prop.longitude = tTarget;
   }
-  if (pStep !== 0 && Math.abs(this.prop.phi - pTarget) <= Math.abs(pStep) * 2) {
+  if (pStep !== 0 && Math.abs(this.prop.latitude - pTarget) <= Math.abs(pStep) * 2) {
     pStep = 0;
-    this.prop.phi = pTarget;
+    this.prop.latitude = pTarget;
   }
   
   this.rotate(
-    this.prop.theta + tStep,
-    this.prop.phi + pStep
+    this.prop.longitude + tStep,
+    this.prop.latitude + pStep
   );
   
   if (tStep !== 0 || pStep !== 0) {
     this.prop.animation_timeout = setTimeout(this._animate.bind(this, tStep, pStep, tTarget, pTarget), 1000 / this.prop.fps);
+  }
+  else {
+    this.stopAnimation();
   }
 };
 
@@ -839,7 +846,7 @@ PhotoSphereViewer.prototype.toggleFullscreen = function() {
 /**
  * Parse the animation speed
  * @param speed (string) The speed, in radians/degrees/revolutions per second/minute
- * @return (double)
+ * @return (double) radians per second
  */
 PhotoSphereViewer.prototype.parseAnimSpeed = function(speed) {
   speed = speed.toString().trim();
@@ -881,7 +888,7 @@ PhotoSphereViewer.prototype.parseAnimSpeed = function(speed) {
 
     // Unknown unit
     default:
-      throw 'PhotoSphereViewer: unknown speed unit "' + speed_unit + '"';
+      throw new PSVError('unknown speed unit "' + speed_unit + '"');
   }
   
   return rad_per_second;
@@ -893,24 +900,7 @@ PhotoSphereViewer.prototype.parseAnimSpeed = function(speed) {
  * @return (void)
  */
 PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
-  this.prop.theta_offset = this.parseAnimSpeed(speed);
-};
-
-/**
- * Sets the viewer size
- * @param size (Object) An object containing the wanted width and height
- * @return (void)
- */
-PhotoSphereViewer.prototype._setViewerSize = function(size) {
-  for (var dim in size) {
-    if (dim == 'width' || dim == 'height') {
-      if (/^[0-9.]+$/.test(size[dim])) {
-        size[dim]+= 'px';
-      }
-
-      this.container.style[dim] = size[dim];
-    }
-  }
+  this.prop.anim_speed = this.parseAnimSpeed(speed);
 };
 
 /**
