@@ -2,7 +2,7 @@
  * Loader class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVLoader = function(psv) {
+function PSVLoader(psv) {
   this.psv = psv;
   this.container = null;
   this.canvas = null;

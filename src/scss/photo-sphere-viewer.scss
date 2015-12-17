@@ -30,7 +30,7 @@ $download-button-size: 12px;
 
 $tooltip-background-color: rgba(61, 61, 61, 0.8);
 
-$tooltip-animate-offset: 20px;
+$tooltip-animate-offset: 5px; // set tooltip.offset JS config to the same value
 $tooltip-radius: 4px;
 $tooltip-padding: 0.5em 1em;
 $tooltip-arrow-size: 7px; // set tooltip.arrow_size JS config to the same value

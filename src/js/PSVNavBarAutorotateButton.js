@@ -2,7 +2,7 @@
  * Navigation bar autorotate button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVNavBarAutorotateButton = function(psv) {
+function PSVNavBarAutorotateButton(psv) {
   PSVNavBarButton.call(this, psv);
   this.create();
 };

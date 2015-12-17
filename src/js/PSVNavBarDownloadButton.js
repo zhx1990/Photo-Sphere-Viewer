@@ -2,7 +2,7 @@
  * Navigation bar download button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVNavBarDownloadButton = function(psv) {
+function PSVNavBarDownloadButton(psv) {
   PSVNavBarButton.call(this, psv);
 
   this.create();

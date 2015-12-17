@@ -2,7 +2,7 @@
  * Tooltip class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVTooltip = function(psv) {
+function PSVTooltip(psv) {
   this.psv = psv;
   this.config = this.psv.config.tooltip;
   this.container = null;

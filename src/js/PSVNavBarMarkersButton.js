@@ -2,7 +2,7 @@
  * Navigation bar markers button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVNavBarMarkersButton = function(psv) {
+function PSVNavBarMarkersButton(psv) {
   PSVNavBarButton.call(this, psv);
   
   this.prop = {

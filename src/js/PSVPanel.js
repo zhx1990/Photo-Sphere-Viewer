@@ -2,7 +2,7 @@
  * Panel class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVPanel = function(psv) {
+function PSVPanel(psv) {
   this.psv = psv;
   this.container = null;
   this.resizer = null;

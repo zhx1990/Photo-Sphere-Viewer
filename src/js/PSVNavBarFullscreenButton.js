@@ -2,7 +2,7 @@
  * Navigation bar fullscreen button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVNavBarFullscreenButton = function(psv) {
+function PSVNavBarFullscreenButton(psv) {
   PSVNavBarButton.call(this, psv);
   this.create();
 };

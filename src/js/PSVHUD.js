@@ -2,7 +2,7 @@
  * HUD class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVHUD = function(psv) {
+function PSVHUD(psv) {
   this.psv = psv;
   this.container = null;
   this.markers = {};

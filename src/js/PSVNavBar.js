@@ -2,7 +2,7 @@
  * Navigation bar class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVNavBar = function(psv) {
+function PSVNavBar(psv) {
   this.psv = psv;
   this.config = this.psv.config.navbar;
   this.container = null;

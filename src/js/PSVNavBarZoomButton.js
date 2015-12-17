@@ -2,7 +2,7 @@
  * Navigation bar zoom button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVNavBarZoomButton = function(psv) {
+function PSVNavBarZoomButton(psv) {
   PSVNavBarButton.call(this, psv);
 
   this.zoom_range = null;

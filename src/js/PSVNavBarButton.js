@@ -2,7 +2,7 @@
  * Navigation bar button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-var PSVNavBarButton = function(psv) {
+function PSVNavBarButton(psv) {
   this.psv = psv;
   this.button = null;
 };

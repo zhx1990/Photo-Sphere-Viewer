@@ -2,7 +2,7 @@
  * Viewer class
  * @param options (Object) Viewer settings
  */
-var PhotoSphereViewer = function(options) {
+function PhotoSphereViewer(options) {
   if (!(this instanceof PhotoSphereViewer)) {
     return new PhotoSphereViewer(options);
   }
