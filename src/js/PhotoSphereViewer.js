@@ -44,6 +44,7 @@ function PhotoSphereViewer(options) {
   this.renderer = null;
   this.scene = null;
   this.camera = null;
+  this.raycaster = null;
   this.actions = {};
 
   // local properties
@@ -55,6 +56,8 @@ function PhotoSphereViewer(options) {
     zoom_lvl: 0,
     moving: false,
     zooming: false,
+    start_mouse_x: 0,
+    start_mouse_y: 0,
     mouse_x: 0,
     mouse_y: 0,
     pinch_dist: 0,
@@ -325,6 +328,8 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
  */
 PhotoSphereViewer.prototype._createScene = function(img) {
   this._onResize();
+  
+  this.raycaster = new THREE.Raycaster();
 
   // Renderer depends on whether WebGL is supported or not
   this.renderer = PSVUtils.isWebGLSupported() ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
@@ -342,6 +347,7 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   // default texture origin is at 1/4 (phiStart=0) of the panorama, I set it at 1/2 (phiStart=PI/2)
   var geometry = new THREE.SphereGeometry(200, 32, 32, -PhotoSphereViewer.HalfPI);
   var material = new THREE.MeshBasicMaterial({map: texture, overdraw: true});
+  material.side = THREE.DoubleSide;
   var mesh = new THREE.Mesh(geometry, material);
   mesh.scale.x = -1;
 
@@ -397,7 +403,8 @@ PhotoSphereViewer.prototype._bindEvents = function() {
     this.hud.container.style.cursor = 'move';
     this.hud.container.addEventListener('mousedown', this._onMouseDown.bind(this));
     this.hud.container.addEventListener('touchstart', this._onTouchStart.bind(this));
-    PSVUtils.addEvents(this.hud.container, 'mouseup touchend', this._onMouseUp.bind(this));
+    this.hud.container.addEventListener('mouseup', this._onMouseUp.bind(this));
+    this.hud.container.addEventListener('touchend', this._onTouchEnd.bind(this));
     this.hud.container.addEventListener('mousemove', this._onMouseMove.bind(this));
     this.hud.container.addEventListener('touchmove', this._onTouchMove.bind(this));
   }
@@ -541,8 +548,8 @@ PhotoSphereViewer.prototype._onTouchStart = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._startMove = function(evt) {
-  this.prop.mouse_x = parseInt(evt.clientX);
-  this.prop.mouse_y = parseInt(evt.clientY);
+  this.prop.mouse_x = this.prop.start_mouse_x = parseInt(evt.clientX);
+  this.prop.mouse_y = this.prop.start_mouse_y = parseInt(evt.clientY);
   this.prop.moving = true;
   this.prop.zooming = false;
 
@@ -579,10 +586,71 @@ PhotoSphereViewer.prototype._startZoom = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._onMouseUp = function(evt) {
+  this._stopMove(evt)
+};
+
+/**
+ * The user wants to stop moving (mobile version)
+ * @param evt (Event) The event
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
+  this._stopMove(evt.changedTouches[0])
+};
+
+/**
+ * Stops the movement
+ * @param evt (Event) The event
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._stopMove = function(evt) {
   this.prop.moving = false;
   this.prop.zooming = false;
   
+  if (Math.abs(evt.clientX - this.prop.start_mouse_x) < 5 && Math.abs(evt.clientY - this.prop.start_mouse_y) < 5) {
+    this._clicked(evt.clientX, evt.clientY);
+  }
+  
   this.trigger('__mouseup', evt);
+};
+
+/**
+ * Trigger an event with all coordinates when a simple click is performed
+ * @param x (Integer) mouse x
+ * @param y (Integer) mouse y
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._clicked = function(x, y) {
+  var screen = new THREE.Vector2(
+    2 * x / this.prop.size.width - 1,
+    - 2 * y / this.prop.size.height + 1
+  );
+  
+  this.raycaster.setFromCamera(screen, this.camera);
+  
+  var intersects = this.raycaster.intersectObjects(this.scene.children);
+  
+  if (intersects.length === 1) {
+    var data = {
+      client_x: parseInt(x),
+      client_y: parseInt(y)
+    };
+    
+    var p = intersects[0].point;
+    var phi = Math.acos(p.y / Math.sqrt(p.x*p.x + p.y*p.y + p.z*p.z));
+    var theta = Math.atan2(p.x, p.z);
+    
+    data.longitude = theta < 0 ? - theta : PhotoSphereViewer.TwoPI - theta;
+    data.latitude = PhotoSphereViewer.HalfPI - phi;
+    
+    var relativeLong = data.longitude / PhotoSphereViewer.TwoPI * this.prop.size.image_width;
+    var relativeLat = data.latitude / PhotoSphereViewer.PI * this.prop.size.image_height;
+
+    data.texture_x = parseInt(data.longitude < PhotoSphereViewer.PI ? relativeLong + this.prop.size.image_width/2 : relativeLong - this.prop.size.image_width/2);
+    data.texture_y = parseInt(this.prop.size.image_height/2 - relativeLat);
+  
+    this.trigger('click', data);
+  }
 };
 
 /**

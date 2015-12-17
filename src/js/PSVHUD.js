@@ -97,8 +97,11 @@ PSVHUD.prototype.addMarker = function(marker, noRender) {
   
   // convert texture coordinates to spherical coordinates
   if (marker.hasOwnProperty('x') && marker.hasOwnProperty('y')) {
-    marker.longitude = PhotoSphereViewer.PI + marker.x / this.psv.prop.size.image_width * PhotoSphereViewer.TwoPI;
-    marker.latitude = PhotoSphereViewer.HalfPI - marker.y / this.psv.prop.size.image_height * PhotoSphereViewer.PI;
+    var relativeX = marker.x / this.psv.prop.size.image_width * PhotoSphereViewer.TwoPI;
+    var relativeY = marker.y / this.psv.prop.size.image_height * PhotoSphereViewer.PI;
+    
+    marker.longitude = relativeX >= PhotoSphereViewer.PI ? relativeX - PhotoSphereViewer.PI : relativeX + PhotoSphereViewer.PI;
+    marker.latitude = PhotoSphereViewer.HalfPI - relativeY;
   }
   
   // compute x/y/z position
