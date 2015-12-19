@@ -4,6 +4,7 @@
  */
 function PSVNavBarAutorotateButton(psv) {
   PSVNavBarButton.call(this, psv);
+  
   this.create();
 };
 

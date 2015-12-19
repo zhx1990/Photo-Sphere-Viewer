@@ -3,37 +3,38 @@
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
 function PSVNavBar(psv) {
-  this.psv = psv;
+  PSVComponent.call(this, psv);
+
   this.config = this.psv.config.navbar;
   this.container = null;
   this.caption = null;
 
   if (this.config === true) {
-    this.config = {
-      autorotate: true,
-      zoom: true,
-      fullscreen: true,
-      download: true,
-      markers: true
-    };
+    this.config = PSVUtils.clone(PSVNavBar.DEFAULTS);
   }
   else if (typeof this.config == 'string') {
     var map = {};
     this.config.split(/[ ,:]/).forEach(function(button) {
       map[button] = true;
     });
-    this.config = map;
+    this.config = PSVUtils.deepmerge(PSVNavBar.DEFAULTS, map);
   }
 
   this.create();
-  
-  // expose some methods to the viewer
-  PSVNavBar.publicMethods.forEach(function(method) {
-    this.psv[method] = this[method].bind(this);
-  }, this);
 };
 
+PSVNavBar.prototype = Object.create(PSVComponent.prototype);
+PSVNavBar.prototype.constructor = PSVNavBar;
+
 PSVNavBar.publicMethods = ['setCaption'];
+
+PSVNavBar.DEFAULTS = {
+  autorotate: true,
+  zoom: true,
+  fullscreen: true,
+  download: true,
+  markers: true
+};
 
 /**
  * Creates the elements
@@ -46,32 +47,32 @@ PSVNavBar.prototype.create = function() {
 
   // Autorotate button
   if (this.config.autorotate) {
-    this.autorotateBtn = new PSVNavBarAutorotateButton(this.psv);
-    this.container.appendChild(this.autorotateBtn.getButton());
+    var autorotateBtn = new PSVNavBarAutorotateButton(this.psv);
+    this.container.appendChild(autorotateBtn.button);
   }
 
   // Zoom buttons
   if (this.config.zoom) {
-    this.zoomBar = new PSVNavBarZoomButton(this.psv);
-    this.container.appendChild(this.zoomBar.getButton());
+    var zoomBar = new PSVNavBarZoomButton(this.psv);
+    this.container.appendChild(zoomBar.button);
   }
 
   // Download button
   if (this.config.download) {
-    this.downloadBtn = new PSVNavBarDownloadButton(this.psv);
-    this.container.appendChild(this.downloadBtn.getButton());
+    var downloadBtn = new PSVNavBarDownloadButton(this.psv);
+    this.container.appendChild(downloadBtn.button);
   }
 
   // Markers button
   if (this.config.markers) {
-    this.markersBtn = new PSVNavBarMarkersButton(this.psv);
-    this.container.appendChild(this.markersBtn.getButton());
+    var markersBtn = new PSVNavBarMarkersButton(this.psv);
+    this.container.appendChild(markersBtn.button);
   }
 
   // Fullscreen button
   if (this.config.fullscreen) {
-    this.fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
-    this.container.appendChild(this.fullscreenBtn.getButton());
+    var fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
+    this.container.appendChild(fullscreenBtn.button);
   }
 
   // Caption

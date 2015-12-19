@@ -97,6 +97,8 @@ PhotoSphereViewer.PI = Math.PI;
 PhotoSphereViewer.TwoPI = Math.PI * 2.0;
 PhotoSphereViewer.HalfPI = Math.PI / 2.0;
 
+PhotoSphereViewer.MOVE_THRESHOLD = 4;
+
 PhotoSphereViewer.ICONS = {};
 
 /**
@@ -399,6 +401,7 @@ PhotoSphereViewer.prototype._bindEvents = function() {
   window.addEventListener('resize', this._onResize.bind(this));
   document.addEventListener(PSVUtils.fullscreenEvent(), this._fullscreenToggled.bind(this));
   
+  // all interation events are binded to the HUD only
   if (this.config.mousemove) {
     this.hud.container.style.cursor = 'move';
     this.hud.container.addEventListener('mousedown', this._onMouseDown.bind(this));
@@ -551,12 +554,11 @@ PhotoSphereViewer.prototype._startMove = function(evt) {
   this.prop.mouse_x = this.prop.start_mouse_x = parseInt(evt.clientX);
   this.prop.mouse_y = this.prop.start_mouse_y = parseInt(evt.clientY);
   this.prop.moving = true;
+  this.prop.moved = false;
   this.prop.zooming = false;
 
   this.stopAutorotate();
   this.stopAnimation();
-  
-  this.trigger('__mousedown', evt);
 };
 
 /**
@@ -576,8 +578,6 @@ PhotoSphereViewer.prototype._startZoom = function(evt) {
 
   this.stopAutorotate();
   this.stopAnimation();
-  
-  this.trigger('__mousedown', evt.touches[0]);
 };
 
 /**
@@ -604,26 +604,33 @@ PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._stopMove = function(evt) {
-  this.prop.moving = false;
-  this.prop.zooming = false;
-  
-  if (Math.abs(evt.clientX - this.prop.start_mouse_x) < 5 && Math.abs(evt.clientY - this.prop.start_mouse_y) < 5) {
-    this._clicked(evt.clientX, evt.clientY);
+  if (this.prop.moving) {
+    if (Math.abs(evt.clientX - this.prop.start_mouse_x) < PhotoSphereViewer.MOVE_THRESHOLD && Math.abs(evt.clientY - this.prop.start_mouse_y) < PhotoSphereViewer.MOVE_THRESHOLD) {
+      this._click(evt);
+    }
+    else {
+      this.prop.moved = true;
+    }
   }
   
-  this.trigger('__mouseup', evt);
+  this.prop.moving = false;
+  this.prop.zooming = false;
 };
 
 /**
  * Trigger an event with all coordinates when a simple click is performed
- * @param x (Integer) mouse x
- * @param y (Integer) mouse y
+ * @param evt (Event) The event
  * @return (void)
  */
-PhotoSphereViewer.prototype._clicked = function(x, y) {
+PhotoSphereViewer.prototype._click = function(evt) {
+  this.trigger('_click', evt);
+  if (evt.defaultPrevented) {
+    return;
+  }
+
   var screen = new THREE.Vector2(
-    2 * x / this.prop.size.width - 1,
-    - 2 * y / this.prop.size.height + 1
+    2 * evt.clientX / this.prop.size.width - 1,
+    - 2 * evt.clientY / this.prop.size.height + 1
   );
   
   this.raycaster.setFromCamera(screen, this.camera);
@@ -632,8 +639,8 @@ PhotoSphereViewer.prototype._clicked = function(x, y) {
   
   if (intersects.length === 1) {
     var data = {
-      client_x: parseInt(x),
-      client_y: parseInt(y)
+      client_x: parseInt(evt.clientX),
+      client_y: parseInt(evt.clientY)
     };
     
     var p = intersects[0].point;
@@ -677,9 +684,6 @@ PhotoSphereViewer.prototype._onTouchMove = function(evt) {
     evt.preventDefault();
     this._zoom(evt);
   }
-  else {
-    this._onMouseUp();
-  }
 };
 
 /**
@@ -699,8 +703,6 @@ PhotoSphereViewer.prototype._move = function(evt) {
 
     this.prop.mouse_x = x;
     this.prop.mouse_y = y;
-
-    this.trigger('__mousemove', evt);
   }
 };
 
@@ -722,8 +724,6 @@ PhotoSphereViewer.prototype._zoom = function(evt) {
     this.zoom(this.prop.zoom_lvl + delta);
 
     this.prop.pinch_dist = p;
-    
-    this.trigger('__mousemove', evt.touches[0]);
   }
 };
 

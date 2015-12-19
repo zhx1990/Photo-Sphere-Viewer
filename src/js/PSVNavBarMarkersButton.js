@@ -27,6 +27,7 @@ PSVNavBarMarkersButton.prototype.create = function() {
   this.button.innerHTML = PhotoSphereViewer.ICONS['pin.svg'];
   
   this.button.addEventListener('click', this.toggleMarkers.bind(this));
+  
   this.psv.on('open-panel', this._onPanelOpened.bind(this));
   this.psv.on('close-panel', this._onPanelClosed.bind(this));
 };

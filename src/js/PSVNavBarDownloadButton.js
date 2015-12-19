@@ -4,7 +4,7 @@
  */
 function PSVNavBarDownloadButton(psv) {
   PSVNavBarButton.call(this, psv);
-
+  
   this.create();
 };
 

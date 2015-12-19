@@ -3,37 +3,38 @@
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
 function PSVTooltip(psv) {
-  this.psv = psv;
+  PSVComponent.call(this, psv);
+  
   this.config = this.psv.config.tooltip;
   this.container = null;
   
   this.create();
-  
-  this.psv.on('render', this.hideTooltip.bind(this));
-  
-  // expose some methods to the viewer
-  PSVTooltip.publicMethods.forEach(function(method) {
-    this.psv[method] = this[method].bind(this);
-  }, this);
 };
+
+PSVTooltip.prototype = Object.create(PSVComponent.prototype);
+PSVTooltip.prototype.constructor = PSVTooltip;
+
+PSVTooltip.publicMethods = ['showTooltip', 'hideTooltip'];
 
 PSVTooltip.leftMap = {0: 'left', 0.5: 'center', 1: 'right'};
 PSVTooltip.topMap = {0: 'top', 0.5: 'center', 1: 'bottom'};
-PSVTooltip.publicMethods = ['showTooltip', 'hideTooltip'];
 
 /**
  * Creates the elements
  * @return (void)
  */
 PSVTooltip.prototype.create = function() {
-  // Container
   this.container = document.createElement('div');
   this.container.innerHTML = '<div class="arrow"></div><div class="content"></div>';
   this.container.className = 'psv-tooltip';
+  this.container.style.top = '-1000px';
+  this.container.style.left = '-1000px';
+  
+  this.psv.on('render', this.hideTooltip.bind(this));
 };
 
 /**
- * Show the tooltip for a specific marker
+ * Show the tooltip
  * @param tooltip (Mixed) content, className, position
  * @param marker (Object) target for positioning: width, height, position2D(top, left)
  * @return (void)
@@ -131,6 +132,12 @@ PSVTooltip.prototype.showTooltip = function(tooltip, marker) {
 PSVTooltip.prototype.hideTooltip = function() {
   this.container.classList.remove('visible');
   this.psv.trigger('hide-tooltip');
+  
+  var self = this;
+  setTimeout(function() {
+    self.container.style.top = '-1000px';
+    self.container.style.left = '-1000px';
+  }, 100);
 };
 
 /**

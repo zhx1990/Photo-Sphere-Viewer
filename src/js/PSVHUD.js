@@ -3,26 +3,17 @@
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
 function PSVHUD(psv) {
-  this.psv = psv;
+  PSVComponent.call(this, psv);
+  
   this.container = null;
   this.markers = {};
   this.currentMarker = null;
   
-  this.prop = {
-    mouse_x: 0,
-    mouse_y: 0,
-    moved: false
-  };
-  
   this.create();
-  
-  this.psv.on('render', this.updatePositions.bind(this));
-  
-  // expose some methods to the viewer
-  PSVHUD.publicMethods.forEach(function(method) {
-    this.psv[method] = this[method].bind(this);
-  }, this);
 };
+
+PSVHUD.prototype = Object.create(PSVComponent.prototype);
+PSVHUD.prototype.constructor = PSVHUD;
 
 PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'getMarker', 'getCurrentMarker', 'gotoMarker', 'hideMarker', 'showMarker', 'toggleMarker'];
 
@@ -31,7 +22,6 @@ PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'getMarker', 'getCurrentMar
  * @return (void)
  */
 PSVHUD.prototype.create = function() {
-  // Container
   this.container = document.createElement('div');
   this.container.className = 'psv-hud';
   
@@ -39,17 +29,16 @@ PSVHUD.prototype.create = function() {
   this.container.addEventListener('mouseenter', this._onMouseEnter.bind(this), true);
   this.container.addEventListener('mouseleave', this._onMouseLeave.bind(this), true);
   
-  // Mouse events (internal)
-  this.psv.on('__mousedown', this._onMouseDown.bind(this), true);
-  this.psv.on('__mousemove', this._onMouseMove.bind(this), true);
-  this.psv.on('__mouseup', this._onMouseUp.bind(this), true);
+  this.psv.on('_click', this._onClick.bind(this), true);
+  
+  this.psv.on('render', this.updatePositions.bind(this));
 };
 
 /**
  * Add a new marker to HUD
  * @param marker (Object)
  * @param noRender (Boolean) disable immediate render
- * @return (void)
+ * @return (Object) a modified marker object
  */
 PSVHUD.prototype.addMarker = function(marker, noRender) {
   if (!marker.id) {
@@ -72,7 +61,7 @@ PSVHUD.prototype.addMarker = function(marker, noRender) {
     throw new PSVError('missing marker position, latitude/longitude or x/y');
   }
 
-  marker = PSVUtils.deepmerge({}, marker); // clone
+  marker = PSVUtils.clone(marker);
   
   // create DOM
   marker.$el = document.createElement('div');
@@ -122,21 +111,8 @@ PSVHUD.prototype.addMarker = function(marker, noRender) {
   if (!noRender) {
     this.updatePositions();
   }
-};
-
-/**
- * Remove a marker
- * @param marker (Mixed)
- * @param noRender (Boolean)
- * @return (void)
- */
-PSVHUD.prototype.removeMarker = function(marker, noRender) {
-  marker = this.getMarker(marker);
-  delete this.markers[marker.id];
   
-  if (!noRender) {
-    this.updatePositions();
-  }
+  return marker;
 };
 
 /**
@@ -160,6 +136,21 @@ PSVHUD.prototype.getMarker = function(marker) {
  */
 PSVHUD.prototype.getCurrentMarker = function() {
   return this.currentMarker;
+};
+
+/**
+ * Remove a marker
+ * @param marker (Mixed)
+ * @param noRender (Boolean)
+ * @return (void)
+ */
+PSVHUD.prototype.removeMarker = function(marker, noRender) {
+  marker = this.getMarker(marker);
+  delete this.markers[marker.id];
+  
+  if (!noRender) {
+    this.updatePositions();
+  }
 };
 
 /**
@@ -287,41 +278,18 @@ PSVHUD.prototype._onMouseLeave = function(e) {
 };
 
 /**
- * The mouse button is pressed : save start position
- * @param e (Event)
- * @return (void)
- */
-PSVHUD.prototype._onMouseDown = function(e) {
-  this.prop.mouse_x = e.clientX;
-  this.prop.mouse_y = e.clientY;
-  this.prop.moved = false;
-};
-
-/**
- * The mouse moves (while button is pressed) : flag as move if threeshold reached
- * @param e (Event)
- * @return (void)
- */
-PSVHUD.prototype._onMouseMove = function(e) {
-  if (Math.abs(e.clientX - this.prop.mouse_x) > 5 || Math.abs(e.clientY - this.prop.mouse_y) > 5) {
-    this.prop.moved = true;
-  }
-};
-
-/**
  * The mouse button is release : show/hide the panel if threeshold was not reached, or do nothing
  * @param e (Event)
  * @return (void)
  */
-PSVHUD.prototype._onMouseUp = function(e) {
-  if (!this.prop.moved) {
-    var clickedOnHud = !PSVUtils.hasParent(e.target, this.psv.panel.container) && (!this.psv.navbar || !PSVUtils.hasParent(e.target, this.psv.navbar.container));
-    
+PSVHUD.prototype._onClick = function(e) {
+  if (!this.psv.prop.moved) {
     if (e.target && e.target.psvMarker) {
       this.currentMarker = e.target.psvMarker;
       this.psv.trigger('select-marker', e.target.psvMarker);
+      e.preventDefault(); // prevent the public "click" event
     }
-    else if (clickedOnHud) {
+    else {
       this.currentMarker = null;
       this.psv.trigger('unselect-marker');
     }
@@ -329,8 +297,8 @@ PSVHUD.prototype._onMouseUp = function(e) {
     if (e.target && e.target.psvMarker && e.target.psvMarker.content) {
       this.psv.panel.showPanel(e.target.psvMarker.content);
     }
-    // only hide the panel if we clicked on something else than the panel itself or the navbar
-    else if (clickedOnHud) {
+    else if (this.psv.panel.prop.opened) {
+      e.preventDefault(); // prevent the public "click" event
       this.psv.panel.hidePanel();
     }
   }

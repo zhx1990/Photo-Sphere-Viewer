@@ -3,6 +3,7 @@ module.exports = function(grunt) {
 
   var files_in_order = [
     'src/js/PhotoSphereViewer.js',
+    'src/js/PSVComponent.js',
     'src/js/PSVLoader.js',
     'src/js/PSVHUD.js',
     'src/js/PSVPanel.js',

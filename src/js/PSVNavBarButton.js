@@ -16,14 +16,6 @@ PSVNavBarButton.prototype.create = function() {
 };
 
 /**
- * Returns the button element
- * @return (HTMLElement) The button
- */
-PSVNavBarButton.prototype.getButton = function() {
-  return this.button;
-};
-
-/**
  * Changes the active state of the button
  * @param active (boolean) true if the button should be active, false otherwise
  * @return (void)

@@ -32,20 +32,6 @@ PSVUtils.getMaxTextureWidth = function() {
 };
 
 /**
- * Attaches an event handler function to an elemnt
- * @param elt (HTMLElement) The element
- * @param evt (string) The event name(s)
- * @param f (Function) The handler function
- * @param cap (Boolean) use capture
- * @return (void)
- */
-PSVUtils.addEvents = function(elt, evt, f, cap) {
-  evt.split(' ').forEach(function(e) {
-    elt.addEventListener(e, f, cap);
-  });
-};
-
-/**
  * Search if an element has a particular, at any level including itself
  * @param el (HTMLElement)
  * @param parent (HTMLElement)
@@ -224,4 +210,13 @@ PSVUtils.deepmerge = function(target, src) {
   }
 
   return dst;
+};
+
+/**
+ * Clone an object
+ * @param object
+ * @return object
+ */
+PSVUtils.clone = function(src) {
+  return PSVUtils.deepmerge({}, src);
 };

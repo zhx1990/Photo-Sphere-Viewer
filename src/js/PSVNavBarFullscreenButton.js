@@ -4,6 +4,7 @@
  */
 function PSVNavBarFullscreenButton(psv) {
   PSVNavBarButton.call(this, psv);
+  
   this.create();
 };
 
