@@ -627,22 +627,24 @@ PhotoSphereViewer.prototype._click = function(evt) {
   if (evt.defaultPrevented) {
     return;
   }
+  
+  var boundingRect = this.container.getBoundingClientRect();
+  
+  var data = {
+    client_x: parseInt(evt.clientX - boundingRect.left),
+    client_y: parseInt(evt.clientY - boundingRect.top)
+  };
 
   var screen = new THREE.Vector2(
-    2 * evt.clientX / this.prop.size.width - 1,
-    - 2 * evt.clientY / this.prop.size.height + 1
+    2 * data.client_x / this.prop.size.width - 1,
+    - 2 * data.client_y / this.prop.size.height + 1
   );
   
   this.raycaster.setFromCamera(screen, this.camera);
   
   var intersects = this.raycaster.intersectObjects(this.scene.children);
   
-  if (intersects.length === 1) {
-    var data = {
-      client_x: parseInt(evt.clientX),
-      client_y: parseInt(evt.clientY)
-    };
-    
+  if (intersects.length === 1) {    
     var p = intersects[0].point;
     var phi = Math.acos(p.y / Math.sqrt(p.x*p.x + p.y*p.y + p.z*p.z));
     var theta = Math.atan2(p.x, p.z);
