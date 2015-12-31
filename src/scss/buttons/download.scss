@@ -14,7 +14,7 @@
     border-radius: 0;
     transition: border-radius 0.2s ease;
   }
-  
+
   div {
     position: absolute;
     width: $download-button-size;
@@ -24,19 +24,19 @@
     margin: #{- $download-button-size / 2};
     margin-top: #{- $download-button-size / 2 - $download-button-tickness};
     transition: margin-top 0.2s ease;
-    
+
     &:before, &:after {
       content: '';
       display: block;
       margin: 0 auto;
     }
-    
+
     &:before {
       width: #{2 * round($download-button-size / 4)};
       height: #{round($download-button-size / 2)};
       background: $buttons-color;
     }
-    
+
     &:after {
       width: 0;
       height: 0;
@@ -44,12 +44,12 @@
       border-top-color: $buttons-color;
     }
   }
-    
+
   &:hover {
     &:before {
       border-radius: $download-button-tickness;
     }
-    
+
     div {
       margin-top: #{- $download-button-size / 2};
     }

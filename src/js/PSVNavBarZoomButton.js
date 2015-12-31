@@ -13,7 +13,7 @@ function PSVNavBarZoomButton(psv) {
   };
 
   this.create();
-};
+}
 
 PSVNavBarZoomButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarZoomButton.prototype.constructor = PSVNavBarZoomButton;

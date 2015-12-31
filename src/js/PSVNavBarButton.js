@@ -5,7 +5,7 @@
 function PSVNavBarButton(psv) {
   this.psv = psv;
   this.button = null;
-};
+}
 
 /**
  * Creates the button

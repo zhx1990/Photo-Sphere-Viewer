@@ -1,3 +1,5 @@
+/*jshint multistr: true */
+
 /**
  * Navigation bar markers button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
@@ -11,7 +13,7 @@ function PSVNavBarMarkersButton(psv) {
   };
 
   this.create();
-};
+}
 
 PSVNavBarMarkersButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;

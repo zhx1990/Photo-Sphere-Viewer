@@ -6,7 +6,7 @@ function PSVNavBarDownloadButton(psv) {
   PSVNavBarButton.call(this, psv);
   
   this.create();
-};
+}
 
 PSVNavBarDownloadButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarDownloadButton.prototype.constructor = PSVNavBarDownloadButton;

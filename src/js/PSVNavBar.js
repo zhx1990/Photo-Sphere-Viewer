@@ -21,7 +21,7 @@ function PSVNavBar(psv) {
   }
 
   this.create();
-};
+}
 
 PSVNavBar.prototype = Object.create(PSVComponent.prototype);
 PSVNavBar.prototype.constructor = PSVNavBar;

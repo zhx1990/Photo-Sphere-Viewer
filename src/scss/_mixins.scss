@@ -1,0 +1,28 @@
+@mixin user-select($value) {
+  -webkit-touch-callout: $value;
+  -webkit-user-select: $value;
+  -khtml-user-select: $value;
+  -moz-user-select: $value;
+  -ms-user-select: $value;
+  user-select: $value;
+}
+
+@function make-dot-shadow($color, $width, $height) {
+  $val: 1px 0 $color;
+  $x: 3;
+  $y: 0;
+  $w: $width / 1px;
+  $h: $height / 1px;
+
+  @while $y < $h {
+    @if $x > $w {
+      $x: 1;
+      $y: $y + 2;
+    } @else {
+      $val: #{$val}, #{$x}px #{$y}px #{$color};
+      $x: $x + 2;
+    }
+  }
+
+  @return $val;
+}

@@ -1,19 +1,20 @@
+// scss-lint:disable ColorVariable
 $main-background: radial-gradient(#ffffff, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%, #efefef 66%, #dfdfdf 82%, #bfbfbf 100%);
 
-$loader-color: rgba(61, 61, 61, 0.7);
+$loader-color: rgba(61, 61, 61, .7);
 $loader-width: 150px;
 $loader-tickness: 10px;
 $loader-font: 14px sans-serif;
 
-$navbar-background: rgba(61, 61, 61, 0.5);
+$navbar-background: rgba(61, 61, 61, .5);
 $caption-font: sans-serif;
-$caption-color: rgba(255, 255, 255, 0.7);
+$caption-color: rgba(255, 255, 255, .7);
 
 $buttons-height: 20px;
 $buttons-padding: 10px;
 $buttons-background: transparent;
-$buttons-active-background: rgba(255, 255, 255, 0.1);
-$buttons-color: rgba(255, 255, 255, 0.7);
+$buttons-active-background: rgba(255, 255, 255, .1);
+$buttons-color: rgba(255, 255, 255, .7);
 
 $zoom-range-width: 80px;
 $zoom-range-tickness: 1px;
@@ -23,52 +24,58 @@ $zoom-buttons-width: 14px;
 $autorotate-button-tickness: 1px;
 
 $fullscreen-button-tickness: 2px;
-$fullscreen-button-ratio: 4/3;
+$fullscreen-button-ratio: 4 / 3;
 
 $download-button-tickness: 2px;
 $download-button-size: 12px;
 
-$tooltip-background-color: rgba(61, 61, 61, 0.8);
+$tooltip-background-color: rgba(61, 61, 61, .8);
 
-$tooltip-animate-offset: 5px; // set tooltip.offset JS config to the same value
+$tooltip-animate-offset: 5px;
+// set tooltip.offset JS config to the same value
 $tooltip-radius: 4px;
-$tooltip-padding: 0.5em 1em;
-$tooltip-arrow-size: 7px; // set tooltip.arrow_size JS config to the same value
+$tooltip-padding: .5em 1em;
+$tooltip-arrow-size: 7px;
+// set tooltip.arrow_size JS config to the same value
 $tooltip-max-width: 200px;
 
 $tooltip-text-color: rgb(255, 255, 255);
 $tooltip-font: 14px sans-serif;
-$tooltip-text-shadow: 0px 1px black;
+$tooltip-text-shadow: 0 1px #000000;
 
-$tooltip-shadow-color: rgba(90, 90, 90, 0.7);
-$tooltip-shadow-offset: 3px; // the shadow is always at the opposite side of the arrow
+$tooltip-shadow-color: rgba(90, 90, 90, .7);
+$tooltip-shadow-offset: 3px;
+// the shadow is always at the opposite side of the arrow
 
-$panel-background: rgba(10, 10, 10, 0.7);
+$panel-background: rgba(10, 10, 10, .7);
 $panel-text-color: rgb(220, 220, 220);
 
 $panel-width: 400px;
 $panel-padding: 1em;
 
-$panel-resizer-width: 9px; // must be odd
-$panel-resizer-background: rgba(0, 0, 0, 0.9);
-$panel-resizer-grip-color: white;
-$panel-resizer-grip-height: 29px; // must be odd;
+// must be odd
+$panel-resizer-width: 9px;
+$panel-resizer-background: rgba(0, 0, 0, .9);
+$panel-resizer-grip-color: #ffffff;
+// must be odd
+$panel-resizer-grip-height: 29px;
 $panel-close-button-width: 24px;
 $panel-close-button-background: $panel-resizer-background;
-$panel-close-button-color: white;
+$panel-close-button-color: #ffffff;
 
 $panel-font: 16px sans-serif;
 
 $markers-list-image-size: 20px;
-$markers-list-padding: 0.5em 1em;
+$markers-list-padding: .5em 1em;
 $markers-list-hover-translation: 10px;
 
-$markers-list-odd-background: rgba(255,255,255,0.1);
+$markers-list-odd-background: rgba(255, 255, 255, .1);
 $markers-list-even-background: transparent;
 
-$markers-list-title-shadow: 2px 1px black;
+$markers-list-title-shadow: 2px 1px #000000;
 $markers-list-title-font: 24px sans-serif;
 
+@import 'mixins';
 
 .psv-container {
   width: 100%;
@@ -78,7 +85,7 @@ $markers-list-title-font: 24px sans-serif;
   position: relative;
   background: $main-background;
   overflow: hidden;
-  
+
   &.loading {
     text-align: center;
   }
@@ -87,14 +94,14 @@ $markers-list-title-font: 24px sans-serif;
 .psv-canvas-container {
   position: absolute;
   z-index: 0;
- 
+
   canvas {
     display: block;
   }
 }
 
-@import "loader";
-@import "navbar";
-@import "hud";
-@import "panel";
-@import "tooltip";
+@import 'loader';
+@import 'navbar';
+@import 'hud';
+@import 'panel';
+@import 'tooltip';

@@ -1,3 +1,5 @@
+/*jshint multistr: true */
+
 /**
  * Panel class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
@@ -16,7 +18,7 @@ function PSVPanel(psv) {
   };
   
   this.create();
-};
+}
 
 PSVPanel.prototype = Object.create(PSVComponent.prototype);
 PSVPanel.prototype.constructor = PSVPanel;

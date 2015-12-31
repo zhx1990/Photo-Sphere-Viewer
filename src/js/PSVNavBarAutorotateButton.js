@@ -6,7 +6,7 @@ function PSVNavBarAutorotateButton(psv) {
   PSVNavBarButton.call(this, psv);
   
   this.create();
-};
+}
 
 PSVNavBarAutorotateButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarAutorotateButton.prototype.constructor = PSVNavBarAutorotateButton;

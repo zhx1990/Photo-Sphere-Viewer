@@ -6,7 +6,7 @@ function PSVNavBarFullscreenButton(psv) {
   PSVNavBarButton.call(this, psv);
   
   this.create();
-};
+}
 
 PSVNavBarFullscreenButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarFullscreenButton.prototype.constructor = PSVNavBarFullscreenButton;

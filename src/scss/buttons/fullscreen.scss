@@ -9,7 +9,7 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
     position: absolute;
     width: $fullscreen-width;
     height: $buttons-height;
-    
+
     &:before, &:after {
       content: '';
       position: absolute;
@@ -20,7 +20,7 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
       border-width: $fullscreen-button-tickness;
       transition: all 0.2s ease;
     }
-    
+
     &:first-child:before {
       top: 0;
       left: 0;
@@ -46,7 +46,7 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
       border-top-width: 0;
     }
   }
-    
+
   &:hover {
     div {
       &:before, &:after {

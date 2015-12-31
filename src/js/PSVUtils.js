@@ -42,7 +42,7 @@ PSVUtils.hasParent = function(el, parent) {
     if (el === parent) {
       return true;
     }
-  } while (el = el.parentNode);
+  } while (!!(el = el.parentNode));
 
   return false;
 };
@@ -54,13 +54,13 @@ PSVUtils.hasParent = function(el, parent) {
  * @return (HTMLElement)
  */
 PSVUtils.getClosest = function(el, selector) {
-  var matches = el.matches || el.msMatchesSelector
+  var matches = el.matches || el.msMatchesSelector;
   
   do {
     if (matches.bind(el)(selector)) {
       return el;
     }
-  } while (el = el.parentElement);
+  } while (!!(el = el.parentElement));
 
   return null;
 };

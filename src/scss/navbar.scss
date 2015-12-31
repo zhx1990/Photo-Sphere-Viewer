@@ -4,7 +4,8 @@
   bottom: 0;
   width: 100%;
   background: $navbar-background;
-  
+
+  // scss-lint:disable UnnecessaryParentReference
   &, & * {
     box-sizing: content-box;
   }
@@ -25,13 +26,14 @@
     cursor: pointer;
     height: $buttons-height;
     background: $buttons-background;
-    
+
     &.active {
       background: $buttons-active-background;
     }
-    
+
     svg {
       width: 100%;
+
       * {
         fill: $buttons-color;
       }
@@ -39,8 +41,8 @@
   }
 }
 
-@import "buttons/autorotate";
-@import "buttons/download";
-@import "buttons/fullscreen";
-@import "buttons/zoom";
-@import "buttons/markers";
+@import 'buttons/autorotate';
+@import 'buttons/download';
+@import 'buttons/fullscreen';
+@import 'buttons/zoom';
+@import 'buttons/markers';

@@ -9,7 +9,7 @@ function PSVTooltip(psv) {
   this.container = null;
   
   this.create();
-};
+}
 
 PSVTooltip.prototype = Object.create(PSVComponent.prototype);
 PSVTooltip.prototype.constructor = PSVTooltip;

@@ -9,104 +9,104 @@
   opacity: 0;
   transition-property: opacity;
   transition-timing-function: ease-in-out;
-  transition-duration: 0.1s;
-  
+  transition-duration: .1s;
+
   .content {
     color: $tooltip-text-color;
     font: $tooltip-font;
     text-shadow: $tooltip-text-shadow;
   }
-  
-  .arrow{
+
+  .arrow {
     position: absolute;
     height: 0;
     width: 0;
     border: $tooltip-arrow-size solid transparent;
   }
-  
-  &.bottom-center{
-    box-shadow: 0px $tooltip-shadow-offset 0px $tooltip-shadow-color;
-    transform: translate3D(0, -$tooltip-animate-offset, 0);
+
+  &.bottom-center {
+    box-shadow: 0 $tooltip-shadow-offset 0 $tooltip-shadow-color;
+    transform: translate3d(0, -$tooltip-animate-offset, 0);
     transition-property: opacity, transform;
-    
+
     .arrow {
       border-bottom-color: $tooltip-background-color;
     }
   }
-  
-  &.center-left{
-    box-shadow: #{-$tooltip-shadow-offset} 0px 0px $tooltip-shadow-color;
-    transform: translate3D($tooltip-animate-offset, 0, 0);
+
+  &.center-left {
+    box-shadow: #{-$tooltip-shadow-offset} 0 0 $tooltip-shadow-color;
+    transform: translate3d($tooltip-animate-offset, 0, 0);
     transition-property: opacity, transform;
-    
+
     .arrow {
       border-left-color: $tooltip-background-color;
     }
   }
-  
-  &.top-center{
-    box-shadow: 0px #{-$tooltip-shadow-offset} 0px $tooltip-shadow-color;
-    transform: translate3D(0, $tooltip-animate-offset, 0);
+
+  &.top-center {
+    box-shadow: 0 #{-$tooltip-shadow-offset} 0 $tooltip-shadow-color;
+    transform: translate3d(0, $tooltip-animate-offset, 0);
     transition-property: opacity, transform;
-    
+
     .arrow {
       border-top-color: $tooltip-background-color;
     }
   }
-  
-  &.center-right{
-    box-shadow: $tooltip-shadow-offset 0px 0px $tooltip-shadow-color;
-    transform: translate3D(-$tooltip-animate-offset, 0, 0);
+
+  &.center-right {
+    box-shadow: $tooltip-shadow-offset 0 0 $tooltip-shadow-color;
+    transform: translate3d(-$tooltip-animate-offset, 0, 0);
     transition-property: opacity, transform;
-    
+
     .arrow {
       border-right-color: $tooltip-background-color;
     }
   }
-  
-  &.bottom-left{
-    box-shadow: #{-$tooltip-shadow-offset} $tooltip-shadow-offset 0px $tooltip-shadow-color;
-    transform: translate3D(0, -$tooltip-animate-offset, 0);
+
+  &.bottom-left {
+    box-shadow: #{-$tooltip-shadow-offset} $tooltip-shadow-offset 0 $tooltip-shadow-color;
+    transform: translate3d(0, -$tooltip-animate-offset, 0);
     transition-property: opacity, transform;
-    
+
     .arrow {
       border-bottom-color: $tooltip-background-color;
     }
   }
-  
-  &.bottom-right{
-    box-shadow: $tooltip-shadow-offset $tooltip-shadow-offset 0px $tooltip-shadow-color;
-    transform: translate3D(0, -$tooltip-animate-offset, 0);
+
+  &.bottom-right {
+    box-shadow: $tooltip-shadow-offset $tooltip-shadow-offset 0 $tooltip-shadow-color;
+    transform: translate3d(0, -$tooltip-animate-offset, 0);
     transition-property: opacity, transform;
-    
+
     .arrow {
       border-bottom-color: $tooltip-background-color;
     }
   }
-  
-  &.top-left{
-    box-shadow: #{-$tooltip-shadow-offset} #{-$tooltip-shadow-offset} 0px $tooltip-shadow-color;
-    transform: translate3D(0, $tooltip-animate-offset, 0);
+
+  &.top-left {
+    box-shadow: #{-$tooltip-shadow-offset} #{-$tooltip-shadow-offset} 0 $tooltip-shadow-color;
+    transform: translate3d(0, $tooltip-animate-offset, 0);
     transition-property: opacity, transform;
-    
+
     .arrow {
       border-top-color: $tooltip-background-color;
     }
   }
-  
-  &.top-right{
-    box-shadow: $tooltip-shadow-offset #{-$tooltip-shadow-offset} 0px $tooltip-shadow-color;
-    transform: translate3D(0, $tooltip-animate-offset, 0);
+
+  &.top-right {
+    box-shadow: $tooltip-shadow-offset #{-$tooltip-shadow-offset} 0 $tooltip-shadow-color;
+    transform: translate3d(0, $tooltip-animate-offset, 0);
     transition-property: opacity, transform;
-    
+
     .arrow {
       border-top-color: $tooltip-background-color;
     }
   }
-  
+
   &.visible {
-    transform: translate3D(0, 0, 0);
+    transform: translate3d(0, 0, 0);
     opacity: 1;
-    transition-duration: 0.2s;
+    transition-duration: .2s;
   }
 }

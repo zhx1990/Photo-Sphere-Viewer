@@ -11,14 +11,14 @@ $autorotate-sphere-width: $buttons-height - $autorotate-button-tickness * 2;
     transition: 0.3s ease;
     transition-property: transform, height, margin;
   }
-  
+
   .sphere {
     width: $autorotate-sphere-width;
     height: $autorotate-sphere-width;
     transform: rotateY(0deg);
   }
-  
-  .equator  {
+
+  .equator {
     position: absolute;
     top: 50%;
     width: $autorotate-sphere-width;
@@ -28,11 +28,11 @@ $autorotate-sphere-width: $buttons-height - $autorotate-button-tickness * 2;
   }
 
   &:hover {
-    .sphere  {
+    .sphere {
       transform: rotateY(180deg);
     }
-    
-    .equator  {
+
+    .equator {
       transform: rotateY(180deg);
       height: #{$autorotate-sphere-width / 4};
       margin-top: #{- $autorotate-sphere-width / 8 - $autorotate-button-tickness};

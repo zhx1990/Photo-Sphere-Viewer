@@ -91,7 +91,7 @@ function PhotoSphereViewer(options) {
   if (this.config.autoload) {
     this.load();
   }
-};
+}
 
 PhotoSphereViewer.PI = Math.PI;
 PhotoSphereViewer.TwoPI = Math.PI * 2.0;
@@ -121,7 +121,6 @@ PhotoSphereViewer.DEFAULTS = {
   lat_offset: Math.PI / 720.0,
   time_anim: 2000,
   anim_speed: '2rpm',
-  anim_lat: null,
   anim_lat: null,
   navbar: false,
   tooltip: {
@@ -190,8 +189,8 @@ PhotoSphereViewer.prototype._loadXMP = function() {
   var progress = 0;
 
   xhr.onreadystatechange = function() {
-    if (xhr.readyState == 4) {
-      if (xhr.status == 200 || xhr.status == 201 || xhr.status == 202 || xhr.status == 0) {
+    if (xhr.readyState === 4) {
+      if (xhr.status === 200 || xhr.status === 201 || xhr.status === 202 || xhr.status === 0) {
         self.loader.setProgress(100);
 
         var binary = xhr.responseText;
@@ -199,7 +198,7 @@ PhotoSphereViewer.prototype._loadXMP = function() {
         var data = binary.substring(a, b);
 
         // No data retrieved
-        if (a == -1 || b == -1 || data.indexOf('GPano:') == -1) {
+        if (a === -1 || b === -1 || data.indexOf('GPano:') === -1) {
           self._loadTexture(false, true);
           return;
         }
@@ -219,7 +218,7 @@ PhotoSphereViewer.prototype._loadXMP = function() {
         self.container.textContent = 'Cannot load image';
       }
     }
-    else if (xhr.readyState == 3) {
+    else if (xhr.readyState === 3) {
       self.loader.setProgress(progress + 10);
     }
   };
@@ -586,7 +585,7 @@ PhotoSphereViewer.prototype._startZoom = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._onMouseUp = function(evt) {
-  this._stopMove(evt)
+  this._stopMove(evt);
 };
 
 /**
@@ -595,7 +594,7 @@ PhotoSphereViewer.prototype._onMouseUp = function(evt) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
-  this._stopMove(evt.changedTouches[0])
+  this._stopMove(evt.changedTouches[0]);
 };
 
 /**

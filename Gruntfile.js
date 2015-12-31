@@ -1,4 +1,9 @@
 module.exports = function(grunt) {
+  require('time-grunt')(grunt);
+  require('jit-grunt')(grunt, {
+    scsslint: 'grunt-scss-lint'
+  });
+
   grunt.util.linefeed = '\n';
 
   var files_in_order = [
@@ -108,6 +113,17 @@ module.exports = function(grunt) {
     jshint: {
       dist: {
         src: ['src/js/*.js']
+      },
+      grunt: {
+        src: ['Gruntfile.js']
+      }
+    },
+
+    scsslint: {
+      allFiles: ['src/scss/*.scss'],
+      options: {
+        colorizeOutput: true,
+        config: '.scss-lint.yml'
       }
     },
 
@@ -119,16 +135,6 @@ module.exports = function(grunt) {
     }
   });
 
-
-  grunt.loadNpmTasks('grunt-contrib-concat');
-  grunt.loadNpmTasks('grunt-contrib-uglify');
-  grunt.loadNpmTasks('grunt-wrap');
-  grunt.loadNpmTasks('grunt-contrib-cssmin');
-  grunt.loadNpmTasks('grunt-contrib-sass');
-  grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-jshint');
-
-
   grunt.registerTask('default', [
     'concat:js',
     'wrap',
@@ -139,6 +145,7 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('test', [
-    'jshint'
+    'jshint',
+    'scsslint'
   ]);
 };

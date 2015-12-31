@@ -8,7 +8,7 @@ function PSVLoader(psv) {
   this.canvas = null;
   
   this.create();
-};
+}
 
 /**
  * Creates the loader content

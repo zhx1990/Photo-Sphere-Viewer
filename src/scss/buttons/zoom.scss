@@ -1,4 +1,4 @@
-.psv-navbar  .zoom-button {
+.psv-navbar .zoom-button {
   cursor: default;
 
   .minus, .plus {
@@ -7,17 +7,17 @@
     cursor: pointer;
     width: $zoom-buttons-width;
     height: $zoom-buttons-width;
-    
+
     svg {
       position: relative;
       top: 20%;
     }
   }
-  
+
   .range {
     float: left;
     padding: #{($buttons-height - $zoom-range-tickness) / 2} #{$zoom-buttons-width / 2};
-    
+
     .line {
       position: relative;
       cursor: pointer;
@@ -26,7 +26,7 @@
       background: $buttons-color;
       transition: all 0.3s ease;
     }
-    
+
     .handle {
       position: absolute;
       border-radius: 50%;

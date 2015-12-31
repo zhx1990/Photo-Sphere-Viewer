@@ -10,7 +10,7 @@ function PSVHUD(psv) {
   this.currentMarker = null;
   
   this.create();
-};
+}
 
 PSVHUD.prototype = Object.create(PSVComponent.prototype);
 PSVHUD.prototype.constructor = PSVHUD;
