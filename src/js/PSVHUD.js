@@ -146,8 +146,10 @@ PSVHUD.prototype.getCurrentMarker = function() {
  */
 PSVHUD.prototype.removeMarker = function(marker, noRender) {
   marker = this.getMarker(marker);
+
+  marker.$el.parentNode.removeChild(marker.$el);
   delete this.markers[marker.id];
-  
+
   if (!noRender) {
     this.updatePositions();
   }
@@ -289,11 +291,11 @@ PSVHUD.prototype._onClick = function(e) {
       this.psv.trigger('select-marker', e.target.psvMarker);
       e.preventDefault(); // prevent the public "click" event
     }
-    else {
+    else if (this.currentMarker) {
       this.currentMarker = null;
       this.psv.trigger('unselect-marker');
     }
-    
+
     if (e.target && e.target.psvMarker && e.target.psvMarker.content) {
       this.psv.panel.showPanel(e.target.psvMarker.content);
     }
