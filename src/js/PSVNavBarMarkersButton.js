@@ -6,7 +6,7 @@
  */
 function PSVNavBarMarkersButton(psv) {
   PSVNavBarButton.call(this, psv);
-  
+
   this.prop = {
     panelOpened: false,
     panelOpening: false
@@ -23,15 +23,37 @@ PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;
  * @return (void)
  */
 PSVNavBarMarkersButton.prototype.create = function() {
-  this.button = document.createElement('div');
-  this.button.className = 'psv-button markers-button';
+  PSVNavBarButton.prototype.create.call(this);
+
+  this.button.classList.add('markers-button');
   this.button.title = this.psv.config.lang.markers;
   this.button.innerHTML = PhotoSphereViewer.ICONS['pin.svg'];
-  
+
   this.button.addEventListener('click', this.toggleMarkers.bind(this));
-  
-  this.psv.on('open-panel', this._onPanelOpened.bind(this));
-  this.psv.on('close-panel', this._onPanelClosed.bind(this));
+
+  this.psv.on('open-panel', this);
+  this.psv.on('close-panel', this);
+};
+
+/**
+ * Destroys the button
+ */
+PSVNavBarMarkersButton.prototype.destroy = function() {
+  this.psv.off('open-panel', this);
+  this.psv.off('close-panel', this);
+
+  PSVNavBarButton.prototype.destroy.call(this);
+};
+
+/**
+ * Handle events
+ * @param e (Event)
+ */
+PSVNavBarMarkersButton.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    case 'psv:open-panel': this._onPanelOpened(); break;
+    case 'psv:close-panel': this._onPanelClosed(); break;
+  }
 };
 
 /**
@@ -58,24 +80,24 @@ PSVNavBarMarkersButton.prototype.showMarkers = function() {
 
     for (var id in this.psv.hud.markers) {
       var marker = this.psv.hud.markers[id];
-      
+
       var name = marker.name || marker.id;
       if (marker.tooltip) {
         name = typeof marker.tooltip === 'string' ? marker.tooltip : marker.tooltip.content;
       }
-      
+
       html+= '<li data-psv-marker="' + marker.id + '"> \
         <img src="' + marker.image + '"/> \
         <p>' + name + '</p> \
       </li>';
     }
-  
+
   html+= '</ul> \
   </div>';
-  
+
   this.prop.panelOpening = true;
   this.psv.panel.showPanel(html, true);
-  
+
   this.psv.panel.container.querySelector('.psv-markers-list').addEventListener('click', this._onClickItem.bind(this));
 };
 
@@ -111,7 +133,7 @@ PSVNavBarMarkersButton.prototype._onPanelOpened = function() {
   else {
     this.prop.panelOpened = false;
   }
-  
+
   this.toggleActive(this.prop.panelOpened);
 };
 
@@ -122,6 +144,6 @@ PSVNavBarMarkersButton.prototype._onPanelOpened = function() {
 PSVNavBarMarkersButton.prototype._onPanelClosed = function() {
   this.prop.panelOpened = false;
   this.prop.panelOpening = false;
-  
+
   this.toggleActive(this.prop.panelOpened);
 };

@@ -6,17 +6,16 @@
  */
 function PSVPanel(psv) {
   PSVComponent.call(this, psv);
-  
-  this.container = null;
+
   this.content = null;
-  
+
   this.prop = {
     mouse_x: 0,
     mouse_y: 0,
     mousedown: false,
     opened: false
   };
-  
+
   this.create();
 }
 
@@ -26,37 +25,65 @@ PSVPanel.prototype.constructor = PSVPanel;
 PSVPanel.publicMethods = ['showPanel', 'hidePanel'];
 
 /**
- * Creates the elements
+ * Creates the panel
  * @return (void)
  */
 PSVPanel.prototype.create = function() {
-  this.container = document.createElement('aside');
+  PSVComponent.prototype.create.call(this);
+
   this.container.className = 'psv-panel';
   this.container.innerHTML = '\
 <div class="resizer"></div>\
 <div class="close-button"></div>\
 <div class="content"></div>';
-  
+
   this.content = this.container.querySelector('.content');
-  
+
   var closeBtn = this.container.querySelector('.close-button');
   closeBtn.addEventListener('click', this.hidePanel.bind(this));
-  
+
   // Stop event bubling from panel
   if (this.psv.config.mousewheel) {
     this.container.addEventListener(PSVUtils.mouseWheelEvent(), function(e) {
       e.stopPropagation();
     });
   }
-  
+
   // Event for panel resizing + stop bubling
   var resizer = this.container.querySelector('.resizer');
-  resizer.addEventListener('mousedown', this._onMouseDown.bind(this));
-  resizer.addEventListener('touchstart', this._onTouchStart.bind(this));
-  this.psv.container.addEventListener('mouseup', this._onMouseUp.bind(this));
-  this.psv.container.addEventListener('touchend', this._onMouseUp.bind(this));
-  this.psv.container.addEventListener('mousemove', this._onMouseMove.bind(this));
-  this.psv.container.addEventListener('touchmove', this._onTouchMove.bind(this));
+  resizer.addEventListener('mousedown', this);
+  resizer.addEventListener('touchstart', this);
+  this.psv.container.addEventListener('mouseup', this);
+  this.psv.container.addEventListener('touchend', this);
+  this.psv.container.addEventListener('mousemove', this);
+  this.psv.container.addEventListener('touchmove', this);
+};
+
+/**
+ * Destroys the panel
+ */
+PSVPanel.prototype.destroy = function() {
+  this.psv.container.removeEventListener('mousemove', this);
+  this.psv.container.removeEventListener('touchmove', this);
+  this.psv.container.removeEventListener('mouseup', this);
+  this.psv.container.removeEventListener('touchend', this);
+
+  PSVComponent.prototype.destroy.call(this);
+};
+
+/**
+ * Handle events
+ * @param e (Event)
+ */
+PSVPanel.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    case 'mousedown': this._onMouseDown(e); break;
+    case 'touchstart': this._onTouchStart(e); break;
+    case 'mousemove': this._onMouseMove(e); break;
+    case 'touchmove': this._onMouseMove(e); break;
+    case 'mouseup': this._onMouseUp(e); break;
+    case 'touchend': this._onMouseUp(e); break;
+  }
 };
 
 /**
@@ -69,7 +96,7 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
   this.content.innerHTML = content;
   this.content.scrollTop = 0;
   this.container.classList.add('open');
-  
+
   if (noMargin) {
     if (!this.content.classList.contains('no-margin')) {
       this.content.classList.add('no-margin');
@@ -78,7 +105,7 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
   else {
     this.content.classList.remove('no-margin');
   }
-  
+
   this.prop.opened = true;
   this.psv.trigger('open-panel');
 };
@@ -171,7 +198,7 @@ PSVPanel.prototype._onTouchMove = function(evt) {
 PSVPanel.prototype._resize = function(evt) {
   var x = parseInt(evt.clientX);
   var y = parseInt(evt.clientY);
-  
+
   this.container.style.width = (this.container.offsetWidth - (x - this.prop.mouse_x)) + 'px';
 
   this.prop.mouse_x = x;

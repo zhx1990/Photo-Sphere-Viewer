@@ -4,7 +4,7 @@
  */
 function PSVNavBarDownloadButton(psv) {
   PSVNavBarButton.call(this, psv);
-  
+
   this.create();
 }
 
@@ -16,8 +16,9 @@ PSVNavBarDownloadButton.prototype.constructor = PSVNavBarDownloadButton;
  * @return (void)
  */
 PSVNavBarDownloadButton.prototype.create = function() {
-  this.button = document.createElement('div');
-  this.button.className = 'psv-button download-button';
+  PSVNavBarButton.prototype.create.call(this);
+
+  this.button.classList.add('download-button');
   this.button.title = this.psv.config.lang.download;
 
   this.button.appendChild(document.createElement('div'));

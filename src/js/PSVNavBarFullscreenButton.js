@@ -4,7 +4,7 @@
  */
 function PSVNavBarFullscreenButton(psv) {
   PSVNavBarButton.call(this, psv);
-  
+
   this.create();
 }
 
@@ -16,14 +16,34 @@ PSVNavBarFullscreenButton.prototype.constructor = PSVNavBarFullscreenButton;
  * @return (void)
  */
 PSVNavBarFullscreenButton.prototype.create = function() {
-  this.button = document.createElement('div');
-  this.button.className = 'psv-button fullscreen-button';
+  PSVNavBarButton.prototype.create.call(this);
+
+  this.button.classList.add('fullscreen-button');
   this.button.title = this.psv.config.lang.fullscreen;
 
   this.button.appendChild(document.createElement('div'));
   this.button.appendChild(document.createElement('div'));
 
   this.button.addEventListener('click', this.psv.toggleFullscreen.bind(this.psv));
-  
-  this.psv.on('fullscreen-updated', this.toggleActive.bind(this));
+
+  this.psv.on('fullscreen-updated', this);
+};
+
+/**
+ * Destroys the button
+ */
+PSVNavBarFullscreenButton.prototype.destroy = function() {
+  this.psv.off('fullscreen-updated', this);
+
+  PSVNavBarButton.prototype.destroy.call(this);
+};
+
+/**
+ * Handle events
+ * @param e (Event)
+ */
+PSVNavBarFullscreenButton.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    case 'psv:fullscreen-updated': this.toggleActive(); break;
+  }
 };

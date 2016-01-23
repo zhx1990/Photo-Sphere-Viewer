@@ -4,10 +4,9 @@
  */
 function PSVTooltip(psv) {
   PSVComponent.call(this, psv);
-  
+
   this.config = this.psv.config.tooltip;
-  this.container = null;
-  
+
   this.create();
 }
 
@@ -20,17 +19,37 @@ PSVTooltip.leftMap = {0: 'left', 0.5: 'center', 1: 'right'};
 PSVTooltip.topMap = {0: 'top', 0.5: 'center', 1: 'bottom'};
 
 /**
- * Creates the elements
+ * Creates the tooltip
  * @return (void)
  */
 PSVTooltip.prototype.create = function() {
-  this.container = document.createElement('div');
+  PSVComponent.prototype.create.call(this);
+
   this.container.innerHTML = '<div class="arrow"></div><div class="content"></div>';
   this.container.className = 'psv-tooltip';
   this.container.style.top = '-1000px';
   this.container.style.left = '-1000px';
-  
-  this.psv.on('render', this.hideTooltip.bind(this));
+
+  this.psv.on('render', this);
+};
+
+/**
+ * Destroys the tooltip
+ */
+PSVTooltip.prototype.destroy = function() {
+  this.psv.off('render', this);
+
+  PSVComponent.prototype.destroy.call(this);
+};
+
+/**
+ * Handle events
+ * @param e (Event)
+ */
+PSVTooltip.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    case 'psv:render': this.hideTooltip(); break;
+  }
 };
 
 /**
@@ -43,25 +62,25 @@ PSVTooltip.prototype.showTooltip = function(tooltip, marker) {
   var t = this.container;
   var c = t.querySelector('.content');
   var a = t.querySelector('.arrow');
-  
+
   if (typeof tooltip === 'string') {
     tooltip = {
       content: marker.tooltip,
       position: ['top', 'center']
     };
   }
-  
+
   // parse position
   if (typeof tooltip.position === 'string') {
     var tempPos = PSVUtils.parsePosition(tooltip.position);
-    
+
     if (!(tempPos.left in PSVTooltip.leftMap) || !(tempPos.top in PSVTooltip.topMap)) {
       throw new PSVError('unable to parse tooltip position "' + tooltip.position + '"');
     }
-    
+
     tooltip.position = [PSVTooltip.topMap[tempPos.top], PSVTooltip.leftMap[tempPos.left]];
   }
-  
+
   t.className = 'psv-tooltip'; // reset the class
   if (tooltip.className) {
     t.classList.add(tooltip.className);
@@ -70,7 +89,7 @@ PSVTooltip.prototype.showTooltip = function(tooltip, marker) {
   c.innerHTML = tooltip.content;
   t.style.top = '0px';
   t.style.left = '0px';
-  
+
   // compute size
   var rect = t.getBoundingClientRect();
   var style = {
@@ -82,10 +101,10 @@ PSVTooltip.prototype.showTooltip = function(tooltip, marker) {
     arrow_top: 0,
     arrow_left: 0
   };
-  
+
   // set initial position
   this._computeTooltipPosition(style, marker);
-  
+
   // correct position if overflow
   var refresh = false;
   if (style.top < this.config.offset) {
@@ -107,16 +126,16 @@ PSVTooltip.prototype.showTooltip = function(tooltip, marker) {
   if (refresh) {
     this._computeTooltipPosition(style, marker);
   }
-  
+
   // apply position
   t.style.top = style.top + 'px';
   t.style.left = style.left + 'px';
-  
+
   a.style.top = style.arrow_top + 'px';
   a.style.left = style.arrow_left + 'px';
-  
+
   t.classList.add(style.posClass.join('-'));
-  
+
   // delay for correct transition between the two classes
   var self = this;
   setTimeout(function() {
@@ -132,7 +151,7 @@ PSVTooltip.prototype.showTooltip = function(tooltip, marker) {
 PSVTooltip.prototype.hideTooltip = function() {
   this.container.classList.remove('visible');
   this.psv.trigger('hide-tooltip');
-  
+
   var self = this;
   setTimeout(function() {
     self.container.style.top = '-1000px';
@@ -148,26 +167,26 @@ PSVTooltip.prototype.hideTooltip = function() {
  */
 PSVTooltip.prototype._computeTooltipPosition = function(style, marker) {
   var topBottom = false;
-  
+
   switch (style.posClass[0]) {
     case 'bottom':
       style.top = marker.position2D.top + marker.height + this.config.offset + this.config.arrow_size;
       style.arrow_top = - this.config.arrow_size * 2;
       topBottom = true;
       break;
-    
+
     case 'center':
       style.top = marker.position2D.top + marker.height/2 - style.height/2;
       style.arrow_top = style.height/2 - this.config.arrow_size;
       break;
-    
+
     case 'top':
       style.top = marker.position2D.top - style.height - this.config.offset - this.config.arrow_size;
       style.arrow_top = style.height;
       topBottom = true;
       break;
   }
-  
+
   switch (style.posClass[1]) {
     case 'right':
       if (topBottom) {
@@ -179,12 +198,12 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, marker) {
         style.arrow_left = - this.config.arrow_size * 2;
       }
       break;
-    
+
     case 'center':
       style.left = marker.position2D.left + marker.width/2 - style.width/2;
       style.arrow_left = style.width/2 - this.config.arrow_size;
       break;
-    
+
     case 'left':
       if (topBottom) {
         style.left = marker.position2D.left - style.width + marker.width;

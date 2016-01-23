@@ -28,7 +28,7 @@ function PhotoSphereViewer(options) {
     this.config.anim_lat = this.config.default_lat;
   }
   this.config.anim_lat = PSVUtils.stayBetween(this.config.anim_lat, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
-  
+
   if (this.config.tilt_up_max < this.config.tilt_down_max) {
     throw new PSVError('tilt_up_max cannot be lower than tilt_down_max');
   }
@@ -44,6 +44,7 @@ function PhotoSphereViewer(options) {
   this.renderer = null;
   this.scene = null;
   this.camera = null;
+  this.mesh = null;
   this.raycaster = null;
   this.actions = {};
 
@@ -145,11 +146,73 @@ PhotoSphereViewer.DEFAULTS = {
 };
 
 /**
+ * Destroy the viewer
+ */
+PhotoSphereViewer.prototype.destroy = function() {
+  // remove listeners
+  window.removeEventListener('resize', this);
+  document.removeEventListener(PSVUtils.fullscreenEvent(), this);
+
+  if (this.config.mousemove && this.hud) {
+    this.hud.container.removeEventListener('mousedown', this);
+    this.hud.container.removeEventListener('touchstart', this);
+    this.hud.container.removeEventListener('mouseup', this);
+    this.hud.container.removeEventListener('touchend', this);
+    this.hud.container.removeEventListener('mousemove', this);
+    this.hud.container.removeEventListener('touchmove', this);
+  }
+
+  if (this.config.mousewheel && this.hud) {
+    this.hud.container.removeEventListener(PSVUtils.mouseWheelEvent(), this);
+  }
+
+  // destroy components
+  if (this.hud) this.hud.destroy();
+  if (this.loader) this.loader.destroy();
+  if (this.navbar) this.navbar.destroy();
+  if (this.panel) this.panel.destroy();
+  if (this.tooltip) this.tooltip.destroy();
+
+  // destroy ThreeJS view
+  if (this.scene) {
+    this.scene.remove(this.camera);
+    this.scene.remove(this.mesh);
+  }
+
+  if (this.mesh) {
+    if (this.mesh.material) {
+      if (this.mesh.material.geometry) this.mesh.material.geometry.dispose();
+      if (this.mesh.material.map) this.mesh.material.map.dispose();
+      this.mesh.material.dispose();
+    }
+  }
+
+  this.renderer = null;
+  this.scene = null;
+  this.camera = null;
+  this.mesh = null;
+  this.raycaster = null;
+
+  // remove container
+  if (this.canvas_container) {
+    this.container.removeChild(this.canvas_container);
+  }
+
+  this.canvas_container = null;
+
+  // remove classes
+  this.container.classList.remove('psv-container');
+  this.container.classList.remove('loading');
+  this.container.classList.remove('has-navbar');
+};
+
+/**
  * Starts to load the panorama
  * @return (void)
  */
 PhotoSphereViewer.prototype.load = function() {
-  this.container.classList.add('psv-container', 'loading');
+  this.container.classList.add('psv-container');
+  this.container.classList.add('loading');
 
   // Is canvas supported?
   if (!PSVUtils.isCanvasSupported()) {
@@ -298,7 +361,7 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
 
     var ctx = buffer.getContext('2d');
     ctx.drawImage(img, pano_data.cropped_x, pano_data.cropped_y, pano_data.cropped_width, pano_data.cropped_height);
-    
+
     self.prop.size.image_width = pano_data.cropped_width;
     self.prop.size.image_height = pano_data.cropped_height;
 
@@ -329,7 +392,7 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
  */
 PhotoSphereViewer.prototype._createScene = function(img) {
   this._onResize();
-  
+
   this.raycaster = new THREE.Raycaster();
 
   // Renderer depends on whether WebGL is supported or not
@@ -349,14 +412,14 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   var geometry = new THREE.SphereGeometry(200, 32, 32, -PhotoSphereViewer.HalfPI);
   var material = new THREE.MeshBasicMaterial({map: texture, overdraw: true});
   material.side = THREE.DoubleSide;
-  var mesh = new THREE.Mesh(geometry, material);
-  mesh.scale.x = -1;
+  this.mesh = new THREE.Mesh(geometry, material);
+  this.mesh.scale.x = -1;
 
-  this.scene.add(mesh);
+  this.scene.add(this.mesh);
   this.canvas_container.appendChild(this.renderer.domElement);
 
   // Remove loader
-  this.container.removeChild(this.loader.container);
+  this.loader.destroy();
   this.loader = null;
   this.container.classList.remove('loading');
 
@@ -364,23 +427,19 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   if (this.config.navbar) {
     this.container.classList.add('has-navbar');
     this.navbar = new PSVNavBar(this);
-    this.container.appendChild(this.navbar.container);
   }
-  
+
   // HUD
   this.hud = new PSVHUD(this);
   this.config.markers.forEach(function(marker) {
-    this.hud.addMarker(marker, true);
+    this.hud.addMarker(marker, false);
   }, this);
-  this.container.appendChild(this.hud.container);
-  
+
   // Panel
   this.panel = new PSVPanel(this);
-  this.container.appendChild(this.panel.container);
-  
+
   // Tooltip
   this.tooltip = new PSVTooltip(this);
-  this.container.appendChild(this.tooltip.container);
 
   // Queue animation
   if (this.config.time_anim !== false) {
@@ -397,22 +456,40 @@ PhotoSphereViewer.prototype._createScene = function(img) {
  * @return (void)
  */
 PhotoSphereViewer.prototype._bindEvents = function() {
-  window.addEventListener('resize', this._onResize.bind(this));
-  document.addEventListener(PSVUtils.fullscreenEvent(), this._fullscreenToggled.bind(this));
-  
+  window.addEventListener('resize', this);
+  document.addEventListener(PSVUtils.fullscreenEvent(), this);
+
   // all interation events are binded to the HUD only
-  if (this.config.mousemove) {
+  if (this.config.mousemove && this.hud) {
     this.hud.container.style.cursor = 'move';
-    this.hud.container.addEventListener('mousedown', this._onMouseDown.bind(this));
-    this.hud.container.addEventListener('touchstart', this._onTouchStart.bind(this));
-    this.hud.container.addEventListener('mouseup', this._onMouseUp.bind(this));
-    this.hud.container.addEventListener('touchend', this._onTouchEnd.bind(this));
-    this.hud.container.addEventListener('mousemove', this._onMouseMove.bind(this));
-    this.hud.container.addEventListener('touchmove', this._onTouchMove.bind(this));
+    this.hud.container.addEventListener('mousedown', this);
+    this.hud.container.addEventListener('touchstart', this);
+    this.hud.container.addEventListener('mouseup', this);
+    this.hud.container.addEventListener('touchend', this);
+    this.hud.container.addEventListener('mousemove', this);
+    this.hud.container.addEventListener('touchmove', this);
   }
-  
-  if (this.config.mousewheel) {
-    this.hud.container.addEventListener(PSVUtils.mouseWheelEvent(), this._onMouseWheel.bind(this));
+
+  if (this.config.mousewheel && this.hud) {
+    this.hud.container.addEventListener(PSVUtils.mouseWheelEvent(), this);
+  }
+};
+
+/**
+ * Handle events
+ * @param e (Event)
+ */
+PhotoSphereViewer.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    case 'resize': this._onResize(); break;
+    case PSVUtils.fullscreenEvent(): this._fullscreenToggled(); break;
+    case 'mousedown': this._onMouseDown(e); break;
+    case 'touchstart': this._onTouchStart(e); break;
+    case 'mouseup': this._onMouseUp(e); break;
+    case 'touchend': this._onTouchEnd(e); break;
+    case 'mousemove': this._onMouseMove(e); break;
+    case 'touchmove': this._onTouchMove(e); break;
+    case PSVUtils.mouseWheelEvent(): this._onMouseWheel(e); break;
   }
 };
 
@@ -453,9 +530,9 @@ PhotoSphereViewer.prototype._autorotate = function() {
 PhotoSphereViewer.prototype.startAutorotate = function() {
   clearTimeout(this.prop.start_timeout);
   this.prop.start_timeout = null;
-  
+
   this.stopAnimation();
-  
+
   this._autorotate();
   this.trigger('autorotate', true);
 };
@@ -570,7 +647,7 @@ PhotoSphereViewer.prototype._startZoom = function(evt) {
     {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
     {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
   ];
-  
+
   this.prop.pinch_dist = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
   this.prop.moving = false;
   this.prop.zooming = true;
@@ -611,7 +688,7 @@ PhotoSphereViewer.prototype._stopMove = function(evt) {
       this.prop.moved = true;
     }
   }
-  
+
   this.prop.moving = false;
   this.prop.zooming = false;
 };
@@ -626,9 +703,9 @@ PhotoSphereViewer.prototype._click = function(evt) {
   if (evt.defaultPrevented) {
     return;
   }
-  
+
   var boundingRect = this.container.getBoundingClientRect();
-  
+
   var data = {
     client_x: parseInt(evt.clientX - boundingRect.left),
     client_y: parseInt(evt.clientY - boundingRect.top)
@@ -638,25 +715,25 @@ PhotoSphereViewer.prototype._click = function(evt) {
     2 * data.client_x / this.prop.size.width - 1,
     - 2 * data.client_y / this.prop.size.height + 1
   );
-  
+
   this.raycaster.setFromCamera(screen, this.camera);
-  
+
   var intersects = this.raycaster.intersectObjects(this.scene.children);
-  
-  if (intersects.length === 1) {    
+
+  if (intersects.length === 1) {
     var p = intersects[0].point;
     var phi = Math.acos(p.y / Math.sqrt(p.x*p.x + p.y*p.y + p.z*p.z));
     var theta = Math.atan2(p.x, p.z);
-    
+
     data.longitude = theta < 0 ? - theta : PhotoSphereViewer.TwoPI - theta;
     data.latitude = PhotoSphereViewer.HalfPI - phi;
-    
+
     var relativeLong = data.longitude / PhotoSphereViewer.TwoPI * this.prop.size.image_width;
     var relativeLat = data.latitude / PhotoSphereViewer.PI * this.prop.size.image_height;
 
     data.texture_x = parseInt(data.longitude < PhotoSphereViewer.PI ? relativeLong + this.prop.size.image_width/2 : relativeLong - this.prop.size.image_width/2);
     data.texture_y = parseInt(this.prop.size.image_height/2 - relativeLat);
-  
+
     this.trigger('click', data);
   }
 };
@@ -696,7 +773,7 @@ PhotoSphereViewer.prototype._move = function(evt) {
   if (this.prop.moving) {
     var x = parseInt(evt.clientX);
     var y = parseInt(evt.clientY);
-  
+
     this.rotate(
       this.prop.longitude - (x - this.prop.mouse_x) * this.config.long_offset,
       this.prop.latitude + (y - this.prop.mouse_y) * this.config.lat_offset
@@ -718,10 +795,10 @@ PhotoSphereViewer.prototype._zoom = function(evt) {
       {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
       {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
     ];
-    
+
     var p = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
     var delta = 80 * (p - this.prop.pinch_dist) / this.prop.size.width;
-  
+
     this.zoom(this.prop.zoom_lvl + delta);
 
     this.prop.pinch_dist = p;
@@ -757,13 +834,13 @@ PhotoSphereViewer.prototype.animate = function(t, p, s) {
     this.rotate(t, p);
     return;
   }
-  
+
   t = t - Math.floor(t / PhotoSphereViewer.TwoPI) * PhotoSphereViewer.TwoPI;
   p = PSVUtils.stayBetween(p, this.config.tilt_down_max, this.config.tilt_up_max);
 
   var t0 = this.prop.longitude;
   var p0 = this.prop.latitude;
-  
+
   // get duration of animation
   var duration;
   if (s && typeof s === 'number') {
@@ -776,26 +853,26 @@ PhotoSphereViewer.prototype.animate = function(t, p, s) {
     var angle = Math.acos(Math.cos(p0) * Math.cos(p) * Math.cos(t0-t) + Math.sin(p0) * Math.sin(p));
     duration = angle / speed;
   }
-  
+
   var steps = duration * this.prop.fps;
-  
+
   // longitude offset for shortest arc
   var tCandidates = [
     t - t0, // direct
     PhotoSphereViewer.TwoPI - t0 + t, // clock-wise cross zero
     t - t0 - PhotoSphereViewer.TwoPI // counter-clock-wise cross zero
   ];
-  
+
   var tOffset = tCandidates.reduce(function(value, candidate) {
     return Math.abs(candidate) < Math.abs(value) ? candidate : value;
   }, Infinity);
-  
+
   // latitude offset
   var pOffset = p - p0;
-  
+
   this.stopAutorotate();
   this.stopAnimation();
-  
+
   this._animate(tOffset / steps, pOffset / steps, t, p);
 };
 
@@ -816,12 +893,12 @@ PhotoSphereViewer.prototype._animate = function(tStep, pStep, tTarget, pTarget) 
     pStep = 0;
     this.prop.latitude = pTarget;
   }
-  
+
   this.rotate(
     this.prop.longitude + tStep,
     this.prop.latitude + pStep
   );
-  
+
   if (tStep !== 0 || pStep !== 0) {
     this.prop.animation_timeout = setTimeout(this._animate.bind(this, tStep, pStep, tTarget, pTarget), 1000 / this.prop.fps);
   }
@@ -959,7 +1036,7 @@ PhotoSphereViewer.prototype.parseAnimSpeed = function(speed) {
     default:
       throw new PSVError('unknown speed unit "' + speed_unit + '"');
   }
-  
+
   return rad_per_second;
 };
 
@@ -973,17 +1050,34 @@ PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
 };
 
 /**
- * Adds an action
+ * Adds an event listener
+ * If "func" is an object, its "handleEvent" method will be called with an object as paremeter
+ *    - type: name of the event prefixed with "psv:"
+ *    - args: array of action arguments
  * @param name (string) Action name
- * @param f (Function) The handler function
+ * @param func (Function|Object) The handler function, or an object with an "handleEvent" method
  * @return (void)
  */
-PhotoSphereViewer.prototype.on = function(name, f) {
+PhotoSphereViewer.prototype.on = function(name, func) {
   if (!(name in this.actions)) {
     this.actions[name] = [];
   }
 
-  this.actions[name].push(f);
+  this.actions[name].push(func);
+};
+
+/**
+ * Removes an event listener
+ * @param name (string) Action name
+ * @param func (Function|Object)
+ */
+PhotoSphereViewer.prototype.off = function(name, func) {
+  if (name in this.actions) {
+    var idx = this.actions[name].indexOf(func);
+    if (idx !== -1) {
+      this.actions[name].splice(idx, 1);
+    }
+  }
 };
 
 /**
@@ -995,8 +1089,16 @@ PhotoSphereViewer.prototype.on = function(name, f) {
 PhotoSphereViewer.prototype.trigger = function(name, args) {
   args = Array.prototype.slice.call(arguments, 1);
   if ((name in this.actions) && this.actions[name].length > 0) {
-    for (var i = 0, l = this.actions[name].length; i < l; ++i) {
-      this.actions[name][i].apply(this, args);
-    }
+    this.actions[name].forEach(function(func) {
+      if (typeof func === 'object') {
+        func.handleEvent({
+          type: 'psv:' + name,
+          args: args
+        });
+      }
+      else {
+        func.apply(this, args);
+      }
+    }, this);
   }
 };

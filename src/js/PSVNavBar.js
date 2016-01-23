@@ -6,8 +6,8 @@ function PSVNavBar(psv) {
   PSVComponent.call(this, psv);
 
   this.config = this.psv.config.navbar;
-  this.container = null;
   this.caption = null;
+  this.buttons = [];
 
   if (this.config === true) {
     this.config = PSVUtils.clone(PSVNavBar.DEFAULTS);
@@ -37,42 +37,37 @@ PSVNavBar.DEFAULTS = {
 };
 
 /**
- * Creates the elements
+ * Creates the navbar
  * @return (void)
  */
 PSVNavBar.prototype.create = function() {
-  // Container
-  this.container = document.createElement('div');
+  PSVComponent.prototype.create.call(this);
+
   this.container.className = 'psv-navbar';
 
   // Autorotate button
   if (this.config.autorotate) {
-    var autorotateBtn = new PSVNavBarAutorotateButton(this.psv);
-    this.container.appendChild(autorotateBtn.button);
+    this.buttons.push(new PSVNavBarAutorotateButton(this));
   }
 
   // Zoom buttons
   if (this.config.zoom) {
-    var zoomBar = new PSVNavBarZoomButton(this.psv);
-    this.container.appendChild(zoomBar.button);
+    this.buttons.push(new PSVNavBarZoomButton(this));
   }
 
   // Download button
   if (this.config.download) {
-    var downloadBtn = new PSVNavBarDownloadButton(this.psv);
-    this.container.appendChild(downloadBtn.button);
+    this.buttons.push(new PSVNavBarDownloadButton(this));
   }
 
   // Markers button
   if (this.config.markers) {
-    var markersBtn = new PSVNavBarMarkersButton(this.psv);
-    this.container.appendChild(markersBtn.button);
+    this.buttons.push(new PSVNavBarMarkersButton(this));
   }
 
   // Fullscreen button
   if (this.config.fullscreen) {
-    var fullscreenBtn = new PSVNavBarFullscreenButton(this.psv);
-    this.container.appendChild(fullscreenBtn.button);
+    this.buttons.push(new PSVNavBarFullscreenButton(this));
   }
 
   // Caption
@@ -80,6 +75,17 @@ PSVNavBar.prototype.create = function() {
   this.caption.className = 'caption';
   this.container.appendChild(this.caption);
   this.setCaption(this.psv.config.caption);
+};
+
+/**
+ * Destroys the navbar
+ */
+PSVNavBar.prototype.destroy = function() {
+  this.buttons.forEach(function(button) {
+    button.destroy();
+  });
+
+  PSVComponent.prototype.destroy.call(this);
 };
 
 /**

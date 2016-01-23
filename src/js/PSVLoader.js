@@ -6,7 +6,7 @@ function PSVLoader(psv) {
   this.psv = psv;
   this.container = null;
   this.canvas = null;
-  
+
   this.create();
 }
 
@@ -16,12 +16,12 @@ function PSVLoader(psv) {
 PSVLoader.prototype.create = function() {
   this.container = document.createElement('div');
   this.container.className = 'psv-loader';
-  
+
   this.psv.container.appendChild(this.container);
 
   this.canvas = document.createElement('canvas');
   this.canvas.className = 'loader-canvas';
-  
+
   this.canvas.width = this.container.clientWidth;
   this.canvas.height = this.container.clientWidth;
   this.container.appendChild(this.canvas);
@@ -45,6 +45,13 @@ PSVLoader.prototype.create = function() {
     inner.style.maxHeight = a + 'px';
     this.container.appendChild(inner);
   }
+};
+
+/**
+ * Destroys the loader
+ */
+PSVLoader.prototype.destroy = function() {
+  this.psv.container.removeChild(this.container);
 };
 
 /**

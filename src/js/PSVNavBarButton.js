@@ -1,9 +1,10 @@
 /**
  * Navigation bar button class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param navbar (PSVNavBar) A PSVNavBar object
  */
-function PSVNavBarButton(psv) {
-  this.psv = psv;
+function PSVNavBarButton(navbar) {
+  this.navbar = navbar;
+  this.psv = navbar.psv;
   this.button = null;
 }
 
@@ -12,7 +13,17 @@ function PSVNavBarButton(psv) {
  * @return (void)
  */
 PSVNavBarButton.prototype.create = function() {
-  throw new PSVError('Not implemented');
+  this.button = document.createElement('div');
+  this.button.className = 'psv-button';
+  this.navbar.container.appendChild(this.button);
+};
+
+/**
+ * Destroys the button
+ */
+PSVNavBarButton.prototype.destroy = function() {
+  this.navbar.container.removeChild(this.button);
+  this.button = null;
 };
 
 /**
