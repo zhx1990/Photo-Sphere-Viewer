@@ -267,12 +267,12 @@ PhotoSphereViewer.prototype._loadXMP = function() {
         }
 
         var pano_data = {
-          full_width: parseInt(PSVUtils.getAttribute(data, 'FullPanoWidthPixels')),
-          full_height: parseInt(PSVUtils.getAttribute(data, 'FullPanoHeightPixels')),
-          cropped_width: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageWidthPixels')),
-          cropped_height: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaImageHeightPixels')),
-          cropped_x: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaLeftPixels')),
-          cropped_y: parseInt(PSVUtils.getAttribute(data, 'CroppedAreaTopPixels')),
+          full_width: parseInt(PSVUtils.getXMPValue(data, 'FullPanoWidthPixels')),
+          full_height: parseInt(PSVUtils.getXMPValue(data, 'FullPanoHeightPixels')),
+          cropped_width: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaImageWidthPixels')),
+          cropped_height: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaImageHeightPixels')),
+          cropped_x: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaLeftPixels')),
+          cropped_y: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaTopPixels')),
         };
 
         self._loadTexture(pano_data, true);

@@ -55,7 +55,7 @@ PSVUtils.hasParent = function(el, parent) {
  */
 PSVUtils.getClosest = function(el, selector) {
   var matches = el.matches || el.msMatchesSelector;
-  
+
   do {
     if (matches.bind(el)(selector)) {
       return el;
@@ -102,9 +102,19 @@ PSVUtils.stayBetween = function(x, min, max) {
  * @param attr (string) The wanted attribute
  * @return (string) The value of the attribute
  */
-PSVUtils.getAttribute = function(data, attr) {
-  var a = data.indexOf('GPano:' + attr) + attr.length + 8, b = data.indexOf('"', a);
-  return data.substring(a, b);
+PSVUtils.getXMPValue = function(data, attr) {
+  var a, b;
+  // XMP data are stored in children
+  if ((a = data.indexOf('<GPano:'+attr+'>')) !== -1 && (b = data.indexOf('</GPano:'+attr+'>')) !== -1) {
+    return data.substring(a, b).replace('<GPano:'+attr+'>','');
+  }
+  // XMP data are stored in attributes
+  else if ((a = data.indexOf('GPano:'+attr)) !== -1 && (b = data.indexOf('"', a)) !== -1) {
+    return data.substring(a + attr.length + 8, b);
+  }
+  else {
+    return null;
+  }
 };
 
 /**
@@ -150,13 +160,13 @@ PSVUtils.parsePosition = function(value) {
   if (!value) {
     return {top: 0.5, left: 0.5};
   }
-  
+
   var e = document.createElement('div');
   document.body.appendChild(e);
   e.style.backgroundPosition = value;
   var parsed = PSVUtils.getStyle(e, 'background-position').match(/^([0-9.]+)% ([0-9.]+)%$/);
   document.body.removeChild(e);
-  
+
   return {
     left: parsed[1]/100,
     top: parsed[2]/100
