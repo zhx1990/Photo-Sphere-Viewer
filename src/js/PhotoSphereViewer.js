@@ -77,7 +77,7 @@ function PhotoSphereViewer(options) {
 
   // compute zoom level
   this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
-  this.prop.zoom_lvl-= 2 * (this.prop.zoom_lvl - 50);
+  this.prop.zoom_lvl -= 2 * (this.prop.zoom_lvl - 50);
 
   // init
   this.setAnimSpeed(this.config.anim_speed);
@@ -272,7 +272,7 @@ PhotoSphereViewer.prototype._loadXMP = function() {
           cropped_width: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaImageWidthPixels')),
           cropped_height: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaImageHeightPixels')),
           cropped_x: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaLeftPixels')),
-          cropped_y: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaTopPixels')),
+          cropped_y: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaTopPixels'))
         };
 
         self._loadTexture(pano_data, true);
@@ -331,7 +331,7 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
         cropped_width: img.width,
         cropped_height: img.height,
         cropped_x: 0,
-        cropped_y: 0,
+        cropped_y: 0
       };
     }
 
@@ -410,7 +410,7 @@ PhotoSphereViewer.prototype._createScene = function(img) {
 
   // default texture origin is at 1/4 (phiStart=0) of the panorama, I set it at 1/2 (phiStart=PI/2)
   var geometry = new THREE.SphereGeometry(200, 32, 32, -PhotoSphereViewer.HalfPI);
-  var material = new THREE.MeshBasicMaterial({map: texture, overdraw: true});
+  var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: true });
   material.side = THREE.DoubleSide;
   this.mesh = new THREE.Mesh(geometry, material);
   this.mesh.scale.x = -1;
@@ -481,6 +481,7 @@ PhotoSphereViewer.prototype._bindEvents = function() {
  */
 PhotoSphereViewer.prototype.handleEvent = function(e) {
   switch (e.type) {
+    // @formatter:off
     case 'resize': this._onResize(); break;
     case PSVUtils.fullscreenEvent(): this._fullscreenToggled(); break;
     case 'mousedown': this._onMouseDown(e); break;
@@ -490,6 +491,7 @@ PhotoSphereViewer.prototype.handleEvent = function(e) {
     case 'mousemove': this._onMouseMove(e); break;
     case 'touchmove': this._onTouchMove(e); break;
     case PSVUtils.mouseWheelEvent(): this._onMouseWheel(e); break;
+    // @formatter:on
   }
 };
 
@@ -580,7 +582,7 @@ PhotoSphereViewer.prototype._onResize = function() {
  * @param height (integer) The new canvas height
  * @return (void)
  */
-PhotoSphereViewer.prototype.resize = function (width, height) {
+PhotoSphereViewer.prototype.resize = function(width, height) {
   this.prop.size.width = parseInt(width);
   this.prop.size.height = parseInt(height);
   this.prop.size.ratio = this.prop.size.width / this.prop.size.height;
@@ -644,11 +646,11 @@ PhotoSphereViewer.prototype._startMove = function(evt) {
  */
 PhotoSphereViewer.prototype._startZoom = function(evt) {
   var t = [
-    {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
-    {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
+    { x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY) },
+    { x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY) }
   ];
 
-  this.prop.pinch_dist = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
+  this.prop.pinch_dist = Math.sqrt(Math.pow(t[0].x - t[1].x, 2) + Math.pow(t[0].y - t[1].y, 2));
   this.prop.moving = false;
   this.prop.zooming = true;
 
@@ -713,7 +715,7 @@ PhotoSphereViewer.prototype._click = function(evt) {
 
   var screen = new THREE.Vector2(
     2 * data.client_x / this.prop.size.width - 1,
-    - 2 * data.client_y / this.prop.size.height + 1
+    -2 * data.client_y / this.prop.size.height + 1
   );
 
   this.raycaster.setFromCamera(screen, this.camera);
@@ -722,17 +724,17 @@ PhotoSphereViewer.prototype._click = function(evt) {
 
   if (intersects.length === 1) {
     var p = intersects[0].point;
-    var phi = Math.acos(p.y / Math.sqrt(p.x*p.x + p.y*p.y + p.z*p.z));
+    var phi = Math.acos(p.y / Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z));
     var theta = Math.atan2(p.x, p.z);
 
-    data.longitude = theta < 0 ? - theta : PhotoSphereViewer.TwoPI - theta;
+    data.longitude = theta < 0 ? -theta : PhotoSphereViewer.TwoPI - theta;
     data.latitude = PhotoSphereViewer.HalfPI - phi;
 
     var relativeLong = data.longitude / PhotoSphereViewer.TwoPI * this.prop.size.image_width;
     var relativeLat = data.latitude / PhotoSphereViewer.PI * this.prop.size.image_height;
 
-    data.texture_x = parseInt(data.longitude < PhotoSphereViewer.PI ? relativeLong + this.prop.size.image_width/2 : relativeLong - this.prop.size.image_width/2);
-    data.texture_y = parseInt(this.prop.size.image_height/2 - relativeLat);
+    data.texture_x = parseInt(data.longitude < PhotoSphereViewer.PI ? relativeLong + this.prop.size.image_width / 2 : relativeLong - this.prop.size.image_width / 2);
+    data.texture_y = parseInt(this.prop.size.image_height / 2 - relativeLat);
 
     this.trigger('click', data);
   }
@@ -792,11 +794,11 @@ PhotoSphereViewer.prototype._move = function(evt) {
 PhotoSphereViewer.prototype._zoom = function(evt) {
   if (this.prop.zooming) {
     var t = [
-      {x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY)},
-      {x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY)}
+      { x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY) },
+      { x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY) }
     ];
 
-    var p = Math.sqrt(Math.pow(t[0].x-t[1].x, 2) + Math.pow(t[0].y-t[1].y, 2));
+    var p = Math.sqrt(Math.pow(t[0].x - t[1].x, 2) + Math.pow(t[0].y - t[1].y, 2));
     var delta = 80 * (p - this.prop.pinch_dist) / this.prop.size.width;
 
     this.zoom(this.prop.zoom_lvl + delta);
@@ -850,7 +852,7 @@ PhotoSphereViewer.prototype.animate = function(t, p, s) {
     // desired radial speed
     var speed = s ? this.parseAnimSpeed(s) : this.prop.anim_speed;
     // get the angle between current position and target
-    var angle = Math.acos(Math.cos(p0) * Math.cos(p) * Math.cos(t0-t) + Math.sin(p0) * Math.sin(p));
+    var angle = Math.acos(Math.cos(p0) * Math.cos(p) * Math.cos(t0 - t) + Math.sin(p0) * Math.sin(p));
     duration = angle / speed;
   }
 
@@ -925,7 +927,7 @@ PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
   evt.preventDefault();
   evt.stopPropagation();
 
-  var delta = evt.deltaY!==undefined ? -evt.deltaY : (evt.wheelDelta!==undefined ? evt.wheelDelta : -evt.detail);
+  var delta = evt.deltaY !== undefined ? -evt.deltaY : (evt.wheelDelta !== undefined ? evt.wheelDelta : -evt.detail);
 
   if (delta !== 0) {
     var direction = parseInt(delta / Math.abs(delta));

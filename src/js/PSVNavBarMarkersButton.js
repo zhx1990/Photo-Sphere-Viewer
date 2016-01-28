@@ -51,8 +51,10 @@ PSVNavBarMarkersButton.prototype.destroy = function() {
  */
 PSVNavBarMarkersButton.prototype.handleEvent = function(e) {
   switch (e.type) {
+    // @formatter:off
     case 'psv:open-panel': this._onPanelOpened(); break;
     case 'psv:close-panel': this._onPanelClosed(); break;
+    // @formatter:on
   }
 };
 
@@ -78,21 +80,21 @@ PSVNavBarMarkersButton.prototype.showMarkers = function() {
     <h1>' + this.psv.config.lang.markers + '</h1> \
     <ul>';
 
-    for (var id in this.psv.hud.markers) {
-      var marker = this.psv.hud.markers[id];
+  for (var id in this.psv.hud.markers) {
+    var marker = this.psv.hud.markers[id];
 
-      var name = marker.name || marker.id;
-      if (marker.tooltip) {
-        name = typeof marker.tooltip === 'string' ? marker.tooltip : marker.tooltip.content;
-      }
+    var name = marker.name || marker.id;
+    if (marker.tooltip) {
+      name = typeof marker.tooltip === 'string' ? marker.tooltip : marker.tooltip.content;
+    }
 
-      html+= '<li data-psv-marker="' + marker.id + '"> \
+    html += '<li data-psv-marker="' + marker.id + '"> \
         <img src="' + marker.image + '"/> \
         <p>' + name + '</p> \
       </li>';
-    }
+  }
 
-  html+= '</ul> \
+  html += '</ul> \
   </div>';
 
   this.prop.panelOpening = true;

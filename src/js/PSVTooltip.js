@@ -15,8 +15,8 @@ PSVTooltip.prototype.constructor = PSVTooltip;
 
 PSVTooltip.publicMethods = ['showTooltip', 'hideTooltip'];
 
-PSVTooltip.leftMap = {0: 'left', 0.5: 'center', 1: 'right'};
-PSVTooltip.topMap = {0: 'top', 0.5: 'center', 1: 'bottom'};
+PSVTooltip.leftMap = { 0: 'left', 0.5: 'center', 1: 'right' };
+PSVTooltip.topMap = { 0: 'top', 0.5: 'center', 1: 'bottom' };
 
 /**
  * Creates the tooltip
@@ -48,7 +48,9 @@ PSVTooltip.prototype.destroy = function() {
  */
 PSVTooltip.prototype.handleEvent = function(e) {
   switch (e.type) {
+    // @formatter:off
     case 'psv:render': this.hideTooltip(); break;
+    // @formatter:on
   }
 };
 
@@ -171,13 +173,13 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, marker) {
   switch (style.posClass[0]) {
     case 'bottom':
       style.top = marker.position2D.top + marker.height + this.config.offset + this.config.arrow_size;
-      style.arrow_top = - this.config.arrow_size * 2;
+      style.arrow_top = -this.config.arrow_size * 2;
       topBottom = true;
       break;
 
     case 'center':
-      style.top = marker.position2D.top + marker.height/2 - style.height/2;
-      style.arrow_top = style.height/2 - this.config.arrow_size;
+      style.top = marker.position2D.top + marker.height / 2 - style.height / 2;
+      style.arrow_top = style.height / 2 - this.config.arrow_size;
       break;
 
     case 'top':
@@ -191,23 +193,23 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, marker) {
     case 'right':
       if (topBottom) {
         style.left = marker.position2D.left;
-        style.arrow_left = marker.width/2 - this.config.arrow_size;
+        style.arrow_left = marker.width / 2 - this.config.arrow_size;
       }
       else {
         style.left = marker.position2D.left + marker.width + this.config.offset + this.config.arrow_size;
-        style.arrow_left = - this.config.arrow_size * 2;
+        style.arrow_left = -this.config.arrow_size * 2;
       }
       break;
 
     case 'center':
-      style.left = marker.position2D.left + marker.width/2 - style.width/2;
-      style.arrow_left = style.width/2 - this.config.arrow_size;
+      style.left = marker.position2D.left + marker.width / 2 - style.width / 2;
+      style.arrow_left = style.width / 2 - this.config.arrow_size;
       break;
 
     case 'left':
       if (topBottom) {
         style.left = marker.position2D.left - style.width + marker.width;
-        style.arrow_left = style.width - marker.width/2 - this.config.arrow_size;
+        style.arrow_left = style.width - marker.width / 2 - this.config.arrow_size;
       }
       else {
         style.left = marker.position2D.left - style.width - this.config.offset - this.config.arrow_size;

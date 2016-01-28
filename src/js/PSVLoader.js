@@ -40,7 +40,7 @@ PSVLoader.prototype.create = function() {
     inner.innerHTML = this.psv.config.loading_txt;
   }
   if (inner) {
-    var a = Math.round(Math.sqrt(2 * Math.pow(this.canvas.width/2-this.tickness/2, 2)));
+    var a = Math.round(Math.sqrt(2 * Math.pow(this.canvas.width / 2 - this.tickness / 2, 2)));
     inner.style.maxWidth = a + 'px';
     inner.style.maxHeight = a + 'px';
     this.container.appendChild(inner);
@@ -68,9 +68,9 @@ PSVLoader.prototype.setProgress = function(value) {
 
   context.beginPath();
   context.arc(
-    this.canvas.width/2, this.canvas.height/2,
-    this.canvas.width/2 - this.tickness/2,
-    -Math.PI/2, value/100 * 2*Math.PI - Math.PI/2
+    this.canvas.width / 2, this.canvas.height / 2,
+    this.canvas.width / 2 - this.tickness / 2,
+    -Math.PI / 2, value / 100 * 2 * Math.PI - Math.PI / 2
   );
   context.stroke();
 };

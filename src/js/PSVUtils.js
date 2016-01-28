@@ -70,9 +70,9 @@ PSVUtils.getClosest = function(el, selector) {
  * @return (string)
  */
 PSVUtils.mouseWheelEvent = function() {
-  return "onwheel" in document.createElement("div") ? "wheel" : // Modern browsers support "wheel"
-    document.onmousewheel !== undefined ? "mousewheel" : // Webkit and IE support at least "mousewheel"
-    "DOMMouseScroll"; // let's assume that remaining browsers are older Firefox
+  return 'onwheel' in document.createElement('div') ? 'wheel' : // Modern browsers support "wheel"
+    document.onmousewheel !== undefined ? 'mousewheel' : // Webkit and IE support at least "mousewheel"
+      'DOMMouseScroll'; // let's assume that remaining browsers are older Firefox
 };
 
 /**
@@ -80,8 +80,17 @@ PSVUtils.mouseWheelEvent = function() {
  * @return (string)
  */
 PSVUtils.fullscreenEvent = function() {
-  var map = {'exitFullscreen': 'fullscreenchange', 'webkitExitFullscreen': 'webkitfullscreenchange', 'mozCancelFullScreen': 'mozfullscreenchange', 'msExitFullscreen': 'msFullscreenEnabled'};
-  for (var exit in map) if (exit in document) return map[exit];
+  var map = {
+    'exitFullscreen': 'fullscreenchange',
+    'webkitExitFullscreen': 'webkitfullscreenchange',
+    'mozCancelFullScreen': 'mozfullscreenchange',
+    'msExitFullscreen': 'msFullscreenEnabled'
+  };
+
+  for (var exit in map) {
+    if (exit in document) return map[exit];
+  }
+
   return 'fullscreenchange';
 };
 
@@ -105,11 +114,11 @@ PSVUtils.stayBetween = function(x, min, max) {
 PSVUtils.getXMPValue = function(data, attr) {
   var a, b;
   // XMP data are stored in children
-  if ((a = data.indexOf('<GPano:'+attr+'>')) !== -1 && (b = data.indexOf('</GPano:'+attr+'>')) !== -1) {
-    return data.substring(a, b).replace('<GPano:'+attr+'>','');
+  if ((a = data.indexOf('<GPano:' + attr + '>')) !== -1 && (b = data.indexOf('</GPano:' + attr + '>')) !== -1) {
+    return data.substring(a, b).replace('<GPano:' + attr + '>', '');
   }
   // XMP data are stored in attributes
-  else if ((a = data.indexOf('GPano:'+attr)) !== -1 && (b = data.indexOf('"', a)) !== -1) {
+  else if ((a = data.indexOf('GPano:' + attr)) !== -1 && (b = data.indexOf('"', a)) !== -1) {
     return data.substring(a + attr.length + 8, b);
   }
   else {
@@ -158,7 +167,7 @@ PSVUtils.getStyle = function(elt, prop) {
  */
 PSVUtils.parsePosition = function(value) {
   if (!value) {
-    return {top: 0.5, left: 0.5};
+    return { top: 0.5, left: 0.5 };
   }
 
   var e = document.createElement('div');
@@ -168,8 +177,8 @@ PSVUtils.parsePosition = function(value) {
   document.body.removeChild(e);
 
   return {
-    left: parsed[1]/100,
-    top: parsed[2]/100
+    left: parsed[1] / 100,
+    top: parsed[2] / 100
   };
 };
 
@@ -191,28 +200,32 @@ PSVUtils.deepmerge = function(target, src) {
     src.forEach(function(e, i) {
       if (typeof dst[i] === 'undefined') {
         dst[i] = e;
-      } else if (typeof e === 'object') {
+      }
+      else if (typeof e === 'object') {
         dst[i] = PSVUtils.deepmerge(target[i], e);
-      } else {
+      }
+      else {
         if (target.indexOf(e) === -1) {
           dst.push(e);
         }
       }
     });
-  } else {
+  }
+  else {
     if (target && typeof target === 'object') {
-      Object.keys(target).forEach(function (key) {
+      Object.keys(target).forEach(function(key) {
         dst[key] = target[key];
       });
     }
-    Object.keys(src).forEach(function (key) {
+    Object.keys(src).forEach(function(key) {
       if (typeof src[key] !== 'object' || !src[key]) {
         dst[key] = src[key];
       }
       else {
         if (!target[key]) {
           dst[key] = src[key];
-        } else {
+        }
+        else {
           dst[key] = PSVUtils.deepmerge(target[key], src[key]);
         }
       }

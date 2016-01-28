@@ -29,11 +29,11 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     banner:
-      '/*!\n'+
-      ' * Photo Sphere Viewer <%= pkg.version %>\n'+
-      ' * Copyright (c) 2014-<%= grunt.template.today("yyyy") %> Jérémy Heleine\n'+
-      ' * Copyright (c) <%= grunt.template.today("yyyy") %> Damien "Mistic" Sorel\n'+
-      ' * Licensed under MIT (http://opensource.org/licenses/MIT)\n'+
+      '/*!\n' +
+      ' * Photo Sphere Viewer <%= pkg.version %>\n' +
+      ' * Copyright (c) 2014-2015 Jérémy Heleine\n' +
+      ' * Copyright (c) 2015-<%= grunt.template.today("yyyy") %> Damien "Mistic" Sorel\n' +
+      ' * Licensed under MIT (http://opensource.org/licenses/MIT)\n' +
       ' */',
 
     concat: {
@@ -59,9 +59,9 @@ module.exports = function(grunt) {
           banner: '<%= banner %>\n\n'
         },
         files: [{
-            expand: true,
-            src: 'dist/*.css',
-            dest: ''
+          expand: true,
+          src: 'dist/*.css',
+          dest: ''
         }]
       }
     },
@@ -91,7 +91,7 @@ module.exports = function(grunt) {
         dest: 'dist/photo-sphere-viewer.min.js'
       }
     },
-    
+
     sass: {
       options: {
         sourcemap: 'none',
@@ -102,12 +102,12 @@ module.exports = function(grunt) {
         dest: 'dist/photo-sphere-viewer.css'
       }
     },
-    
+
     cssmin: {
-        dist: {
-            src: 'dist/photo-sphere-viewer.css',
-            dest: 'dist/photo-sphere-viewer.min.css'
-        }
+      dist: {
+        src: 'dist/photo-sphere-viewer.css',
+        dest: 'dist/photo-sphere-viewer.min.css'
+      }
     },
 
     jshint: {
@@ -116,6 +116,15 @@ module.exports = function(grunt) {
       },
       grunt: {
         src: ['Gruntfile.js']
+      }
+    },
+
+    jscs: {
+      lib: {
+        options: {
+          config: '.jscsrc'
+        },
+        src: ['src/js/*.js']
       }
     },
 
@@ -146,6 +155,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('test', [
     'jshint',
+    'jscs',
     'scsslint'
   ]);
 };

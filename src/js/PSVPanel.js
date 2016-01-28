@@ -77,12 +77,14 @@ PSVPanel.prototype.destroy = function() {
  */
 PSVPanel.prototype.handleEvent = function(e) {
   switch (e.type) {
+    // @formatter:off
     case 'mousedown': this._onMouseDown(e); break;
     case 'touchstart': this._onTouchStart(e); break;
     case 'mousemove': this._onMouseMove(e); break;
     case 'touchmove': this._onMouseMove(e); break;
     case 'mouseup': this._onMouseUp(e); break;
     case 'touchend': this._onMouseUp(e); break;
+    // @formatter:on
   }
 };
 

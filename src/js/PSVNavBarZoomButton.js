@@ -90,6 +90,7 @@ PSVNavBarZoomButton.prototype.destroy = function() {
  */
 PSVNavBarZoomButton.prototype.handleEvent = function(e) {
   switch (e.type) {
+    // @formatter:off
     case 'mousedown': this._initZoomChangeWithMouse(e); break;
     case 'touchstart': this._initZoomChangeByTouch(e); break;
     case 'mousemove': this._changeZoomWithMouse(e); break;
@@ -97,6 +98,7 @@ PSVNavBarZoomButton.prototype.handleEvent = function(e) {
     case 'mouseup': this._stopZoomChange(e); break;
     case 'touchend': this._stopZoomChange(e); break;
     case 'psv:zoom-updated': this._moveZoomValue(e.args[0]); break;
+    // @formatter:on
   }
 };
 

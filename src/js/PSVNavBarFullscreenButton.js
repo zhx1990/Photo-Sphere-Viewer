@@ -44,6 +44,8 @@ PSVNavBarFullscreenButton.prototype.destroy = function() {
  */
 PSVNavBarFullscreenButton.prototype.handleEvent = function(e) {
   switch (e.type) {
+    // @formatter:off
     case 'psv:fullscreen-updated': this.toggleActive(); break;
+    // @formatter:on
   }
 };

@@ -53,10 +53,12 @@ PSVHUD.prototype.destroy = function() {
  */
 PSVHUD.prototype.handleEvent = function(e) {
   switch (e.type) {
+    // @formatter:off
     case 'mouseenter': this._onMouseEnter(e); break;
     case 'mouseleave': this._onMouseLeave(e); break;
     case 'psv:_click': this._onClick(e.args[0]); break;
     case 'psv:render': this.updatePositions(); break;
+    // @formatter:on
   }
 };
 
