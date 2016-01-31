@@ -187,23 +187,30 @@ PhotoSphereViewer.prototype.destroy = function() {
     }
   }
 
-  this.renderer = null;
-  this.scene = null;
-  this.camera = null;
-  this.mesh = null;
-  this.raycaster = null;
-
   // remove container
   if (this.canvas_container) {
     this.container.removeChild(this.canvas_container);
   }
 
-  this.canvas_container = null;
-
   // remove classes
   this.container.classList.remove('psv-container');
   this.container.classList.remove('loading');
   this.container.classList.remove('has-navbar');
+
+  // clean references
+  this.container = null;
+  this.loader = null;
+  this.navbar = null;
+  this.hud = null;
+  this.panel = null;
+  this.tooltip = null;
+  this.canvas_container = null;
+  this.renderer = null;
+  this.scene = null;
+  this.camera = null;
+  this.mesh = null;
+  this.raycaster = null;
+  this.actions = {};
 };
 
 /**

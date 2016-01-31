@@ -23,6 +23,9 @@ PSVNavBarButton.prototype.create = function() {
  */
 PSVNavBarButton.prototype.destroy = function() {
   this.navbar.container.removeChild(this.button);
+
+  this.navbar = null;
+  this.psv = null;
   this.button = null;
 };
 

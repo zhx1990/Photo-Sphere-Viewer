@@ -85,6 +85,8 @@ PSVNavBar.prototype.destroy = function() {
     button.destroy();
   });
 
+  this.buttons.length = 0;
+
   PSVComponent.prototype.destroy.call(this);
 };
 

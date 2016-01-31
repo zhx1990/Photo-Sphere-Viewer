@@ -19,6 +19,7 @@ function PSVComponent(psv) {
  */
 PSVComponent.prototype.create = function() {
   this.container = document.createElement('div');
+
   this.psv.container.appendChild(this.container);
 };
 
@@ -27,5 +28,7 @@ PSVComponent.prototype.create = function() {
  */
 PSVComponent.prototype.destroy = function() {
   this.psv.container.removeChild(this.container);
+
   this.container = null;
+  this.psv = null;
 };

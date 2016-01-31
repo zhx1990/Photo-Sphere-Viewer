@@ -52,6 +52,9 @@ PSVLoader.prototype.create = function() {
  */
 PSVLoader.prototype.destroy = function() {
   this.psv.container.removeChild(this.container);
+
+  this.psv = null;
+  this.container = null;
 };
 
 /**
