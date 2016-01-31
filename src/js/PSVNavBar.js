@@ -14,10 +14,10 @@ function PSVNavBar(psv) {
   }
   else if (typeof this.config == 'string') {
     var map = {};
-    this.config.split(/[ ,:]/).forEach(function(button) {
-      map[button] = true;
-    });
-    this.config = PSVUtils.deepmerge(PSVNavBar.DEFAULTS, map);
+    Object.keys(PSVNavBar.DEFAULTS).forEach(function(button) {
+      map[button] = this.config.indexOf(button) !== -1;
+    }, this);
+    this.config = map;
   }
 
   this.create();

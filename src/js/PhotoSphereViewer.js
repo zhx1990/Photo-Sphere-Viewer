@@ -33,6 +33,10 @@ function PhotoSphereViewer(options) {
     throw new PSVError('tilt_up_max cannot be lower than tilt_down_max');
   }
 
+  if (this.config.caption && !this.config.navbar) {
+    this.config.navbar = 'caption';
+  }
+
   // references to components
   this.container = (typeof this.config.container == 'string') ? document.getElementById(this.config.container) : this.config.container;
   this.loader = null;
