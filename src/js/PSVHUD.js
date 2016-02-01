@@ -264,10 +264,10 @@ PSVHUD.prototype.updatePositions = function() {
 PSVHUD.prototype._isMarkerVisible = function(marker, position) {
   return marker.visible &&
     marker.position3D.dot(this.psv.prop.direction) > 0 &&
-    position.left >= 0 &&
-    position.left + marker.width <= this.psv.prop.size.width &&
-    position.top >= 0 &&
-    position.top + marker.height <= this.psv.prop.size.height;
+    position.left + marker.width >= 0 &&
+    position.left - marker.width <= this.psv.prop.size.width &&
+    position.top + marker.height >= 0 &&
+    position.top - marker.height <= this.psv.prop.size.height;
 };
 
 /**
