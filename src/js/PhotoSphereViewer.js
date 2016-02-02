@@ -157,7 +157,7 @@ PhotoSphereViewer.prototype.destroy = function() {
   window.removeEventListener('resize', this);
   document.removeEventListener(PSVUtils.fullscreenEvent(), this);
 
-  if (this.config.mousemove && this.hud) {
+  if (this.config.mousemove) {
     this.hud.container.removeEventListener('mousedown', this);
     this.hud.container.removeEventListener('touchstart', this);
     this.hud.container.removeEventListener('mouseup', this);
@@ -166,7 +166,7 @@ PhotoSphereViewer.prototype.destroy = function() {
     this.hud.container.removeEventListener('touchmove', this);
   }
 
-  if (this.config.mousewheel && this.hud) {
+  if (this.config.mousewheel) {
     this.hud.container.removeEventListener(PSVUtils.mouseWheelEvent(), this);
   }
 
@@ -419,7 +419,7 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   var texture = new THREE.Texture(img);
   texture.needsUpdate = true;
 
-  // default texture origin is at 1/4 (phiStart=0) of the panorama, I set it at 1/2 (phiStart=PI/2)
+  // The middle of the panorama is placed at longitude=0
   var geometry = new THREE.SphereGeometry(200, 32, 32, -PhotoSphereViewer.HalfPI);
   var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: true });
   material.side = THREE.DoubleSide;
@@ -471,7 +471,7 @@ PhotoSphereViewer.prototype._bindEvents = function() {
   document.addEventListener(PSVUtils.fullscreenEvent(), this);
 
   // all interation events are binded to the HUD only
-  if (this.config.mousemove && this.hud) {
+  if (this.config.mousemove) {
     this.hud.container.style.cursor = 'move';
     this.hud.container.addEventListener('mousedown', this);
     this.hud.container.addEventListener('touchstart', this);
@@ -481,7 +481,7 @@ PhotoSphereViewer.prototype._bindEvents = function() {
     this.hud.container.addEventListener('touchmove', this);
   }
 
-  if (this.config.mousewheel && this.hud) {
+  if (this.config.mousewheel) {
     this.hud.container.addEventListener(PSVUtils.mouseWheelEvent(), this);
   }
 };
@@ -493,15 +493,15 @@ PhotoSphereViewer.prototype._bindEvents = function() {
 PhotoSphereViewer.prototype.handleEvent = function(e) {
   switch (e.type) {
     // @formatter:off
-    case 'resize': this._onResize(); break;
-    case PSVUtils.fullscreenEvent(): this._fullscreenToggled(); break;
-    case 'mousedown': this._onMouseDown(e); break;
-    case 'touchstart': this._onTouchStart(e); break;
-    case 'mouseup': this._onMouseUp(e); break;
-    case 'touchend': this._onTouchEnd(e); break;
-    case 'mousemove': this._onMouseMove(e); break;
-    case 'touchmove': this._onTouchMove(e); break;
-    case PSVUtils.mouseWheelEvent(): this._onMouseWheel(e); break;
+    case 'resize':      this._onResize();       break;
+    case 'mousedown':   this._onMouseDown(e);   break;
+    case 'touchstart':  this._onTouchStart(e);  break;
+    case 'mouseup':     this._onMouseUp(e);     break;
+    case 'touchend':    this._onTouchEnd(e);    break;
+    case 'mousemove':   this._onMouseMove(e);   break;
+    case 'touchmove':   this._onTouchMove(e);   break;
+    case PSVUtils.fullscreenEvent():  this._fullscreenToggled();  break;
+    case PSVUtils.mouseWheelEvent():  this._onMouseWheel(e);      break;
     // @formatter:on
   }
 };

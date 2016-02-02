@@ -81,11 +81,11 @@ PSVHUD.prototype.addMarker = function(marker, render) {
     throw new PSVError('missing marker width/height');
   }
 
-  if (!marker.image) {
-    throw new PSVError('missing marker image');
+  if (!marker.image && !marker.text) {
+    throw new PSVError('missing marker image/text');
   }
 
-  if ((!marker.hasOwnProperty('x') || !marker.hasOwnProperty('y')) & (!marker.hasOwnProperty('latitude') || !marker.hasOwnProperty('longitude'))) {
+  if ((!marker.hasOwnProperty('x') || !marker.hasOwnProperty('y')) && (!marker.hasOwnProperty('latitude') || !marker.hasOwnProperty('longitude'))) {
     throw new PSVError('missing marker position, latitude/longitude or x/y');
   }
 
@@ -93,8 +93,9 @@ PSVHUD.prototype.addMarker = function(marker, render) {
 
   // create DOM
   marker.$el = document.createElement('div');
+  marker.$el.id = 'psv-marker-' + marker.id;
   marker.$el.psvMarker = marker;
-  marker.$el.className = 'marker';
+  marker.$el.className = 'psv-marker';
 
   if (marker.className) {
     marker.$el.classList.add(marker.className);
@@ -107,7 +108,19 @@ PSVHUD.prototype.addMarker = function(marker, render) {
   var style = marker.$el.style;
   style.width = marker.width + 'px';
   style.height = marker.height + 'px';
-  style.backgroundImage = 'url(' + marker.image + ')';
+
+  if (marker.style) {
+    Object.getOwnPropertyNames(marker.style).forEach(function(prop) {
+      style[prop] = marker.style[prop];
+    });
+  }
+
+  if (marker.image) {
+    style.backgroundImage = 'url(' + marker.image + ')';
+  }
+  else {
+    marker.$el.innerHTML = marker.text;
+  }
 
   // parse anchor
   marker.anchor = PSVUtils.parsePosition(marker.anchor);
@@ -308,15 +321,16 @@ PSVHUD.prototype._onMouseLeave = function(e) {
 };
 
 /**
- * The mouse button is release : show/hide the panel if threeshold was not reached, or do nothing
+ * The mouse button is release : show/hide the panel if threshold was not reached, or do nothing
  * @param e (Event)
  * @return (void)
  */
 PSVHUD.prototype._onClick = function(e) {
   if (!this.psv.prop.moved) {
-    if (e.target && e.target.psvMarker) {
-      this.currentMarker = e.target.psvMarker;
-      this.psv.trigger('select-marker', e.target.psvMarker);
+    var marker;
+    if (e.target && (marker = PSVUtils.getClosest(e.target, '.psv-marker')) && marker.psvMarker) {
+      this.currentMarker = marker.psvMarker;
+      this.psv.trigger('select-marker', marker.psvMarker);
       e.preventDefault(); // prevent the public "click" event
     }
     else if (this.currentMarker) {
@@ -324,8 +338,8 @@ PSVHUD.prototype._onClick = function(e) {
       this.psv.trigger('unselect-marker');
     }
 
-    if (e.target && e.target.psvMarker && e.target.psvMarker.content) {
-      this.psv.panel.showPanel(e.target.psvMarker.content);
+    if (marker && marker.psvMarker && marker.psvMarker.content) {
+      this.psv.panel.showPanel(marker.psvMarker.content);
     }
     else if (this.psv.panel.prop.opened) {
       e.preventDefault(); // prevent the public "click" event
