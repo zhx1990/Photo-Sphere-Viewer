@@ -1,5 +1,3 @@
-/*jshint multistr: true */
-
 /**
  * Navigation bar markers button class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
@@ -76,26 +74,31 @@ PSVNavBarMarkersButton.prototype.toggleMarkers = function() {
  * @return (void)
  */
 PSVNavBarMarkersButton.prototype.showMarkers = function() {
-  var html = '<div class="psv-markers-list"> \
-    <h1>' + this.psv.config.lang.markers + '</h1> \
-    <ul>';
+  var html = '<div class="psv-markers-list">'
+    + '<h1>' + this.psv.config.lang.markers + '</h1>'
+    + '<ul>';
 
   for (var id in this.psv.hud.markers) {
     var marker = this.psv.hud.markers[id];
 
-    var name = marker.name || marker.id;
-    if (marker.tooltip) {
+    var name = marker.id;
+    if (marker.html) {
+      name = marker.html;
+    }
+    else if (marker.tooltip) {
       name = typeof marker.tooltip === 'string' ? marker.tooltip : marker.tooltip.content;
     }
 
-    html += '<li data-psv-marker="' + marker.id + '"> \
-        <img src="' + marker.image + '"/> \
-        <p>' + name + '</p> \
-      </li>';
+    html += '<li data-psv-marker="' + marker.id + '">';
+    if (marker.image) {
+      html += '<img src="' + marker.image + '"/>';
+    }
+    html += '<p>' + name + '</p>'
+      + '</li>';
   }
 
-  html += '</ul> \
-  </div>';
+  html += '</ul>'
+    + '</div>';
 
   this.prop.panelOpening = true;
   this.psv.panel.showPanel(html, true);

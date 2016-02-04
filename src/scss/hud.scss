@@ -13,6 +13,11 @@
     cursor: pointer;
     display: none;
 
+    &.transparent {
+      display: block;
+      opacity: 0;
+    }
+
     &.visible {
       display: block;
     }

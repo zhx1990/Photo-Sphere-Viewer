@@ -170,6 +170,10 @@ PSVUtils.parsePosition = function(value) {
     return { top: 0.5, left: 0.5 };
   }
 
+  if (typeof value === 'object') {
+    return value;
+  }
+
   var e = document.createElement('div');
   document.body.appendChild(e);
   e.style.backgroundPosition = value;

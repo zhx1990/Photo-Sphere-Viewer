@@ -14,7 +14,7 @@ function PSVHUD(psv) {
 PSVHUD.prototype = Object.create(PSVComponent.prototype);
 PSVHUD.prototype.constructor = PSVHUD;
 
-PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'getMarker', 'getCurrentMarker', 'gotoMarker', 'hideMarker', 'showMarker', 'toggleMarker'];
+PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'updateMarker', 'getMarker', 'getCurrentMarker', 'gotoMarker', 'hideMarker', 'showMarker', 'toggleMarker'];
 
 /**
  * Creates the HUD
@@ -77,26 +77,75 @@ PSVHUD.prototype.addMarker = function(marker, render) {
     throw new PSVError('marker "' + marker.id + '" already exists');
   }
 
-  if (!marker.width || !marker.height) {
-    throw new PSVError('missing marker width/height');
+  if (!marker.image && !marker.html) {
+    throw new PSVError('missing marker image/html');
   }
 
-  if (!marker.image && !marker.text) {
-    throw new PSVError('missing marker image/text');
+  if (marker.image && (!marker.width || !marker.height)) {
+    throw new PSVError('missing marker width/height');
   }
 
   if ((!marker.hasOwnProperty('x') || !marker.hasOwnProperty('y')) && (!marker.hasOwnProperty('latitude') || !marker.hasOwnProperty('longitude'))) {
     throw new PSVError('missing marker position, latitude/longitude or x/y');
   }
 
-  marker = PSVUtils.clone(marker);
-
   // create DOM
   marker.$el = document.createElement('div');
   marker.$el.id = 'psv-marker-' + marker.id;
-  marker.$el.psvMarker = marker;
   marker.$el.className = 'psv-marker';
 
+  this.markers[marker.id] = marker; // will be replaced by updateMarker
+  this.container.appendChild(marker.$el);
+
+  return this.updateMarker(PSVUtils.clone(marker), render);
+
+};
+
+/**
+ * Get a marker by it's id or external object
+ * @param marker (Mixed)
+ * @return (Object)
+ */
+PSVHUD.prototype.getMarker = function(marker) {
+  var id = typeof marker === 'object' ? marker.id : marker;
+
+  if (!this.markers[id]) {
+    throw new PSVError('cannot find marker "' + id + '"');
+  }
+
+  return this.markers[id];
+};
+
+/**
+ * Get the current selected marker
+ * @return (Object)
+ */
+PSVHUD.prototype.getCurrentMarker = function() {
+  return this.currentMarker;
+};
+
+/**
+ * Update a marker
+ * @param marker (Object)
+ * @param render (Boolean) "false" to disable immediate render
+ * @return (Object) a modified marker object
+ */
+PSVHUD.prototype.updateMarker = function(marker, render) {
+  var old = this.getMarker(marker);
+
+  // clean some previous data
+  if (old.className) {
+    old.$el.classList.remove(old.className);
+  }
+  if (old.tooltip) {
+    old.$el.classList.remove('has-tooltip');
+  }
+
+  // merge objects
+  delete marker.$el;
+  marker = PSVUtils.deepmerge(old, marker);
+
+  // add classes
   if (marker.className) {
     marker.$el.classList.add(marker.className);
   }
@@ -106,8 +155,15 @@ PSVHUD.prototype.addMarker = function(marker, render) {
 
   // set image
   var style = marker.$el.style;
-  style.width = marker.width + 'px';
-  style.height = marker.height + 'px';
+
+  if (marker.width && marker.height) {
+    style.width = marker.width + 'px';
+    style.height = marker.height + 'px';
+    marker.dynamicSize = false;
+  }
+  else {
+    marker.dynamicSize = true;
+  }
 
   if (marker.style) {
     Object.getOwnPropertyNames(marker.style).forEach(function(prop) {
@@ -119,7 +175,7 @@ PSVHUD.prototype.addMarker = function(marker, render) {
     style.backgroundImage = 'url(' + marker.image + ')';
   }
   else {
-    marker.$el.innerHTML = marker.text;
+    marker.$el.innerHTML = marker.html;
   }
 
   // parse anchor
@@ -146,37 +202,14 @@ PSVHUD.prototype.addMarker = function(marker, render) {
   }
 
   // save
+  marker.$el.psvMarker = marker;
   this.markers[marker.id] = marker;
-  this.container.appendChild(marker.$el);
 
   if (render !== false) {
     this.updatePositions();
   }
 
   return marker;
-};
-
-/**
- * Get a marker by it's id or external object
- * @param marker (Mixed)
- * @return (Object)
- */
-PSVHUD.prototype.getMarker = function(marker) {
-  var id = typeof marker === 'object' ? marker.id : marker;
-
-  if (!this.markers[id]) {
-    throw new PSVError('cannot find marker "' + id + '"');
-  }
-
-  return this.markers[id];
-};
-
-/**
- * Get the current selected marker
- * @return (Object)
- */
-PSVHUD.prototype.getCurrentMarker = function() {
-  return this.currentMarker;
 };
 
 /**
@@ -289,6 +322,16 @@ PSVHUD.prototype._isMarkerVisible = function(marker, position) {
  * @return (Object) top and left position
  */
 PSVHUD.prototype._getMarkerPosition = function(marker) {
+  if (marker.dynamicSize) {
+    // make the marker visible to get it's size
+    marker.$el.classList.add('transparent');
+    var rect = marker.$el.getBoundingClientRect();
+    marker.$el.classList.remove('transparent');
+
+    marker.width = rect.right - rect.left;
+    marker.height = rect.bottom - rect.top;
+  }
+
   var vector = marker.position3D.clone();
   vector.project(this.psv.camera);
 

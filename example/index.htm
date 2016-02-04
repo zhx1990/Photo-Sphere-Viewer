@@ -124,15 +124,14 @@
 
       a.push({
         id: 'text',
-        text: 'This <b>is</b> text',
+        html: 'This <b>is</b> text <img src="pin3.png" style="height: 24px; vertical-align: top;"/>',
+        anchor: 'bottom right',
         style: {
           color: 'white',
           fontSize: '20px',
           fontFamily: 'Helvetica, sans-serif',
           textAlign: 'center'
         },
-        width: 100,
-        height: 20,
         latitude: -0.2,
         longitude: 0.5
       });
@@ -156,6 +155,14 @@
   PSV.on('select-marker', function(marker) {
     if (marker.id.indexOf('#') === 0) {
       PSV.removeMarker(marker);
+    }
+    else if (marker.id === 'gif') {
+      var width = (Math.random()*0.4 + 0.8) * marker.width;
+      PSV.updateMarker({
+        id: marker.id,
+        width: width,
+        height: width
+      });
     }
   });
 </script>
