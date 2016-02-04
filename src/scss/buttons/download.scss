@@ -7,7 +7,7 @@
     position: absolute;
     width: $buttons-height;
     height: round($buttons-height / 3);
-    left: #{$buttons-padding - $download-button-tickness};
+    left: $buttons-padding;
     bottom: $buttons-padding;
     border: $download-button-tickness solid $buttons-color;
     border-top-width: 0;

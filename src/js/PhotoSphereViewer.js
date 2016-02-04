@@ -38,7 +38,8 @@ function PhotoSphereViewer(options) {
   }
 
   // references to components
-  this.container = (typeof this.config.container == 'string') ? document.getElementById(this.config.container) : this.config.container;
+  this.parent = (typeof this.config.container == 'string') ? document.getElementById(this.config.container) : this.config.container;
+  this.container = null;
   this.loader = null;
   this.navbar = null;
   this.hud = null;
@@ -83,14 +84,18 @@ function PhotoSphereViewer(options) {
   this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
   this.prop.zoom_lvl -= 2 * (this.prop.zoom_lvl - 50);
 
+  // create actual container
+  this.container = document.createElement('div');
+  this.container.classList.add('psv-container');
+  this.parent.appendChild(this.container);
+
   // init
   this.setAnimSpeed(this.config.anim_speed);
 
   this.rotate(this.config.default_long, this.config.default_lat);
 
   if (this.config.size !== null) {
-    this.container.style.width = this.config.size.width;
-    this.container.style.height = this.config.size.height;
+    this._setViewerSize(this.config.size);
   }
 
   if (this.config.autoload) {
@@ -195,11 +200,7 @@ PhotoSphereViewer.prototype.destroy = function() {
   if (this.canvas_container) {
     this.container.removeChild(this.canvas_container);
   }
-
-  // remove classes
-  this.container.classList.remove('psv-container');
-  this.container.classList.remove('loading');
-  this.container.classList.remove('has-navbar');
+  this.parent.removeChild(this.container);
 
   // clean references
   this.container = null;
@@ -222,7 +223,6 @@ PhotoSphereViewer.prototype.destroy = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype.load = function() {
-  this.container.classList.add('psv-container');
   this.container.classList.add('loading');
 
   // Is canvas supported?
@@ -1060,6 +1060,20 @@ PhotoSphereViewer.prototype.parseAnimSpeed = function(speed) {
  */
 PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
   this.prop.anim_speed = this.parseAnimSpeed(speed);
+};
+
+/**
+ * Sets the viewer size
+ * @param size (Object) An object containing the wanted width and height
+ * @return (void)
+ */
+PhotoSphereViewer.prototype._setViewerSize = function(size) {
+  ['width', 'height'].forEach(function(dim) {
+    if (size[dim]) {
+      if (/^[0-9.]+$/.test(size[dim])) size[dim] += 'px';
+      this.parent.style[dim] = size[dim];
+    }
+  }, this);
 };
 
 /**
