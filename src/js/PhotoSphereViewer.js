@@ -861,7 +861,7 @@ PhotoSphereViewer.prototype.animate = function(t, p, s) {
   }
   else {
     // desired radial speed
-    var speed = s ? this.parseAnimSpeed(s) : this.prop.anim_speed;
+    var speed = s ? this._parseAnimSpeed(s) : this.prop.anim_speed;
     // get the angle between current position and target
     var angle = Math.acos(Math.cos(p0) * Math.cos(p) * Math.cos(t0 - t) + Math.sin(p0) * Math.sin(p));
     duration = angle / speed;
@@ -1007,7 +1007,7 @@ PhotoSphereViewer.prototype.toggleFullscreen = function() {
  * @param speed (string) The speed, in radians/degrees/revolutions per second/minute
  * @return (double) radians per second
  */
-PhotoSphereViewer.prototype.parseAnimSpeed = function(speed) {
+PhotoSphereViewer.prototype._parseAnimSpeed = function(speed) {
   speed = speed.toString().trim();
 
   // Speed extraction
@@ -1059,7 +1059,7 @@ PhotoSphereViewer.prototype.parseAnimSpeed = function(speed) {
  * @return (void)
  */
 PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
-  this.prop.anim_speed = this.parseAnimSpeed(speed);
+  this.prop.anim_speed = this._parseAnimSpeed(speed);
 };
 
 /**

@@ -145,12 +145,17 @@ PSVHUD.prototype.updateMarker = function(marker, render) {
   delete marker.$el;
   marker = PSVUtils.deepmerge(old, marker);
 
+  marker.position2D = null;
+
   // add classes
   if (marker.className) {
     marker.$el.classList.add(marker.className);
   }
   if (marker.tooltip) {
     marker.$el.classList.add('has-tooltip');
+    if (typeof marker.tooltip === 'string') {
+      marker.tooltip = { content: marker.tooltip };
+    }
   }
 
   // set image
@@ -348,7 +353,14 @@ PSVHUD.prototype._getMarkerPosition = function(marker) {
  */
 PSVHUD.prototype._onMouseEnter = function(e) {
   if (e.target && e.target.psvMarker && e.target.psvMarker.tooltip) {
-    this.psv.tooltip.showTooltip(e.target.psvMarker.tooltip, e.target.psvMarker);
+    var marker = e.target.psvMarker;
+    this.psv.tooltip.showTooltip({
+      content: marker.tooltip.content,
+      position: marker.tooltip.position,
+      top: marker.position2D.top,
+      left: marker.position2D.left,
+      marker: marker
+    });
   }
 };
 
