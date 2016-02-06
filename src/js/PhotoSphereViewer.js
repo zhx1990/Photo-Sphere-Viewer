@@ -165,8 +165,8 @@ PhotoSphereViewer.prototype.destroy = function() {
   if (this.config.mousemove) {
     this.hud.container.removeEventListener('mousedown', this);
     this.hud.container.removeEventListener('touchstart', this);
-    this.hud.container.removeEventListener('mouseup', this);
-    this.hud.container.removeEventListener('touchend', this);
+    window.removeEventListener('mouseup', this);
+    window.removeEventListener('touchend', this);
     this.hud.container.removeEventListener('mousemove', this);
     this.hud.container.removeEventListener('touchmove', this);
   }
@@ -475,8 +475,8 @@ PhotoSphereViewer.prototype._bindEvents = function() {
     this.hud.container.style.cursor = 'move';
     this.hud.container.addEventListener('mousedown', this);
     this.hud.container.addEventListener('touchstart', this);
-    this.hud.container.addEventListener('mouseup', this);
-    this.hud.container.addEventListener('touchend', this);
+    window.addEventListener('mouseup', this);
+    window.addEventListener('touchend', this);
     this.hud.container.addEventListener('mousemove', this);
     this.hud.container.addEventListener('touchmove', this);
   }

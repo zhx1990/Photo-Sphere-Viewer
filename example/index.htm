@@ -14,9 +14,8 @@
       padding: 0;
     }
     #photosphere {
-      width: 75vw;
-      height: 75vh;
-      margin: 12.5vh 12.5vw;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
@@ -61,6 +60,7 @@
   var PSV = new PhotoSphereViewer({
     panorama: 'Bryce-Canyon-National-Park-Mark-Doliner.jpg',
     container: 'photosphere',
+    loading_img: 'photosphere-logo.gif',
     navbar: true, //'fullscreen zoom',
     caption: 'Bryce Canyon National Park <b>&copy; Mark Doliner</b>',
     tilt_up_max: Math.PI/4,

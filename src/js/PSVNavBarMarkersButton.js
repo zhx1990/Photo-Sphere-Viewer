@@ -123,6 +123,7 @@ PSVNavBarMarkersButton.prototype._onClickItem = function(e) {
   var li;
   if (e.target && (li = PSVUtils.getClosest(e.target, 'li')) && li.dataset.psvMarker) {
     this.psv.hud.gotoMarker(li.dataset.psvMarker, 1000);
+    this.psv.panel.hidePanel();
   }
 };
 

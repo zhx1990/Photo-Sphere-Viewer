@@ -92,6 +92,10 @@ PSVTooltip.prototype.showTooltip = function(config) {
     config.position = [PSVTooltip.topMap[tempPos.top], PSVTooltip.leftMap[tempPos.left]];
   }
 
+  if (config.position[0] == 'center' && config.position[1] == 'center') {
+    throw new PSVError('unable to parse tooltip position "center center"');
+  }
+
   t.className = 'psv-tooltip'; // reset the class
   if (config.className) {
     t.classList.add(config.className);
