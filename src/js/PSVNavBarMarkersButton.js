@@ -91,9 +91,9 @@ PSVNavBarMarkersButton.prototype.showMarkers = function() {
 
     html += '<li data-psv-marker="' + marker.id + '">';
     if (marker.image) {
-      html += '<img src="' + marker.image + '"/>';
+      html += '<img class="marker-image" src="' + marker.image + '"/>';
     }
-    html += '<p>' + name + '</p>'
+    html += '<p class="marker-name">' + name + '</p>'
       + '</li>';
   }
 

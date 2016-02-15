@@ -61,12 +61,12 @@
         transition: transform 0.1s ease-in-out;
       }
 
-      img {
+      img.marker-image {
         float: left;
         width: $markers-list-image-size;
       }
 
-      p {
+      p.marker-name {
         margin: 0;
         padding: 0;
         padding-left: calc(#{$markers-list-image-size} + #{nth($markers-list-padding, 1)});

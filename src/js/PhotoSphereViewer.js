@@ -71,6 +71,7 @@ function PhotoSphereViewer(options) {
     autorotate_timeout: null,
     animation_timeout: null,
     start_timeout: null,
+    boundingRect: null,
     size: {
       width: 0,
       height: 0,
@@ -450,7 +451,7 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   this.panel = new PSVPanel(this);
 
   // Tooltip
-  this.tooltip = new PSVTooltip(this);
+  this.tooltip = new PSVTooltip(this, this.hud);
 
   // Queue animation
   if (this.config.time_anim !== false) {
@@ -597,6 +598,7 @@ PhotoSphereViewer.prototype.resize = function(width, height) {
   this.prop.size.width = parseInt(width);
   this.prop.size.height = parseInt(height);
   this.prop.size.ratio = this.prop.size.width / this.prop.size.height;
+  this.prop.boundingRect = this.container.getBoundingClientRect();
 
   if (this.camera) {
     this.camera.aspect = this.prop.size.ratio;
@@ -717,11 +719,9 @@ PhotoSphereViewer.prototype._click = function(evt) {
     return;
   }
 
-  var boundingRect = this.container.getBoundingClientRect();
-
   var data = {
-    client_x: parseInt(evt.clientX - boundingRect.left),
-    client_y: parseInt(evt.clientY - boundingRect.top)
+    client_x: parseInt(evt.clientX - this.prop.boundingRect.left),
+    client_y: parseInt(evt.clientY - this.prop.boundingRect.top)
   };
 
   var screen = new THREE.Vector2(

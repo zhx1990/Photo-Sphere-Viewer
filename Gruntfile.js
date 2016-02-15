@@ -136,10 +136,35 @@ module.exports = function(grunt) {
       }
     },
 
+    connect: {
+      dev: {
+        options: {
+          port: 9000,
+          livereload: true
+        }
+      }
+    },
+
     watch: {
-      all: {
+      src: {
         files: ['src/**'],
-        tasks: ['default']
+        tasks: ['default'],
+        options: {
+          livereload: true
+        }
+      },
+      example: {
+        files: ['example/**'],
+        tasks: [],
+        options: {
+          livereload: true
+        }
+      }
+    },
+
+    open: {
+      dev: {
+        path: 'http://localhost:<%= connect.dev.options.port%>/example/index.htm'
       }
     }
   });
@@ -157,5 +182,11 @@ module.exports = function(grunt) {
     'jshint',
     'jscs',
     'scsslint'
+  ]);
+
+  grunt.registerTask('serve', [
+    'open',
+    'connect',
+    'watch'
   ]);
 };

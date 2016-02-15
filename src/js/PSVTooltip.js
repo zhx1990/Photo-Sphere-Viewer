@@ -2,8 +2,8 @@
  * Tooltip class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
-function PSVTooltip(psv) {
-  PSVComponent.call(this, psv);
+function PSVTooltip(psv, parent) {
+  PSVComponent.call(this, psv, parent);
 
   this.config = this.psv.config.tooltip;
 
@@ -13,7 +13,7 @@ function PSVTooltip(psv) {
 PSVTooltip.prototype = Object.create(PSVComponent.prototype);
 PSVTooltip.prototype.constructor = PSVTooltip;
 
-PSVTooltip.publicMethods = ['showTooltip', 'hideTooltip'];
+PSVTooltip.publicMethods = ['showTooltip', 'hideTooltip', 'isTooltipVisible'];
 
 PSVTooltip.leftMap = { 0: 'left', 0.5: 'center', 1: 'right' };
 PSVTooltip.topMap = { 0: 'top', 0.5: 'center', 1: 'bottom' };
@@ -54,6 +54,10 @@ PSVTooltip.prototype.handleEvent = function(e) {
   }
 };
 
+PSVTooltip.prototype.isTooltipVisible = function() {
+  return this.container.classList.contains('visible');
+};
+
 /**
  * Show the tooltip
  * @param config (Object)
@@ -66,6 +70,7 @@ PSVTooltip.prototype.handleEvent = function(e) {
  * @return (void)
  */
 PSVTooltip.prototype.showTooltip = function(config) {
+  var isUpdate = this.isTooltipVisible();
   var t = this.container;
   var c = t.querySelector('.content');
   var a = t.querySelector('.arrow');
@@ -96,9 +101,18 @@ PSVTooltip.prototype.showTooltip = function(config) {
     throw new PSVError('unable to parse tooltip position "center center"');
   }
 
-  t.className = 'psv-tooltip'; // reset the class
-  if (config.className) {
-    t.classList.add(config.className);
+  if (isUpdate) {
+    t.classList.forEach(function(className) {
+      if (className != 'psv-tooltip' && className != 'visible') {
+        t.classList.remove(className);
+      }
+    });
+  }
+  else {
+    t.className = 'psv-tooltip'; // reset the class
+    if (config.className) {
+      t.classList.add(config.className);
+    }
   }
 
   c.innerHTML = config.content;
@@ -152,11 +166,13 @@ PSVTooltip.prototype.showTooltip = function(config) {
   t.classList.add(style.posClass.join('-'));
 
   // delay for correct transition between the two classes
-  var self = this;
-  setTimeout(function() {
-    t.classList.add('visible');
-    self.psv.trigger('show-tooltip');
-  }, 100);
+  if (!isUpdate) {
+    var self = this;
+    setTimeout(function() {
+      t.classList.add('visible');
+      self.psv.trigger('show-tooltip');
+    }, 100);
+  }
 };
 
 /**
@@ -164,14 +180,16 @@ PSVTooltip.prototype.showTooltip = function(config) {
  * @return (void)
  */
 PSVTooltip.prototype.hideTooltip = function() {
-  this.container.classList.remove('visible');
-  this.psv.trigger('hide-tooltip');
+  if (this.isTooltipVisible()) {
+    this.container.classList.remove('visible');
+    this.psv.trigger('hide-tooltip');
 
-  var self = this;
-  setTimeout(function() {
-    self.container.style.top = '-1000px';
-    self.container.style.left = '-1000px';
-  }, 100);
+    var self = this;
+    setTimeout(function() {
+      self.container.style.top = '-1000px';
+      self.container.style.left = '-1000px';
+    }, 100);
+  }
 };
 
 /**
