@@ -300,11 +300,11 @@ PSVHUD.prototype._updatePolygonMarker = function(marker) {
   marker.latitude = marker.polygon_rad[1];
 
   marker.positions3D = [];
-  for (var i = 0, l = marker.polygon_rad.length; i < l; i+=2) {
+  for (var i = 0, l = marker.polygon_rad.length; i < l; i += 2) {
     marker.positions3D.push(new THREE.Vector3(
-      -Math.cos(marker.polygon_rad[i+1]) * Math.sin(marker.polygon_rad[i]),
-      Math.sin(marker.polygon_rad[i+1]),
-      Math.cos(marker.polygon_rad[i+1]) * Math.cos(marker.polygon_rad[i])
+      -Math.cos(marker.polygon_rad[i + 1]) * Math.sin(marker.polygon_rad[i]),
+      Math.sin(marker.polygon_rad[i + 1]),
+      Math.cos(marker.polygon_rad[i + 1]) * Math.cos(marker.polygon_rad[i])
     ));
   }
 };
@@ -393,7 +393,7 @@ PSVHUD.prototype.updatePositions = function() {
 
         var points = '';
         positions.forEach(function(pos) {
-          points+= pos.left + ',' + pos.top + ' ';
+          points += pos.left + ',' + pos.top + ' ';
         });
 
         marker.$el.setAttributeNS(null, 'points', points);
@@ -616,7 +616,17 @@ PSVHUD.prototype._onClick = function(e) {
     if (e.target && (marker = PSVUtils.getClosest(e.target, '.psv-marker')) && marker.psvMarker) {
       this.currentMarker = marker.psvMarker;
       this.psv.trigger('select-marker', marker.psvMarker);
-      e.preventDefault(); // prevent the public "click" event
+
+      if (this.psv.config.click_event_on_marker) {
+        // add the marker to event data
+        e.data = {
+          marker: marker.psvMarker
+        };
+      }
+      else {
+        // prevent the public "click" event
+        e.preventDefault();
+      }
     }
     else if (this.currentMarker) {
       this.currentMarker = null;

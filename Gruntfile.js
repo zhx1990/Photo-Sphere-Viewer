@@ -111,6 +111,9 @@ module.exports = function(grunt) {
     },
 
     jshint: {
+      options: {
+        jshintrc: '.jshintrc'
+      },
       dist: {
         src: ['src/js/*.js']
       },
@@ -185,6 +188,7 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('serve', [
+    'default',
     'open',
     'connect',
     'watch'

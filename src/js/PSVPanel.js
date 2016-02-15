@@ -1,5 +1,3 @@
-/*jshint multistr: true */
-
 /**
  * Panel class
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
@@ -32,10 +30,10 @@ PSVPanel.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
   this.container.className = 'psv-panel';
-  this.container.innerHTML = '\
-<div class="resizer"></div>\
-<div class="close-button"></div>\
-<div class="content"></div>';
+  this.container.innerHTML =
+    '<div class="resizer"></div>' +
+    '<div class="close-button"></div>' +
+    '<div class="content"></div>';
 
   this.content = this.container.querySelector('.content');
 

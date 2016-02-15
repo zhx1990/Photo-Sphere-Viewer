@@ -168,6 +168,9 @@
   });
 
   PSV.on('click', function(e) {
+    if (e.marker && !e.marker.isPolygon) {
+      return;
+    }
     PSV.addMarker({
       id: '#' + Math.random(),
       longitude: e.longitude,

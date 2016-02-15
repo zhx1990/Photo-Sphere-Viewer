@@ -102,11 +102,13 @@ PSVTooltip.prototype.showTooltip = function(config) {
   }
 
   if (isUpdate) {
-    t.classList.forEach(function(className) {
-      if (className != 'psv-tooltip' && className != 'visible') {
-        t.classList.remove(className);
+    // Remove every other classes (Firefox does not implements forEach)
+    for (var i = t.classList.length - 1; i >= 0; i--) {
+      var item = t.classList.item(i);
+      if (item != 'psv-tooltip' && item != 'visible') {
+        t.classList.remove(item);
       }
-    });
+    }
   }
   else {
     t.className = 'psv-tooltip'; // reset the class

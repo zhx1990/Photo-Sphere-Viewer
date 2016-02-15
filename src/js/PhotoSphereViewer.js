@@ -149,6 +149,7 @@ PhotoSphereViewer.DEFAULTS = {
   },
   mousewheel: true,
   mousemove: true,
+  click_event_on_marker: true,
   loading_img: null,
   loading_txt: 'Loading...',
   size: null,
@@ -723,6 +724,10 @@ PhotoSphereViewer.prototype._click = function(evt) {
     client_x: parseInt(evt.clientX - this.prop.boundingRect.left),
     client_y: parseInt(evt.clientY - this.prop.boundingRect.top)
   };
+
+  if (evt.data) {
+    data = PSVUtils.deepmerge(data, evt.data);
+  }
 
   var screen = new THREE.Vector2(
     2 * data.client_x / this.prop.size.width - 1,
