@@ -14,12 +14,15 @@ module.exports = function(grunt) {
     'src/js/PSVPanel.js',
     'src/js/PSVTooltip.js',
     'src/js/PSVNavBar.js',
+    'src/js/PSVNavBarCaption.js',
+    'src/js/PSVNavBarSpacer.js',
     'src/js/PSVNavBarButton.js',
     'src/js/PSVNavBarAutorotateButton.js',
     'src/js/PSVNavBarFullscreenButton.js',
     'src/js/PSVNavBarZoomButton.js',
     'src/js/PSVNavBarDownloadButton.js',
     'src/js/PSVNavBarMarkersButton.js',
+    'src/js/PSVNavBarCustomButton.js',
     'src/js/PSVError.js',
     'src/js/PSVUtils.js'
   ];

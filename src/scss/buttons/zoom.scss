@@ -1,5 +1,6 @@
 .psv-navbar .zoom-button {
   cursor: default;
+  width: #{$zoom-buttons-width * 3 + $zoom-range-width};
 
   .minus, .plus {
     float: left;

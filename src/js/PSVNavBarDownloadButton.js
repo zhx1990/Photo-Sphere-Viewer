@@ -1,15 +1,17 @@
 /**
  * Navigation bar download button class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param navbar (PSVNavBar) A PSVNavBar object
  */
-function PSVNavBarDownloadButton(psv) {
-  PSVNavBarButton.call(this, psv);
+function PSVNavBarDownloadButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
 
   this.create();
 }
 
 PSVNavBarDownloadButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarDownloadButton.prototype.constructor = PSVNavBarDownloadButton;
+
+PSVNavBarDownloadButton.className = 'psv-button hoverable download-button';
 
 /**
  * Creates the button
@@ -18,14 +20,11 @@ PSVNavBarDownloadButton.prototype.constructor = PSVNavBarDownloadButton;
 PSVNavBarDownloadButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
 
-  this.button.classList.add('download-button');
-  this.button.title = this.psv.config.lang.download;
+  this.container.title = this.psv.config.lang.download;
 
-  this.button.appendChild(document.createElement('div'));
+  this.container.appendChild(document.createElement('div'));
 
-  this.button.addEventListener('mouseenter', this.toggleActive.bind(this, true));
-  this.button.addEventListener('mouseleave', this.toggleActive.bind(this, false));
-  this.button.addEventListener('click', this.download.bind(this));
+  this.container.addEventListener('click', this.download.bind(this));
 };
 
 /**

@@ -3,31 +3,11 @@
  * @param navbar (PSVNavBar) A PSVNavBar object
  */
 function PSVNavBarButton(navbar) {
-  this.navbar = navbar;
-  this.psv = navbar.psv;
-  this.button = null;
+  PSVComponent.call(this, navbar);
 }
 
-/**
- * Creates the button
- * @return (void)
- */
-PSVNavBarButton.prototype.create = function() {
-  this.button = document.createElement('div');
-  this.button.className = 'psv-button';
-  this.navbar.container.appendChild(this.button);
-};
-
-/**
- * Destroys the button
- */
-PSVNavBarButton.prototype.destroy = function() {
-  this.navbar.container.removeChild(this.button);
-
-  this.navbar = null;
-  this.psv = null;
-  this.button = null;
-};
+PSVNavBarButton.prototype = Object.create(PSVComponent.prototype);
+PSVNavBarButton.prototype.constructor = PSVNavBarButton;
 
 /**
  * Changes the active state of the button
@@ -35,10 +15,5 @@ PSVNavBarButton.prototype.destroy = function() {
  * @return (void)
  */
 PSVNavBarButton.prototype.toggleActive = function(active) {
-  if (active) {
-    this.button.classList.add('active');
-  }
-  else {
-    this.button.classList.remove('active');
-  }
+  this.container.classList.toggle('active', active);
 };

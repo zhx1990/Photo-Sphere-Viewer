@@ -1,11 +1,10 @@
 /**
  * Base sub-component class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  * @param parent (PhotoSphereViewer | PSVComponent) The parent with a "container" property
  */
-function PSVComponent(psv, parent) {
-  this.psv = psv;
-  this.parent = parent || psv;
+function PSVComponent(parent) {
+  this.psv = parent instanceof PhotoSphereViewer ? parent : parent.psv;
+  this.parent = parent;
   this.container = null;
 
   // expose some methods to the viewer
@@ -21,6 +20,10 @@ function PSVComponent(psv, parent) {
  */
 PSVComponent.prototype.create = function() {
   this.container = document.createElement('div');
+
+  if (this.constructor.className) {
+    this.container.className = this.constructor.className;
+  }
 
   this.parent.container.appendChild(this.container);
 };

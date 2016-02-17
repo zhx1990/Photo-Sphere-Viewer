@@ -16,6 +16,7 @@ function PSVHUD(psv) {
 PSVHUD.prototype = Object.create(PSVComponent.prototype);
 PSVHUD.prototype.constructor = PSVHUD;
 
+PSVHUD.className = 'psv-hud';
 PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'updateMarker', 'getMarker', 'getCurrentMarker', 'gotoMarker', 'hideMarker', 'showMarker', 'toggleMarker'];
 
 PSVHUD.svgNS = 'http://www.w3.org/2000/svg';
@@ -26,8 +27,6 @@ PSVHUD.svgNS = 'http://www.w3.org/2000/svg';
  */
 PSVHUD.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
-
-  this.container.className = 'psv-hud';
 
   this.$svg = document.createElementNS(PSVHUD.svgNS, 'svg');
   this.$svg.setAttribute('class', 'psv-svg-container');

@@ -18,6 +18,10 @@
       width: 100%;
       height: 100%;
     }
+
+    .psv-button.custom-button {
+      font-size: 18px;
+    }
   </style>
 </head>
 <body>
@@ -73,7 +77,20 @@
     panorama: 'Bryce-Canyon-National-Park-Mark-Doliner.jpg',
     container: 'photosphere',
     loading_img: 'photosphere-logo.gif',
-    navbar: true, //'fullscreen zoom',
+    navbar: [
+      'autorotate', 'zoom', 'download', 'markers',
+      'spacer-1',
+      {
+        title: 'Custom action',
+        className: 'custom-button',
+        content: '★',
+        onClick: function() {
+          alert('You clicked the custom action');
+        }
+      },
+      'caption',
+      'fullscreen'
+    ],
     caption: 'Bryce Canyon National Park <b>&copy; Mark Doliner</b>',
     tilt_up_max: Math.PI/4,
     tilt_down_max: -Math.PI/4,

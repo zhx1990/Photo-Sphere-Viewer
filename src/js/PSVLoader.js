@@ -3,21 +3,23 @@
  * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
  */
 function PSVLoader(psv) {
-  this.psv = psv;
-  this.container = null;
+  PSVComponent.call(this, psv);
+
   this.canvas = null;
 
   this.create();
 }
 
+PSVLoader.prototype = Object.create(PSVComponent.prototype);
+PSVLoader.prototype.constructor = PSVLoader;
+
+PSVLoader.className = 'psv-loader';
+
 /**
  * Creates the loader content
  */
 PSVLoader.prototype.create = function() {
-  this.container = document.createElement('div');
-  this.container.className = 'psv-loader';
-
-  this.psv.container.appendChild(this.container);
+  PSVComponent.prototype.create.call(this);
 
   this.canvas = document.createElement('canvas');
   this.canvas.className = 'loader-canvas';
@@ -45,16 +47,6 @@ PSVLoader.prototype.create = function() {
     inner.style.maxHeight = a + 'px';
     this.container.appendChild(inner);
   }
-};
-
-/**
- * Destroys the loader
- */
-PSVLoader.prototype.destroy = function() {
-  this.psv.container.removeChild(this.container);
-
-  this.psv = null;
-  this.container = null;
 };
 
 /**

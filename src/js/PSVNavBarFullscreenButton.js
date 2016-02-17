@@ -1,15 +1,17 @@
 /**
  * Navigation bar fullscreen button class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param navbar (PSVNavBar) A PSVNavBar object
  */
-function PSVNavBarFullscreenButton(psv) {
-  PSVNavBarButton.call(this, psv);
+function PSVNavBarFullscreenButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
 
   this.create();
 }
 
 PSVNavBarFullscreenButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarFullscreenButton.prototype.constructor = PSVNavBarFullscreenButton;
+
+PSVNavBarFullscreenButton.className = 'psv-button fullscreen-button';
 
 /**
  * Creates the button
@@ -18,13 +20,12 @@ PSVNavBarFullscreenButton.prototype.constructor = PSVNavBarFullscreenButton;
 PSVNavBarFullscreenButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
 
-  this.button.classList.add('fullscreen-button');
-  this.button.title = this.psv.config.lang.fullscreen;
+  this.container.title = this.psv.config.lang.fullscreen;
 
-  this.button.appendChild(document.createElement('div'));
-  this.button.appendChild(document.createElement('div'));
+  this.container.appendChild(document.createElement('div'));
+  this.container.appendChild(document.createElement('div'));
 
-  this.button.addEventListener('click', this.psv.toggleFullscreen.bind(this.psv));
+  this.container.addEventListener('click', this.psv.toggleFullscreen.bind(this.psv));
 
   this.psv.on('fullscreen-updated', this);
 };

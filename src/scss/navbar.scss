@@ -1,4 +1,5 @@
 .psv-navbar {
+  @include flexbox();
   position: absolute;
   z-index: 100;
   bottom: 0;
@@ -10,7 +11,8 @@
     box-sizing: content-box;
   }
 
-  .caption {
+  .psv-caption {
+    @include flex-grow(10);
     color: $caption-color;
     margin: $buttons-padding;
     white-space: nowrap;
@@ -19,15 +21,25 @@
     font-family: $caption-font;
   }
 
+  .psv-spacer {
+    @for $i from 1 through 10 {
+      &.weight-#{$i} {
+        @include flex-grow($i);
+      }
+    }
+  }
+
   .psv-button {
-    float: left;
+    @include flex-grow(0);
     padding: $buttons-padding;
     position: relative;
     cursor: pointer;
     height: $buttons-height;
+    width: $buttons-height;
     background: $buttons-background;
+    color: $buttons-color;
 
-    &.active {
+    &.active, &.hoverable:hover {
       background: $buttons-active-background;
     }
 

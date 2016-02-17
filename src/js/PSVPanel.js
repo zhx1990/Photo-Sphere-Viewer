@@ -20,6 +20,7 @@ function PSVPanel(psv) {
 PSVPanel.prototype = Object.create(PSVComponent.prototype);
 PSVPanel.prototype.constructor = PSVPanel;
 
+PSVPanel.className = 'psv-panel';
 PSVPanel.publicMethods = ['showPanel', 'hidePanel'];
 
 /**
@@ -29,7 +30,6 @@ PSVPanel.publicMethods = ['showPanel', 'hidePanel'];
 PSVPanel.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
-  this.container.className = 'psv-panel';
   this.container.innerHTML =
     '<div class="resizer"></div>' +
     '<div class="close-button"></div>' +

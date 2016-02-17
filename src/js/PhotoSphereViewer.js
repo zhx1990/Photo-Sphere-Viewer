@@ -133,10 +133,18 @@ PhotoSphereViewer.DEFAULTS = {
   time_anim: 2000,
   anim_speed: '2rpm',
   anim_lat: null,
-  navbar: false,
+  navbar: [
+    'autorotate',
+    'zoom',
+    'download',
+    'markers',
+    'caption',
+    'fullscreen'
+  ],
   tooltip: {
     offset: 5,
-    arrow_size: 7
+    arrow_size: 7,
+    delay: 100
   },
   lang: {
     autorotate: 'Automatic rotation',
@@ -452,7 +460,7 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   this.panel = new PSVPanel(this);
 
   // Tooltip
-  this.tooltip = new PSVTooltip(this, this.hud);
+  this.tooltip = new PSVTooltip(this.hud);
 
   // Queue animation
   if (this.config.time_anim !== false) {

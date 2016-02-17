@@ -9,7 +9,7 @@
   opacity: 0;
   transition-property: opacity;
   transition-timing-function: ease-in-out;
-  transition-duration: .1s;
+  transition-duration: $tooltip-animate-delay;
 
   .content {
     color: $tooltip-text-color;
@@ -107,6 +107,6 @@
   &.visible {
     transform: translate3d(0, 0, 0);
     opacity: 1;
-    transition-duration: .2s;
+    transition-duration: $tooltip-animate-delay;
   }
 }

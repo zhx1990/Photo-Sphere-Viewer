@@ -6,18 +6,16 @@ function PSVNavBar(psv) {
   PSVComponent.call(this, psv);
 
   this.config = this.psv.config.navbar;
-  this.caption = null;
-  this.buttons = [];
+  this.items = [];
 
   if (this.config === true) {
-    this.config = PSVUtils.clone(PSVNavBar.DEFAULTS);
+    this.config = PSVUtils.clone(PhotoSphereViewer.DEFAULTS.navbar);
   }
   else if (typeof this.config == 'string') {
-    var map = {};
-    Object.keys(PSVNavBar.DEFAULTS).forEach(function(button) {
-      map[button] = this.config.indexOf(button) !== -1;
-    }, this);
-    this.config = map;
+    this.config = this.config.split(' ');
+  }
+  else if (!Array.isArray(this.config)) {
+    this.config = Object.keys(this.config);
   }
 
   this.create();
@@ -26,15 +24,7 @@ function PSVNavBar(psv) {
 PSVNavBar.prototype = Object.create(PSVComponent.prototype);
 PSVNavBar.prototype.constructor = PSVNavBar;
 
-PSVNavBar.publicMethods = ['setCaption'];
-
-PSVNavBar.DEFAULTS = {
-  autorotate: true,
-  zoom: true,
-  fullscreen: true,
-  download: true,
-  markers: true
-};
+PSVNavBar.className = 'psv-navbar';
 
 /**
  * Creates the navbar
@@ -43,63 +33,62 @@ PSVNavBar.DEFAULTS = {
 PSVNavBar.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
-  this.container.className = 'psv-navbar';
+  this.config.forEach(function(button) {
+    if (typeof button == 'object') {
+      this.items.push(new PSVNavBarCustomButton(this, button));
+    }
+    else {
+      switch (button) {
+        case 'autorotate':
+          this.items.push(new PSVNavBarAutorotateButton(this));
+          break;
 
-  // Autorotate button
-  if (this.config.autorotate) {
-    this.buttons.push(new PSVNavBarAutorotateButton(this));
-  }
+        case 'zoom':
+          this.items.push(new PSVNavBarZoomButton(this));
+          break;
 
-  // Zoom buttons
-  if (this.config.zoom) {
-    this.buttons.push(new PSVNavBarZoomButton(this));
-  }
+        case 'download':
+          this.items.push(new PSVNavBarDownloadButton(this));
+          break;
 
-  // Download button
-  if (this.config.download) {
-    this.buttons.push(new PSVNavBarDownloadButton(this));
-  }
+        case 'markers':
+          this.items.push(new PSVNavBarMarkersButton(this));
+          break;
 
-  // Markers button
-  if (this.config.markers) {
-    this.buttons.push(new PSVNavBarMarkersButton(this));
-  }
+        case 'fullscreen':
+          this.items.push(new PSVNavBarFullscreenButton(this));
+          break;
 
-  // Fullscreen button
-  if (this.config.fullscreen) {
-    this.buttons.push(new PSVNavBarFullscreenButton(this));
-  }
+        case 'caption':
+          this.items.push(new PSVNavBarCaption(this, this.psv.config.caption));
+          break;
 
-  // Caption
-  this.caption = document.createElement('div');
-  this.caption.className = 'caption';
-  this.container.appendChild(this.caption);
-  this.setCaption(this.psv.config.caption);
+        case 'spacer':
+          button = 'spacer-5';
+        /* falls through */
+        default:
+          var matches = button.match(/spacer\-([0-9]+)/);
+          if (matches !== null) {
+            this.items.push(new PSVNavBarSpacer(this, matches[1]));
+          }
+          else {
+            throw new PSVError('Unknown button ' + button);
+          }
+          break;
+      }
+    }
+  }, this);
 };
 
 /**
  * Destroys the navbar
  */
 PSVNavBar.prototype.destroy = function() {
-  this.buttons.forEach(function(button) {
-    button.destroy();
+  this.items.forEach(function(item) {
+    item.destroy();
   });
 
-  this.buttons.length = 0;
+  this.items.length = 0;
 
   PSVComponent.prototype.destroy.call(this);
-};
-
-/**
- * Sets the bar caption
- * @param (string) html
- */
-PSVNavBar.prototype.setCaption = function(html) {
-  if (!html) {
-    this.caption.style.display = 'none';
-  }
-  else {
-    this.caption.style.display = 'block';
-    this.caption.innerHTML = html;
-  }
 };

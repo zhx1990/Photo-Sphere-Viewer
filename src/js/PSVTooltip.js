@@ -1,9 +1,9 @@
 /**
  * Tooltip class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param hud (PSVHUD) A PSVHUD object
  */
-function PSVTooltip(psv, parent) {
-  PSVComponent.call(this, psv, parent);
+function PSVTooltip(hud) {
+  PSVComponent.call(this, hud);
 
   this.config = this.psv.config.tooltip;
 
@@ -13,6 +13,7 @@ function PSVTooltip(psv, parent) {
 PSVTooltip.prototype = Object.create(PSVComponent.prototype);
 PSVTooltip.prototype.constructor = PSVTooltip;
 
+PSVTooltip.className = 'psv-tooltip';
 PSVTooltip.publicMethods = ['showTooltip', 'hideTooltip', 'isTooltipVisible'];
 
 PSVTooltip.leftMap = { 0: 'left', 0.5: 'center', 1: 'right' };
@@ -26,7 +27,6 @@ PSVTooltip.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
   this.container.innerHTML = '<div class="arrow"></div><div class="content"></div>';
-  this.container.className = 'psv-tooltip';
   this.container.style.top = '-1000px';
   this.container.style.left = '-1000px';
 
@@ -173,7 +173,7 @@ PSVTooltip.prototype.showTooltip = function(config) {
     setTimeout(function() {
       t.classList.add('visible');
       self.psv.trigger('show-tooltip');
-    }, 100);
+    }, this.config.delay);
   }
 };
 
@@ -190,7 +190,7 @@ PSVTooltip.prototype.hideTooltip = function() {
     setTimeout(function() {
       self.container.style.top = '-1000px';
       self.container.style.left = '-1000px';
-    }, 100);
+    }, this.config.delay);
   }
 };
 

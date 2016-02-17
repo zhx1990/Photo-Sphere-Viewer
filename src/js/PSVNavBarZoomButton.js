@@ -1,9 +1,9 @@
 /**
  * Navigation bar zoom button class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param navbar (PSVNavBar) A PSVNavBar object
  */
-function PSVNavBarZoomButton(psv) {
-  PSVNavBarButton.call(this, psv);
+function PSVNavBarZoomButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
 
   this.zoom_range = null;
   this.zoom_value = null;
@@ -18,6 +18,8 @@ function PSVNavBarZoomButton(psv) {
 PSVNavBarZoomButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarZoomButton.prototype.constructor = PSVNavBarZoomButton;
 
+PSVNavBarZoomButton.className = 'psv-button zoom-button';
+
 /**
  * Creates the button
  * @return (void)
@@ -25,17 +27,15 @@ PSVNavBarZoomButton.prototype.constructor = PSVNavBarZoomButton;
 PSVNavBarZoomButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
 
-  this.button.classList.add('zoom-button');
-
   var zoom_minus = document.createElement('div');
   zoom_minus.className = 'minus';
   zoom_minus.title = this.psv.config.lang.zoomOut;
   zoom_minus.innerHTML = PhotoSphereViewer.ICONS['zoom-out.svg'];
-  this.button.appendChild(zoom_minus);
+  this.container.appendChild(zoom_minus);
 
   var zoom_range_bg = document.createElement('div');
   zoom_range_bg.className = 'range';
-  this.button.appendChild(zoom_range_bg);
+  this.container.appendChild(zoom_range_bg);
 
   this.zoom_range = document.createElement('div');
   this.zoom_range.className = 'line';
@@ -51,7 +51,7 @@ PSVNavBarZoomButton.prototype.create = function() {
   zoom_plus.className = 'plus';
   zoom_plus.title = this.psv.config.lang.zoomIn;
   zoom_plus.innerHTML = PhotoSphereViewer.ICONS['zoom-in.svg'];
-  this.button.appendChild(zoom_plus);
+  this.container.appendChild(zoom_plus);
 
   this.zoom_range.addEventListener('mousedown', this);
   this.zoom_range.addEventListener('touchstart', this);

@@ -1,9 +1,9 @@
 /**
  * Navigation bar markers button class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param navbar (PSVNavBar) A PSVNavBar object
  */
-function PSVNavBarMarkersButton(psv) {
-  PSVNavBarButton.call(this, psv);
+function PSVNavBarMarkersButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
 
   this.prop = {
     panelOpened: false,
@@ -16,6 +16,8 @@ function PSVNavBarMarkersButton(psv) {
 PSVNavBarMarkersButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;
 
+PSVNavBarMarkersButton.className = 'psv-button markers-button';
+
 /**
  * Creates the button
  * @return (void)
@@ -23,11 +25,10 @@ PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;
 PSVNavBarMarkersButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
 
-  this.button.classList.add('markers-button');
-  this.button.title = this.psv.config.lang.markers;
-  this.button.innerHTML = PhotoSphereViewer.ICONS['pin.svg'];
+  this.container.title = this.psv.config.lang.markers;
+  this.container.innerHTML = PhotoSphereViewer.ICONS['pin.svg'];
 
-  this.button.addEventListener('click', this.toggleMarkers.bind(this));
+  this.container.addEventListener('click', this.toggleMarkers.bind(this));
 
   this.psv.on('open-panel', this);
   this.psv.on('close-panel', this);

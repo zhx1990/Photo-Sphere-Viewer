@@ -31,12 +31,14 @@ $download-button-size: 12px;
 
 $tooltip-background-color: rgba(61, 61, 61, .8);
 
-$tooltip-animate-offset: 5px;
 // set tooltip.offset JS config to the same value
+$tooltip-animate-offset: 5px;
+// set tooltip.delay JS config to teh same value
+$tooltip-animate-delay: .1s;
 $tooltip-radius: 4px;
 $tooltip-padding: .5em 1em;
-$tooltip-arrow-size: 7px;
 // set tooltip.arrow_size JS config to the same value
+$tooltip-arrow-size: 7px;
 $tooltip-max-width: 200px;
 
 $tooltip-text-color: rgb(255, 255, 255);
@@ -44,8 +46,8 @@ $tooltip-font: 14px sans-serif;
 $tooltip-text-shadow: 0 1px #000000;
 
 $tooltip-shadow-color: rgba(90, 90, 90, .7);
-$tooltip-shadow-offset: 3px;
 // the shadow is always at the opposite side of the arrow
+$tooltip-shadow-offset: 3px;
 
 $panel-background: rgba(10, 10, 10, .7);
 $panel-text-color: rgb(220, 220, 220);
