@@ -77,6 +77,15 @@ $markers-list-even-background: transparent;
 $markers-list-title-shadow: 2px 1px #000000;
 $markers-list-title-font: 24px sans-serif;
 
+$canvas-zindex: 0;
+$hud-zindex: 10;
+$polygon-marker-zindex: 20;
+$tooltip-zindex: 30;
+$marker-zindex: 40;
+$panel-zindex: 90;
+$navbar-zindex: 90;
+$loader-zindex: 100;
+
 @import 'mixins';
 
 .psv-container {
@@ -88,17 +97,15 @@ $markers-list-title-font: 24px sans-serif;
   background: $main-background;
   overflow: hidden;
 
-  &.loading {
-    text-align: center;
-  }
-}
+  .canvas-container {
+    position: absolute;
+    top: 0;
+    left:0;
+    z-index: $canvas-zindex;
 
-.psv-canvas-container {
-  position: absolute;
-  z-index: 0;
-
-  canvas {
-    display: block;
+    canvas {
+      display: block;
+    }
   }
 }
 

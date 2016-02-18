@@ -1,6 +1,6 @@
 .psv-tooltip {
   position: absolute;
-  z-index: 75;
+  z-index: $tooltip-zindex;
   box-sizing: border-box;
   max-width: $tooltip-max-width;
   background-color: $tooltip-background-color;

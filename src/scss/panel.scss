@@ -2,7 +2,7 @@ $panel-resizer-grip-width: $panel-resizer-width - 4px;
 
 .psv-panel {
   position: absolute;
-  z-index: 100;
+  z-index: $panel-zindex;
   right: 0;
   height: 100%;
   width: $panel-width;

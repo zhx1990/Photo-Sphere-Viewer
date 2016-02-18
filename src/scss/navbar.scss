@@ -1,8 +1,9 @@
 .psv-navbar {
   @include flexbox();
   position: absolute;
-  z-index: 100;
+  z-index: $navbar-zindex;
   bottom: 0;
+  left: 0;
   width: 100%;
   background: $navbar-background;
 

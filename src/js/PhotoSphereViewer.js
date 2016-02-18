@@ -90,6 +90,17 @@ function PhotoSphereViewer(options) {
   this.container.classList.add('psv-container');
   this.parent.appendChild(this.container);
 
+  // create canvas container
+  this.canvas_container = document.createElement('div');
+  this.canvas_container.className = 'canvas-container';
+  this.container.appendChild(this.canvas_container);
+
+  // is canvas supported?
+  if (!PSVUtils.isCanvasSupported()) {
+    this.container.textContent = 'Canvas is not supported, update your browser!';
+    throw new PSVError('Canvas is not supported.');
+  }
+
   // init
   this.setAnimSpeed(this.config.anim_speed);
 
@@ -233,29 +244,7 @@ PhotoSphereViewer.prototype.destroy = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype.load = function() {
-  this.container.classList.add('loading');
-
-  // Is canvas supported?
-  if (!PSVUtils.isCanvasSupported()) {
-    this.container.textContent = 'Canvas is not supported, update your browser!';
-    return;
-  }
-
-  // Loader
-  this.loader = new PSVLoader(this);
-
-  // Canvas container
-  this.canvas_container = document.createElement('div');
-  this.canvas_container.className = 'psv-canvas-container';
-  this.container.appendChild(this.canvas_container);
-
-  // load image
-  if (this.config.usexmpdata) {
-    this._loadXMP();
-  }
-  else {
-    this._loadTexture(false, false);
-  }
+  this.setPanorama(this.config.panorama);
 };
 
 /**
@@ -283,20 +272,20 @@ PhotoSphereViewer.prototype._loadXMP = function() {
 
         // No data retrieved
         if (a === -1 || b === -1 || data.indexOf('GPano:') === -1) {
-          self._loadTexture(false, true);
-          return;
+          self._loadTexture(false);
         }
+        else {
+          var pano_data = {
+            full_width: parseInt(PSVUtils.getXMPValue(data, 'FullPanoWidthPixels')),
+            full_height: parseInt(PSVUtils.getXMPValue(data, 'FullPanoHeightPixels')),
+            cropped_width: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaImageWidthPixels')),
+            cropped_height: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaImageHeightPixels')),
+            cropped_x: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaLeftPixels')),
+            cropped_y: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaTopPixels'))
+          };
 
-        var pano_data = {
-          full_width: parseInt(PSVUtils.getXMPValue(data, 'FullPanoWidthPixels')),
-          full_height: parseInt(PSVUtils.getXMPValue(data, 'FullPanoHeightPixels')),
-          cropped_width: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaImageWidthPixels')),
-          cropped_height: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaImageHeightPixels')),
-          cropped_x: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaLeftPixels')),
-          cropped_y: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaTopPixels'))
-        };
-
-        self._loadTexture(pano_data, true);
+          self._loadTexture(pano_data);
+        }
       }
       else {
         self.container.textContent = 'Cannot load image';
@@ -328,13 +317,12 @@ PhotoSphereViewer.prototype._loadXMP = function() {
 /**
  * Loads the sphere texture
  * @param pano_data (mixed) An object containing the panorama XMP data (false if it there is not)
- * @param in_cache (boolean) If the image has already been loaded and should be in cache
  * @return (void)
  */
-PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
+PhotoSphereViewer.prototype._loadTexture = function(pano_data) {
   var loader = new THREE.ImageLoader();
   var self = this;
-  var progress = in_cache ? 100 : 0;
+  var progress = pano_data ? 100 : 0;
 
   // CORS when the panorama is not given as a base64 string
   if (!this.config.panorama.match(/^data:image\/[a-z]+;base64/)) {
@@ -386,7 +374,7 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
     self.prop.size.image_width = pano_data.cropped_width;
     self.prop.size.image_height = pano_data.cropped_height;
 
-    self._createScene(buffer);
+    self._setTexture(img);
   };
 
   var onprogress = function(e) {
@@ -407,11 +395,37 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data, in_cache) {
 };
 
 /**
- * Creates the 3D scene and GUI compoents
+ * Applies the texture to the scene
+ * Creates the scene if needed
  * @param img (Canvas) The sphere texture
+ */
+PhotoSphereViewer.prototype._setTexture = function(img) {
+  if (!this.scene) {
+    this._createScene();
+  }
+
+  if (this.mesh.material.map) {
+    this.mesh.material.map.dispose();
+  }
+
+  this.mesh.material.map = new THREE.Texture(img);
+  this.mesh.material.map.needsUpdate = true;
+
+  this.loader.destroy();
+  this.loader = null;
+
+  this.container.classList.remove('loading');
+
+  this.trigger('panorama-loaded');
+
+  this.render();
+};
+
+/**
+ * Creates the 3D scene and GUI compoents
  * @return (void)
  */
-PhotoSphereViewer.prototype._createScene = function(img) {
+PhotoSphereViewer.prototype._createScene = function() {
   this._onResize();
 
   this.raycaster = new THREE.Raycaster();
@@ -426,23 +440,15 @@ PhotoSphereViewer.prototype._createScene = function(img) {
   this.scene = new THREE.Scene();
   this.scene.add(this.camera);
 
-  var texture = new THREE.Texture(img);
-  texture.needsUpdate = true;
-
   // The middle of the panorama is placed at longitude=0
   var geometry = new THREE.SphereGeometry(200, 32, 32, -PhotoSphereViewer.HalfPI);
-  var material = new THREE.MeshBasicMaterial({ map: texture, overdraw: true });
+  var material = new THREE.MeshBasicMaterial();
   material.side = THREE.DoubleSide;
   this.mesh = new THREE.Mesh(geometry, material);
   this.mesh.scale.x = -1;
 
   this.scene.add(this.mesh);
   this.canvas_container.appendChild(this.renderer.domElement);
-
-  // Remove loader
-  this.loader.destroy();
-  this.loader = null;
-  this.container.classList.remove('loading');
 
   // Navigation bar
   if (this.config.navbar) {
@@ -469,7 +475,6 @@ PhotoSphereViewer.prototype._createScene = function(img) {
 
   this._bindEvents();
   this.trigger('ready');
-  this.render();
 };
 
 /**
@@ -517,6 +522,26 @@ PhotoSphereViewer.prototype.handleEvent = function(e) {
 };
 
 /**
+ * Load a panorama file
+ * Creates the scene in needed
+ * @param path (String)
+ */
+PhotoSphereViewer.prototype.setPanorama = function(path) {
+  this.config.panorama = path;
+
+  this.container.classList.add('loading');
+
+  this.loader = new PSVLoader(this);
+
+  if (this.config.usexmpdata) {
+    this._loadXMP();
+  }
+  else {
+    this._loadTexture(false);
+  }
+};
+
+/**
  * Renders an image
  * @return (void)
  */
@@ -529,6 +554,7 @@ PhotoSphereViewer.prototype.render = function() {
 
   this.camera.lookAt(this.prop.direction);
   this.renderer.render(this.scene, this.camera);
+
   this.trigger('render');
 };
 
@@ -537,7 +563,7 @@ PhotoSphereViewer.prototype.render = function() {
  * @return (void)
  */
 PhotoSphereViewer.prototype._autorotate = function() {
-  // Rotates the sphere && Returns to the equator (latitude = 0)
+  // Rotates the sphere && Returns to config.anim_lat
   this.rotate(
     this.prop.longitude + this.prop.anim_speed / this.prop.fps,
     this.prop.latitude - (this.prop.latitude - this.config.anim_lat) / 200

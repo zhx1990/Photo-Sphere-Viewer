@@ -6,6 +6,7 @@ function PSVLoader(psv) {
   PSVComponent.call(this, psv);
 
   this.canvas = null;
+  this.loader = null;
 
   this.create();
 }
@@ -13,7 +14,7 @@ function PSVLoader(psv) {
 PSVLoader.prototype = Object.create(PSVComponent.prototype);
 PSVLoader.prototype.constructor = PSVLoader;
 
-PSVLoader.className = 'psv-loader';
+PSVLoader.className = 'loader-container';
 
 /**
  * Creates the loader content
@@ -21,14 +22,18 @@ PSVLoader.className = 'psv-loader';
 PSVLoader.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
+  this.loader = document.createElement('div');
+  this.loader.className = 'psv-loader';
+  this.container.appendChild(this.loader);
+
   this.canvas = document.createElement('canvas');
   this.canvas.className = 'loader-canvas';
 
-  this.canvas.width = this.container.clientWidth;
-  this.canvas.height = this.container.clientWidth;
-  this.container.appendChild(this.canvas);
+  this.canvas.width = this.loader.clientWidth;
+  this.canvas.height = this.loader.clientWidth;
+  this.loader.appendChild(this.canvas);
 
-  this.tickness = (this.container.offsetWidth - this.container.clientWidth) / 2;
+  this.tickness = (this.loader.offsetWidth - this.loader.clientWidth) / 2;
 
   var inner;
   if (this.psv.config.loading_img) {
@@ -45,7 +50,7 @@ PSVLoader.prototype.create = function() {
     var a = Math.round(Math.sqrt(2 * Math.pow(this.canvas.width / 2 - this.tickness / 2, 2)));
     inner.style.maxWidth = a + 'px';
     inner.style.maxHeight = a + 'px';
-    this.container.appendChild(inner);
+    this.loader.appendChild(inner);
   }
 };
 
@@ -59,7 +64,7 @@ PSVLoader.prototype.setProgress = function(value) {
   context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
   context.lineWidth = this.tickness;
-  context.strokeStyle = PSVUtils.getStyle(this.container, 'color');
+  context.strokeStyle = PSVUtils.getStyle(this.loader, 'color');
 
   context.beginPath();
   context.arc(
