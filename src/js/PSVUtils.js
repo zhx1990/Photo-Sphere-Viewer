@@ -118,7 +118,7 @@ PSVUtils.getXMPValue = function(data, attr) {
     return data.substring(a, b).replace('<GPano:' + attr + '>', '');
   }
   // XMP data are stored in attributes
-  else if ((a = data.indexOf('GPano:' + attr)) !== -1 && (b = data.indexOf('"', a)) !== -1) {
+  else if ((a = data.indexOf('GPano:' + attr)) !== -1 && (b = data.indexOf('"', a + attr.length + 8)) !== -1) {
     return data.substring(a + attr.length + 8, b);
   }
   else {
