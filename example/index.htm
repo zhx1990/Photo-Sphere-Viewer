@@ -91,7 +91,7 @@
       'autorotate', 'zoom', 'download', 'markers',
       'spacer-1',
       {
-        title: 'Custom action',
+        title: 'Change image',
         className: 'custom-button',
         content: '★',
         onClick: (function() {
@@ -108,7 +108,7 @@
               latitude: i ? 0.57417649320975916 : -0.24434609527920628
             }, true)
               .then(function() {
-                PSV.setCaption('Bryce Canyon National Park <b>&copy; Jess Beauchemin</b>');
+                PSV.setCaption(i ? 'Bryce Canyon National Park <b>&copy; Jess Beauchemin</b>' : 'Bryce Canyon National Park <b>&copy; Mark Doliner</b>');
               });
           }
         }())
@@ -127,7 +127,6 @@
       loader: true,
       blur: true
     },
-    visit: [[3.861, 0.034], [5.157,0.340], [0.479,0.654], [1.893,0.270]]/*,
     markers: (function(){
       var a = [];
       for (var i=0; i<Math.PI*2; i+=Math.PI/4) {
@@ -211,7 +210,7 @@
       });
 
       return a;
-    }())*/
+    }())
   });
 
   PSV.on('click', function(e) {

@@ -204,12 +204,12 @@ PSVUtils.parsePosition = function(value) {
 /**
  * Utility for animations
  * @param options (Object)
- *    - properties[{end, start}]
- *    - duration
- *    - delay
- *    - easing
- *    - onTick(properties)
- * @returns (D.promise)
+ *    - properties ({name: {end: number, start: number}})
+ *    - duration (int)
+ *    - delay (int, optional)
+ *    - easing (string|function, optional)
+ *    - onTick (function(properties))
+ * @returns (D.promise) with an additional "cancel" method
  */
 PSVUtils.animation = function(options) {
   var defer = D();
@@ -220,15 +220,23 @@ PSVUtils.animation = function(options) {
   }
 
   function run(timestamp) {
+    // the animation has been cancelled
+    if (defer.promise.getStatus() === -1) {
+      return;
+    }
+
+    // first iteration
     if (start === null) {
       start = timestamp;
     }
 
+    // compute progress
     var progress = (timestamp - start) / options.duration;
     var current = {};
     var name;
 
     if (progress < 1.0) {
+      // interpolate properties
       for (name in options.properties) {
         current[name] = options.properties[name].start + (options.properties[name].end - options.properties[name].start) * options.easing(progress);
       }
@@ -238,6 +246,7 @@ PSVUtils.animation = function(options) {
       window.requestAnimationFrame(run);
     }
     else {
+      // call onTick one last time with final values
       for (name in options.properties) {
         current[name] = options.properties[name].end;
       }
@@ -248,8 +257,8 @@ PSVUtils.animation = function(options) {
     }
   }
 
-  if (options.delay) {
-    setTimeout(function() {
+  if (options.delay !== undefined) {
+    window.setTimeout(function() {
       window.requestAnimationFrame(run);
     }, options.delay);
   }
@@ -257,11 +266,14 @@ PSVUtils.animation = function(options) {
     window.requestAnimationFrame(run);
   }
 
-  return defer.promise;
+  // add a "cancel" to the promise
+  var promise = defer.promise;
+  promise.cancel = defer.reject.bind(defer);
+  return promise;
 };
 
 /**
- * Collection fo easing functions
+ * Collection of easing functions
  * https://gist.github.com/frederickk/6165768
  */
 // @formatter:off
