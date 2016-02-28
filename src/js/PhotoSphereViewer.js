@@ -83,6 +83,7 @@ function PhotoSphereViewer(options) {
     start_mouse_y: 0,
     mouse_x: 0,
     mouse_y: 0,
+    mouse_history: [],
     pinch_dist: 0,
     direction: null,
     autorotate_reqid: null,
@@ -134,12 +135,27 @@ PhotoSphereViewer.PI = Math.PI;
 PhotoSphereViewer.TwoPI = Math.PI * 2.0;
 PhotoSphereViewer.HalfPI = Math.PI / 2.0;
 
+/**
+ * Number of pixels bellow which a mouse move will be considered as a click
+ * @type (int)
+ */
 PhotoSphereViewer.MOVE_THRESHOLD = 4;
 
+/**
+ * Time size of the mouse position history used to compute inertia
+ * @type (int)
+ */
+PhotoSphereViewer.INERTIA_WINDOW = 300;
+
+/**
+ * SVG icons sources
+ * @type (Object)
+ */
 PhotoSphereViewer.ICONS = {};
 
 /**
  * System properties
+ * @type (Object)
  */
 PhotoSphereViewer.SYSTEM = {
   loaded: false,
@@ -205,6 +221,7 @@ PhotoSphereViewer.DEFAULTS = {
   },
   mousewheel: true,
   mousemove: true,
+  move_inertia: true,
   click_event_on_marker: true,
   transition: {
     duration: 1500,

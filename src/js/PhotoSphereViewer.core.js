@@ -324,8 +324,6 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
       self.prop.zoom_lvl = properties.zoom;
     }
 
-    // self.hud.container.style.opacity = properties.opacity;
-
     self.render();
   };
 
@@ -336,7 +334,6 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
         opacity: { start: 0.0, end: 0.5 },
         zoom: { start: original_zoom_lvl, end: 100 }
       },
-      delay: 1, // FIXME
       duration: self.config.transition.duration / (self.config.transition.blur ? 4 / 3 : 2),
       easing: self.config.transition.blur ? 'outCubic' : 'linear',
       onTick: onTick

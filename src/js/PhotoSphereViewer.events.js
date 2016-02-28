@@ -77,14 +77,16 @@ PhotoSphereViewer.prototype._onTouchStart = function(evt) {
  * @param evt (Event) The event
  */
 PhotoSphereViewer.prototype._startMove = function(evt) {
+  this.stopAutorotate();
+  this.stopAnimation();
+
   this.prop.mouse_x = this.prop.start_mouse_x = parseInt(evt.clientX);
   this.prop.mouse_y = this.prop.start_mouse_y = parseInt(evt.clientY);
   this.prop.moving = true;
-  this.prop.moved = false;
   this.prop.zooming = false;
 
-  this.stopAutorotate();
-  this.stopAnimation();
+  this.prop.mouse_history.length = 0;
+  this._logMouseMove(evt);
 };
 
 /**
@@ -92,6 +94,9 @@ PhotoSphereViewer.prototype._startMove = function(evt) {
  * @param evt (Event) The event
  */
 PhotoSphereViewer.prototype._startZoom = function(evt) {
+  this.stopAutorotate();
+  this.stopAnimation();
+
   var t = [
     { x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY) },
     { x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY) }
@@ -100,9 +105,6 @@ PhotoSphereViewer.prototype._startZoom = function(evt) {
   this.prop.pinch_dist = Math.sqrt(Math.pow(t[0].x - t[1].x, 2) + Math.pow(t[0].y - t[1].y, 2));
   this.prop.moving = false;
   this.prop.zooming = true;
-
-  this.stopAutorotate();
-  this.stopAnimation();
 };
 
 /**
@@ -123,19 +125,55 @@ PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
 
 /**
  * Stops the movement
+ * If the user was moving (one finger) : if the move threshold was not reached, a click event is triggered
+ *    otherwise a animation is launched to simulate inertia
  * @param evt (Event) The event
  */
 PhotoSphereViewer.prototype._stopMove = function(evt) {
   if (this.prop.moving) {
+    // move threshold to trigger a click
     if (Math.abs(evt.clientX - this.prop.start_mouse_x) < PhotoSphereViewer.MOVE_THRESHOLD && Math.abs(evt.clientY - this.prop.start_mouse_y) < PhotoSphereViewer.MOVE_THRESHOLD) {
       this._click(evt);
+      this.prop.moving = false;
+    }
+    // inertia animation
+    else if (this.config.move_inertia) {
+      this._logMouseMove(evt);
+
+      var direction = {
+        x: evt.clientX - this.prop.mouse_history[0][1],
+        y: evt.clientY - this.prop.mouse_history[0][2]
+      };
+
+      var norm = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+
+      var self = this;
+
+      this.prop.animation_promise = PSVUtils.animation({
+        properties: {
+          clientX: { start: evt.clientX, end: evt.clientX + direction.x },
+          clientY: { start: evt.clientY, end: evt.clientY + direction.y }
+        },
+        duration: norm * PhotoSphereViewer.INERTIA_WINDOW / 100,
+        easing: 'outCirc',
+        onTick: function(properties) {
+          self._move(properties);
+        },
+        onCancel: function() {
+          self.prop.moving = false;
+        }
+      });
+
+      this.prop.animation_promise.then(function() {
+        self.prop.moving = false;
+      });
     }
     else {
-      this.prop.moved = true;
+      self.prop.moving = false;
     }
   }
 
-  this.prop.moving = false;
+  this.prop.mouse_history.length = 0;
   this.prop.zooming = false;
 };
 
@@ -189,8 +227,10 @@ PhotoSphereViewer.prototype._click = function(evt) {
  * @param evt (Event) The event
  */
 PhotoSphereViewer.prototype._onMouseMove = function(evt) {
-  evt.preventDefault();
-  this._move(evt);
+  if (evt.buttons !== 0) {
+    evt.preventDefault();
+    this._move(evt);
+  }
 };
 
 /**
@@ -224,6 +264,8 @@ PhotoSphereViewer.prototype._move = function(evt) {
 
     this.prop.mouse_x = x;
     this.prop.mouse_y = y;
+
+    this._logMouseMove(evt);
   }
 };
 
@@ -269,3 +311,32 @@ PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
 PhotoSphereViewer.prototype._fullscreenToggled = function() {
   this.trigger('fullscreen-updated', PSVUtils.isFullscreenEnabled());
 };
+
+/**
+ * Store each mouse position during a mouse move
+ * Positions older than "INERTIA_WINDOW" are removed
+ * Positions before a pause of "INERTIA_WINDOW" / 10 are removed
+ * @param evt (Event)
+ */
+PhotoSphereViewer.prototype._logMouseMove = function(evt) {
+  var now = Date.now();
+  this.prop.mouse_history.push([now, evt.clientX, evt.clientY]);
+
+  var previous = null;
+
+  for (var i = 0; i < this.prop.mouse_history.length;) {
+    if (this.prop.mouse_history[0][i] < now - PhotoSphereViewer.INERTIA_WINDOW) {
+      this.prop.mouse_history.splice(i, 1);
+    }
+    else if (previous && this.prop.mouse_history[0][i] - previous > PhotoSphereViewer.INERTIA_WINDOW / 10) {
+      this.prop.mouse_history.splice(0, i);
+      i = 0;
+      previous = this.prop.mouse_history[0][i];
+    }
+    else {
+      i++;
+      previous = this.prop.mouse_history[0][i];
+    }
+  }
+};
+

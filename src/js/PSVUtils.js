@@ -209,6 +209,7 @@ PSVUtils.parsePosition = function(value) {
  *    - delay (int, optional)
  *    - easing (string|function, optional)
  *    - onTick (function(properties))
+ *    - onCancel (function)
  * @returns (D.promise) with an additional "cancel" method
  */
 PSVUtils.animation = function(options) {
@@ -268,7 +269,12 @@ PSVUtils.animation = function(options) {
 
   // add a "cancel" to the promise
   var promise = defer.promise;
-  promise.cancel = defer.reject.bind(defer);
+  promise.cancel = function() {
+    if (options.onCancel) {
+      options.onCancel();
+      defer.reject(defer);
+    }
+  };
   return promise;
 };
 

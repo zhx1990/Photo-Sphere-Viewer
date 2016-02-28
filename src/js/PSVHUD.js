@@ -599,34 +599,32 @@ PSVHUD.prototype._onMouseMove = function(e) {
  * @return (void)
  */
 PSVHUD.prototype._onClick = function(e) {
-  if (!this.psv.prop.moved) {
-    var marker;
-    if (e.target && (marker = PSVUtils.getClosest(e.target, '.psv-marker')) && marker.psvMarker) {
-      this.currentMarker = marker.psvMarker;
-      this.psv.trigger('select-marker', marker.psvMarker);
+  var marker;
+  if (e.target && (marker = PSVUtils.getClosest(e.target, '.psv-marker')) && marker.psvMarker) {
+    this.currentMarker = marker.psvMarker;
+    this.psv.trigger('select-marker', marker.psvMarker);
 
-      if (this.psv.config.click_event_on_marker) {
-        // add the marker to event data
-        e.data = {
-          marker: marker.psvMarker
-        };
-      }
-      else {
-        // prevent the public "click" event
-        e.preventDefault();
-      }
+    if (this.psv.config.click_event_on_marker) {
+      // add the marker to event data
+      e.data = {
+        marker: marker.psvMarker
+      };
     }
-    else if (this.currentMarker) {
-      this.currentMarker = null;
-      this.psv.trigger('unselect-marker');
+    else {
+      // prevent the public "click" event
+      e.preventDefault();
     }
+  }
+  else if (this.currentMarker) {
+    this.currentMarker = null;
+    this.psv.trigger('unselect-marker');
+  }
 
-    if (marker && marker.psvMarker && marker.psvMarker.content) {
-      this.psv.panel.showPanel(marker.psvMarker.content);
-    }
-    else if (this.psv.panel.prop.opened) {
-      e.preventDefault(); // prevent the public "click" event
-      this.psv.panel.hidePanel();
-    }
+  if (marker && marker.psvMarker && marker.psvMarker.content) {
+    this.psv.panel.showPanel(marker.psvMarker.content);
+  }
+  else if (this.psv.panel.prop.opened) {
+    e.preventDefault(); // prevent the public "click" event
+    this.psv.panel.hidePanel();
   }
 };
