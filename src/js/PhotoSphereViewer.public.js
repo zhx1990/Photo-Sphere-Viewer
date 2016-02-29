@@ -228,7 +228,10 @@ PhotoSphereViewer.prototype.resize = function(width, height) {
     this.render();
   }
 
-  this.trigger('size-updated', this.prop.size.width, this.prop.size.height);
+  this.trigger('size-updated', {
+    width: this.prop.size.width,
+    height: this.prop.size.height
+  });
 };
 
 /**
@@ -245,7 +248,10 @@ PhotoSphereViewer.prototype.rotate = function(position) {
     this.render();
   }
 
-  this.trigger('position-updated', this.prop.longitude, this.prop.latitude);
+  this.trigger('position-updated', {
+    longitude: this.prop.longitude,
+    latitude: this.prop.latitude
+  });
 };
 
 /**

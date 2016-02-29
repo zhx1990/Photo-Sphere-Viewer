@@ -11,14 +11,6 @@ function PhotoSphereViewer(options) {
     PhotoSphereViewer.loadSystem();
   }
 
-  if (!PhotoSphereViewer.SYSTEM.isWebGLSupported && !PSVUtils.checkTHREE('CanvasRenderer', 'Projector')) {
-    throw new PSVError('Missing Three.js components: CanvasRenderer, Projector. Get them from threejs-examples package.');
-  }
-
-  if (options === undefined || options.panorama === undefined || options.container === undefined) {
-    throw new PSVError('No value given for panorama or container.');
-  }
-
   this.config = PSVUtils.deepmerge(PhotoSphereViewer.DEFAULTS, options);
 
   // normalize config
@@ -41,16 +33,30 @@ function PhotoSphereViewer(options) {
   }
 
   // check config
+  if (!options.panorama || !options.container) {
+    throw new PSVError('No value given for panorama or container.');
+  }
+
+  if ((!PhotoSphereViewer.SYSTEM.isWebGLSupported || !this.config.webgl) && !PSVUtils.checkTHREE('CanvasRenderer', 'Projector')) {
+    throw new PSVError('Missing Three.js components: CanvasRenderer, Projector. Get them from threejs-examples package.');
+  }
+
+  if (this.config.transition && this.config.transition.blur) {
+    if (!PhotoSphereViewer.SYSTEM.isWebGLSupported || !this.config.webgl) {
+      this.config.transition.blur = false;
+      console.warn('PhotoSphereViewer: Using canvas rendering, blur transition disabled.');
+    }
+    else if (!PSVUtils.checkTHREE('EffectComposer', 'RenderPass', 'ShaderPass', 'MaskPass', 'CopyShader')) {
+      throw new PSVError('Missing Three.js components: EffectComposer, RenderPass, ShaderPass, MaskPass, CopyShader. Get them from threejs-examples package.');
+    }
+  }
+
   if (this.config.max_fov < this.config.min_fov) {
     throw new PSVError('max_fov cannot be lower than min_fov.');
   }
 
   if (this.config.tilt_up_max < this.config.tilt_down_max) {
     throw new PSVError('tilt_up_max cannot be lower than tilt_down_max.');
-  }
-
-  if (this.config.transition && this.config.transition.blur && !PSVUtils.checkTHREE('EffectComposer', 'RenderPass', 'ShaderPass', 'MaskPass', 'CopyShader')) {
-    throw new PSVError('Missing Three.js components: EffectComposer, RenderPass, ShaderPass, MaskPass, CopyShader. Get them from threejs-examples package.');
   }
 
   // references to components
@@ -72,7 +78,6 @@ function PhotoSphereViewer(options) {
 
   // local properties
   this.prop = {
-    fps: 60,
     latitude: 0,
     longitude: 0,
     anim_speed: 0,
@@ -185,6 +190,7 @@ PhotoSphereViewer.DEFAULTS = {
   caption: null,
   autoload: true,
   usexmpdata: true,
+  webgl: true,
   min_fov: 30,
   max_fov: 90,
   default_fov: null,

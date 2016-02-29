@@ -197,7 +197,7 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.raycaster = new THREE.Raycaster();
 
   // Renderer depends on whether WebGL is supported or not
-  this.renderer = PhotoSphereViewer.SYSTEM.isWebGLSupported ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
+  this.renderer = PhotoSphereViewer.SYSTEM.isWebGLSupported && this.config.webgl ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
   this.renderer.setSize(this.prop.size.width, this.prop.size.height);
 
   this.camera = new THREE.PerspectiveCamera(this.config.default_fov, this.prop.size.ratio, 1, 300);
@@ -284,7 +284,7 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
   var self = this;
 
   // create a new sphere with the new texture
-  var geometry = new THREE.SphereGeometry(190, 32, 32, -PhotoSphereViewer.HalfPI);
+  var geometry = new THREE.SphereGeometry(150, 32, 32, -PhotoSphereViewer.HalfPI);
 
   var material = new THREE.MeshBasicMaterial();
   material.side = THREE.DoubleSide;
