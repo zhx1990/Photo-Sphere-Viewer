@@ -169,7 +169,7 @@ PhotoSphereViewer.prototype._stopMove = function(evt) {
       });
     }
     else {
-      self.prop.moving = false;
+      this.prop.moving = false;
     }
   }
 

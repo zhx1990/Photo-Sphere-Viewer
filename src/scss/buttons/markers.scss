@@ -3,7 +3,7 @@
 
   svg {
     transform: scale(1);
-    transition: transform 0.3s ease;
+    transition: transform .3s ease;
   }
 
   &:hover svg {
@@ -30,11 +30,11 @@
       min-height: $markers-list-image-size;
       padding: $markers-list-padding;
       cursor: pointer;
-      transform: translateX(0px);
-      transition: transform 0.3s ease-in-out;
+      transform: translateX(0);
+      transition: transform .3s ease-in-out;
 
       // pseudo-element used to fill the gap of the hover translation
-      &:before {
+      &::before {
         content: '';
         position: absolute;
         top: 0;
@@ -44,33 +44,29 @@
         margin-left: -$markers-list-hover-translation;
       }
 
-      &:nth-child(odd) {
-        &, &:before {
-          background: $markers-list-odd-background;
-        }
+      &:nth-child(odd), &:nth-child(odd)::before {
+        background: $markers-list-odd-background;
       }
 
-      &:nth-child(even) {
-        &, &:before {
-          background: $markers-list-even-background;
-        }
+      &:nth-child(even), &:nth-child(even)::before {
+        background: $markers-list-even-background;
       }
+    }
 
-      &:hover {
-        transform: translateX($markers-list-hover-translation);
-        transition: transform 0.1s ease-in-out;
-      }
+    &:hover {
+      transform: translateX($markers-list-hover-translation);
+      transition: transform .1s ease-in-out;
+    }
 
-      img.marker-image {
-        float: left;
-        width: $markers-list-image-size;
-      }
+    .marker-image {
+      float: left;
+      width: $markers-list-image-size;
+    }
 
-      p.marker-name {
-        margin: 0;
-        padding: 0;
-        padding-left: calc(#{$markers-list-image-size} + #{nth($markers-list-padding, 1)});
-      }
+    .marker-name {
+      margin: 0;
+      padding: 0;
+      padding-left: calc(#{$markers-list-image-size} + #{nth($markers-list-padding, 1)});
     }
   }
 }

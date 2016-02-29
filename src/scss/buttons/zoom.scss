@@ -25,7 +25,7 @@
       width: $zoom-range-width;
       height: $zoom-range-tickness;
       background: $buttons-color;
-      transition: all 0.3s ease;
+      transition: all .3s ease;
     }
 
     .handle {
@@ -36,7 +36,7 @@
       height: $zoom-disk-diameter;
       background: $buttons-color;
       transform: scale(1);
-      transition: transform 0.3s ease;
+      transition: transform .3s ease;
     }
   }
 
@@ -45,6 +45,7 @@
       .line {
         box-shadow: 0 0 2px $buttons-color;
       }
+
       .handle {
         transform: scale(1.3);
       }

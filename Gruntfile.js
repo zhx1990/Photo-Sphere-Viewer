@@ -9,9 +9,9 @@ module.exports = function(grunt) {
   // some classes have to be executed before other
   var files_in_order = grunt.file.expand([
     'src/js/PhotoSphereViewer.js',
-    'src/js/PSVComponent.js',
-    'src/js/PSVNavBarButton.js',
-    'src/js/*.js'
+    'src/js/components/PSVComponent.js',
+    'src/js/buttons/PSVNavBarButton.js',
+    'src/js/**/*.js'
   ]);
 
   grunt.initConfig({
@@ -125,7 +125,7 @@ module.exports = function(grunt) {
         jshintrc: '.jshintrc'
       },
       lib: {
-        src: ['src/js/*.js']
+        src: ['src/js/**/*.js']
       },
       grunt: {
         src: ['Gruntfile.js']
@@ -140,7 +140,7 @@ module.exports = function(grunt) {
         config: '.jscsrc'
       },
       lib: {
-        src: ['src/js/*.js']
+        src: ['src/js/**/*.js', '!src/js/lib/requestAnimationFrame.js']
       },
       grunt: {
         src: ['Gruntfile.js']
@@ -156,7 +156,7 @@ module.exports = function(grunt) {
         config: '.scss-lint.yml'
       },
       lib: {
-        src: ['src/scss/*.scss']
+        src: ['src/scss/**/*.scss']
       }
     },
 

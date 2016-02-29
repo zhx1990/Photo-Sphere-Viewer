@@ -8,7 +8,7 @@ $autorotate-sphere-width: $buttons-height - $autorotate-button-tickness * 2;
     border-width: $autorotate-button-tickness;
     border-style: solid;
     border-color: $buttons-color;
-    transition: 0.3s ease;
+    transition: .3s ease;
     transition-property: transform, height, margin;
   }
 

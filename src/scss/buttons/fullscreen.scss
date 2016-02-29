@@ -10,36 +10,39 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
     width: $fullscreen-width;
     height: $buttons-height;
 
-    &:before, &:after {
+    &::before, &::after {
       content: '';
       position: absolute;
-      width: #{$fullscreen-width * 0.3 - $fullscreen-button-tickness};
-      height: #{$buttons-height * 0.3 - $fullscreen-button-tickness};
+      width: #{$fullscreen-width * .3 - $fullscreen-button-tickness};
+      height: #{$buttons-height * .3 - $fullscreen-button-tickness};
       border-style: solid;
       border-color: $buttons-color;
       border-width: $fullscreen-button-tickness;
-      transition: all 0.2s ease;
+      transition: all .2s ease;
     }
 
-    &:first-child:before {
+    &:first-child::before {
       top: 0;
       left: 0;
       border-right-width: 0;
       border-bottom-width: 0;
     }
-    &:first-child:after {
+
+    &:first-child::after {
       top: 0;
       right: 0;
       border-left-width: 0;
       border-bottom-width: 0;
     }
-    &:last-child:before {
+
+    &:last-child::before {
       bottom: 0;
       left: 0;
       border-right-width: 0;
       border-top-width: 0;
     }
-    &:last-child:after {
+
+    &:last-child::after {
       bottom: 0;
       right: 0;
       border-left-width: 0;
@@ -49,9 +52,9 @@ $fullscreen-width: $buttons-height * $fullscreen-button-ratio;
 
   &:hover {
     div {
-      &:before, &:after {
-        width: #{$fullscreen-width * 0.4 - $fullscreen-button-tickness};
-        height: #{$buttons-height * 0.4 - $fullscreen-button-tickness};
+      &::before, &::after {
+        width: #{$fullscreen-width * .4 - $fullscreen-button-tickness};
+        height: #{$buttons-height * .4 - $fullscreen-button-tickness};
       }
     }
   }
