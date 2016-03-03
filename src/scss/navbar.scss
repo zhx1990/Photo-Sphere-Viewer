@@ -40,22 +40,26 @@
     background: $buttons-background;
     color: $buttons-color;
 
-    &.active, &.hoverable:hover {
+    &.active {
       background: $buttons-active-background;
     }
 
     svg {
       width: 100%;
+      transform: scale(1);
+      transition: transform .3s ease;
 
       * {
         fill: $buttons-color;
       }
     }
+
+    &.hover-scale:hover svg {
+      transform: scale(1.2);
+    }
   }
 }
 
 @import 'buttons/autorotate';
-@import 'buttons/download';
-@import 'buttons/fullscreen';
 @import 'buttons/zoom';
 @import 'buttons/markers';

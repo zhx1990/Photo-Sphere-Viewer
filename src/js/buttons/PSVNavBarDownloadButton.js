@@ -11,7 +11,8 @@ function PSVNavBarDownloadButton(navbar) {
 PSVNavBarDownloadButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarDownloadButton.prototype.constructor = PSVNavBarDownloadButton;
 
-PSVNavBarDownloadButton.className = 'psv-button hoverable download-button';
+PSVNavBarDownloadButton.className = 'psv-button hover-scale download-button';
+PSVNavBarDownloadButton.icon = 'download.svg';
 
 /**
  * Creates the button
@@ -22,15 +23,13 @@ PSVNavBarDownloadButton.prototype.create = function() {
 
   this.container.title = this.psv.config.lang.download;
 
-  this.container.appendChild(document.createElement('div'));
-
-  this.container.addEventListener('click', this.download.bind(this));
+  this.container.addEventListener('click', this._download.bind(this));
 };
 
 /**
  * Ask the browser to download the panorama source file
  */
-PSVNavBarDownloadButton.prototype.download = function() {
+PSVNavBarDownloadButton.prototype._download = function() {
   var link = document.createElement('a');
   link.href = this.psv.config.panorama;
   link.download = this.psv.config.panorama;

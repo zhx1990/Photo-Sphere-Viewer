@@ -16,7 +16,8 @@ function PSVNavBarMarkersButton(navbar) {
 PSVNavBarMarkersButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;
 
-PSVNavBarMarkersButton.className = 'psv-button markers-button';
+PSVNavBarMarkersButton.className = 'psv-button hover-scale markers-button';
+PSVNavBarMarkersButton.icon = 'pin.svg';
 
 /**
  * Creates the button
@@ -26,7 +27,6 @@ PSVNavBarMarkersButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
 
   this.container.title = this.psv.config.lang.markers;
-  this.container.innerHTML = PhotoSphereViewer.ICONS['pin.svg'];
 
   this.container.addEventListener('click', this.toggleMarkers.bind(this));
 
