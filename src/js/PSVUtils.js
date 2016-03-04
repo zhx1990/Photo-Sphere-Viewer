@@ -203,8 +203,10 @@ PSVUtils.getStyle = function(elt, prop) {
 
 /**
  * Translate CSS values like "top center" or "10% 50%" as top and left positions
+ * The implementation is as close as possible to the "background-position" specification
+ * https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
  * @param value (String)
- * @return Object
+ * @return Object ({top: double: left: double})
  */
 PSVUtils.parsePosition = function(value) {
   if (!value) {

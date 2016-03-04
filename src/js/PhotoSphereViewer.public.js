@@ -13,7 +13,12 @@ PhotoSphereViewer.prototype.render = function() {
   this.camera.fov = this.config.max_fov + (this.prop.zoom_lvl / 100) * (this.config.min_fov - this.config.max_fov);
   this.camera.lookAt(this.prop.direction);
   this.camera.updateProjectionMatrix();
-  this.renderer.render(this.scene, this.camera);
+  if (this.composer) {
+    this.composer.render();
+  }
+  else {
+    this.renderer.render(this.scene, this.camera);
+  }
   this.trigger('render');
 };
 
@@ -75,6 +80,7 @@ PhotoSphereViewer.prototype.destroy = function() {
   this.tooltip = null;
   this.canvas_container = null;
   this.renderer = null;
+  this.composer = null;
   this.scene = null;
   this.camera = null;
   this.mesh = null;
@@ -222,8 +228,8 @@ PhotoSphereViewer.prototype.resize = function(width, height) {
 
   if (this.renderer) {
     this.renderer.setSize(this.prop.size.width, this.prop.size.height);
-    if (this.config.transition) { // "renderer" is actually the composer, update the renderer as well
-      this.renderer.renderer.setSize(this.prop.size.width, this.prop.size.height);
+    if (this.composer) {
+      this.composer.reset(new THREE.WebGLRenderTarget(this.prop.size.width, this.prop.size.height));
     }
     this.render();
   }

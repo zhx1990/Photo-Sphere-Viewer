@@ -69,6 +69,7 @@ function PhotoSphereViewer(options) {
   this.tooltip = null;
   this.canvas_container = null;
   this.renderer = null;
+  this.composer = null;
   this.passes = {};
   this.scene = null;
   this.camera = null;

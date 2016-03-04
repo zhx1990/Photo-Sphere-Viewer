@@ -248,7 +248,7 @@ PhotoSphereViewer.prototype._createScene = function() {
 
   // Init shader renderer
   if (this.config.transition && this.config.transition.blur) {
-    this.renderer = new THREE.EffectComposer(this.renderer);
+    this.composer = new THREE.EffectComposer(this.renderer);
 
     this.passes.render = new THREE.RenderPass(this.scene, this.camera);
 
@@ -265,9 +265,9 @@ PhotoSphereViewer.prototype._createScene = function() {
     this.passes.blur.uniforms.fDecay.value = 0.5;
     this.passes.blur.uniforms.fExposure.value = 1.0;
 
-    this.renderer.addPass(this.passes.render);
-    this.renderer.addPass(this.passes.copy);
-    this.renderer.addPass(this.passes.blur);
+    this.composer.addPass(this.passes.render);
+    this.composer.addPass(this.passes.copy);
+    this.composer.addPass(this.passes.blur);
   }
 
   this._bindEvents();
