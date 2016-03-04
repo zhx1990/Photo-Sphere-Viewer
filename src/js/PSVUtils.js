@@ -41,13 +41,13 @@ PSVUtils.getWebGLCtx = function() {
   }
 
   if (names.some(function(name) {
-    try {
-      context = canvas.getContext(name);
-      return (context && typeof context.getParameter == 'function');
-    } catch (e) {
-      return false;
-    }
-  })) {
+      try {
+        context = canvas.getContext(name);
+        return (context && typeof context.getParameter == 'function');
+      } catch (e) {
+        return false;
+      }
+    })) {
     return context;
   }
   else {
@@ -215,17 +215,41 @@ PSVUtils.parsePosition = function(value) {
     return value;
   }
 
-  var e = document.createElement('div');
-  document.body.appendChild(e);
-  e.style.backgroundPosition = value;
-  var parsed = PSVUtils.getStyle(e, 'background-position').match(/^([0-9.]+)% ([0-9.]+)%$/);
-  document.body.removeChild(e);
+  var tokens = value.toLocaleLowerCase().split(' ').slice(0, 2);
 
-  return {
-    left: parsed[1] / 100,
-    top: parsed[2] / 100
-  };
+  if (tokens.length === 1) {
+    if (PSVUtils.parsePosition.positions[tokens[0]] !== undefined) {
+      tokens = [tokens[0], 'center'];
+    }
+    else {
+      tokens = [tokens[0], tokens[0]];
+    }
+  }
+
+  var xFirst = tokens[1] != 'left' && tokens[1] != 'right' && tokens[0] != 'top' && tokens[0] != 'bottom';
+
+  tokens = tokens.map(function(token) {
+    return PSVUtils.parsePosition.positions[token] || token;
+  });
+
+  if (!xFirst) {
+    tokens.reverse();
+  }
+
+  var parsed = tokens.join(' ').match(/^([0-9.]+)% ([0-9.]+)%$/);
+
+  if (parsed) {
+    return {
+      left: parsed[1] / 100,
+      top: parsed[2] / 100
+    };
+  }
+  else {
+    return { top: 0.5, left: 0.5 };
+  }
 };
+
+PSVUtils.parsePosition.positions = { 'top': '0%', 'bottom': '100%', 'left': '0%', 'right': '100%', 'center': '50%' };
 
 /**
  * Utility for animations

@@ -162,6 +162,15 @@ module.exports = function(grunt) {
     },
 
     /**
+     * Mocha unit tests
+     */
+    mochaTest: {
+      lib: {
+        src: ['tests/utils/*.js']
+      }
+    },
+
+    /**
      * Serve des content on localhost:9000
      */
     connect: {
@@ -221,7 +230,8 @@ module.exports = function(grunt) {
   grunt.registerTask('test', [
     'jshint',
     'jscs',
-    'scsslint'
+    'scsslint',
+    'mochaTest'
   ]);
 
   /**
