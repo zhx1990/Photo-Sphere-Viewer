@@ -9,6 +9,25 @@ PhotoSphereViewer.loadSystem = function() {
   S.maxTextureWidth = PSVUtils.getMaxTextureWidth();
   S.mouseWheelEvent = PSVUtils.mouseWheelEvent();
   S.fullscreenEvent = PSVUtils.fullscreenEvent();
+  S.deviceOrientationSupported = D();
+
+  window.addEventListener('deviceorientation', PhotoSphereViewer.deviceOrientationListener, false);
+};
+
+/**
+ * Resolve or reject SYSTEM.deviceOrientationSupported
+ * We can only be sure device orientation is supported once received an event with coherent data
+ * @param event
+ */
+PhotoSphereViewer.deviceOrientationListener = function(event) {
+  if (event.alpha !== null) {
+    PhotoSphereViewer.SYSTEM.deviceOrientationSupported.resolve();
+  }
+  else {
+    PhotoSphereViewer.SYSTEM.deviceOrientationSupported.reject();
+  }
+
+  window.removeEventListener('deviceorientation', PhotoSphereViewer.deviceOrientationListener);
 };
 
 /**

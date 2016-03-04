@@ -9,16 +9,25 @@ PhotoSphereViewer.prototype.load = function() {
  * Performs a render
  */
 PhotoSphereViewer.prototype.render = function() {
-  this.prop.direction = this.sphericalCoordsToVector3(this.prop.longitude, this.prop.latitude);
+  if (this.doControls && this.prop.device_orientation) {
+    this.doControls.update();
+    this.prop.direction = this.camera.getWorldDirection();
+  }
+  else {
+    this.prop.direction = this.sphericalCoordsToVector3(this.prop.longitude, this.prop.latitude);
+    this.camera.lookAt(this.prop.direction);
+  }
+
   this.camera.fov = this.config.max_fov + (this.prop.zoom_lvl / 100) * (this.config.min_fov - this.config.max_fov);
-  this.camera.lookAt(this.prop.direction);
   this.camera.updateProjectionMatrix();
+
   if (this.composer) {
     this.composer.render();
   }
   else {
     this.renderer.render(this.scene, this.camera);
   }
+
   this.trigger('render');
 };
 
@@ -49,6 +58,7 @@ PhotoSphereViewer.prototype.destroy = function() {
   if (this.navbar) this.navbar.destroy();
   if (this.panel) this.panel.destroy();
   if (this.tooltip) this.tooltip.destroy();
+  if (this.doControls) this.doControls.disconnect();
 
   // destroy ThreeJS view
   if (this.scene) {
@@ -208,6 +218,11 @@ PhotoSphereViewer.prototype.toggleAutorotate = function() {
   else {
     this.startAutorotate();
   }
+};
+
+PhotoSphereViewer.prototype.toggleDeviceOrientation = function() {
+  this.prop.device_orientation = !this.prop.device_orientation;
+  this.trigger('device-orientation-updated', this.prop.device_orientation);
 };
 
 /**

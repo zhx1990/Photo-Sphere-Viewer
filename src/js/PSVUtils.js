@@ -172,7 +172,7 @@ PSVUtils.getXMPValue = function(data, attr) {
  * @return (boolean) true if fullscreen is enabled, false otherwise
  */
 PSVUtils.isFullscreenEnabled = function() {
-  return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+  return !!(document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
 };
 
 /**

@@ -75,6 +75,7 @@ function PhotoSphereViewer(options) {
   this.camera = null;
   this.mesh = null;
   this.raycaster = null;
+  this.doControls = null;
   this.actions = {};
 
   // local properties
@@ -92,6 +93,7 @@ function PhotoSphereViewer(options) {
     mouse_history: [], // list of latest positions of the cursor [time, x, y]
     pinch_dist: 0, // distance between fingers when zooming
     direction: null, // direction of the camera (Vector3)
+    device_orientation: false, // is device orientation enabled
     autorotate_reqid: null, // animationRequest id of the automatic rotation
     animation_promise: null, // promise of the current animation (either go to position or image transition)
     start_timeout: null, // timeout id of the automatic rotation delay
@@ -178,6 +180,7 @@ PhotoSphereViewer.SYSTEM = {
   loaded: false,
   isWebGLSupported: false,
   isCanvasSupported: false,
+  deviceOrientationSupported: null,
   maxTextureWidth: 0,
   mouseWheelEvent: null,
   fullscreenEvent: null
@@ -212,6 +215,7 @@ PhotoSphereViewer.DEFAULTS = {
     'download',
     'markers',
     'caption',
+    'gyroscope',
     'fullscreen'
   ],
   tooltip: {

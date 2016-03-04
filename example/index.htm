@@ -112,6 +112,7 @@
         }())
       },
       'caption',
+      'gyroscope',
       'fullscreen'
     ],
     caption: 'Bryce Canyon National Park <b>&copy; Mark Doliner</b>',
@@ -238,6 +239,12 @@
         height: width
       });
     }
+  });
+
+  ['fullscreen-updated', 'size-updated'].forEach(function(event) {
+    PSV.on(event, function(value) {
+      console.log(event + ' ' + JSON.stringify(value));
+    });
   });
 </script>
 

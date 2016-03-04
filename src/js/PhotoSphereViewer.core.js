@@ -206,6 +206,10 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.camera = new THREE.PerspectiveCamera(this.config.default_fov, this.prop.size.width / this.prop.size.height, 1, 300);
   this.camera.position.set(0, 0, 0);
 
+  if (PSVUtils.checkTHREE('DeviceOrientationControls')) {
+    this.doControls = new THREE.DeviceOrientationControls(this.camera);
+  }
+
   this.scene = new THREE.Scene();
   this.scene.add(this.camera);
 
