@@ -1,4 +1,17 @@
 /**
+ * Init the global SYSTEM var with information generic support information
+ */
+PhotoSphereViewer.loadSystem = function() {
+  var S = PhotoSphereViewer.SYSTEM;
+  S.loaded = true;
+  S.isWebGLSupported = PSVUtils.isWebGLSupported();
+  S.isCanvasSupported = PSVUtils.isCanvasSupported();
+  S.maxTextureWidth = PSVUtils.getMaxTextureWidth();
+  S.mouseWheelEvent = PSVUtils.mouseWheelEvent();
+  S.fullscreenEvent = PSVUtils.fullscreenEvent();
+};
+
+/**
  * Parse the animation speed
  * @param speed (string) The speed, in radians/degrees/revolutions per second/minute
  * @return (double) radians per second
@@ -69,8 +82,8 @@ PhotoSphereViewer.prototype._setViewerSize = function(size) {
  * @returns ({longitude: double, latitude: double})
  */
 PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(x, y) {
-  var relativeX = x / this.prop.size.image_width * PhotoSphereViewer.TwoPI;
-  var relativeY = y / this.prop.size.image_height * PhotoSphereViewer.PI;
+  var relativeX = x / this.prop.image_size.original_width * PhotoSphereViewer.TwoPI;
+  var relativeY = y / this.prop.image_size.original_height * PhotoSphereViewer.PI;
 
   return {
     longitude: relativeX >= PhotoSphereViewer.PI ? relativeX - PhotoSphereViewer.PI : relativeX + PhotoSphereViewer.PI,
@@ -85,12 +98,12 @@ PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(x, y) {
  * @returns ({x: int, y: int})
  */
 PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(longitude, latitude) {
-  var relativeLong = longitude / PhotoSphereViewer.TwoPI * this.prop.size.image_width;
-  var relativeLat = latitude / PhotoSphereViewer.PI * this.prop.size.image_height;
+  var relativeLong = longitude / PhotoSphereViewer.TwoPI * this.prop.image_size.original_width;
+  var relativeLat = latitude / PhotoSphereViewer.PI * this.prop.image_size.original_height;
 
   return {
-    x: parseInt(longitude < PhotoSphereViewer.PI ? relativeLong + this.prop.size.image_width / 2 : relativeLong - this.prop.size.image_width / 2),
-    y: parseInt(this.prop.size.image_height / 2 - relativeLat)
+    x: parseInt(longitude < PhotoSphereViewer.PI ? relativeLong + this.prop.image_size.original_width / 2 : relativeLong - this.prop.image_size.original_width / 2),
+    y: parseInt(this.prop.image_size.original_height / 2 - relativeLat)
   };
 };
 

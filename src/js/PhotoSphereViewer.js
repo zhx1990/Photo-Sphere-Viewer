@@ -79,29 +79,40 @@ function PhotoSphereViewer(options) {
 
   // local properties
   this.prop = {
-    latitude: 0,
-    longitude: 0,
-    anim_speed: 0,
-    zoom_lvl: 0,
-    moving: false,
-    zooming: false,
-    start_mouse_x: 0,
-    start_mouse_y: 0,
-    mouse_x: 0,
-    mouse_y: 0,
-    mouse_history: [],
-    pinch_dist: 0,
-    direction: null,
-    autorotate_reqid: null,
-    animation_promise: null,
-    start_timeout: null,
-    boundingRect: null,
-    size: {
+    latitude: 0, // current latitude of the center
+    longitude: 0, // current longitude of the center
+    anim_speed: 0, // parsed anim speed (rad/sec)
+    zoom_lvl: 0, // current zoom level
+    moving: false, // is the user moving
+    zooming: false, // is the user zooming
+    start_mouse_x: 0, // start x position of the click/touch
+    start_mouse_y: 0, // start y position of the click/touch
+    mouse_x: 0, // current x position of the cursor
+    mouse_y: 0, // current y position of the cursor
+    mouse_history: [], // list of latest positions of the cursor [time, x, y]
+    pinch_dist: 0, // distance between fingers when zooming
+    direction: null, // direction of the camera (Vector3)
+    autorotate_reqid: null, // animationRequest id of the automatic rotation
+    animation_promise: null, // promise of the current animation (either go to position or image transition)
+    start_timeout: null, // timeout id of the automatic rotation delay
+    boundingRect: null, // DOMRect of the container
+    size: { // size of the container
+      width: 0,
+      height: 0
+    },
+    image_size: { // size of the image
       width: 0,
       height: 0,
-      ratio: 0,
-      image_width: 0,
-      image_height: 0
+      original_width: 0,
+      original_height: 0
+    },
+    pano_data: { // panorama metadata
+      full_width: 0,
+      full_height: 0,
+      cropped_width: 0,
+      cropped_height: 0,
+      cropped_x: 0,
+      cropped_y: 0
     }
   };
 
@@ -172,18 +183,9 @@ PhotoSphereViewer.SYSTEM = {
   fullscreenEvent: null
 };
 
-PhotoSphereViewer.loadSystem = function() {
-  var S = PhotoSphereViewer.SYSTEM;
-  S.loaded = true;
-  S.isWebGLSupported = PSVUtils.isWebGLSupported();
-  S.isCanvasSupported = PSVUtils.isCanvasSupported();
-  S.maxTextureWidth = PSVUtils.getMaxTextureWidth();
-  S.mouseWheelEvent = PSVUtils.mouseWheelEvent();
-  S.fullscreenEvent = PSVUtils.fullscreenEvent();
-};
-
 /**
  * PhotoSphereViewer defaults
+ * @type (Object)
  */
 PhotoSphereViewer.DEFAULTS = {
   panorama: null,

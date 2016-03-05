@@ -211,36 +211,6 @@ PhotoSphereViewer.prototype.toggleAutorotate = function() {
 };
 
 /**
- * Resizes the canvas
- * @param width (integer) The new canvas width
- * @param height (integer) The new canvas height
- */
-PhotoSphereViewer.prototype.resize = function(width, height) {
-  this.prop.size.width = parseInt(width);
-  this.prop.size.height = parseInt(height);
-  this.prop.size.ratio = this.prop.size.width / this.prop.size.height;
-  this.prop.boundingRect = this.container.getBoundingClientRect();
-
-  if (this.camera) {
-    this.camera.aspect = this.prop.size.ratio;
-    this.camera.updateProjectionMatrix();
-  }
-
-  if (this.renderer) {
-    this.renderer.setSize(this.prop.size.width, this.prop.size.height);
-    if (this.composer) {
-      this.composer.reset(new THREE.WebGLRenderTarget(this.prop.size.width, this.prop.size.height));
-    }
-    this.render();
-  }
-
-  this.trigger('size-updated', {
-    width: this.prop.size.width,
-    height: this.prop.size.height
-  });
-};
-
-/**
  * Rotate the camera
  * @param position (Object) latitude & longitude or x & y
  */
@@ -326,7 +296,7 @@ PhotoSphereViewer.prototype.stopAnimation = function() {
  * @param level (integer) New zoom level
  */
 PhotoSphereViewer.prototype.zoom = function(level) {
-  this.prop.zoom_lvl = PSVUtils.stayBetween(parseInt(Math.round(level)), 0, 100);
+  this.prop.zoom_lvl = PSVUtils.stayBetween(Math.round(level), 0, 100);
   this.render();
   this.trigger('zoom-updated', this.prop.zoom_lvl);
 };

@@ -47,7 +47,27 @@ PhotoSphereViewer.prototype.handleEvent = function(e) {
  */
 PhotoSphereViewer.prototype._onResize = function() {
   if (this.container.clientWidth != this.prop.size.width || this.container.clientHeight != this.prop.size.height) {
-    this.resize(this.container.clientWidth, this.container.clientHeight);
+    this.prop.size.width = parseInt(this.container.clientWidth);
+    this.prop.size.height = parseInt(this.container.clientHeight);
+    this.prop.boundingRect = this.container.getBoundingClientRect();
+
+    if (this.camera) {
+      this.camera.aspect = this.prop.size.width / this.prop.size.height;
+      this.camera.updateProjectionMatrix();
+    }
+
+    if (this.renderer) {
+      this.renderer.setSize(this.prop.size.width, this.prop.size.height);
+      if (this.composer) {
+        this.composer.reset(new THREE.WebGLRenderTarget(this.prop.size.width, this.prop.size.height));
+      }
+      this.render();
+    }
+
+    this.trigger('size-updated', {
+      width: this.prop.size.width,
+      height: this.prop.size.height
+    });
   }
 };
 
@@ -139,34 +159,7 @@ PhotoSphereViewer.prototype._stopMove = function(evt) {
     // inertia animation
     else if (this.config.move_inertia) {
       this._logMouseMove(evt);
-
-      var direction = {
-        x: evt.clientX - this.prop.mouse_history[0][1],
-        y: evt.clientY - this.prop.mouse_history[0][2]
-      };
-
-      var norm = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
-
-      var self = this;
-
-      this.prop.animation_promise = PSVUtils.animation({
-        properties: {
-          clientX: { start: evt.clientX, end: evt.clientX + direction.x },
-          clientY: { start: evt.clientY, end: evt.clientY + direction.y }
-        },
-        duration: norm * PhotoSphereViewer.INERTIA_WINDOW / 100,
-        easing: 'outCirc',
-        onTick: function(properties) {
-          self._move(properties);
-        },
-        onCancel: function() {
-          self.prop.moving = false;
-        }
-      });
-
-      this.prop.animation_promise.then(function() {
-        self.prop.moving = false;
-      });
+      this._stopMoveInertia(evt);
     }
     else {
       this.prop.moving = false;
@@ -175,6 +168,40 @@ PhotoSphereViewer.prototype._stopMove = function(evt) {
 
   this.prop.mouse_history.length = 0;
   this.prop.zooming = false;
+};
+
+/**
+ * Performs an animation to simulate inertia when stop moving
+ * @param evt
+ */
+PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
+  var self = this;
+
+  var direction = {
+    x: evt.clientX - this.prop.mouse_history[0][1],
+    y: evt.clientY - this.prop.mouse_history[0][2]
+  };
+
+  var norm = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+
+  this.prop.animation_promise = PSVUtils.animation({
+    properties: {
+      clientX: { start: evt.clientX, end: evt.clientX + direction.x },
+      clientY: { start: evt.clientY, end: evt.clientY + direction.y }
+    },
+    duration: norm * PhotoSphereViewer.INERTIA_WINDOW / 100,
+    easing: 'outCirc',
+    onTick: function(properties) {
+      self._move(properties);
+    },
+    onCancel: function() {
+      self.prop.moving = false;
+    }
+  });
+
+  this.prop.animation_promise.then(function() {
+    self.prop.moving = false;
+  });
 };
 
 /**
