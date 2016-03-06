@@ -93,7 +93,7 @@ function PhotoSphereViewer(options) {
     mouse_history: [], // list of latest positions of the cursor [time, x, y]
     pinch_dist: 0, // distance between fingers when zooming
     direction: null, // direction of the camera (Vector3)
-    device_orientation: false, // is device orientation enabled
+    orientation_reqid: null, // animationRequest id of the device orientation
     autorotate_reqid: null, // animationRequest id of the automatic rotation
     animation_promise: null, // promise of the current animation (either go to position or image transition)
     start_timeout: null, // timeout id of the automatic rotation delay
@@ -230,7 +230,8 @@ PhotoSphereViewer.DEFAULTS = {
     zoomIn: 'Zoom in',
     download: 'Download',
     fullscreen: 'Fullscreen',
-    markers: 'Markers'
+    markers: 'Markers',
+    gyroscope: 'Gyroscope'
   },
   mousewheel: true,
   mousemove: true,

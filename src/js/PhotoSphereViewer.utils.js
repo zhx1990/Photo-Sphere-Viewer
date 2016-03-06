@@ -141,6 +141,21 @@ PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(longitude, latit
 };
 
 /**
+ * Converts a THREE.Vector3 to sperical radians coordinates
+ * @param vector (THREE.Vector3)
+ * @returns ({longitude: double, latitude: double})
+ */
+PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
+  var phi = Math.acos(vector.y / Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z));
+  var theta = Math.atan2(vector.x, vector.z);
+
+  return {
+    longitude: theta < 0 ? -theta : PhotoSphereViewer.TwoPI - theta,
+    latitude: PhotoSphereViewer.HalfPI - phi
+  };
+};
+
+/**
  * Converts x/y to latitude/longitude if present and ensure boundaries
  * @param position (Object)
  */

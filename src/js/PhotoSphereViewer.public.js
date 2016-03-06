@@ -7,15 +7,13 @@ PhotoSphereViewer.prototype.load = function() {
 
 /**
  * Performs a render
+ * @param updateDirection (boolean) false to NOT update view direction
  */
-PhotoSphereViewer.prototype.render = function() {
-  if (this.doControls && this.prop.device_orientation) {
-    this.doControls.update();
-    this.prop.direction = this.camera.getWorldDirection();
-  }
-  else {
+PhotoSphereViewer.prototype.render = function(updateDirection) {
+  if (updateDirection !== false) {
     this.prop.direction = this.sphericalCoordsToVector3(this.prop.longitude, this.prop.latitude);
     this.camera.lookAt(this.prop.direction);
+    this.camera.rotation.z = 0;
   }
 
   this.camera.fov = this.config.max_fov + (this.prop.zoom_lvl / 100) * (this.config.min_fov - this.config.max_fov);
@@ -117,8 +115,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
   if (position) {
     this._cleanPosition(position);
 
-    this.stopAutorotate();
-    this.stopAnimation();
+    this.stopAll();
   }
 
   this.config.panorama = path;
@@ -164,11 +161,19 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
 };
 
 /**
+ * Stops all current animations
+ */
+PhotoSphereViewer.prototype.stopAll = function() {
+  this.stopAutorotate();
+  this.stopAnimation();
+  this.stopGyroscopeControl();
+};
+
+/**
  * Starts the autorotate animation
  */
 PhotoSphereViewer.prototype.startAutorotate = function() {
-  this.stopAutorotate();
-  this.stopAnimation();
+  this.stopAll();
 
   var self = this;
   var last = null;
@@ -220,9 +225,54 @@ PhotoSphereViewer.prototype.toggleAutorotate = function() {
   }
 };
 
-PhotoSphereViewer.prototype.toggleDeviceOrientation = function() {
-  this.prop.device_orientation = !this.prop.device_orientation;
-  this.trigger('device-orientation-updated', this.prop.device_orientation);
+/**
+ * Starts the gyroscope interaction
+ */
+PhotoSphereViewer.prototype.startGyroscopeControl = function() {
+  this.stopAll();
+
+  var self = this;
+
+  (function run() {
+    self.doControls.update();
+    self.prop.direction = self.camera.getWorldDirection();
+
+    var sphericalCoords = self.vector3ToSphericalCoords(self.prop.direction);
+    self.prop.longitude = sphericalCoords.longitude;
+    self.prop.latitude = sphericalCoords.latitude;
+
+    self.render(false);
+
+    self.prop.orientation_reqid = window.requestAnimationFrame(run);
+  }());
+
+  this.trigger('gyroscope-updated', true);
+};
+
+/**
+ * Stops the gyroscope interaction
+ */
+PhotoSphereViewer.prototype.stopGyroscopeControl = function() {
+  if (this.prop.orientation_reqid) {
+    window.cancelAnimationFrame(this.prop.orientation_reqid);
+    this.prop.orientation_reqid = null;
+
+    this.trigger('gyroscope-updated', false);
+
+    this.render();
+  }
+};
+
+/**
+ * Toggles the gyroscope interaction
+ */
+PhotoSphereViewer.prototype.toggleGyroscopeControl = function() {
+  if (this.prop.orientation_reqid) {
+    this.stopGyroscopeControl();
+  }
+  else {
+    this.startGyroscopeControl();
+  }
 };
 
 /**
@@ -251,8 +301,7 @@ PhotoSphereViewer.prototype.rotate = function(position) {
  * @param duration (String|integer) Animation speed (per spec) or duration (milliseconds)
  */
 PhotoSphereViewer.prototype.animate = function(position, duration) {
-  this.stopAutorotate();
-  this.stopAnimation();
+  this.stopAll();
 
   if (!duration) {
     this.rotate(position);

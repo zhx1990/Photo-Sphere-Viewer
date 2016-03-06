@@ -29,7 +29,7 @@ PhotoSphereViewer.prototype._bindEvents = function() {
 PhotoSphereViewer.prototype.handleEvent = function(e) {
   switch (e.type) {
     // @formatter:off
-    case 'resize':      this._onResize();       break;
+    case 'resize': PSVUtils.throttle(this._onResize(), 50); break;
     case 'mousedown':   this._onMouseDown(e);   break;
     case 'touchstart':  this._onTouchStart(e);  break;
     case 'mouseup':     this._onMouseUp(e);     break;
@@ -53,7 +53,6 @@ PhotoSphereViewer.prototype._onResize = function() {
 
     if (this.camera) {
       this.camera.aspect = this.prop.size.width / this.prop.size.height;
-      this.camera.updateProjectionMatrix();
     }
 
     if (this.renderer) {
@@ -97,8 +96,11 @@ PhotoSphereViewer.prototype._onTouchStart = function(evt) {
  * @param evt (Event) The event
  */
 PhotoSphereViewer.prototype._startMove = function(evt) {
-  this.stopAutorotate();
-  this.stopAnimation();
+  if (this.prop.orientation_reqid || this.prop.autorotate_reqid) {
+    return;
+  }
+
+  this.stopAll();
 
   this.prop.mouse_x = this.prop.start_mouse_x = parseInt(evt.clientX);
   this.prop.mouse_y = this.prop.start_mouse_y = parseInt(evt.clientY);
@@ -114,9 +116,6 @@ PhotoSphereViewer.prototype._startMove = function(evt) {
  * @param evt (Event) The event
  */
 PhotoSphereViewer.prototype._startZoom = function(evt) {
-  this.stopAutorotate();
-  this.stopAnimation();
-
   var t = [
     { x: parseInt(evt.touches[0].clientX), y: parseInt(evt.touches[0].clientY) },
     { x: parseInt(evt.touches[1].clientX), y: parseInt(evt.touches[1].clientY) }
@@ -233,12 +232,10 @@ PhotoSphereViewer.prototype._click = function(evt) {
   var intersects = this.raycaster.intersectObjects(this.scene.children);
 
   if (intersects.length === 1) {
-    var p = intersects[0].point;
-    var phi = Math.acos(p.y / Math.sqrt(p.x * p.x + p.y * p.y + p.z * p.z));
-    var theta = Math.atan2(p.x, p.z);
+    var sphericalCoords = this.vector3ToSphericalCoords(intersects[0].point);
 
-    data.longitude = theta < 0 ? -theta : PhotoSphereViewer.TwoPI - theta;
-    data.latitude = PhotoSphereViewer.HalfPI - phi;
+    data.longitude = sphericalCoords.longitude;
+    data.latitude = sphericalCoords.latitude;
 
     var textureCoords = this.sphericalCoordsToTextureCoords(data.longitude, data.latitude);
 
