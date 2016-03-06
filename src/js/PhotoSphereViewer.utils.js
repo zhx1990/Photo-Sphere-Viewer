@@ -9,6 +9,25 @@ PhotoSphereViewer.loadSystem = function() {
   S.maxTextureWidth = PSVUtils.getMaxTextureWidth();
   S.mouseWheelEvent = PSVUtils.mouseWheelEvent();
   S.fullscreenEvent = PSVUtils.fullscreenEvent();
+  S.deviceOrientationSupported = D();
+
+  window.addEventListener('deviceorientation', PhotoSphereViewer.deviceOrientationListener, false);
+};
+
+/**
+ * Resolve or reject SYSTEM.deviceOrientationSupported
+ * We can only be sure device orientation is supported once received an event with coherent data
+ * @param event
+ */
+PhotoSphereViewer.deviceOrientationListener = function(event) {
+  if (event.alpha !== null) {
+    PhotoSphereViewer.SYSTEM.deviceOrientationSupported.resolve();
+  }
+  else {
+    PhotoSphereViewer.SYSTEM.deviceOrientationSupported.reject();
+  }
+
+  window.removeEventListener('deviceorientation', PhotoSphereViewer.deviceOrientationListener);
 };
 
 /**
@@ -119,6 +138,21 @@ PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(longitude, latit
     Math.sin(latitude),
     Math.cos(latitude) * Math.cos(longitude)
   );
+};
+
+/**
+ * Converts a THREE.Vector3 to sperical radians coordinates
+ * @param vector (THREE.Vector3)
+ * @returns ({longitude: double, latitude: double})
+ */
+PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
+  var phi = Math.acos(vector.y / Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z));
+  var theta = Math.atan2(vector.x, vector.z);
+
+  return {
+    longitude: theta < 0 ? -theta : PhotoSphereViewer.TwoPI - theta,
+    latitude: PhotoSphereViewer.HalfPI - phi
+  };
 };
 
 /**
