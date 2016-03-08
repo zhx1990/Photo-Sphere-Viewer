@@ -16,18 +16,25 @@ function PhotoSphereViewer(options) {
   // normalize config
   this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
   this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
-  this.config.tilt_up_max = PSVUtils.stayBetween(this.config.tilt_up_max, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
-  this.config.tilt_down_max = PSVUtils.stayBetween(this.config.tilt_down_max, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
+  this.config.tilt_up_max = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.tilt_up_max, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
+  this.config.tilt_down_max = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.tilt_down_max, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
   if (this.config.default_fov === null) {
     this.config.default_fov = this.config.max_fov / 2 + this.config.min_fov / 2;
   }
   else {
     this.config.default_fov = PSVUtils.stayBetween(this.config.default_fov, this.config.min_fov, this.config.max_fov);
   }
+  this.config.default_long = PSVUtils.parseAngle(this.config.default_long);
+  this.config.default_lat = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.default_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
   if (this.config.anim_lat === null) {
     this.config.anim_lat = this.config.default_lat;
   }
-  this.config.anim_lat = PSVUtils.stayBetween(this.config.anim_lat, -PhotoSphereViewer.HalfPI, PhotoSphereViewer.HalfPI);
+  else {
+    this.config.anim_lat = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.anim_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
+  }
+  this.config.long_offset = PSVUtils.parseAngle(this.config.long_offset);
+  this.config.lat_offset = PSVUtils.parseAngle(this.config.lat_offset);
+  this.config.anim_speed = PSVUtils.parseSpeed(this.config.anim_speed);
   if (this.config.caption && !this.config.navbar) {
     this.config.navbar = ['caption'];
   }
@@ -134,8 +141,6 @@ function PhotoSphereViewer(options) {
   }
 
   // init
-  this.setAnimSpeed(this.config.anim_speed);
-
   this.rotate({
     longitude: this.config.default_long,
     latitude: this.config.default_lat
@@ -149,10 +154,6 @@ function PhotoSphereViewer(options) {
     this.load();
   }
 }
-
-PhotoSphereViewer.PI = Math.PI;
-PhotoSphereViewer.TwoPI = Math.PI * 2.0;
-PhotoSphereViewer.HalfPI = Math.PI / 2.0;
 
 /**
  * Number of pixels bellow which a mouse move will be considered as a click
@@ -202,8 +203,8 @@ PhotoSphereViewer.DEFAULTS = {
   default_fov: null,
   default_long: 0,
   default_lat: 0,
-  tilt_up_max: PhotoSphereViewer.HalfPI,
-  tilt_down_max: -PhotoSphereViewer.HalfPI,
+  tilt_up_max: PSVUtils.HalfPI,
+  tilt_down_max: -PSVUtils.HalfPI,
   long_offset: Math.PI / 1440.0,
   lat_offset: Math.PI / 720.0,
   time_anim: 2000,

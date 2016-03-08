@@ -7,7 +7,7 @@ PhotoSphereViewer.prototype.load = function() {
 
 /**
  * Performs a render
- * @param updateDirection (boolean) false to NOT update view direction
+ * @param updateDirection (boolean) should update camera direction - default: true
  */
 PhotoSphereViewer.prototype.render = function(updateDirection) {
   if (updateDirection !== false) {
@@ -185,7 +185,7 @@ PhotoSphereViewer.prototype.startAutorotate = function() {
       last = timestamp;
 
       self.rotate({
-        longitude: self.prop.longitude + self.prop.anim_speed * elapsed / 1000,
+        longitude: self.prop.longitude + self.config.anim_speed * elapsed / 1000,
         latitude: self.prop.latitude - (self.prop.latitude - self.config.anim_lat) / 200
       });
     }
@@ -312,7 +312,7 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
 
   if (!duration && typeof duration != 'number') {
     // desired radial speed
-    duration = duration ? this._parseAnimSpeed(duration) : this.prop.anim_speed;
+    duration = duration ? PSVUtils.parseSpeed(duration) : this.config.anim_speed;
     // get the angle between current position and target
     var angle = Math.acos(
       Math.cos(this.prop.latitude) * Math.cos(position.latitude) * Math.cos(this.prop.longitude - position.longitude) +
@@ -325,8 +325,8 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
   // longitude offset for shortest arc
   var tCandidates = [
     0, // direct
-    PhotoSphereViewer.TwoPI, // clock-wise cross zero
-    -PhotoSphereViewer.TwoPI // counter-clock-wise cross zero
+    PSVUtils.TwoPI, // clock-wise cross zero
+    -PSVUtils.TwoPI // counter-clock-wise cross zero
   ];
 
   var tOffset = tCandidates.reduce(function(value, candidate) {
@@ -393,14 +393,6 @@ PhotoSphereViewer.prototype.toggleFullscreen = function() {
   else {
     PSVUtils.exitFullscreen();
   }
-};
-
-/**
- * Sets the animation speed
- * @param speed (string) The speed, in radians/degrees/revolutions per second/minute
- */
-PhotoSphereViewer.prototype.setAnimSpeed = function(speed) {
-  this.prop.anim_speed = this._parseAnimSpeed(speed);
 };
 
 /**

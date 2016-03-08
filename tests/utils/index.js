@@ -6,6 +6,61 @@ var assert = require('assert');
 var psvUtilsFile = fs.readFileSync('src/js/PSVUtils.js');
 vm.runInThisContext(psvUtilsFile);
 
+describe('PSVUtils::parseAngle', function() {
+  it('should parse radians angles', function() {
+    var values = {
+      '0': 0,
+      '1.72': 1.72,
+      '-2.56': PSVUtils.TwoPI - 2.56,
+      '3.14rad': 3.14,
+      '-3.14rad': PSVUtils.TwoPI - 3.14
+    };
+
+    for (var pos in values) {
+      assert.equal(PSVUtils.parseAngle(pos), values[pos], pos);
+    }
+  });
+
+  it('should parse degrees angles', function() {
+    var values = {
+      '0deg': 0,
+      '30deg': 30/180*Math.PI,
+      '-30deg': PSVUtils.TwoPI - 30/180*Math.PI,
+      '85degs': 85/180*Math.PI,
+      '360degs': 0
+    };
+
+    for (var pos in values) {
+      assert.equal(PSVUtils.parseAngle(pos), values[pos], pos);
+    }
+  });
+
+  it('should normalize angles between 0 and 2Pi', function() {
+    var values = {
+      '450deg': Math.PI/2,
+      '1440deg': 0,
+      '8.15': 8.15 - PSVUtils.TwoPI,
+      '-3.14': PSVUtils.TwoPI - 3.14,
+      '-360deg': 0,
+    };
+
+    for (var pos in values) {
+      assert.equal(PSVUtils.parseAngle(pos), values[pos], pos);
+    }
+  });
+
+  it('should normalize angles between -Pi and Pi', function() {
+    var values = {
+      '270deg': -Math.PI/2,
+      '-4': 2*Math.PI - 4
+    };
+
+    for (var pos in values) {
+      assert.equal(PSVUtils.parseAngle(pos, -Math.PI), values[pos], pos);
+    }
+  });
+});
+
 describe('PSVUtils::parsePosition', function() {
   it('should parse 2 keywords', function() {
     var values = {

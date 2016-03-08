@@ -214,7 +214,7 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.scene.add(this.camera);
 
   // The middle of the panorama is placed at longitude=0
-  var geometry = new THREE.SphereGeometry(200, 32, 32, -PhotoSphereViewer.HalfPI);
+  var geometry = new THREE.SphereGeometry(200, 32, 32, -PSVUtils.HalfPI);
 
   var material = new THREE.MeshBasicMaterial();
   material.side = THREE.DoubleSide;
@@ -291,7 +291,7 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
   var self = this;
 
   // create a new sphere with the new texture
-  var geometry = new THREE.SphereGeometry(150, 32, 32, -PhotoSphereViewer.HalfPI);
+  var geometry = new THREE.SphereGeometry(150, 32, 32, -PSVUtils.HalfPI);
 
   var material = new THREE.MeshBasicMaterial();
   material.side = THREE.DoubleSide;
