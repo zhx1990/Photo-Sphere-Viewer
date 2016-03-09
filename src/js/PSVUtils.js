@@ -76,6 +76,24 @@ PSVUtils.getMaxTextureWidth = function() {
 };
 
 /**
+ * Toggle a CSS class
+ * @param element
+ * @param className
+ * @param active
+ */
+PSVUtils.toggleClass = function(element, className, active) {
+  if (active === undefined) {
+    element.classList.toggle(className);
+  }
+  else if (active && !element.classList.contains(className)) {
+    element.classList.add(className);
+  }
+  else if (!active) {
+    element.classList.remove(className);
+  }
+};
+
+/**
  * Search if an element has a particular, at any level including itself
  * @param el (HTMLElement)
  * @param parent (HTMLElement)
