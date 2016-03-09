@@ -172,10 +172,11 @@ PSVUtils.getXMPValue = function(data, attr) {
 
 /**
  * Detects whether fullscreen is enabled or not
+ * @param elt (HTMLElement)
  * @return (boolean) true if fullscreen is enabled, false otherwise
  */
-PSVUtils.isFullscreenEnabled = function() {
-  return !!(document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement);
+PSVUtils.isFullscreenEnabled = function(elt) {
+  return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) === elt;
 };
 
 /**
@@ -274,8 +275,6 @@ PSVUtils.parseSpeed = function(speed) {
       speed_value /= 60;
     }
 
-    var rad_per_second = 0;
-
     // Which unit?
     switch (speed_unit) {
       // Degrees per minute / second
@@ -283,13 +282,13 @@ PSVUtils.parseSpeed = function(speed) {
       case 'degrees per minute':
       case 'dps':
       case 'degrees per second':
-        rad_per_second = speed_value * Math.PI / 180;
+        speed = speed_value * Math.PI / 180;
         break;
 
       // Radians per minute / second
       case 'radians per minute':
       case 'radians per second':
-        rad_per_second = speed_value;
+        speed = speed_value;
         break;
 
       // Revolutions per minute / second
@@ -297,7 +296,7 @@ PSVUtils.parseSpeed = function(speed) {
       case 'revolutions per minute':
       case 'rps':
       case 'revolutions per second':
-        rad_per_second = speed_value * PSVUtils.TwoPI;
+        speed = speed_value * PSVUtils.TwoPI;
         break;
 
       // Unknown unit
@@ -306,7 +305,7 @@ PSVUtils.parseSpeed = function(speed) {
     }
   }
 
-  return rad_per_second;
+  return speed;
 };
 
 /**

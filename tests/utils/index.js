@@ -3,8 +3,9 @@ var fs = require('fs');
 var assert = require('assert');
 
 // Load PSVUtils (not a node module) in current context
-var psvUtilsFile = fs.readFileSync('src/js/PSVUtils.js');
-vm.runInThisContext(psvUtilsFile);
+vm.runInThisContext(fs.readFileSync('src/js/PSVError.js'));
+vm.runInThisContext(fs.readFileSync('src/js/PSVUtils.js'));
+
 
 describe('PSVUtils::parseAngle', function() {
   it('should parse radians angles', function() {
@@ -59,7 +60,18 @@ describe('PSVUtils::parseAngle', function() {
       assert.equal(PSVUtils.parseAngle(pos, -Math.PI), values[pos], pos);
     }
   });
+
+  it('should throw exception on invalid values', function() {
+    assert.throws(function() {
+      PSVUtils.parseAngle('foobar');
+    }, /unknown angle "foobar"/, 'foobar');
+
+    assert.throws(function() {
+      PSVUtils.parseAngle('200gr')
+    }, /unknown angle unit "gr"/, '200gr');
+  });
 });
+
 
 describe('PSVUtils::parsePosition', function() {
   it('should parse 2 keywords', function() {
@@ -174,5 +186,54 @@ describe('PSVUtils::parsePosition', function() {
     for (var pos in values) {
       assert.deepEqual(PSVUtils.parsePosition(pos), values[pos], pos);
     }
+  });
+});
+
+
+describe('PSVUtils::parseSpeed', function() {
+  it('should parse all units', function() {
+    var values = {
+      '360dpm': 360/180*Math.PI/60,
+      '360degrees per minute': 360/180*Math.PI/60,
+      '10dps': 10/180*Math.PI,
+      '10degrees per second': 10/180*Math.PI,
+      '2radians per minute': 2/60,
+      '0.1radians per second': 0.1,
+      '2rpm': 2*2*Math.PI/60,
+      '2revolutions per minute': 2*2*Math.PI/60,
+      '0.01rps': 0.01*2*Math.PI,
+      '0.01revolutions per second': 0.01*2*Math.PI
+    };
+
+    for (var speed in values) {
+      assert.equal(PSVUtils.parseSpeed(speed), values[speed], speed);
+    }
+  });
+
+  it('should allow various forms', function() {
+    var values = {
+      '2rpm': 2*2*Math.PI/60,
+      '2 rpm': 2*2*Math.PI/60,
+      '2revolutions per minute': 2*2*Math.PI/60,
+      '2 revolutions per minute': 2*2*Math.PI/60,
+      '-2rpm': -2*2*Math.PI/60,
+      '-2 rpm': -2*2*Math.PI/60,
+      '-2revolutions per minute': -2*2*Math.PI/60,
+      '-2 revolutions per minute': -2*2*Math.PI/60
+    };
+
+    for (var speed in values) {
+      assert.equal(PSVUtils.parseSpeed(speed), values[speed], speed);
+    }
+  });
+
+  it('should throw exception on invalid unit', function() {
+    assert.throws(function() {
+      PSVUtils.parseSpeed('10rpsec');
+    }, /unknown speed unit "rpsec"/, '10rpsec');
+  });
+
+  it('should passthrough when number', function() {
+    assert.equal(PSVUtils.parseSpeed(Math.PI), Math.PI, Math.PI);
   });
 });

@@ -109,13 +109,7 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data) {
     self.prop.image_size.original_width = pano_data.cropped_width;
     self.prop.image_size.original_height = pano_data.cropped_height;
 
-    // resize the panorama depending on max allowed texture size
-    var max_width = 4096; // canvas size limit for mobile compatibility
-    if (PhotoSphereViewer.SYSTEM.isWebGLSupported) {
-      max_width = PhotoSphereViewer.SYSTEM.maxTextureWidth;
-    }
-
-    var r = Math.min(pano_data.full_width, max_width) / pano_data.full_width;
+    var r = Math.min(pano_data.full_width, PhotoSphereViewer.SYSTEM.maxTextureWidth) / pano_data.full_width;
 
     pano_data.full_width *= r;
     pano_data.full_height *= r;

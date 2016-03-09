@@ -6,6 +6,60 @@ PhotoSphereViewer.prototype.load = function() {
 };
 
 /**
+ * Returns teh current position on the camera
+ * @returns ({longitude: double, latitude: double})
+ */
+PhotoSphereViewer.prototype.getPosition = function() {
+  return {
+    longitude: this.prop.longitude,
+    latitude: this.prop.latitude
+  };
+};
+
+/**
+ * Returns the current zoom level
+ * @returns (double)
+ */
+PhotoSphereViewer.prototype.getZoomLevel = function() {
+  return this.prop.zoom_lvl;
+};
+
+/**
+ * Returns the current viewer size
+ * @returns ({width: int, height: int})
+ */
+PhotoSphereViewer.prototype.getSize = function() {
+  return {
+    width: this.prop.size.width,
+    height: this.prop.size.height
+  };
+};
+
+/**
+ * Check if the automatic rotation is enabled
+ * @returns (boolean)
+ */
+PhotoSphereViewer.prototype.isAutorotateEnabled = function() {
+  return !!this.prop.autorotate_reqid;
+};
+
+/**
+ * Check if the gyroscope is enabled
+ * @returns (boolean)
+ */
+PhotoSphereViewer.prototype.isGyroscopeEnabled = function() {
+  return !!this.prop.orientation_reqid;
+};
+
+/**
+ * Check if the viewer is in fullscreen
+ * @returns (boolean)
+ */
+PhotoSphereViewer.prototype.isFullscreenEnabled = function() {
+  return PSVUtils.isFullscreenEnabled(this.container);
+};
+
+/**
  * Performs a render
  * @param updateDirection (boolean) should update camera direction - default: true
  */
@@ -217,7 +271,7 @@ PhotoSphereViewer.prototype.stopAutorotate = function() {
  * Launches/stops the autorotate animation
  */
 PhotoSphereViewer.prototype.toggleAutorotate = function() {
-  if (this.prop.autorotate_reqid) {
+  if (this.isAutorotateEnabled()) {
     this.stopAutorotate();
   }
   else {
@@ -267,7 +321,7 @@ PhotoSphereViewer.prototype.stopGyroscopeControl = function() {
  * Toggles the gyroscope interaction
  */
 PhotoSphereViewer.prototype.toggleGyroscopeControl = function() {
-  if (this.prop.orientation_reqid) {
+  if (this.isGyroscopeEnabled()) {
     this.stopGyroscopeControl();
   }
   else {
@@ -289,10 +343,7 @@ PhotoSphereViewer.prototype.rotate = function(position) {
     this.render();
   }
 
-  this.trigger('position-updated', {
-    longitude: this.prop.longitude,
-    latitude: this.prop.latitude
-  });
+  this.trigger('position-updated', this.getPosition());
 };
 
 /**
@@ -362,7 +413,7 @@ PhotoSphereViewer.prototype.stopAnimation = function() {
 PhotoSphereViewer.prototype.zoom = function(level) {
   this.prop.zoom_lvl = PSVUtils.stayBetween(Math.round(level), 0, 100);
   this.render();
-  this.trigger('zoom-updated', this.prop.zoom_lvl);
+  this.trigger('zoom-updated', this.getZoomLevel());
 };
 
 /**
@@ -387,7 +438,7 @@ PhotoSphereViewer.prototype.zoomOut = function() {
  * Enables/disables fullscreen
  */
 PhotoSphereViewer.prototype.toggleFullscreen = function() {
-  if (!PSVUtils.isFullscreenEnabled()) {
+  if (!this.isFullscreenEnabled()) {
     PSVUtils.requestFullscreen(this.container);
   }
   else {
