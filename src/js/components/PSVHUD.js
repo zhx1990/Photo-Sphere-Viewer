@@ -291,7 +291,7 @@ PSVHUD.prototype._updatePolygonMarker = function(marker) {
     marker.polygon_rad = marker.polygon_rad.map(function(coord) {
       return [
         PSVUtils.parseAngle(coord[0]),
-        PSVUtils.stayBetween(PSVUtils.parseAngle(coord[1], -Math.PI), this.config.tilt_down_max, this.config.tilt_up_max)
+        PSVUtils.stayBetween(PSVUtils.parseAngle(coord[1], -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI)
       ];
     });
   }

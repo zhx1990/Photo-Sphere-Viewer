@@ -50,8 +50,8 @@ PhotoSphereViewer.prototype._setViewerSize = function(size) {
  * @returns ({longitude: double, latitude: double})
  */
 PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(x, y) {
-  var relativeX = x / this.prop.image_size.original_width * PSVUtils.TwoPI;
-  var relativeY = y / this.prop.image_size.original_height * Math.PI;
+  var relativeX = (x + this.prop.pano_data.cropped_x) / this.prop.pano_data.full_width * PSVUtils.TwoPI;
+  var relativeY = (y + this.prop.pano_data.cropped_y) / this.prop.pano_data.full_height * Math.PI;
 
   return {
     longitude: relativeX >= Math.PI ? relativeX - Math.PI : relativeX + Math.PI,
@@ -66,12 +66,12 @@ PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(x, y) {
  * @returns ({x: int, y: int})
  */
 PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(longitude, latitude) {
-  var relativeLong = longitude / PSVUtils.TwoPI * this.prop.image_size.original_width;
-  var relativeLat = latitude / Math.PI * this.prop.image_size.original_height;
+  var relativeLong = longitude / PSVUtils.TwoPI * this.prop.pano_data.full_width;
+  var relativeLat = latitude / Math.PI * this.prop.pano_data.full_height;
 
   return {
-    x: parseInt(longitude < Math.PI ? relativeLong + this.prop.image_size.original_width / 2 : relativeLong - this.prop.image_size.original_width / 2),
-    y: parseInt(this.prop.image_size.original_height / 2 - relativeLat)
+    x: parseInt(longitude < Math.PI ? relativeLong + this.prop.pano_data.full_width / 2 : relativeLong - this.prop.pano_data.full_width / 2) - this.prop.pano_data.cropped_x,
+    y: parseInt(this.prop.pano_data.full_height / 2 - relativeLat) - this.prop.pano_data.cropped_y
   };
 };
 
@@ -90,7 +90,7 @@ PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(longitude, latit
 };
 
 /**
- * Converts a THREE.Vector3 to sperical radians coordinates
+ * Converts a THREE.Vector3 to spherical radians coordinates
  * @param vector (THREE.Vector3)
  * @returns ({longitude: double, latitude: double})
  */
@@ -107,8 +107,9 @@ PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
 /**
  * Converts x/y to latitude/longitude if present and ensure boundaries
  * @param position (Object)
+ * @param useTiltMax (boolean) use "tilt_down_max" and "tilt_up_max" for latitude - default: false
  */
-PhotoSphereViewer.prototype._cleanPosition = function(position) {
+PhotoSphereViewer.prototype._cleanPosition = function(position, useTiltMax) {
   if (position.hasOwnProperty('x') && position.hasOwnProperty('y')) {
     var sphericalCoords = this.textureCoordsToSphericalCoords(position.x, position.y);
     position.longitude = sphericalCoords.longitude;
@@ -116,5 +117,9 @@ PhotoSphereViewer.prototype._cleanPosition = function(position) {
   }
 
   position.longitude = PSVUtils.parseAngle(position.longitude);
-  position.latitude = PSVUtils.stayBetween(PSVUtils.parseAngle(position.latitude, -Math.PI), this.config.tilt_down_max, this.config.tilt_up_max);
+  position.latitude = PSVUtils.stayBetween(
+    PSVUtils.parseAngle(position.latitude, -Math.PI),
+    useTiltMax ? this.config.tilt_down_max : -PSVUtils.HalfPI,
+    useTiltMax ? this.config.tilt_up_max : PSVUtils.HalfPI
+  );
 };

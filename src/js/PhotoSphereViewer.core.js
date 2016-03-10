@@ -94,6 +94,11 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data) {
       self.loader.setProgress(100);
     }
 
+    // Config XMP data
+    if (!pano_data && self.config.pano_data) {
+      pano_data = PSVUtils.clone(self.config.pano_data);
+    }
+
     // Default XMP data
     if (!pano_data) {
       pano_data = {
@@ -106,32 +111,28 @@ PhotoSphereViewer.prototype._loadTexture = function(pano_data) {
       };
     }
 
-    self.prop.image_size.original_width = pano_data.cropped_width;
-    self.prop.image_size.original_height = pano_data.cropped_height;
+    self.prop.pano_data = pano_data;
 
     var r = Math.min(pano_data.full_width, PhotoSphereViewer.SYSTEM.maxTextureWidth) / pano_data.full_width;
+    var resized_pano_data = PSVUtils.clone(pano_data);
 
-    pano_data.full_width *= r;
-    pano_data.full_height *= r;
-    pano_data.cropped_width *= r;
-    pano_data.cropped_height *= r;
-    pano_data.cropped_x *= r;
-    pano_data.cropped_y *= r;
+    resized_pano_data.full_width *= r;
+    resized_pano_data.full_height *= r;
+    resized_pano_data.cropped_width *= r;
+    resized_pano_data.cropped_height *= r;
+    resized_pano_data.cropped_x *= r;
+    resized_pano_data.cropped_y *= r;
 
-    img.width = pano_data.cropped_width;
-    img.height = pano_data.cropped_height;
-
-    self.prop.image_size.width = pano_data.cropped_width;
-    self.prop.image_size.height = pano_data.cropped_height;
-    self.prop.pano_data = pano_data;
+    img.width = resized_pano_data.cropped_width;
+    img.height = resized_pano_data.cropped_height;
 
     // create a new image containing the source image and black for cropped parts
     var buffer = document.createElement('canvas');
-    buffer.width = pano_data.full_width;
-    buffer.height = pano_data.full_height;
+    buffer.width = resized_pano_data.full_width;
+    buffer.height = resized_pano_data.full_height;
 
     var ctx = buffer.getContext('2d');
-    ctx.drawImage(img, pano_data.cropped_x, pano_data.cropped_y, pano_data.cropped_width, pano_data.cropped_height);
+    ctx.drawImage(img, resized_pano_data.cropped_x, resized_pano_data.cropped_y, resized_pano_data.cropped_width, resized_pano_data.cropped_height);
 
     var texture = new THREE.Texture(buffer);
     texture.needsUpdate = true;

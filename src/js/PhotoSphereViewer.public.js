@@ -334,7 +334,7 @@ PhotoSphereViewer.prototype.toggleGyroscopeControl = function() {
  * @param position (Object) latitude & longitude or x & y
  */
 PhotoSphereViewer.prototype.rotate = function(position) {
-  this._cleanPosition(position);
+  this._cleanPosition(position, true);
 
   this.prop.longitude = position.longitude;
   this.prop.latitude = position.latitude;
@@ -359,7 +359,7 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
     return;
   }
 
-  this._cleanPosition(position);
+  this._cleanPosition(position, true);
 
   if (!duration && typeof duration != 'number') {
     // desired radial speed

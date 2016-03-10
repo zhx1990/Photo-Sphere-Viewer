@@ -109,12 +109,6 @@ function PhotoSphereViewer(options) {
       width: 0,
       height: 0
     },
-    image_size: { // size of the image
-      width: 0,
-      height: 0,
-      original_width: 0,
-      original_height: 0
-    },
     pano_data: { // panorama metadata
       full_width: 0,
       full_height: 0,
@@ -197,6 +191,7 @@ PhotoSphereViewer.DEFAULTS = {
   caption: null,
   autoload: true,
   usexmpdata: true,
+  pano_data: null,
   webgl: true,
   min_fov: 30,
   max_fov: 90,
