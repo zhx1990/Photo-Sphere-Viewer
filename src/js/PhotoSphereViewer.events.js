@@ -205,12 +205,8 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
  * @param evt (Event) The event
  */
 PhotoSphereViewer.prototype._click = function(evt) {
-  this.trigger('_click', evt);
-  if (evt.defaultPrevented) {
-    return;
-  }
-
   var data = {
+    target: evt.target,
     client_x: parseInt(evt.clientX - this.prop.boundingRect.left),
     client_y: parseInt(evt.clientY - this.prop.boundingRect.top)
   };

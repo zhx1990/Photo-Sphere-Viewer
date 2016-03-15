@@ -225,24 +225,6 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.container.appendChild(this.canvas_container);
   this.canvas_container.appendChild(this.renderer.domElement);
 
-  // Navigation bar
-  if (this.config.navbar) {
-    this.container.classList.add('has-navbar');
-    this.navbar = new PSVNavBar(this);
-  }
-
-  // HUD
-  this.hud = new PSVHUD(this);
-  this.config.markers.forEach(function(marker) {
-    this.hud.addMarker(marker, false);
-  }, this);
-
-  // Panel
-  this.panel = new PSVPanel(this);
-
-  // Tooltip
-  this.tooltip = new PSVTooltip(this.hud);
-
   // Queue animation
   if (this.config.time_anim !== false) {
     this.prop.start_timeout = window.setTimeout(this.startAutorotate.bind(this), this.config.time_anim);

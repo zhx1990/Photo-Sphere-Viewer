@@ -2,6 +2,10 @@
  * Starts to load the panorama
  */
 PhotoSphereViewer.prototype.load = function() {
+  if (!this.config.panorama) {
+    throw new PSVError('No value given for panorama.');
+  }
+
   this.setPanorama(this.config.panorama, false);
 };
 
@@ -67,7 +71,7 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
   if (updateDirection !== false) {
     this.prop.direction = this.sphericalCoordsToVector3(this.prop.longitude, this.prop.latitude);
     this.camera.lookAt(this.prop.direction);
-    this.camera.rotation.z = 0;
+    //this.camera.rotation.z = 0;
   }
 
   this.camera.fov = this.config.max_fov + (this.prop.zoom_lvl / 100) * (this.config.min_fov - this.config.max_fov);
@@ -341,9 +345,9 @@ PhotoSphereViewer.prototype.rotate = function(position) {
 
   if (this.renderer) {
     this.render();
-  }
 
-  this.trigger('position-updated', this.getPosition());
+    this.trigger('position-updated', this.getPosition());
+  }
 };
 
 /**
@@ -443,63 +447,5 @@ PhotoSphereViewer.prototype.toggleFullscreen = function() {
   }
   else {
     PSVUtils.exitFullscreen();
-  }
-};
-
-/**
- * Adds an event listener
- * If "func" is an object, its "handleEvent" method will be called with an object as paremeter
- *    - type: name of the event prefixed with "psv:"
- *    - args: array of action arguments
- * @param name (string) Action name
- * @param func (Function|Object) The handler function, or an object with an "handleEvent" method
- * @return (PhotoSphereViewer)
- */
-PhotoSphereViewer.prototype.on = function(name, func) {
-  if (!(name in this.actions)) {
-    this.actions[name] = [];
-  }
-
-  this.actions[name].push(func);
-
-  return this;
-};
-
-/**
- * Removes an event listener
- * @param name (string) Action name
- * @param func (Function|Object)
- * @return (PhotoSphereViewer)
- */
-PhotoSphereViewer.prototype.off = function(name, func) {
-  if (name in this.actions) {
-    var idx = this.actions[name].indexOf(func);
-    if (idx !== -1) {
-      this.actions[name].splice(idx, 1);
-    }
-  }
-
-  return this;
-};
-
-/**
- * Triggers an action
- * @param name (string) Action name
- * @param args... (mixed) Arguments to send to the handler functions
- */
-PhotoSphereViewer.prototype.trigger = function(name, args) {
-  args = Array.prototype.slice.call(arguments, 1);
-  if ((name in this.actions) && this.actions[name].length > 0) {
-    this.actions[name].forEach(function(func) {
-      if (typeof func === 'object') {
-        func.handleEvent({
-          type: 'psv:' + name,
-          args: args
-        });
-      }
-      else {
-        func.apply(this, args);
-      }
-    }, this);
   }
 };

@@ -13,6 +13,41 @@ function PhotoSphereViewer(options) {
 
   this.config = PSVUtils.deepmerge(PhotoSphereViewer.DEFAULTS, options);
 
+  // check system and config
+  if (!options.container) {
+    throw new PSVError('No value given for container.');
+  }
+
+  if (!PhotoSphereViewer.SYSTEM.isCanvasSupported) {
+    throw new PSVError('Canvas is not supported.');
+  }
+
+  if ((!PhotoSphereViewer.SYSTEM.isWebGLSupported || !this.config.webgl) && !PSVUtils.checkTHREE('CanvasRenderer', 'Projector')) {
+    throw new PSVError('Missing Three.js components: CanvasRenderer, Projector. Get them from threejs-examples package.');
+  }
+
+  if (this.config.transition && this.config.transition.blur) {
+    if (!PhotoSphereViewer.SYSTEM.isWebGLSupported || !this.config.webgl) {
+      this.config.transition.blur = false;
+      console.warn('PhotoSphereViewer: Using canvas rendering, blur transition disabled.');
+    }
+    else if (!PSVUtils.checkTHREE('EffectComposer', 'RenderPass', 'ShaderPass', 'MaskPass', 'CopyShader')) {
+      throw new PSVError('Missing Three.js components: EffectComposer, RenderPass, ShaderPass, MaskPass, CopyShader. Get them from threejs-examples package.');
+    }
+  }
+
+  if (this.config.max_fov < this.config.min_fov) {
+    this.config.max_fov = PhotoSphereViewer.DEFAULTS.max_fov;
+    this.config.min_fov = PhotoSphereViewer.DEFAULTS.min_fov;
+    console.warn('max_fov cannot be lower than min_fov.');
+  }
+
+  if (this.config.tilt_up_max < this.config.tilt_down_max) {
+    this.config.tilt_up_max = PhotoSphereViewer.DEFAULTS.tilt_up_max;
+    this.config.tilt_down_max = PhotoSphereViewer.DEFAULTS.tilt_down_max;
+    console.warn('tilt_up_max cannot be lower than tilt_down_max.');
+  }
+
   // normalize config
   this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
   this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
@@ -37,33 +72,6 @@ function PhotoSphereViewer(options) {
   this.config.anim_speed = PSVUtils.parseSpeed(this.config.anim_speed);
   if (this.config.caption && !this.config.navbar) {
     this.config.navbar = ['caption'];
-  }
-
-  // check config
-  if (!options.panorama || !options.container) {
-    throw new PSVError('No value given for panorama or container.');
-  }
-
-  if ((!PhotoSphereViewer.SYSTEM.isWebGLSupported || !this.config.webgl) && !PSVUtils.checkTHREE('CanvasRenderer', 'Projector')) {
-    throw new PSVError('Missing Three.js components: CanvasRenderer, Projector. Get them from threejs-examples package.');
-  }
-
-  if (this.config.transition && this.config.transition.blur) {
-    if (!PhotoSphereViewer.SYSTEM.isWebGLSupported || !this.config.webgl) {
-      this.config.transition.blur = false;
-      console.warn('PhotoSphereViewer: Using canvas rendering, blur transition disabled.');
-    }
-    else if (!PSVUtils.checkTHREE('EffectComposer', 'RenderPass', 'ShaderPass', 'MaskPass', 'CopyShader')) {
-      throw new PSVError('Missing Three.js components: EffectComposer, RenderPass, ShaderPass, MaskPass, CopyShader. Get them from threejs-examples package.');
-    }
-  }
-
-  if (this.config.max_fov < this.config.min_fov) {
-    throw new PSVError('max_fov cannot be lower than min_fov.');
-  }
-
-  if (this.config.tilt_up_max < this.config.tilt_down_max) {
-    throw new PSVError('tilt_up_max cannot be lower than tilt_down_max.');
   }
 
   // references to components
@@ -119,34 +127,56 @@ function PhotoSphereViewer(options) {
     }
   };
 
-  // compute zoom level
-  this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
-  this.prop.zoom_lvl -= 2 * (this.prop.zoom_lvl - 50);
-
   // create actual container
   this.container = document.createElement('div');
   this.container.classList.add('psv-container');
   this.parent.appendChild(this.container);
 
-  // is canvas supported?
-  if (!PhotoSphereViewer.SYSTEM.isCanvasSupported) {
-    this.container.textContent = 'Canvas is not supported, update your browser!';
-    throw new PSVError('Canvas is not supported.');
-  }
+  // apply config
+  this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
+  this.prop.zoom_lvl -= 2 * (this.prop.zoom_lvl - 50);
 
-  // init
-  this.rotate({
-    longitude: this.config.default_long,
-    latitude: this.config.default_lat
-  });
+  this.prop.longitude = this.config.default_long;
+  this.prop.latitude = this.config.default_lat;
 
   if (this.config.size !== null) {
     this._setViewerSize(this.config.size);
   }
 
+  // load components
+  if (this.config.navbar) {
+    this.navbar = new PSVNavBar(this);
+    this.navbar.hide();
+  }
+
+  this.hud = new PSVHUD(this);
+  this.hud.hide();
+
+  this.panel = new PSVPanel(this);
+
+  this.tooltip = new PSVTooltip(this.hud);
+
+  // init
   if (this.config.autoload) {
     this.load();
   }
+
+  // enable GUI after first render
+  this.once('render', function() {
+    if (this.config.navbar) {
+      this.navbar.show();
+    }
+
+    this.hud.show();
+
+    if (this.config.markers) {
+      this.config.markers.forEach(function(marker) {
+        this.hud.addMarker(marker, false);
+      }, this);
+
+      this.hud.updatePositions();
+    }
+  }.bind(this));
 }
 
 /**
@@ -243,3 +273,5 @@ PhotoSphereViewer.DEFAULTS = {
   size: null,
   markers: []
 };
+
+uEvent.mixin(PhotoSphereViewer);
