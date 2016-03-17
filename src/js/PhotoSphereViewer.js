@@ -67,8 +67,6 @@ function PhotoSphereViewer(options) {
   else {
     this.config.anim_lat = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.anim_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
   }
-  this.config.long_offset = PSVUtils.parseAngle(this.config.long_offset);
-  this.config.lat_offset = PSVUtils.parseAngle(this.config.lat_offset);
   this.config.anim_speed = PSVUtils.parseSpeed(this.config.anim_speed);
   if (this.config.caption && !this.config.navbar) {
     this.config.navbar = ['caption'];
@@ -133,11 +131,13 @@ function PhotoSphereViewer(options) {
   this.parent.appendChild(this.container);
 
   // apply config
-  this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
-  this.prop.zoom_lvl -= 2 * (this.prop.zoom_lvl - 50);
+  var tempZoom = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
+  this.zoom(tempZoom - 2 * (tempZoom - 50), false);
 
-  this.prop.longitude = this.config.default_long;
-  this.prop.latitude = this.config.default_lat;
+  this.rotate({
+    longitude: this.config.default_long,
+    latitude: this.config.default_lat
+  }, false);
 
   if (this.config.size !== null) {
     this._setViewerSize(this.config.size);
@@ -203,6 +203,7 @@ PhotoSphereViewer.ICONS = {};
  */
 PhotoSphereViewer.SYSTEM = {
   loaded: false,
+  pixelRatio: 1,
   isWebGLSupported: false,
   isCanvasSupported: false,
   deviceOrientationSupported: null,
@@ -230,8 +231,7 @@ PhotoSphereViewer.DEFAULTS = {
   default_lat: 0,
   tilt_up_max: PSVUtils.HalfPI,
   tilt_down_max: -PSVUtils.HalfPI,
-  long_offset: Math.PI / 1440.0,
-  lat_offset: Math.PI / 720.0,
+  move_speed: 1,
   time_anim: 2000,
   anim_speed: '2rpm',
   anim_lat: null,

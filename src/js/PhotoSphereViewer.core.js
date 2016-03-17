@@ -305,7 +305,7 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
 
     if (self.config.transition.blur) {
       self.passes.blur.uniforms.fDensity.value = properties.density;
-      self.prop.zoom_lvl = properties.zoom;
+      self.zoom(properties.zoom, false);
     }
 
     self.render();
@@ -341,7 +341,7 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
         self.passes.copy.enabled = true;
         self.passes.blur.enabled = false;
 
-        self.prop.zoom_lvl = original_zoom_lvl;
+        self.zoom(original_zoom_lvl, false);
       }
 
       // remove temp sphere and transfer the texture to the main sphere

@@ -74,7 +74,7 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
     //this.camera.rotation.z = 0;
   }
 
-  this.camera.fov = this.config.max_fov + (this.prop.zoom_lvl / 100) * (this.config.min_fov - this.config.max_fov);
+  this.camera.fov = this.prop.fov;
   this.camera.updateProjectionMatrix();
 
   if (this.composer) {
@@ -336,14 +336,15 @@ PhotoSphereViewer.prototype.toggleGyroscopeControl = function() {
 /**
  * Rotate the camera
  * @param position (Object) latitude & longitude or x & y
+ * @param render (boolean) default true
  */
-PhotoSphereViewer.prototype.rotate = function(position) {
+PhotoSphereViewer.prototype.rotate = function(position, render) {
   this._cleanPosition(position, true);
 
   this.prop.longitude = position.longitude;
   this.prop.latitude = position.latitude;
 
-  if (this.renderer) {
+  if (render !== false && this.renderer) {
     this.render();
 
     this.trigger('position-updated', this.getPosition());
@@ -413,11 +414,17 @@ PhotoSphereViewer.prototype.stopAnimation = function() {
 /**
  * Zoom
  * @param level (integer) New zoom level
+ * @param render (boolean) default true
  */
-PhotoSphereViewer.prototype.zoom = function(level) {
+PhotoSphereViewer.prototype.zoom = function(level, render) {
   this.prop.zoom_lvl = PSVUtils.stayBetween(Math.round(level), 0, 100);
-  this.render();
-  this.trigger('zoom-updated', this.getZoomLevel());
+  this.prop.fov = this.config.max_fov + (this.prop.zoom_lvl / 100) * (this.config.min_fov - this.config.max_fov);
+
+  if (render !== false && this.renderer) {
+    this.render();
+
+    this.trigger('zoom-updated', this.getZoomLevel());
+  }
 };
 
 /**

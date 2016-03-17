@@ -274,9 +274,11 @@ PhotoSphereViewer.prototype._move = function(evt) {
     var x = parseInt(evt.clientX);
     var y = parseInt(evt.clientY);
 
+    var multiplicator = 1 / PhotoSphereViewer.SYSTEM.pixelRatio * this.prop.fov / 100 * Math.PI * this.config.move_speed;
+
     this.rotate({
-      longitude: this.prop.longitude - (x - this.prop.mouse_x) * this.config.long_offset,
-      latitude: this.prop.latitude + (y - this.prop.mouse_y) * this.config.lat_offset
+      longitude: this.prop.longitude - (x - this.prop.mouse_x) / this.prop.size.width * multiplicator,
+      latitude: this.prop.latitude + (y - this.prop.mouse_y) / this.prop.size.height * multiplicator
     });
 
     this.prop.mouse_x = x;
