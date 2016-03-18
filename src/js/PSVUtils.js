@@ -370,7 +370,7 @@ PSVUtils.parseAngle = function(angle, reference) {
       angle = PSVUtils.TwoPI + angle;
     }
 
-    angle+= reference;
+    angle += reference;
   }
 
   return angle;
@@ -385,6 +385,7 @@ PSVUtils.parseAngle = function(angle, reference) {
  *    - easing (string|function, optional)
  *    - onTick (function(properties))
  *    - onCancel (function)
+ *    - onDone (function)
  * @returns (D.promise) with an additional "cancel" method
  */
 PSVUtils.animation = function(options) {
@@ -429,6 +430,10 @@ PSVUtils.animation = function(options) {
 
       options.onTick(current, 1.0);
 
+      if (options.onDone) {
+        options.onDone();
+      }
+
       defer.resolve();
     }
   }
@@ -447,8 +452,8 @@ PSVUtils.animation = function(options) {
   promise.cancel = function() {
     if (options.onCancel) {
       options.onCancel();
-      defer.reject(defer);
     }
+    defer.reject();
   };
   return promise;
 };
@@ -461,56 +466,34 @@ PSVUtils.animation = function(options) {
 // jscs:disable
 /* jshint ignore:start */
 PSVUtils.animation.easings = {
-  // no easing, no acceleration
   linear: function(t) { return t; },
 
-  // accelerating from zero velocity
   inQuad: function(t) { return t*t; },
-  // decelerating to zero velocity
   outQuad: function(t) { return t*(2-t); },
-  // acceleration until halfway, then deceleration
   inOutQuad: function(t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t; },
 
-  // accelerating from zero velocity
   inCubic: function(t) { return t*t*t; },
-  // decelerating to zero velocity
   outCubic: function(t) { return (--t)*t*t+1; },
-  // acceleration until halfway, then deceleration
   inOutCubic: function(t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1; },
 
-  // accelerating from zero velocity
   inQuart: function(t) { return t*t*t*t; },
-  // decelerating to zero velocity
   outQuart: function(t) { return 1-(--t)*t*t*t; },
-  // acceleration until halfway, then deceleration
   inOutQuart: function(t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t; },
 
-  // accelerating from zero velocity
   inQuint: function(t) { return t*t*t*t*t; },
-  // decelerating to zero velocity
   outQuint: function(t) { return 1+(--t)*t*t*t*t; },
-  // acceleration until halfway, then deceleration
   inOutQuint: function(t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t; },
 
-  // accelerating from zero velocity
   inSine: function(t) { return 1-Math.cos(t*(Math.PI/2)); },
-  // decelerating to zero velocity
   outSine: function(t) { return Math.sin(t*(Math.PI/2)); },
-  // accelerating until halfway, then decelerating
   inOutSine: function(t) { return .5-.5*Math.cos(Math.PI*t); },
 
-  // accelerating from zero velocity
   inExpo: function(t) { return Math.pow(2, 10*(t-1)); },
-  // decelerating to zero velocity
   outExpo: function(t) { return 1-Math.pow(2, -10*t); },
-  // accelerating until halfway, then decelerating
   inOutExpo: function(t) { t=t*2-1; return t<0 ? .5*Math.pow(2, 10*t) : 1-.5*Math.pow(2, -10*t); },
 
-  // accelerating from zero velocity
   inCirc: function(t) { return 1-Math.sqrt(1-t*t); },
-  // decelerating to zero velocity
   outCirc: function(t) { t--; return Math.sqrt(1-t*t); },
-  // acceleration until halfway, then deceleration
   inOutCirc: function(t) { t*=2; return t<1 ? .5-.5*Math.sqrt(1-t*t) : .5+.5*Math.sqrt(1-(t-=2)*t); }
 };
 // jscs:enable
