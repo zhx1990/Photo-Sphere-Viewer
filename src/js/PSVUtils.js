@@ -570,51 +570,52 @@ PSVUtils.throttle = function(func, wait) {
 /**
  * Merge the enumerable attributes of two objects.
  * Modified to replace arrays instead of merge.
+ * Modified to alter the target object.
  * @copyright Nicholas Fisher <nfisher110@gmail.com>"
  * @license MIT
  * @param target (Object)
  * @param src (Object)
- * @return (Object)
+ * @return target (Object)
  */
 PSVUtils.deepmerge = function(target, src) {
-  var array = Array.isArray(src);
-  var dst = array && [] || {};
+  var first = src;
 
-  if (array) {
-    src.forEach(function(e, i) {
-      if (typeof dst[i] === 'undefined') {
-        dst[i] = e;
+  return (function merge(target, src) {
+    if (Array.isArray(src)) {
+      if (!target || !Array.isArray(target)) {
+        target = [];
       }
       else {
-        dst[i] = PSVUtils.deepmerge(null, e);
+        target.length = 0;
       }
-    });
-  }
-  else {
-    if (target && Array.isArray(target)) {
-      target = undefined;
-    }
-    if (target && typeof target === 'object') {
-      Object.keys(target).forEach(function(key) {
-        dst[key] = target[key];
+      src.forEach(function(e, i) {
+        target[i] = merge(null, e);
       });
     }
-    Object.keys(src).forEach(function(key) {
-      if (typeof src[key] !== 'object' || !src[key]) {
-        dst[key] = src[key];
+    else if (typeof src == 'object') {
+      if (!target || Array.isArray(target)) {
+        target = {};
       }
-      else {
-        if (!target[key]) {
-          dst[key] = src[key];
+      Object.keys(src).forEach(function(key) {
+        if (typeof src[key] != 'object' || !src[key]) {
+          target[key] = src[key];
         }
-        else {
-          dst[key] = PSVUtils.deepmerge(target[key], src[key]);
+        else if (src[key] != first) {
+          if (!target[key]) {
+            target[key] = merge(null, src[key]);
+          }
+          else {
+            merge(target[key], src[key]);
+          }
         }
-      }
-    });
-  }
+      });
+    }
+    else {
+      target = src;
+    }
 
-  return dst;
+    return target;
+  }(target, src));
 };
 
 /**
@@ -623,5 +624,5 @@ PSVUtils.deepmerge = function(target, src) {
  * @return (Object)
  */
 PSVUtils.clone = function(src) {
-  return PSVUtils.deepmerge(Array.isArray(src) ? [] : {}, src);
+  return PSVUtils.deepmerge(null, src);
 };

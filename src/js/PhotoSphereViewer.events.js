@@ -216,7 +216,7 @@ PhotoSphereViewer.prototype._click = function(evt) {
   };
 
   if (evt.data) {
-    data = PSVUtils.deepmerge(data, evt.data);
+    PSVUtils.deepmerge(data, evt.data);
   }
 
   var screen = new THREE.Vector2(

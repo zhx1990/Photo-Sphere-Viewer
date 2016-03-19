@@ -11,7 +11,8 @@ function PhotoSphereViewer(options) {
     PhotoSphereViewer.loadSystem();
   }
 
-  this.config = PSVUtils.deepmerge(PhotoSphereViewer.DEFAULTS, options);
+  this.config = PSVUtils.clone(PhotoSphereViewer.DEFAULTS);
+  PSVUtils.deepmerge(this.config, options);
 
   // check system and config
   if (!options.container) {

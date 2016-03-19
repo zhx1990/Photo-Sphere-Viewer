@@ -154,25 +154,26 @@ PSVHUD.prototype.getCurrentMarker = function() {
 
 /**
  * Update a marker
- * @param marker (Object)
+ * @param input (Object)
  * @param render (Boolean) "false" to disable immediate render
  * @return (Object) a modified marker object
  */
-PSVHUD.prototype.updateMarker = function(marker, render) {
-  var old = this.getMarker(marker);
+PSVHUD.prototype.updateMarker = function(input, render) {
+  var marker = this.getMarker(input);
 
   // clean some previous data
-  if (old.className) {
-    PSVUtils.removeClasses(old.$el, old.className);
+  if (marker.className) {
+    PSVUtils.removeClasses(marker.$el, marker.className);
   }
-  if (old.tooltip) {
-    old.$el.classList.remove('has-tooltip');
+  if (marker.tooltip) {
+    marker.$el.classList.remove('has-tooltip');
   }
 
   // merge objects
-  if (marker == old) marker = PSVUtils.clone(marker);
-  delete marker.$el;
-  marker = PSVUtils.deepmerge(old, marker);
+  if (marker != input) {
+    delete input.$el;
+    PSVUtils.deepmerge(marker, input);
+  }
 
   marker.position2D = null;
 
