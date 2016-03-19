@@ -67,7 +67,7 @@ PSVUtils.isWebGLSupported = function() {
 };
 
 /**
- * Get max texture width in WebGL context
+ * Gets max texture width in WebGL context
  * @return (int)
  */
 PSVUtils.getMaxTextureWidth = function() {
@@ -76,10 +76,10 @@ PSVUtils.getMaxTextureWidth = function() {
 };
 
 /**
- * Toggle a CSS class
- * @param element
- * @param className
- * @param active
+ * Toggles a CSS class
+ * @param element (HTMLElement)
+ * @param className (String)
+ * @param active (boolean,optional) forced state
  */
 PSVUtils.toggleClass = function(element, className, active) {
   if (active === undefined) {
@@ -91,6 +91,34 @@ PSVUtils.toggleClass = function(element, className, active) {
   else if (!active) {
     element.classList.remove(className);
   }
+};
+
+/**
+ * Adds one or several CSS classes to an element
+ * @param element (HTMLElement)
+ * @param className (String)
+ */
+PSVUtils.addClasses = function(element, className) {
+  if (!className) {
+    return;
+  }
+  className.split(' ').forEach(function(name) {
+    element.classList.add(name);
+  });
+};
+
+/**
+ * Removes one or several CSS classes to an element
+ * @param element (HTMLElement)
+ * @param className (String)
+ */
+PSVUtils.removeClasses = function(element, className) {
+  if (!className) {
+    return;
+  }
+  className.split(' ').forEach(function(name) {
+    element.classList.remove(name);
+  });
 };
 
 /**

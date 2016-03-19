@@ -163,7 +163,7 @@ PSVHUD.prototype.updateMarker = function(marker, render) {
 
   // clean some previous data
   if (old.className) {
-    old.$el.classList.remove(old.className);
+    PSVUtils.removeClasses(old.$el, old.className);
   }
   if (old.tooltip) {
     old.$el.classList.remove('has-tooltip');
@@ -178,7 +178,7 @@ PSVHUD.prototype.updateMarker = function(marker, render) {
 
   // add classes
   if (marker.className) {
-    marker.$el.classList.add(marker.className);
+    PSVUtils.addClasses(marker.$el, marker.className);
   }
   if (marker.tooltip) {
     marker.$el.classList.add('has-tooltip');
