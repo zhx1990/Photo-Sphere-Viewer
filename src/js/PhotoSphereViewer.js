@@ -99,7 +99,7 @@ function PhotoSphereViewer(options) {
   }
 
   // references to components
-  this.parent = (typeof this.config.container == 'string') ? document.getElementById(this.config.container) : this.config.container;
+  this.parent = (typeof options.container == 'string') ? document.getElementById(options.container) : options.container;
   this.container = null;
   this.loader = null;
   this.navbar = null;

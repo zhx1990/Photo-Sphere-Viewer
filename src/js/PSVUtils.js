@@ -256,7 +256,7 @@ PSVUtils.getStyle = function(elt, prop) {
 /**
  * Translate CSS values like "top center" or "10% 50%" as top and left positions
  * The implementation is as close as possible to the "background-position" specification
- * https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
+ * @link https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
  * @param value (String)
  * @return Object ({top: double: left: double})
  */
@@ -490,7 +490,7 @@ PSVUtils.animation = function(options) {
 
 /**
  * Collection of easing functions
- * https://gist.github.com/frederickk/6165768
+ * @link https://gist.github.com/frederickk/6165768
  */
 // @formatter:off
 // jscs:disable
@@ -570,6 +570,33 @@ PSVUtils.throttle = function(func, wait) {
 };
 
 /**
+ *  Function to test if an object is a plain object, i.e. is constructed
+ *  by the built-in Object constructor and inherits directly from Object.prototype
+ *  or null. Some built-in objects pass the test, e.g. Math which is a plain object
+ *  and some host or exotic objects may pass also.
+ *  @link http://stackoverflow.com/a/5878101/1207670
+ *  @param {} obj - value to test
+ *  @returns {Boolean} true if passes tests, false otherwise
+ */
+PSVUtils.isPlainObject = function(obj) {
+  // Basic check for Type object that's not null
+  if (typeof obj == 'object' && obj !== null) {
+    // If Object.getPrototypeOf supported, use it
+    if (typeof Object.getPrototypeOf == 'function') {
+      var proto = Object.getPrototypeOf(obj);
+      return proto === Object.prototype || proto === null;
+    }
+
+    // Otherwise, use internal class
+    // This should be reliable as if getPrototypeOf not supported, is pre-ES5
+    return Object.prototype.toString.call(obj) == '[object Object]';
+  }
+
+  // Not an object
+  return false;
+};
+
+/**
  * Merge the enumerable attributes of two objects.
  * Modified to replace arrays instead of merge.
  * Modified to alter the target object.
@@ -599,7 +626,7 @@ PSVUtils.deepmerge = function(target, src) {
         target = {};
       }
       Object.keys(src).forEach(function(key) {
-        if (typeof src[key] != 'object' || !src[key]) {
+        if (typeof src[key] != 'object' || !src[key] || !PSVUtils.isPlainObject(src[key])) {
           target[key] = src[key];
         }
         else if (src[key] != first) {
