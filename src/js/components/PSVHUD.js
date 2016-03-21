@@ -17,7 +17,8 @@ PSVHUD.prototype = Object.create(PSVComponent.prototype);
 PSVHUD.prototype.constructor = PSVHUD;
 
 PSVHUD.className = 'psv-hud';
-PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'updateMarker', 'getMarker', 'getCurrentMarker', 'gotoMarker', 'hideMarker', 'showMarker', 'toggleMarker'];
+PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'updateMarker', 'clearMarkers', 'getMarker', 'getCurrentMarker',
+  'gotoMarker', 'hideMarker', 'showMarker', 'toggleMarker'];
 
 PSVHUD.svgNS = 'http://www.w3.org/2000/svg';
 
@@ -324,6 +325,20 @@ PSVHUD.prototype.removeMarker = function(marker, render) {
   }
 
   delete this.markers[marker.id];
+
+  if (render !== false) {
+    this.updatePositions();
+  }
+};
+
+/**
+ + * Remove all markers
+ + * @param render (Boolean) "false" to disable immediate render
+ + */
+PSVHUD.prototype.clearMarkers = function(render) {
+  Object.keys(this.markers).forEach(function(marker) {
+    this.removeMarker(marker, false)
+  }, this);
 
   if (render !== false) {
     this.updatePositions();

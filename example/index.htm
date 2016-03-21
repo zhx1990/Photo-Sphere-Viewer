@@ -100,9 +100,7 @@
 
           return function() {
             i = !i;
-            Object.keys(PSV.hud.markers).forEach(function(marker) {
-              PSV.removeMarker(marker);
-            });
+            PSV.clearMarkers();
 
             PSV.setPanorama(i ? 'Bryce-Canyon-By-Jess-Beauchemin.jpg' : 'Bryce-Canyon-National-Park-Mark-Doliner.jpg', {
               longitude: i ? 3.7153696451829257 : 3.8484510006474992,

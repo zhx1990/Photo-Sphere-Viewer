@@ -18,3 +18,5 @@ function PSVError(message) {
 PSVError.prototype = Object.create(Error.prototype);
 PSVError.prototype.name = 'PSVError';
 PSVError.prototype.constructor = PSVError;
+
+PhotoSphereViewer.Error = PSVError;

@@ -3,6 +3,8 @@
  */
 var PSVUtils = {};
 
+PhotoSphereViewer.Utils = PSVUtils;
+
 PSVUtils.TwoPI = Math.PI * 2.0;
 PSVUtils.HalfPI = Math.PI / 2.0;
 
