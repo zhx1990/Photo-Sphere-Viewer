@@ -296,6 +296,7 @@ PhotoSphereViewer.DEFAULTS = {
   },
   mousewheel: true,
   mousemove: true,
+  gyroscope: false,
   move_inertia: true,
   click_event_on_marker: true,
   transition: {

@@ -55,28 +55,30 @@ PSVNavBar.prototype.create = function() {
     }
     else {
       switch (button) {
-        case 'autorotate':
+        case PSVNavBarAutorotateButton.id:
           this.items.push(new PSVNavBarAutorotateButton(this));
           break;
 
-        case 'zoom':
+        case PSVNavBarZoomButton.id:
           this.items.push(new PSVNavBarZoomButton(this));
           break;
 
-        case 'download':
+        case PSVNavBarDownloadButton.id:
           this.items.push(new PSVNavBarDownloadButton(this));
           break;
 
-        case 'markers':
+        case PSVNavBarMarkersButton.id:
           this.items.push(new PSVNavBarMarkersButton(this));
           break;
 
-        case 'fullscreen':
+        case PSVNavBarFullscreenButton.id:
           this.items.push(new PSVNavBarFullscreenButton(this));
           break;
 
-        case 'gyroscope':
-          this.items.push(new PSVNavBarGyroscopeButton(this));
+        case PSVNavBarGyroscopeButton.id:
+          if (this.psv.config.gyroscope) {
+            this.items.push(new PSVNavBarGyroscopeButton(this));
+          }
           break;
 
         case 'caption':
@@ -87,7 +89,7 @@ PSVNavBar.prototype.create = function() {
           button = 'spacer-5';
         /* falls through */
         default:
-          var matches = button.match(/spacer\-([0-9]+)/);
+          var matches = button.match(/^spacer\-([0-9]+)$/);
           if (matches !== null) {
             this.items.push(new PSVNavBarSpacer(this, matches[1]));
           }

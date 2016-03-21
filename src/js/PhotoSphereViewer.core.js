@@ -199,7 +199,7 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.camera = new THREE.PerspectiveCamera(this.config.default_fov, this.prop.size.width / this.prop.size.height, 1, 300);
   this.camera.position.set(0, 0, 0);
 
-  if (PSVUtils.checkTHREE('DeviceOrientationControls')) {
+  if (this.config.gyroscope && PSVUtils.checkTHREE('DeviceOrientationControls')) {
     this.doControls = new THREE.DeviceOrientationControls(this.camera);
   }
 
@@ -352,6 +352,12 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
 
       // actually rotate the camera
       if (position) {
+        // FIXME: find a better way to handle ranges
+        if (self.config.latitude_range || self.config.longitude_range) {
+          self.config.longitude_range = self.config.latitude_range = null;
+          console.warn('PhotoSphereViewer: trying to perform transition with longitude_range and/or latitude_range, ranges cleared.');
+        }
+
         self.rotate(position);
       }
       else {
