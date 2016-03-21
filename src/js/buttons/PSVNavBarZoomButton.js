@@ -20,6 +20,7 @@ function PSVNavBarZoomButton(navbar) {
 PSVNavBarZoomButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarZoomButton.prototype.constructor = PSVNavBarZoomButton;
 
+PSVNavBarZoomButton.id = 'zoom';
 PSVNavBarZoomButton.className = 'psv-button zoom-button';
 
 /**
@@ -66,7 +67,7 @@ PSVNavBarZoomButton.prototype.create = function() {
 
   this.psv.on('zoom-updated', this);
 
-  this.psv.once('render', function() {
+  this.psv.once('ready', function() {
     this._moveZoomValue(this.psv.prop.zoom_lvl);
   }.bind(this));
 };
@@ -118,6 +119,10 @@ PSVNavBarZoomButton.prototype._moveZoomValue = function(level) {
  * @return (void)
  */
 PSVNavBarZoomButton.prototype._initZoomChangeWithMouse = function(evt) {
+  if (!this.enabled) {
+    return;
+  }
+
   this.prop.mousedown = true;
   this._changeZoom(evt.clientX);
 };
@@ -128,6 +133,10 @@ PSVNavBarZoomButton.prototype._initZoomChangeWithMouse = function(evt) {
  * @return (void)
  */
 PSVNavBarZoomButton.prototype._initZoomChangeByTouch = function(evt) {
+  if (!this.enabled) {
+    return;
+  }
+
   this.prop.mousedown = true;
   this._changeZoom(evt.changedTouches[0].clientX);
 };
@@ -137,6 +146,10 @@ PSVNavBarZoomButton.prototype._initZoomChangeByTouch = function(evt) {
  * Zoom in and register long press timer
  */
 PSVNavBarZoomButton.prototype._zoomIn = function() {
+  if (!this.enabled) {
+    return;
+  }
+
   this.prop.buttondown = true;
   this.psv.zoomIn();
   window.setTimeout(this._startLongPressInterval.bind(this, 1), 200);
@@ -147,6 +160,10 @@ PSVNavBarZoomButton.prototype._zoomIn = function() {
  * Zoom out and register long press timer
  */
 PSVNavBarZoomButton.prototype._zoomOut = function() {
+  if (!this.enabled) {
+    return;
+  }
+
   this.prop.buttondown = true;
   this.psv.zoomOut();
   window.setTimeout(this._startLongPressInterval.bind(this, -1), 200);
@@ -169,6 +186,10 @@ PSVNavBarZoomButton.prototype._startLongPressInterval = function(value) {
  * @return (void)
  */
 PSVNavBarZoomButton.prototype._stopZoomChange = function() {
+  if (!this.enabled) {
+    return;
+  }
+
   window.clearInterval(this.prop.longPressInterval);
   this.prop.longPressInterval = null;
   this.prop.mousedown = false;
@@ -181,6 +202,10 @@ PSVNavBarZoomButton.prototype._stopZoomChange = function() {
  * @return (void)
  */
 PSVNavBarZoomButton.prototype._changeZoomWithMouse = function(evt) {
+  if (!this.enabled) {
+    return;
+  }
+
   evt.preventDefault();
   this._changeZoom(evt.clientX);
 };
@@ -191,6 +216,10 @@ PSVNavBarZoomButton.prototype._changeZoomWithMouse = function(evt) {
  * @return (void)
  */
 PSVNavBarZoomButton.prototype._changeZoomByTouch = function(evt) {
+  if (!this.enabled) {
+    return;
+  }
+
   evt.preventDefault();
   this._changeZoom(evt.changedTouches[0].clientX);
 };

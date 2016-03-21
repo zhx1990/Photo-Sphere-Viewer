@@ -8,6 +8,10 @@ function PSVNavBarCustomButton(navbar, config) {
 
   this.config = config;
 
+  if (this.config.id) {
+    this.id = this.config.id;
+  }
+
   this.create();
 }
 
@@ -34,8 +38,13 @@ PSVNavBarCustomButton.prototype.create = function() {
   if (this.config.content) {
     this.container.innerHTML = this.config.content;
   }
+};
 
+/**
+ * Calls user method on click
+ */
+PSVNavBarCustomButton.prototype._onClick = function() {
   if (this.config.onClick) {
-    this.container.addEventListener('click', this.config.onClick);
+    this.config.onClick.apply(this.psv);
   }
 };

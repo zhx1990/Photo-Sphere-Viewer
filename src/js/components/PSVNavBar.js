@@ -40,7 +40,7 @@ PSVNavBar.prototype = Object.create(PSVComponent.prototype);
 PSVNavBar.prototype.constructor = PSVNavBar;
 
 PSVNavBar.className = 'psv-navbar open';
-PSVNavBar.publicMethods = ['showNavbar', 'hideNavbar', 'toggleNavbar'];
+PSVNavBar.publicMethods = ['showNavbar', 'hideNavbar', 'toggleNavbar', 'getNavbarButton'];
 
 /**
  * Creates the navbar
@@ -111,6 +111,28 @@ PSVNavBar.prototype.destroy = function() {
   this.items.length = 0;
 
   PSVComponent.prototype.destroy.call(this);
+};
+
+/**
+ * Returns a button by it's identifier
+ * @param id
+ * @returns (Object|null)
+ */
+PSVNavBar.prototype.getNavbarButton = function(id) {
+  var button = null;
+
+  this.items.some(function(item) {
+    if (item.id === id) {
+      button = item;
+      return true;
+    }
+  });
+
+  if (!button) {
+    console.warn('PhotoSphereViewer: button "' + id + '" not found in the navbar.');
+  }
+
+  return button;
 };
 
 /**

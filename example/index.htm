@@ -114,6 +114,11 @@
           }
         }())
       },
+      {
+        id: 'disabled',
+        title: 'This button is disabled',
+        content: 'NO'
+      },
       'caption',
       'gyroscope',
       'fullscreen'
@@ -243,6 +248,10 @@
         height: width
       });
     }
+  });
+
+  PSV.on('ready', function() {
+    PSV.getNavbarButton('disabled').disable();
   });
 </script>
 

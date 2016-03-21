@@ -6,6 +6,8 @@
 function PSVNavBarSpacer(navbar, weight) {
   PSVComponent.call(this, navbar);
 
+  this.weight = weight;
+
   this.create();
 
   this.container.classList.add('weight-' + (weight || 5));

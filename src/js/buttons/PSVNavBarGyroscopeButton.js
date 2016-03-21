@@ -11,6 +11,7 @@ function PSVNavBarGyroscopeButton(navbar) {
 PSVNavBarGyroscopeButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarGyroscopeButton.prototype.constructor = PSVNavBarGyroscopeButton;
 
+PSVNavBarGyroscopeButton.id = 'gyroscope';
 PSVNavBarGyroscopeButton.className = 'psv-button hover-scale gyroscope-button';
 PSVNavBarGyroscopeButton.icon = 'compass.svg';
 
@@ -21,7 +22,6 @@ PSVNavBarGyroscopeButton.icon = 'compass.svg';
 PSVNavBarGyroscopeButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
 
-  this.container.style.display = 'none';
   this.container.title = this.psv.config.lang.gyroscope;
 
   PhotoSphereViewer.SYSTEM.deviceOrientationSupported.promise.then(
@@ -29,7 +29,7 @@ PSVNavBarGyroscopeButton.prototype.create = function() {
     this._onAvailabilityChange.bind(this, false)
   );
 
-  this.container.addEventListener('click', this.psv.toggleGyroscopeControl.bind(this.psv));
+  this.hide();
 
   this.psv.on('gyroscope-updated', this);
 };
@@ -55,16 +55,24 @@ PSVNavBarGyroscopeButton.prototype.handleEvent = function(e) {
   }
 };
 
+/**
+ * Toggle gyroscope on click
+ */
+PSVNavBarGyroscopeButton.prototype._onClick = function() {
+  this.psv.toggleGyroscopeControl();
+};
+
+/**
+ * Update button display when API is ready
+ * @param available
+ */
 PSVNavBarGyroscopeButton.prototype._onAvailabilityChange = function(available) {
   if (available) {
     if (this.psv.doControls) {
-      this.container.style.display = 'block';
+      this.show();
     }
     else {
       throw new PSVError('Missing Three.js components: DeviceOrientationControls. Get them from threejs-examples package.');
     }
-  }
-  else {
-    this.destroy();
   }
 };

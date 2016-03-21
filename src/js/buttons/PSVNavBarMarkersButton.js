@@ -16,6 +16,7 @@ function PSVNavBarMarkersButton(navbar) {
 PSVNavBarMarkersButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;
 
+PSVNavBarMarkersButton.id = 'markers';
 PSVNavBarMarkersButton.className = 'psv-button hover-scale markers-button';
 PSVNavBarMarkersButton.icon = 'pin.svg';
 
@@ -27,8 +28,6 @@ PSVNavBarMarkersButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
 
   this.container.title = this.psv.config.lang.markers;
-
-  this.container.addEventListener('click', this.toggleMarkers.bind(this));
 
   this.psv.on('open-panel', this);
   this.psv.on('close-panel', this);
@@ -55,6 +54,13 @@ PSVNavBarMarkersButton.prototype.handleEvent = function(e) {
     case 'close-panel': this._onPanelClosed(); break;
     // @formatter:on
   }
+};
+
+/**
+ * Toggles markers list on click
+ */
+PSVNavBarMarkersButton.prototype._onClick = function() {
+  this.toggleMarkers();
 };
 
 /**

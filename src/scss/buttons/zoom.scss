@@ -40,7 +40,7 @@
     }
   }
 
-  &:hover {
+  &:not(.disabled):hover {
     .range {
       .line {
         box-shadow: 0 0 2px $buttons-color;

@@ -57,6 +57,11 @@
       background: $buttons-active-background;
     }
 
+    &.disabled {
+      pointer-events: none;
+      opacity: $buttons-disabled-opacity;
+    }
+
     svg {
       width: 100%;
       transform: scale(1);
@@ -67,7 +72,7 @@
       }
     }
 
-    &.hover-scale:hover svg {
+    &.hover-scale:not(.disabled):hover svg {
       transform: scale(1.2);
     }
   }
