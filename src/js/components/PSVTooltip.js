@@ -190,6 +190,7 @@ PSVTooltip.prototype.hideTooltip = function() {
 
     var self = this;
     window.setTimeout(function() {
+      self.container.querySelector('.content').innerHTML = null;
       self.container.style.top = '-1000px';
       self.container.style.left = '-1000px';
     }, this.config.delay);
