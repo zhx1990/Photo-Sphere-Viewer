@@ -39,6 +39,8 @@ PSVTooltip.prototype.create = function() {
 PSVTooltip.prototype.destroy = function() {
   this.psv.off('render', this);
 
+  delete this.config;
+
   PSVComponent.prototype.destroy.call(this);
 };
 

@@ -58,7 +58,7 @@ PSVNavBarButton.prototype.disable = function() {
  * Enables the button
  */
 PSVNavBarButton.prototype.enable = function() {
-  this.container.classList.add('enabled');
+  this.container.classList.remove('disabled');
 
   this.enabled = true;
 };

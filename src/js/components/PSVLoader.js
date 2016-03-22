@@ -55,6 +55,16 @@ PSVLoader.prototype.create = function() {
 };
 
 /**
+ * Destroys the loader
+ */
+PSVLoader.prototype.destroy = function() {
+  delete this.loader;
+  delete this.canvas;
+
+  PSVComponent.prototype.destroy.call(this);
+};
+
+/**
  * Sets the loader progression
  * @param value (int) from 0 to 100
  */

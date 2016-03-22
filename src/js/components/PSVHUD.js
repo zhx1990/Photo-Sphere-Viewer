@@ -47,6 +47,8 @@ PSVHUD.prototype.create = function() {
  * Destroys the HUD
  */
 PSVHUD.prototype.destroy = function() {
+  this.clearMarkers(false);
+
   this.container.removeEventListener('mouseenter', this);
   this.container.removeEventListener('mouseleave', this);
   this.container.removeEventListener('mousemove', this);
@@ -54,8 +56,7 @@ PSVHUD.prototype.destroy = function() {
   this.psv.off('click', this);
   this.psv.off('render', this);
 
-  this.container.removeChild(this.$svg);
-  this.$svg = null;
+  delete this.$svg;
 
   PSVComponent.prototype.destroy.call(this);
 };
@@ -391,9 +392,7 @@ PSVHUD.prototype.toggleMarker = function(marker) {
  * @return (void)
  */
 PSVHUD.prototype.updatePositions = function() {
-  // FIXME: only when using gyroscope
-  //var rotation = this.psv.camera.rotation.z / Math.PI * 180;
-  var rotation = 0;
+  var rotation = !this.psv.isGyroscopeEnabled() ? 0 : this.psv.camera.rotation.z / Math.PI * 180;
 
   for (var id in this.markers) {
     var marker = this.markers[id];

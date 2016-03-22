@@ -34,9 +34,15 @@ PSVComponent.prototype.create = function() {
 PSVComponent.prototype.destroy = function() {
   this.parent.container.removeChild(this.container);
 
-  this.container = null;
-  this.psv = null;
-  this.parent = null;
+  if (this.constructor.publicMethods) {
+    this.constructor.publicMethods.forEach(function(method) {
+      delete this.psv[method];
+    }, this);
+  }
+
+  delete this.container;
+  delete this.psv;
+  delete this.parent;
 };
 
 /**

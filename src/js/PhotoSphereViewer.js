@@ -115,7 +115,6 @@ function PhotoSphereViewer(options) {
   this.mesh = null;
   this.raycaster = null;
   this.doControls = null;
-  this.actions = {};
 
   // local properties
   this.prop = {
@@ -188,6 +187,8 @@ function PhotoSphereViewer(options) {
   this.tooltip = new PSVTooltip(this.hud);
 
   // init
+  this.parent.photoSphereViewer = this;
+
   this._bindEvents();
 
   if (this.config.autoload) {

@@ -40,6 +40,12 @@ PSVNavBarCustomButton.prototype.create = function() {
   }
 };
 
+PSVNavBarCustomButton.prototype.destroy = function() {
+  delete this.config;
+
+  PSVNavBarButton.prototype.destroy.call(this);
+};
+
 /**
  * Calls user method on click
  */

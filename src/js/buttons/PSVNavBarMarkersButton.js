@@ -40,6 +40,8 @@ PSVNavBarMarkersButton.prototype.destroy = function() {
   this.psv.off('open-panel', this);
   this.psv.off('close-panel', this);
 
+  delete this.prop;
+
   PSVNavBarButton.prototype.destroy.call(this);
 };
 

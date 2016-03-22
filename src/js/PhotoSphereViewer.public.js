@@ -71,7 +71,7 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
   if (updateDirection !== false) {
     this.prop.direction = this.sphericalCoordsToVector3(this.prop.longitude, this.prop.latitude);
     this.camera.lookAt(this.prop.direction);
-    //this.camera.rotation.z = 0;
+    // this.camera.rotation.z = 0;
   }
 
   this.camera.aspect = this.prop.aspect;
@@ -92,6 +92,12 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
  * Destroy the viewer
  */
 PhotoSphereViewer.prototype.destroy = function() {
+  this.stopAll();
+
+  if (this.isFullscreenEnabled()) {
+    PSVUtils.exitFullscreen();
+  }
+
   // remove listeners
   window.removeEventListener('resize', this);
   document.removeEventListener(PhotoSphereViewer.SYSTEM.fullscreenEvent, this);
@@ -110,11 +116,11 @@ PhotoSphereViewer.prototype.destroy = function() {
   }
 
   // destroy components
+  if (this.tooltip) this.tooltip.destroy();
   if (this.hud) this.hud.destroy();
   if (this.loader) this.loader.destroy();
   if (this.navbar) this.navbar.destroy();
   if (this.panel) this.panel.destroy();
-  if (this.tooltip) this.tooltip.destroy();
   if (this.doControls) this.doControls.disconnect();
 
   // destroy ThreeJS view
@@ -124,8 +130,8 @@ PhotoSphereViewer.prototype.destroy = function() {
   }
 
   if (this.mesh) {
-    this.mesh.material.geometry.dispose();
-    this.mesh.material.geometry = null;
+    this.mesh.geometry.dispose();
+    this.mesh.geometry = null;
     this.mesh.material.map.dispose();
     this.mesh.material.map = null;
     this.mesh.material.dispose();
@@ -138,22 +144,26 @@ PhotoSphereViewer.prototype.destroy = function() {
   }
   this.parent.removeChild(this.container);
 
+  delete this.parent.photoSphereViewer;
+
   // clean references
-  this.container = null;
-  this.loader = null;
-  this.navbar = null;
-  this.hud = null;
-  this.panel = null;
-  this.tooltip = null;
-  this.canvas_container = null;
-  this.renderer = null;
-  this.composer = null;
-  this.scene = null;
-  this.camera = null;
-  this.mesh = null;
-  this.raycaster = null;
-  this.passes = {};
-  this.actions = {};
+  delete this.parent;
+  delete this.container;
+  delete this.loader;
+  delete this.navbar;
+  delete this.hud;
+  delete this.panel;
+  delete this.tooltip;
+  delete this.canvas_container;
+  delete this.renderer;
+  delete this.composer;
+  delete this.scene;
+  delete this.camera;
+  delete this.mesh;
+  delete this.doControls;
+  delete this.raycaster;
+  delete this.passes;
+  delete this.config;
 };
 
 /**

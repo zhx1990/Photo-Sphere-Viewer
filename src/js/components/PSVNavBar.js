@@ -110,7 +110,8 @@ PSVNavBar.prototype.destroy = function() {
     item.destroy();
   });
 
-  this.items.length = 0;
+  delete this.items;
+  delete this.config;
 
   PSVComponent.prototype.destroy.call(this);
 };

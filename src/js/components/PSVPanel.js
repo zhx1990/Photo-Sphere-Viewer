@@ -66,6 +66,9 @@ PSVPanel.prototype.destroy = function() {
   this.psv.container.removeEventListener('mouseup', this);
   this.psv.container.removeEventListener('touchend', this);
 
+  delete this.prop;
+  delete this.content;
+
   PSVComponent.prototype.destroy.call(this);
 };
 

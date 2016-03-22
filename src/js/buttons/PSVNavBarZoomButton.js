@@ -81,6 +81,9 @@ PSVNavBarZoomButton.prototype.destroy = function() {
   this.psv.container.removeEventListener('mouseup', this);
   this.psv.container.removeEventListener('touchend', this);
 
+  delete this.zoom_range;
+  delete this.zoom_value;
+
   this.psv.off('zoom-updated', this);
 
   PSVNavBarButton.prototype.destroy.call(this);
