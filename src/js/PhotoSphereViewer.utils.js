@@ -214,3 +214,22 @@ PhotoSphereViewer.prototype._applyRanges = function(position) {
     }
   }
 };
+
+/**
+ * Compute the shortest offset between two longitudes
+ * @param from (Double)
+ * @param to (Double)
+ * @returns (Double)
+ */
+PhotoSphereViewer.prototype._getShortestArc = function(from, to) {
+  var tCandidates = [
+    0, // direct
+    PSVUtils.TwoPI, // clock-wise cross zero
+    -PSVUtils.TwoPI // counter-clock-wise cross zero
+  ];
+
+  return tCandidates.reduce(function(value, candidate) {
+    candidate = to - from + candidate;
+    return Math.abs(candidate) < Math.abs(value) ? candidate : value;
+  }, Infinity);
+};

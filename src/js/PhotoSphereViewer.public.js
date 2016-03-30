@@ -394,16 +394,7 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
   }
 
   // longitude offset for shortest arc
-  var tCandidates = [
-    0, // direct
-    PSVUtils.TwoPI, // clock-wise cross zero
-    -PSVUtils.TwoPI // counter-clock-wise cross zero
-  ];
-
-  var tOffset = tCandidates.reduce(function(value, candidate) {
-    candidate = position.longitude - this.prop.longitude + candidate;
-    return Math.abs(candidate) < Math.abs(value) ? candidate : value;
-  }.bind(this), Infinity);
+  var tOffset = this._getShortestArc(this.prop.longitude, position.longitude);
 
   this.prop.animation_promise = PSVUtils.animation({
     properties: {

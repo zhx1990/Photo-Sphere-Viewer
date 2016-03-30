@@ -312,3 +312,5 @@ PhotoSphereViewer.DEFAULTS = {
 };
 
 uEvent.mixin(PhotoSphereViewer);
+
+PhotoSphereViewer.Utils = PSVUtils;

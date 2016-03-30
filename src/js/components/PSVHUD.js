@@ -68,73 +68,50 @@ PSVHUD.prototype.destroy = function() {
 PSVHUD.prototype.handleEvent = function(e) {
   switch (e.type) {
     // @formatter:off
-    case 'mouseenter': this._onMouseEnter(e); break;
-    case 'mouseleave': this._onMouseLeave(e); break;
-    case 'mousemove': this._onMouseMove(e); break;
-    case 'click': this._onClick(e.args[0], e); break;
-    case 'render': this.updatePositions(); break;
+    case 'mouseenter':  this._onMouseEnter(e);        break;
+    case 'mouseleave':  this._onMouseLeave(e);        break;
+    case 'mousemove':   this._onMouseMove(e);         break;
+    case 'click':       this._onClick(e.args[0], e);  break;
+    case 'render':      this.updatePositions();       break;
     // @formatter:on
   }
 };
 
 /**
  * Add a new marker to HUD
- * @param marker (Object)
+ * @param properties (Object)
  * @param render (Boolean) "false" to disable immediate render
- * @return (Object) a modified marker object
+ * @return (PSVMarker)
  */
-PSVHUD.prototype.addMarker = function(marker, render) {
-  if (!marker.id) {
+PSVHUD.prototype.addMarker = function(properties, render) {
+  if (!properties.id) {
     throw new PSVError('missing marker id');
   }
 
-  if (this.markers[marker.id]) {
-    throw new PSVError('marker "' + marker.id + '" already exists');
+  if (this.markers[properties.id]) {
+    throw new PSVError('marker "' + properties.id + '" already exists');
   }
 
-  if (!marker.image && !marker.html && !marker.polygon_px && !marker.polygon_rad) {
-    throw new PSVError('missing marker content, image or html or polygon');
-  }
+  var marker = new PSVMarker(properties, this.psv);
 
-  if (marker.image && (!marker.width || !marker.height)) {
-    throw new PSVError('missing marker width/height');
-  }
-
-  if (marker.image || marker.html) {
-    if ((!marker.hasOwnProperty('x') || !marker.hasOwnProperty('y')) && (!marker.hasOwnProperty('latitude') || !marker.hasOwnProperty('longitude'))) {
-      throw new PSVError('missing marker position, latitude/longitude or x/y');
-    }
-  }
-
-  // temporary object replaced by updateMarker()
-  var temp = {
-    id: marker.id,
-    $el: null
-  };
-
-  // create DOM
-  if (marker.image || marker.html) {
-    temp.$el = document.createElement('div');
-    temp.$el.setAttribute('class', 'psv-marker');
-    this.container.appendChild(temp.$el);
+  if (marker.isNormal()) {
+    this.container.appendChild(marker.$el);
   }
   else {
-    temp.$el = document.createElementNS(PSVHUD.svgNS, 'polygon');
-    temp.$el.setAttribute('class', 'psv-marker svg-marker');
-    this.$svg.appendChild(temp.$el);
+    this.$svg.appendChild(marker.$el);
   }
 
-  temp.$el.id = 'psv-marker-' + temp.id;
+  this.markers[marker.id] = marker;
 
-  this.markers[marker.id] = temp;
-
-  return this.updateMarker(marker, render);
+  if (render !== false) {
+    this.updatePositions();
+  }
 };
 
 /**
  * Get a marker by it's id or external object
  * @param marker (Mixed)
- * @return (Object)
+ * @return (PSVMarker)
  */
 PSVHUD.prototype.getMarker = function(marker) {
   var id = typeof marker === 'object' ? marker.id : marker;
@@ -148,7 +125,7 @@ PSVHUD.prototype.getMarker = function(marker) {
 
 /**
  * Get the current selected marker
- * @return (Object)
+ * @return (PSVMarker)
  */
 PSVHUD.prototype.getCurrentMarker = function() {
   return this.currentMarker;
@@ -158,155 +135,18 @@ PSVHUD.prototype.getCurrentMarker = function() {
  * Update a marker
  * @param input (Object)
  * @param render (Boolean) "false" to disable immediate render
- * @return (Object) a modified marker object
+ * @return (PSVMarker)
  */
 PSVHUD.prototype.updateMarker = function(input, render) {
   var marker = this.getMarker(input);
 
-  // clean some previous data
-  if (marker.className) {
-    PSVUtils.removeClasses(marker.$el, marker.className);
-  }
-  if (marker.tooltip) {
-    marker.$el.classList.remove('has-tooltip');
-  }
-
-  // merge objects
-  if (marker != input) {
-    delete input.$el;
-    PSVUtils.deepmerge(marker, input);
-  }
-
-  marker.position2D = null;
-
-  // add classes
-  if (marker.className) {
-    PSVUtils.addClasses(marker.$el, marker.className);
-  }
-  if (marker.tooltip) {
-    marker.$el.classList.add('has-tooltip');
-    if (typeof marker.tooltip === 'string') {
-      marker.tooltip = { content: marker.tooltip };
-    }
-  }
-
-  if (marker.image || marker.html) {
-    this._updateNormalMarker(marker);
-  }
-  else {
-    this._updatePolygonMarker(marker);
-  }
-
-  if (!marker.hasOwnProperty('visible')) {
-    marker.visible = true;
-  }
-
-  // save
-  marker.$el.psvMarker = marker;
-  this.markers[marker.id] = marker;
+  marker.update(input);
 
   if (render !== false) {
     this.updatePositions();
   }
 
   return marker;
-};
-
-/**
- * Update a marker of type point
- * @param marker
- * @private
- */
-PSVHUD.prototype._updateNormalMarker = function(marker) {
-  marker.isPolygon = false;
-
-  // set image
-  var style = marker.$el.style;
-
-  if (marker.width && marker.height) {
-    style.width = marker.width + 'px';
-    style.height = marker.height + 'px';
-    marker.dynamicSize = false;
-  }
-  else {
-    marker.dynamicSize = true;
-  }
-
-  if (marker.style) {
-    Object.getOwnPropertyNames(marker.style).forEach(function(prop) {
-      style[prop] = marker.style[prop];
-    });
-  }
-
-  if (marker.image) {
-    style.backgroundImage = 'url(' + marker.image + ')';
-  }
-  else {
-    marker.$el.innerHTML = marker.html;
-  }
-
-  // parse anchor
-  marker.anchor = PSVUtils.parsePosition(marker.anchor);
-  style.transformOrigin = marker.anchor.left * 100 + '% ' + marker.anchor.top * 100 + '%';
-
-  // convert texture coordinates to spherical coordinates
-  this.psv._cleanPosition(marker);
-
-  // compute x/y/z position
-  marker.position3D = this.psv.sphericalCoordsToVector3(marker.longitude, marker.latitude);
-};
-
-/**
- * Update a marker of type polygon
- * @param marker
- * @private
- */
-PSVHUD.prototype._updatePolygonMarker = function(marker) {
-  marker.isPolygon = true;
-  marker.dynamicSize = true;
-
-  if (marker.style) {
-    Object.getOwnPropertyNames(marker.style).forEach(function(prop) {
-      marker.$el.setAttribute(prop, marker.style[prop]);
-    });
-  }
-  else {
-    marker.$el.setAttribute('fill', 'rgba(0,0,0,0.5)');
-  }
-
-  // fold arrays: [1,2,3,4] => [[1,2],[3,4]]
-  [marker.polygon_rad, marker.polygon_px].forEach(function(polygon) {
-    if (polygon && typeof polygon[0] != 'object') {
-      for (var i = 0; i < polygon.length; i++) {
-        polygon.splice(i, 2, [polygon[i], polygon[i + 1]]);
-      }
-    }
-  });
-
-  // convert texture coordinates to spherical coordinates
-  if (marker.polygon_px) {
-    marker.polygon_rad = marker.polygon_px.map(function(coord) {
-      var sphericalCoords = this.psv.textureCoordsToSphericalCoords(coord[0], coord[1]);
-      return [sphericalCoords.longitude, sphericalCoords.latitude];
-    }, this);
-  }
-  else {
-    marker.polygon_rad = marker.polygon_rad.map(function(coord) {
-      return [
-        PSVUtils.parseAngle(coord[0]),
-        PSVUtils.stayBetween(PSVUtils.parseAngle(coord[1], -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI)
-      ];
-    });
-  }
-
-  // TODO : compute the center of the polygon
-  marker.longitude = marker.polygon_rad[0][0];
-  marker.latitude = marker.polygon_rad[0][1];
-
-  // compute x/y/z positions
-  marker.positions3D = marker.polygon_rad.map(function(coord) {
-    return this.psv.sphericalCoordsToVector3(coord[0], coord[1]);
-  }, this);
 };
 
 /**
@@ -318,11 +158,11 @@ PSVHUD.prototype._updatePolygonMarker = function(marker) {
 PSVHUD.prototype.removeMarker = function(marker, render) {
   marker = this.getMarker(marker);
 
-  if (marker.isPolygon) {
-    this.$svg.removeChild(marker.$el);
+  if (marker.isNormal()) {
+    this.container.removeChild(marker.$el);
   }
   else {
-    this.container.removeChild(marker.$el);
+    this.$svg.removeChild(marker.$el);
   }
 
   delete this.markers[marker.id];
@@ -333,12 +173,12 @@ PSVHUD.prototype.removeMarker = function(marker, render) {
 };
 
 /**
- + * Remove all markers
- + * @param render (Boolean) "false" to disable immediate render
- + */
+ * Remove all markers
+ * @param render (Boolean) "false" to disable immediate render
+ */
 PSVHUD.prototype.clearMarkers = function(render) {
   Object.keys(this.markers).forEach(function(marker) {
-    this.removeMarker(marker, false)
+    this.removeMarker(marker, false);
   }, this);
 
   if (render !== false) {
@@ -397,13 +237,11 @@ PSVHUD.prototype.updatePositions = function() {
   for (var id in this.markers) {
     var marker = this.markers[id];
 
-    if (marker.isPolygon) {
+    if (marker.isPolygon()) {
       var positions = this._getPolygonPositions(marker);
 
       if (this._isPolygonVisible(marker, positions)) {
-        marker.position2D = this._getPolygonDimensions(positions);
-        marker.width = marker.position2D.width;
-        marker.height = marker.position2D.height;
+        marker.position2D = this._getPolygonDimensions(marker, positions);
 
         var points = '';
         positions.forEach(function(pos) {
@@ -444,9 +282,10 @@ PSVHUD.prototype.updatePositions = function() {
 /**
  * Determine if a point marker is visible
  * It tests if the point is in the general direction of the camera, then check if it's in the viewport
- * @param marker (Object)
+ * @param marker (PSVMarker)
  * @param position (Object)
  * @return (Boolean)
+ * @private
  */
 PSVHUD.prototype._isMarkerVisible = function(marker, position) {
   return marker.visible &&
@@ -459,8 +298,8 @@ PSVHUD.prototype._isMarkerVisible = function(marker, position) {
 
 /**
  * Determine if a polygon marker is visible
- * It tests if at least one point is in teh viewport
- * @param marker (Object)
+ * It tests if at least one point is in the viewport
+ * @param marker (PSVMarker)
  * @param positions (Object[])
  * @returns (boolean)
  * @private
@@ -478,7 +317,7 @@ PSVHUD.prototype._isPolygonVisible = function(marker, positions) {
 
 /**
  * Compute HUD coordinates of a marker
- * @param marker (Object)
+ * @param marker (PSVMarker)
  * @returns (Object) top and left position
  * @private
  */
@@ -503,7 +342,7 @@ PSVHUD.prototype._getMarkerPosition = function(marker) {
 
 /**
  * Compute HUD coordinates of each point of a polygon
- * @param marker (Object)
+ * @param marker (PSVMarker)
  * @returns (Object[])
  * @private
  */
@@ -515,11 +354,12 @@ PSVHUD.prototype._getPolygonPositions = function(marker) {
 
 /**
  * Compute the boundaries positions of a polygon marker
+ * @param marker (PSVMarker)
  * @param positions (Object[])
  * @returns (Object)
  * @private
  */
-PSVHUD.prototype._getPolygonDimensions = function(positions) {
+PSVHUD.prototype._getPolygonDimensions = function(marker, positions) {
   var minX = +Infinity;
   var minY = +Infinity;
   var maxX = -Infinity;
@@ -532,11 +372,12 @@ PSVHUD.prototype._getPolygonDimensions = function(positions) {
     maxY = Math.max(maxY, pos.top);
   });
 
+  marker.width = maxX - minX;
+  marker.height = maxY - minY;
+
   return {
     top: minY,
-    left: minX,
-    width: maxX - minX,
-    height: maxY - minY
+    left: minX
   };
 };
 
@@ -547,7 +388,7 @@ PSVHUD.prototype._getPolygonDimensions = function(positions) {
  */
 PSVHUD.prototype._onMouseEnter = function(e) {
   var marker;
-  if (e.target && (marker = e.target.psvMarker) !== undefined && marker.tooltip && !marker.isPolygon) {
+  if (e.target && (marker = e.target.psvMarker) && marker.tooltip && !marker.isPolygon()) {
     this.hoveringMarker = marker;
 
     this.psv.tooltip.showTooltip({
@@ -566,9 +407,10 @@ PSVHUD.prototype._onMouseEnter = function(e) {
  * @return (void)
  */
 PSVHUD.prototype._onMouseLeave = function(e) {
-  if (e.target && e.target.psvMarker) {
-    // do not hide if we enter the tooltip while hovering a polygon
-    if (e.target.psvMarker.isPolygon && e.relatedTarget && PSVUtils.hasParent(e.relatedTarget, this.psv.tooltip.container)) {
+  var marker;
+  if (e.target && (marker = e.target.psvMarker)) {
+    // do not hide if we enter the tooltip itself while hovering a polygon
+    if (marker.isPolygon() && e.relatedTarget && PSVUtils.hasParent(e.relatedTarget, this.psv.tooltip.container)) {
       return;
     }
 
@@ -587,7 +429,7 @@ PSVHUD.prototype._onMouseMove = function(e) {
   if (!this.psv.prop.moving) {
     var marker;
     // do not hide if we enter the tooltip while hovering a polygon
-    if (e.target && (marker = e.target.psvMarker) && marker.tooltip && marker.isPolygon ||
+    if (e.target && (marker = e.target.psvMarker) && marker.tooltip && marker.isPolygon() ||
       e.target && PSVUtils.hasParent(e.target, this.psv.tooltip.container) && (marker = this.hoveringMarker)) {
 
       this.hoveringMarker = marker;
@@ -604,7 +446,7 @@ PSVHUD.prototype._onMouseMove = function(e) {
         }
       });
     }
-    else if (this.hoveringMarker && this.hoveringMarker.isPolygon) {
+    else if (this.hoveringMarker && this.hoveringMarker.isPolygon()) {
       this.psv.tooltip.hideTooltip();
     }
   }

@@ -7,6 +7,8 @@ function PSVTooltip(hud) {
 
   this.config = this.psv.config.tooltip;
 
+  this.timeout = null;
+
   this.create();
 }
 
@@ -72,6 +74,11 @@ PSVTooltip.prototype.isTooltipVisible = function() {
  * @return (void)
  */
 PSVTooltip.prototype.showTooltip = function(config) {
+  if (this.timeout) {
+    window.clearTimeout(this.timeout);
+    this.timeout = null;
+  }
+
   var isUpdate = this.isTooltipVisible();
   var t = this.container;
   var c = t.querySelector('.content');
@@ -172,9 +179,10 @@ PSVTooltip.prototype.showTooltip = function(config) {
   // delay for correct transition between the two classes
   if (!isUpdate) {
     var self = this;
-    window.setTimeout(function() {
+    this.timeout = window.setTimeout(function() {
       t.classList.add('visible');
       self.psv.trigger('show-tooltip');
+      self.timeout = null;
     }, this.config.delay);
   }
 };
@@ -184,15 +192,21 @@ PSVTooltip.prototype.showTooltip = function(config) {
  * @return (void)
  */
 PSVTooltip.prototype.hideTooltip = function() {
+  if (this.timeout) {
+    window.clearTimeout(this.timeout);
+    this.timeout = null;
+  }
+
   if (this.isTooltipVisible()) {
     this.container.classList.remove('visible');
     this.psv.trigger('hide-tooltip');
 
     var self = this;
-    window.setTimeout(function() {
+    this.timeout = window.setTimeout(function() {
       self.container.querySelector('.content').innerHTML = null;
       self.container.style.top = '-1000px';
       self.container.style.left = '-1000px';
+      self.timeout = null;
     }, this.config.delay);
   }
 };

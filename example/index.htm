@@ -152,7 +152,7 @@
       }
 
       a.push({
-        id: 'path',
+        id: 'the-path',
         name: 'The path',
         content: '<img src="pin2.png" style="width:100%"/><img src="pin.png" style="width:100%"/>',
         x: 3900,
@@ -216,12 +216,68 @@
         }
       });
 
+      a.push({
+        id: 'circle',
+        tooltip: 'A circle of radius 30',
+        circle: 30,
+        style: {
+          fill: 'rgba(255,255,0,0.3)',
+          stroke: 'yellow',
+          'stroke-width': '2px'
+        },
+        longitude: 0,
+        latitude: -0.1,
+        anchor: 'center right'
+      });
+
+      a.push({
+        id: 'ellipse',
+        tooltip: 'An ellipse of radius 60/30',
+        ellipse: [60, 30],
+        style: {
+          fill: 'rgba(255,255,0,0.3)',
+          stroke: 'yellow',
+          'stroke-width': '2px'
+        },
+        longitude: 0,
+        latitude: -0.1,
+        anchor: 'center left'
+      });
+
+      a.push({
+        id: 'rect',
+        tooltip: 'A square a side 60',
+        rect: [60, 60],
+        style: {
+          fill: 'rgba(255,255,0,0.3)',
+          stroke: 'yellow',
+          'stroke-width': '2px'
+        },
+        longitude: 0,
+        latitude: -0.2,
+        anchor: 'center right'
+      });
+
+      a.push({
+        id: 'path',
+        tooltip: 'A custom path',
+        path: 'M 0 0 L 60 60 L 60 0 L 0 60 L 0 0',
+        style: {
+          fill: 'rgba(255,255,0,0.3)',
+          stroke: 'yellow',
+          'stroke-width': '2px'
+        },
+        longitude: 0,
+        latitude: -0.2,
+        anchor: 'center left'
+      });
+
       return a;
     }())
   });
 
   PSV.on('click', function(e) {
-    if (e.marker && !e.marker.isPolygon) {
+    if (e.marker && !e.marker.isPolygon()) {
       return;
     }
     PSV.addMarker({
