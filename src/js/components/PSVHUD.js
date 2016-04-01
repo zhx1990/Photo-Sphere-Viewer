@@ -479,7 +479,8 @@ PSVHUD.prototype._isPolygonVisible = function(marker, positions) {
 /**
  * Compute HUD coordinates of a marker
  * @param marker (Object)
- * @return (Object) top and left position
+ * @returns (Object) top and left position
+ * @private
  */
 PSVHUD.prototype._getMarkerPosition = function(marker) {
   if (marker.dynamicSize) {
@@ -492,13 +493,12 @@ PSVHUD.prototype._getMarkerPosition = function(marker) {
     marker.height = rect.bottom - rect.top;
   }
 
-  var vector = marker.position3D.clone();
-  vector.project(this.psv.camera);
+  var position = this.psv.vector3ToViewerCoords(marker.position3D);
 
-  return {
-    top: (1 - vector.y) / 2 * this.psv.prop.size.height - marker.height * marker.anchor.top,
-    left: (vector.x + 1) / 2 * this.psv.prop.size.width - marker.width * marker.anchor.left
-  };
+  position.top -= marker.height * marker.anchor.top;
+  position.left -= marker.width * marker.anchor.left;
+
+  return position;
 };
 
 /**
@@ -509,13 +509,7 @@ PSVHUD.prototype._getMarkerPosition = function(marker) {
  */
 PSVHUD.prototype._getPolygonPositions = function(marker) {
   return marker.positions3D.map(function(pos) {
-    var vector = pos.clone();
-    vector.project(this.psv.camera);
-
-    return {
-      top: (1 - vector.y) / 2 * this.psv.prop.size.height,
-      left: (vector.x + 1) / 2 * this.psv.prop.size.width
-    };
+    return this.psv.vector3ToViewerCoords(pos);
   }, this);
 };
 

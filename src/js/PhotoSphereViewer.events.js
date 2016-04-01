@@ -211,25 +211,16 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
 PhotoSphereViewer.prototype._click = function(evt) {
   var data = {
     target: evt.target,
-    client_x: parseInt(evt.clientX - this.prop.boundingRect.left),
-    client_y: parseInt(evt.clientY - this.prop.boundingRect.top)
+    client_x: evt.clientX,
+    client_y: evt.clientY,
+    viewer_x: parseInt(evt.clientX - this.prop.boundingRect.left),
+    viewer_y: parseInt(evt.clientY - this.prop.boundingRect.top)
   };
 
-  if (evt.data) {
-    PSVUtils.deepmerge(data, evt.data);
-  }
+  var intersect = this.viewerCoordsToVector3(data.viewer_x, data.viewer_y);
 
-  var screen = new THREE.Vector2(
-    2 * data.client_x / this.prop.size.width - 1,
-    -2 * data.client_y / this.prop.size.height + 1
-  );
-
-  this.raycaster.setFromCamera(screen, this.camera);
-
-  var intersects = this.raycaster.intersectObjects(this.scene.children);
-
-  if (intersects.length === 1) {
-    var sphericalCoords = this.vector3ToSphericalCoords(intersects[0].point);
+  if (intersect) {
+    var sphericalCoords = this.vector3ToSphericalCoords(intersect);
 
     data.longitude = sphericalCoords.longitude;
     data.latitude = sphericalCoords.latitude;

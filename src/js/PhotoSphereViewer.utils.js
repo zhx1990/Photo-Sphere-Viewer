@@ -106,6 +106,45 @@ PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
 };
 
 /**
+ * Converts position on the viewer to a THREE.Vector3
+ * @param viewer_x (int)
+ * @param viewer_y (int)
+ * @returns (THREE.Vector3)
+ */
+PhotoSphereViewer.prototype.viewerCoordsToVector3 = function(viewer_x, viewer_y) {
+  var screen = new THREE.Vector2(
+    2 * viewer_x / this.prop.size.width - 1,
+    -2 * viewer_y / this.prop.size.height + 1
+  );
+
+  this.raycaster.setFromCamera(screen, this.camera);
+
+  var intersects = this.raycaster.intersectObjects(this.scene.children);
+
+  if (intersects.length === 1) {
+    return intersects[0].point;
+  }
+  else {
+    return null;
+  }
+};
+
+/**
+ * Converts a THREE.Vector3 to position on the viewer
+ * @param vector
+ * @returns ({top: int, left: int})
+ */
+PhotoSphereViewer.prototype.vector3ToViewerCoords = function(vector) {
+  vector = vector.clone();
+  vector.project(this.camera);
+
+  return {
+    top: parseInt((1 - vector.y) / 2 * this.prop.size.height),
+    left: parseInt((vector.x + 1) / 2 * this.prop.size.width)
+  };
+};
+
+/**
  * Converts x/y to latitude/longitude if present and ensure boundaries
  * @param position (Object)
  */

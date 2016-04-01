@@ -209,7 +209,8 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
         else {
           self.render();
         }
-      });
+      })
+      .rethrow();
   }
   else {
     if (this.config.transition.loader) {
@@ -225,7 +226,8 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
         }
 
         return self._transition(texture, position);
-      });
+      })
+      .rethrow();
   }
 };
 
