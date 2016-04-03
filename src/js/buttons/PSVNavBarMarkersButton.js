@@ -83,31 +83,15 @@ PSVNavBarMarkersButton.prototype.toggleMarkers = function() {
  * @return (void)
  */
 PSVNavBarMarkersButton.prototype.showMarkers = function() {
-  var html = '<div class="psv-markers-list">' +
-    '<h1>' + this.psv.config.lang.markers + '</h1>' +
-    '<ul>';
-
+  var markers = [];
   for (var id in this.psv.hud.markers) {
-    var marker = this.psv.hud.markers[id];
-
-    var name = marker.id;
-    if (marker.html) {
-      name = marker.html;
-    }
-    else if (marker.tooltip) {
-      name = typeof marker.tooltip === 'string' ? marker.tooltip : marker.tooltip.content;
-    }
-
-    html += '<li data-psv-marker="' + marker.id + '">';
-    if (marker.image) {
-      html += '<img class="marker-image" src="' + marker.image + '"/>';
-    }
-    html += '<p class="marker-name">' + name + '</p>' +
-      '</li>';
+    markers.push(this.psv.hud.markers[id]);
   }
 
-  html += '</ul>' +
-    '</div>';
+  var html = this.psv.config.templates.markersList({
+    markers: this.psv.change('render-markers-list', markers),
+    config: this.psv.config
+  });
 
   this.prop.panelOpening = true;
   this.psv.panel.showPanel(html, true);

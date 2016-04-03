@@ -22,7 +22,8 @@
   "dependencies": {
     "three.js": ">= 0.0.67",
     "D.js": "~0.7.3",
-    "uevent": "~1.0.0"
+    "uevent": "~1.0.0",
+    "doT": "master"
   },
   "keywords": [
     "photosphere",
