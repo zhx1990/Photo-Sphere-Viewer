@@ -93,6 +93,7 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
  */
 PhotoSphereViewer.prototype.destroy = function() {
   this.stopAll();
+  this.stopKeyboardControl();
 
   if (this.isFullscreenEnabled()) {
     PSVUtils.exitFullscreen();
@@ -462,4 +463,18 @@ PhotoSphereViewer.prototype.toggleFullscreen = function() {
   else {
     PSVUtils.exitFullscreen();
   }
+};
+
+/**
+ * Starts listening keyboard events
+ */
+PhotoSphereViewer.prototype.startKeyboardControl = function() {
+  window.addEventListener('keydown', this);
+};
+
+/**
+ * Stops listening keyboard events
+ */
+PhotoSphereViewer.prototype.stopKeyboardControl = function() {
+  window.removeEventListener('keydown', this);
 };

@@ -38,6 +38,7 @@ PhotoSphereViewer.prototype.handleEvent = function(e) {
   switch (e.type) {
     // @formatter:off
     case 'resize': PSVUtils.throttle(this._onResize(), 50); break;
+    case 'keydown':     this._onKeyDown(e);     break;
     case 'mousedown':   this._onMouseDown(e);   break;
     case 'touchstart':  this._onTouchStart(e);  break;
     case 'mouseup':     this._onMouseUp(e);     break;
@@ -69,6 +70,40 @@ PhotoSphereViewer.prototype._onResize = function() {
     }
 
     this.trigger('size-updated', this.getSize());
+  }
+};
+
+/**
+ * Rotate or zoom on key down
+ * @param evt (KeyboardEvent)
+ * @private
+ */
+PhotoSphereViewer.prototype._onKeyDown = function(evt) {
+  var dLong = 0;
+  var dLat = 0;
+  var dZoom = 0;
+
+  var key = evt.key || PhotoSphereViewer.KEYMAP[evt.keyCode || evt.which];
+
+  switch (key) {
+    // @formatter:off
+    case 'ArrowUp': dLat = 0.01; break;
+    case 'ArrowDown': dLat = -0.01; break;
+    case 'ArrowRight': dLong = 0.01; break;
+    case 'ArrowLeft': dLong = -0.01; break;
+    case 'PageUp':case '+': dZoom = 1; break;
+    case 'PageDown':case '-': dZoom = -1; break;
+    // @formatter:on
+  }
+
+  if (dZoom !== 0) {
+    this.zoom(this.prop.zoom_lvl + dZoom);
+  }
+  else if (dLat !== 0 || dLong !== 0) {
+    this.rotate({
+      longitude: this.prop.longitude + dLong * this.prop.move_speed * this.prop.hFov,
+      latitude: this.prop.latitude + dLat * this.prop.move_speed * this.prop.vFov
+    });
   }
 };
 
@@ -269,11 +304,9 @@ PhotoSphereViewer.prototype._move = function(evt) {
     var x = parseInt(evt.clientX);
     var y = parseInt(evt.clientY);
 
-    var multiplicator = 1 / PhotoSphereViewer.SYSTEM.pixelRatio * Math.PI / 180 * this.config.move_speed;
-
     this.rotate({
-      longitude: this.prop.longitude - (x - this.prop.mouse_x) / this.prop.size.width * multiplicator * this.prop.hFov,
-      latitude: this.prop.latitude + (y - this.prop.mouse_y) / this.prop.size.height * multiplicator * this.prop.vFov
+      longitude: this.prop.longitude - (x - this.prop.mouse_x) / this.prop.size.width * this.prop.move_speed * this.prop.hFov,
+      latitude: this.prop.latitude + (y - this.prop.mouse_y) / this.prop.size.height * this.prop.move_speed * this.prop.vFov
     });
 
     this.prop.mouse_x = x;
@@ -323,7 +356,18 @@ PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
  * Fullscreen state has changed
  */
 PhotoSphereViewer.prototype._fullscreenToggled = function() {
-  this.trigger('fullscreen-updated', this.isFullscreenEnabled());
+  var enabled = this.isFullscreenEnabled();
+
+  if (this.config.keyboard) {
+    if (enabled) {
+      this.startKeyboardControl();
+    }
+    else {
+      this.stopKeyboardControl();
+    }
+  }
+
+  this.trigger('fullscreen-updated', enabled);
 };
 
 /**

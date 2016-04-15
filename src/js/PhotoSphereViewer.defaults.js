@@ -11,6 +11,21 @@ PhotoSphereViewer.MOVE_THRESHOLD = 4;
 PhotoSphereViewer.INERTIA_WINDOW = 300;
 
 /**
+ * Map between keyboard events "keyCode|which" and "key"
+ * @type (Object)
+ */
+PhotoSphereViewer.KEYMAP = {
+  33: 'PageUp',
+  34: 'PageDown',
+  37: 'ArrowLeft',
+  38: 'ArrowUp',
+  39: 'ArrowRight',
+  40: 'ArrowDown',
+  107: '+',
+  109: '-'
+};
+
+/**
  * SVG icons sources
  * @type (Object)
  */
@@ -80,6 +95,7 @@ PhotoSphereViewer.DEFAULTS = {
   },
   mousewheel: true,
   mousemove: true,
+  keyboard: true,
   gyroscope: false,
   move_inertia: true,
   click_event_on_marker: true,

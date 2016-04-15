@@ -122,9 +122,10 @@ function PhotoSphereViewer(options) {
     longitude: 0, // current longitude of the center
     anim_speed: 0, // parsed anim speed (rad/sec)
     zoom_lvl: 0, // current zoom level
-    vFov: 0,
-    hFov: 0,
-    aspect: 0,
+    vFov: 0, // vertical FOV
+    hFov: 0, // horizontal FOV
+    aspect: 0, // viewer aspect ratio
+    move_speed: 0.1, // move speed (computed with pixel ratio and config move_speed)
     moving: false, // is the user moving
     zooming: false, // is the user zooming
     start_mouse_x: 0, // start x position of the click/touch
@@ -177,6 +178,8 @@ function PhotoSphereViewer(options) {
 
   var tempZoom = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
   this.zoom(tempZoom - 2 * (tempZoom - 50), false);
+
+  this.prop.move_speed = 1 / PhotoSphereViewer.SYSTEM.pixelRatio * Math.PI / 180 * this.config.move_speed;
 
   this.rotate({
     longitude: this.config.default_long,
