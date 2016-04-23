@@ -25,7 +25,7 @@ function PSVMarker(properties, psv) {
 
   // private properties
   var _id = properties.id;
-  var _type = PSVMarker.getType(properties);
+  var _type = PSVMarker.getType(properties, false);
   var $el;
 
   Object.defineProperties(this, {
@@ -88,9 +88,10 @@ function PSVMarker(properties, psv) {
 /**
  * Determines the type of a marker by the available properties
  * @param properties
+ * @param allowNone
  * @returns {String}
  */
-PSVMarker.getType = function(properties) {
+PSVMarker.getType = function(properties, allowNone) {
   var definitions = ['image', 'html', 'polygon_px', 'polygon_rad', 'rect', 'circle', 'ellipse', 'path'];
 
   var found = [];
@@ -100,7 +101,7 @@ PSVMarker.getType = function(properties) {
     }
   });
 
-  if (found.length === 0) {
+  if (found.length === 0 && !allowNone) {
     throw new PSVError('missing marker content, either ' + definitions.join(', '));
   }
   else if (found.length > 1) {
@@ -141,9 +142,9 @@ PSVMarker.prototype.isSvg = function() {
 PSVMarker.prototype.update = function(properties) {
   // merge objects
   if (properties && properties !== this) {
-    var newType = PSVMarker.getType(properties);
+    var newType = PSVMarker.getType(properties, true);
 
-    if (newType !== this.type) {
+    if (newType !== undefined && newType !== this.type) {
       throw new PSVError('cannot change marker type');
     }
 

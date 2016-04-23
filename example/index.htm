@@ -95,7 +95,7 @@
       {
         title: 'Change image',
         className: 'custom-button',
-        content: '★',
+        content: '↻',
         onClick: (function() {
           var i = false;
 
@@ -116,7 +116,8 @@
       {
         id: 'disabled',
         title: 'This button is disabled',
-        content: 'NO'
+        content: '❌',
+        enabled: false
       },
       'caption',
       'gyroscope',
@@ -304,10 +305,6 @@
         height: width
       });
     }
-  });
-
-  PSV.on('ready', function() {
-    PSV.getNavbarButton('disabled').disable();
   });
 </script>
 

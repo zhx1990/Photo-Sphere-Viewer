@@ -38,6 +38,10 @@ PSVNavBarCustomButton.prototype.create = function() {
   if (this.config.content) {
     this.container.innerHTML = this.config.content;
   }
+
+  if (this.config.enabled === false || this.config.disabled === true) {
+    this.disable();
+  }
 };
 
 PSVNavBarCustomButton.prototype.destroy = function() {

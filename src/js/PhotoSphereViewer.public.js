@@ -195,8 +195,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
   if (!transition || !this.config.transition || !this.scene) {
     this.loader = new PSVLoader(this);
 
-    return this._loadXMP()
-      .then(this._loadTexture.bind(this))
+    return this._loadTexture()
       .then(this._setTexture.bind(this))
       .then(function() {
         if (self.loader) {
@@ -218,8 +217,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
       this.loader = new PSVLoader(this);
     }
 
-    return this._loadXMP()
-      .then(this._loadTexture.bind(this))
+    return this._loadTexture()
       .then(function(texture) {
         if (self.loader) {
           self.loader.destroy();
@@ -301,6 +299,11 @@ PhotoSphereViewer.prototype.toggleAutorotate = function() {
  * Starts the gyroscope interaction
  */
 PhotoSphereViewer.prototype.startGyroscopeControl = function() {
+  if (!this.config.gyroscope) {
+    console.warn('PhotoSphereViewer: gyroscope disabled');
+    return;
+  }
+
   this.stopAll();
 
   var self = this;

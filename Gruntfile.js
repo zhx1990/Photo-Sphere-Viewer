@@ -11,7 +11,8 @@ module.exports = function(grunt) {
     'src/js/PhotoSphereViewer.js',
     'src/js/components/PSVComponent.js',
     'src/js/buttons/PSVNavBarButton.js',
-    'src/js/**/*.js'
+    'src/js/**/*.js',
+    'src/js/exports.js'
   ]);
 
   grunt.initConfig({
