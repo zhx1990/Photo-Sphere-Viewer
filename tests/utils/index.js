@@ -25,9 +25,9 @@ describe('PSVUtils::parseAngle', function() {
   it('should parse degrees angles', function() {
     var values = {
       '0deg': 0,
-      '30deg': 30/180*Math.PI,
-      '-30deg': PSVUtils.TwoPI - 30/180*Math.PI,
-      '85degs': 85/180*Math.PI,
+      '30deg': 30 / 180 * Math.PI,
+      '-30deg': PSVUtils.TwoPI - 30 / 180 * Math.PI,
+      '85degs': 85 / 180 * Math.PI,
       '360degs': 0
     };
 
@@ -38,7 +38,7 @@ describe('PSVUtils::parseAngle', function() {
 
   it('should normalize angles between 0 and 2Pi', function() {
     var values = {
-      '450deg': Math.PI/2,
+      '450deg': Math.PI / 2,
       '1440deg': 0,
       '8.15': 8.15 - PSVUtils.TwoPI,
       '-3.14': PSVUtils.TwoPI - 3.14,
@@ -52,8 +52,8 @@ describe('PSVUtils::parseAngle', function() {
 
   it('should normalize angles between -Pi and Pi', function() {
     var values = {
-      '270deg': -Math.PI/2,
-      '-4': 2*Math.PI - 4
+      '270deg': -Math.PI / 2,
+      '-4': 2 * Math.PI - 4
     };
 
     for (var pos in values) {
@@ -193,16 +193,16 @@ describe('PSVUtils::parsePosition', function() {
 describe('PSVUtils::parseSpeed', function() {
   it('should parse all units', function() {
     var values = {
-      '360dpm': 360/180*Math.PI/60,
-      '360degrees per minute': 360/180*Math.PI/60,
-      '10dps': 10/180*Math.PI,
-      '10degrees per second': 10/180*Math.PI,
-      '2radians per minute': 2/60,
+      '360dpm': 360 / 180 * Math.PI / 60,
+      '360degrees per minute': 360 / 180 * Math.PI / 60,
+      '10dps': 10 / 180 * Math.PI,
+      '10degrees per second': 10 / 180 * Math.PI,
+      '2radians per minute': 2 / 60,
       '0.1radians per second': 0.1,
-      '2rpm': 2*2*Math.PI/60,
-      '2revolutions per minute': 2*2*Math.PI/60,
-      '0.01rps': 0.01*2*Math.PI,
-      '0.01revolutions per second': 0.01*2*Math.PI
+      '2rpm': 2 * 2 * Math.PI / 60,
+      '2revolutions per minute': 2 * 2 * Math.PI / 60,
+      '0.01rps': 0.01 * 2 * Math.PI,
+      '0.01revolutions per second': 0.01 * 2 * Math.PI
     };
 
     for (var speed in values) {
@@ -212,14 +212,14 @@ describe('PSVUtils::parseSpeed', function() {
 
   it('should allow various forms', function() {
     var values = {
-      '2rpm': 2*2*Math.PI/60,
-      '2 rpm': 2*2*Math.PI/60,
-      '2revolutions per minute': 2*2*Math.PI/60,
-      '2 revolutions per minute': 2*2*Math.PI/60,
-      '-2rpm': -2*2*Math.PI/60,
-      '-2 rpm': -2*2*Math.PI/60,
-      '-2revolutions per minute': -2*2*Math.PI/60,
-      '-2 revolutions per minute': -2*2*Math.PI/60
+      '2rpm': 2 * 2 * Math.PI / 60,
+      '2 rpm': 2 * 2 * Math.PI / 60,
+      '2revolutions per minute': 2 * 2 * Math.PI / 60,
+      '2 revolutions per minute': 2 * 2 * Math.PI / 60,
+      '-2rpm': -2 * 2 * Math.PI / 60,
+      '-2 rpm': -2 * 2 * Math.PI / 60,
+      '-2revolutions per minute': -2 * 2 * Math.PI / 60,
+      '-2 revolutions per minute': -2 * 2 * Math.PI / 60
     };
 
     for (var speed in values) {
@@ -240,41 +240,41 @@ describe('PSVUtils::parseSpeed', function() {
 
 describe('PSVUtils::deepmerge', function() {
   it('should merge basic plain objects', function() {
-    var one = {a: 'z', b: {c: {d: 'e'}}};
-    var two = {b: {c: {f: 'g', j: 'i'}}};
+    var one = { a: 'z', b: { c: { d: 'e' } } };
+    var two = { b: { c: { f: 'g', j: 'i' } } };
 
     var result = PSVUtils.deepmerge(one, two);
 
-    assert.deepEqual(one, {a: 'z', b: {c: {d: 'e', f: 'g', j: 'i'}}});
+    assert.deepEqual(one, { a: 'z', b: { c: { d: 'e', f: 'g', j: 'i' } } });
     assert.equal(result, one);
   });
 
   it('should merge arrays by replace', function() {
-    var one = {a: [1, 2, 3]};
-    var two = {a: [2, 4]};
+    var one = { a: [1, 2, 3] };
+    var two = { a: [2, 4] };
 
     var result = PSVUtils.deepmerge(one, two);
 
-    assert.deepEqual(one, {a: [2, 4]});
+    assert.deepEqual(one, { a: [2, 4] });
     assert.equal(result, one);
   });
 
   it('should clone object', function() {
-    var one = {b: {c: {d: 'e'}}};
+    var one = { b: { c: { d: 'e' } } };
 
     var result = PSVUtils.deepmerge(null, one);
 
-    assert.deepEqual(result, {b: {c: {d: 'e'}}});
+    assert.deepEqual(result, { b: { c: { d: 'e' } } });
     assert.notEqual(result, one);
     assert.notEqual(result.b.c, one.b.c);
   });
 
   it('should clone array', function() {
-    var one = [{a: 'b'}, {c: 'd'}];
+    var one = [{ a: 'b' }, { c: 'd' }];
 
     var result = PSVUtils.deepmerge(null, one);
 
-    assert.deepEqual(result, [{a: 'b'}, {c: 'd'}]);
+    assert.deepEqual(result, [{ a: 'b' }, { c: 'd' }]);
     assert.notEqual(result[0], one[1]);
   });
 
@@ -288,11 +288,67 @@ describe('PSVUtils::deepmerge', function() {
   });
 
   it('should stop on recursion', function() {
-    var one = {a: 'foo'};
+    var one = { a: 'foo' };
     one.b = one;
 
     var result = PSVUtils.deepmerge(null, one);
 
-    assert.deepEqual(result, {a: 'foo'});
+    assert.deepEqual(result, { a: 'foo' });
   });
+});
+
+describe('PSVUtils::getXMPValue', function() {
+  it('should parse XMP data with children', function() {
+    var data = '<rdf:Description rdf:about="" xmlns:GPano="http://ns.google.com/photos/1.0/panorama/">\
+      <GPano:ProjectionType>equirectangular</GPano:ProjectionType>\
+      <GPano:UsePanoramaViewer>True</GPano:UsePanoramaViewer>\
+      <GPano:CroppedAreaImageWidthPixels>5376</GPano:CroppedAreaImageWidthPixels>\
+      <GPano:CroppedAreaImageHeightPixels>2688</GPano:CroppedAreaImageHeightPixels>\
+      <GPano:FullPanoWidthPixels>5376</GPano:FullPanoWidthPixels>\
+      <GPano:FullPanoHeightPixels>2688</GPano:FullPanoHeightPixels>\
+      <GPano:CroppedAreaLeftPixels>0</GPano:CroppedAreaLeftPixels>\
+      <GPano:CroppedAreaTopPixels>0</GPano:CroppedAreaTopPixels>\
+      <GPano:PoseHeadingDegrees>270.0</GPano:PoseHeadingDegrees>\
+      <GPano:PosePitchDegrees>0</GPano:PosePitchDegrees>\
+      <GPano:PoseRollDegrees>0.2</GPano:PoseRollDegrees>\
+    </rdf:Description>';
+
+    assert.deepEqual([
+      PSVUtils.getXMPValue(data, 'FullPanoWidthPixels'),
+      PSVUtils.getXMPValue(data, 'FullPanoHeightPixels'),
+      PSVUtils.getXMPValue(data, 'CroppedAreaImageWidthPixels'),
+      PSVUtils.getXMPValue(data, 'CroppedAreaImageHeightPixels'),
+      PSVUtils.getXMPValue(data, 'CroppedAreaLeftPixels'),
+      PSVUtils.getXMPValue(data, 'CroppedAreaTopPixels')
+    ], [
+      '5376', '2688', '5376', '2688', '0', '0'
+    ])
+  });
+
+  it('should parse XMP data with attributes', function() {
+    var data = '<rdf:Description rdf:about="" xmlns:GPano="http://ns.google.com/photos/1.0/panorama/"\
+      GPano:ProjectionType="equirectangular"\
+      GPano:UsePanoramaViewer="True"\
+      GPano:CroppedAreaImageWidthPixels="5376"\
+      GPano:CroppedAreaImageHeightPixels="2688"\
+      GPano:FullPanoWidthPixels="5376"\
+      GPano:FullPanoHeightPixels="2688"\
+      GPano:CroppedAreaLeftPixels="0"\
+      GPano:CroppedAreaTopPixels="0"\
+      GPano:PoseHeadingDegrees="270"\
+      GPano:PosePitchDegrees="0"\
+      GPano:PoseRollDegrees="0"/>';
+
+    assert.deepEqual([
+      PSVUtils.getXMPValue(data, 'FullPanoWidthPixels'),
+      PSVUtils.getXMPValue(data, 'FullPanoHeightPixels'),
+      PSVUtils.getXMPValue(data, 'CroppedAreaImageWidthPixels'),
+      PSVUtils.getXMPValue(data, 'CroppedAreaImageHeightPixels'),
+      PSVUtils.getXMPValue(data, 'CroppedAreaLeftPixels'),
+      PSVUtils.getXMPValue(data, 'CroppedAreaTopPixels')
+    ], [
+      '5376', '2688', '5376', '2688', '0', '0'
+    ])
+  });
+
 });

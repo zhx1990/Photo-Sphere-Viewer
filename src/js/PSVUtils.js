@@ -202,14 +202,14 @@ PSVUtils.stayBetween = function(x, min, max) {
  * @return (string) The value of the attribute
  */
 PSVUtils.getXMPValue = function(data, attr) {
-  var a, b;
+  var result;
   // XMP data are stored in children
-  if ((a = data.indexOf('<GPano:' + attr + '>')) !== -1 && (b = data.indexOf('</GPano:' + attr + '>')) !== -1) {
-    return data.substring(a, b).replace('<GPano:' + attr + '>', '');
+  if ((result = data.match('<GPano:' + attr + '>(.*)</GPano:' + attr + '>')) !== null) {
+    return result[1];
   }
   // XMP data are stored in attributes
-  else if ((a = data.indexOf('GPano:' + attr)) !== -1 && (b = data.indexOf('"', a + attr.length + 8)) !== -1) {
-    return data.substring(a + attr.length + 8, b);
+  else if ((result = data.match('GPano:' + attr + '="(.*?)"')) !== null) {
+    return result[1];
   }
   else {
     return null;
