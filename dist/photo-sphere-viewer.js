@@ -1,5 +1,5 @@
 /*!
- * Photo Sphere Viewer 3.2.0-SNAPSHOT
+ * Photo Sphere Viewer 3.2.0
  * Copyright (c) 2014-2015 Jérémy Heleine
  * Copyright (c) 2015-2016 Damien "Mistic" Sorel
  * Licensed under MIT (http://opensource.org/licenses/MIT)
@@ -7,638 +7,21 @@
 
 (function(root, factory) {
   if (typeof define === 'function' && define.amd) {
-    define(['three', 'D.js'], factory);
+    define(['three', 'D.js', 'uevent', 'doT'], factory);
   }
   else if (typeof module === 'object' && module.exports) {
-    module.exports = factory(require('three'), require('d.js'));
+    module.exports = factory(require('three'), require('d.js'), require('uevent'), require('dot'));
   }
   else {
-    root.PhotoSphereViewer = factory(root.THREE, root.D);
+    root.PhotoSphereViewer = factory(root.THREE, root.D, root.uEvent, root.doT);
   }
-}(this, function(THREE, D) {
+}(this, function(THREE, D, uEvent, doT) {
 "use strict";
 
 /**
- * Static utilities for PSV
- */
-var PSVUtils = {};
-
-PSVUtils.TwoPI = Math.PI * 2.0;
-PSVUtils.HalfPI = Math.PI / 2.0;
-
-/**
- * Check if some Three.js components are loaded
- * @param components (String...)
- * @returns (boolean)
- */
-PSVUtils.checkTHREE = function(/* components */) {
-  for (var i = 0, l = arguments.length; i < l; i++) {
-    if (!(arguments[i] in THREE)) {
-      return false;
-    }
-  }
-
-  return true;
-};
-
-/**
- * Detects whether canvas is supported
- * @return (boolean) true if canvas is supported, false otherwise
- */
-PSVUtils.isCanvasSupported = function() {
-  var canvas = document.createElement('canvas');
-  return !!(canvas.getContext && canvas.getContext('2d'));
-};
-
-/**
- * Tries to return a canvas webgl context
- * @return (ctx) if canvas is supported, undefined otherwise
- */
-PSVUtils.getWebGLCtx = function() {
-  var canvas = document.createElement('canvas');
-  var names = ['webgl', 'experimental-webgl', 'moz-webgl', 'webkit-3d'];
-  var context = null;
-
-  if (!canvas.getContext) {
-    return null;
-  }
-
-  if (names.some(function(name) {
-      try {
-        context = canvas.getContext(name);
-        return (context && typeof context.getParameter == 'function');
-      } catch (e) {
-        return false;
-      }
-    })) {
-    return context;
-  }
-  else {
-    return null;
-  }
-};
-
-/**
- * Detects whether WebGL is supported
- * @return (boolean) true if WebGL is supported, false otherwise
- */
-PSVUtils.isWebGLSupported = function() {
-  return !!window.WebGLRenderingContext && PSVUtils.getWebGLCtx() !== null;
-};
-
-/**
- * Get max texture width in WebGL context
- * @return (int)
- */
-PSVUtils.getMaxTextureWidth = function() {
-  var ctx = PSVUtils.getWebGLCtx();
-  return ctx.getParameter(ctx.MAX_TEXTURE_SIZE);
-};
-
-/**
- * Toggle a CSS class
- * @param element
- * @param className
- * @param active
- */
-PSVUtils.toggleClass = function(element, className, active) {
-  if (active === undefined) {
-    element.classList.toggle(className);
-  }
-  else if (active && !element.classList.contains(className)) {
-    element.classList.add(className);
-  }
-  else if (!active) {
-    element.classList.remove(className);
-  }
-};
-
-/**
- * Search if an element has a particular, at any level including itself
- * @param el (HTMLElement)
- * @param parent (HTMLElement)
- * @return (Boolean)
- */
-PSVUtils.hasParent = function(el, parent) {
-  do {
-    if (el === parent) {
-      return true;
-    }
-  } while (!!(el = el.parentNode));
-
-  return false;
-};
-
-/**
- * Get closest parent (can by itself)
- * @param el (HTMLElement)
- * @param selector (String)
- * @return (HTMLElement)
- */
-PSVUtils.getClosest = function(el, selector) {
-  var matches = el.matches || el.msMatchesSelector;
-
-  do {
-    if (matches.bind(el)(selector)) {
-      return el;
-    }
-  } while (!!(el = el.parentElement));
-
-  return null;
-};
-
-/**
- * Get the event name for mouse wheel
- * @return (string)
- */
-PSVUtils.mouseWheelEvent = function() {
-  return 'onwheel' in document.createElement('div') ? 'wheel' : // Modern browsers support "wheel"
-    document.onmousewheel !== undefined ? 'mousewheel' : // Webkit and IE support at least "mousewheel"
-      'DOMMouseScroll'; // let's assume that remaining browsers are older Firefox
-};
-
-/**
- * Get the event name for fullscreen event
- * @return (string)
- */
-PSVUtils.fullscreenEvent = function() {
-  var map = {
-    'exitFullscreen': 'fullscreenchange',
-    'webkitExitFullscreen': 'webkitfullscreenchange',
-    'mozCancelFullScreen': 'mozfullscreenchange',
-    'msExitFullscreen': 'msFullscreenEnabled'
-  };
-
-  for (var exit in map) {
-    if (exit in document) return map[exit];
-  }
-
-  return 'fullscreenchange';
-};
-
-/**
- * Ensures that a number is in a given interval
- * @param x (number) The number to check
- * @param min (number) First endpoint
- * @param max (number) Second endpoint
- * @return (number) The checked number
- */
-PSVUtils.stayBetween = function(x, min, max) {
-  return Math.max(min, Math.min(max, x));
-};
-
-/**
- * Returns the value of a given attribute in the panorama metadata
- * @param data (string) The panorama metadata
- * @param attr (string) The wanted attribute
- * @return (string) The value of the attribute
- */
-PSVUtils.getXMPValue = function(data, attr) {
-  var a, b;
-  // XMP data are stored in children
-  if ((a = data.indexOf('<GPano:' + attr + '>')) !== -1 && (b = data.indexOf('</GPano:' + attr + '>')) !== -1) {
-    return data.substring(a, b).replace('<GPano:' + attr + '>', '');
-  }
-  // XMP data are stored in attributes
-  else if ((a = data.indexOf('GPano:' + attr)) !== -1 && (b = data.indexOf('"', a + attr.length + 8)) !== -1) {
-    return data.substring(a + attr.length + 8, b);
-  }
-  else {
-    return null;
-  }
-};
-
-/**
- * Detects whether fullscreen is enabled or not
- * @param elt (HTMLElement)
- * @return (boolean) true if fullscreen is enabled, false otherwise
- */
-PSVUtils.isFullscreenEnabled = function(elt) {
-  return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) === elt;
-};
-
-/**
- * Enters fullscreen mode
- * @param elt (HTMLElement)
- */
-PSVUtils.requestFullscreen = function(elt) {
-  (elt.requestFullscreen || elt.mozRequestFullScreen || elt.webkitRequestFullscreen || elt.msRequestFullscreen).call(elt);
-};
-
-/**
- * Exits fullscreen mode
- * @param elt (HTMLElement)
- */
-PSVUtils.exitFullscreen = function(elt) {
-  (document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen).call(document);
-};
-
-/**
- * Gets an element style
- * @param elt (HTMLElement)
- * @param prop (string)
- * @return mixed
- */
-PSVUtils.getStyle = function(elt, prop) {
-  return window.getComputedStyle(elt, null)[prop];
-};
-
-/**
- * Translate CSS values like "top center" or "10% 50%" as top and left positions
- * The implementation is as close as possible to the "background-position" specification
- * https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
- * @param value (String)
- * @return Object ({top: double: left: double})
- */
-PSVUtils.parsePosition = function(value) {
-  if (!value) {
-    return { top: 0.5, left: 0.5 };
-  }
-
-  if (typeof value === 'object') {
-    return value;
-  }
-
-  var tokens = value.toLocaleLowerCase().split(' ').slice(0, 2);
-
-  if (tokens.length === 1) {
-    if (PSVUtils.parsePosition.positions[tokens[0]] !== undefined) {
-      tokens = [tokens[0], 'center'];
-    }
-    else {
-      tokens = [tokens[0], tokens[0]];
-    }
-  }
-
-  var xFirst = tokens[1] != 'left' && tokens[1] != 'right' && tokens[0] != 'top' && tokens[0] != 'bottom';
-
-  tokens = tokens.map(function(token) {
-    return PSVUtils.parsePosition.positions[token] || token;
-  });
-
-  if (!xFirst) {
-    tokens.reverse();
-  }
-
-  var parsed = tokens.join(' ').match(/^([0-9.]+)% ([0-9.]+)%$/);
-
-  if (parsed) {
-    return {
-      left: parsed[1] / 100,
-      top: parsed[2] / 100
-    };
-  }
-  else {
-    return { top: 0.5, left: 0.5 };
-  }
-};
-
-PSVUtils.parsePosition.positions = { 'top': '0%', 'bottom': '100%', 'left': '0%', 'right': '100%', 'center': '50%' };
-
-/**
- * Parse the animation speed
- * @param speed (string) The speed, in radians/degrees/revolutions per second/minute
- * @return (double) radians per second
- */
-PSVUtils.parseSpeed = function(speed) {
-  if (typeof speed == 'string') {
-    speed = speed.toString().trim();
-
-    // Speed extraction
-    var speed_value = parseFloat(speed.replace(/^(-?[0-9]+(?:\.[0-9]*)?).*$/, '$1'));
-    var speed_unit = speed.replace(/^-?[0-9]+(?:\.[0-9]*)?(.*)$/, '$1').trim();
-
-    // "per minute" -> "per second"
-    if (speed_unit.match(/(pm|per minute)$/)) {
-      speed_value /= 60;
-    }
-
-    // Which unit?
-    switch (speed_unit) {
-      // Degrees per minute / second
-      case 'dpm':
-      case 'degrees per minute':
-      case 'dps':
-      case 'degrees per second':
-        speed = speed_value * Math.PI / 180;
-        break;
-
-      // Radians per minute / second
-      case 'radians per minute':
-      case 'radians per second':
-        speed = speed_value;
-        break;
-
-      // Revolutions per minute / second
-      case 'rpm':
-      case 'revolutions per minute':
-      case 'rps':
-      case 'revolutions per second':
-        speed = speed_value * PSVUtils.TwoPI;
-        break;
-
-      // Unknown unit
-      default:
-        throw new PSVError('unknown speed unit "' + speed_unit + '"');
-    }
-  }
-
-  return speed;
-};
-
-/**
- * Parses an angle value in radians or degrees and return a normalized value in radians
- * @param angle (String|int|double) - 3.14, 3.14rad, 180deg
- * @param reference (boolean) base value for normalization, false to disable - default: 0
- * @returns (double)
- */
-PSVUtils.parseAngle = function(angle, reference) {
-  if (typeof angle == 'string') {
-    var match = angle.toLowerCase().trim().match(/^(-?[0-9]+(?:\.[0-9]*)?)(.*)$/);
-
-    if (!match) {
-      throw new PSVError('unknown angle "' + angle + '"');
-    }
-
-    var value = parseFloat(match[1]);
-    var unit = match[2];
-
-    if (unit) {
-      switch (unit) {
-        case 'deg':
-        case 'degs':
-          angle = value / 180 * Math.PI;
-          break;
-        case 'rad':
-        case 'rads':
-          angle = value;
-          break;
-        default:
-          throw new PSVError('unknown angle unit "' + unit + '"');
-      }
-    }
-  }
-
-  if (reference !== false) {
-    if (reference === undefined) {
-      reference = 0;
-    }
-
-    angle = (angle - reference) % PSVUtils.TwoPI;
-
-    if (angle < 0) {
-      angle = PSVUtils.TwoPI + angle;
-    }
-
-    angle+= reference;
-  }
-
-  return angle;
-};
-
-/**
- * Utility for animations
- * @param options (Object)
- *    - properties ({name: {end: number, start: number}})
- *    - duration (int)
- *    - delay (int, optional)
- *    - easing (string|function, optional)
- *    - onTick (function(properties))
- *    - onCancel (function)
- * @returns (D.promise) with an additional "cancel" method
- */
-PSVUtils.animation = function(options) {
-  var defer = D();
-  var start = null;
-
-  if (!options.easing || typeof options.easing == 'string') {
-    options.easing = PSVUtils.animation.easings[options.easing || 'linear'];
-  }
-
-  function run(timestamp) {
-    // the animation has been cancelled
-    if (defer.promise.getStatus() === -1) {
-      return;
-    }
-
-    // first iteration
-    if (start === null) {
-      start = timestamp;
-    }
-
-    // compute progress
-    var progress = (timestamp - start) / options.duration;
-    var current = {};
-    var name;
-
-    if (progress < 1.0) {
-      // interpolate properties
-      for (name in options.properties) {
-        current[name] = options.properties[name].start + (options.properties[name].end - options.properties[name].start) * options.easing(progress);
-      }
-
-      options.onTick(current, progress);
-
-      window.requestAnimationFrame(run);
-    }
-    else {
-      // call onTick one last time with final values
-      for (name in options.properties) {
-        current[name] = options.properties[name].end;
-      }
-
-      options.onTick(current, 1.0);
-
-      defer.resolve();
-    }
-  }
-
-  if (options.delay !== undefined) {
-    window.setTimeout(function() {
-      window.requestAnimationFrame(run);
-    }, options.delay);
-  }
-  else {
-    window.requestAnimationFrame(run);
-  }
-
-  // add a "cancel" to the promise
-  var promise = defer.promise;
-  promise.cancel = function() {
-    if (options.onCancel) {
-      options.onCancel();
-      defer.reject(defer);
-    }
-  };
-  return promise;
-};
-
-/**
- * Collection of easing functions
- * https://gist.github.com/frederickk/6165768
- */
-// @formatter:off
-// jscs:disable
-/* jshint ignore:start */
-PSVUtils.animation.easings = {
-  // no easing, no acceleration
-  linear: function(t) { return t; },
-
-  // accelerating from zero velocity
-  inQuad: function(t) { return t*t; },
-  // decelerating to zero velocity
-  outQuad: function(t) { return t*(2-t); },
-  // acceleration until halfway, then deceleration
-  inOutQuad: function(t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t; },
-
-  // accelerating from zero velocity
-  inCubic: function(t) { return t*t*t; },
-  // decelerating to zero velocity
-  outCubic: function(t) { return (--t)*t*t+1; },
-  // acceleration until halfway, then deceleration
-  inOutCubic: function(t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1; },
-
-  // accelerating from zero velocity
-  inQuart: function(t) { return t*t*t*t; },
-  // decelerating to zero velocity
-  outQuart: function(t) { return 1-(--t)*t*t*t; },
-  // acceleration until halfway, then deceleration
-  inOutQuart: function(t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t; },
-
-  // accelerating from zero velocity
-  inQuint: function(t) { return t*t*t*t*t; },
-  // decelerating to zero velocity
-  outQuint: function(t) { return 1+(--t)*t*t*t*t; },
-  // acceleration until halfway, then deceleration
-  inOutQuint: function(t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t; },
-
-  // accelerating from zero velocity
-  inSine: function(t) { return 1-Math.cos(t*(Math.PI/2)); },
-  // decelerating to zero velocity
-  outSine: function(t) { return Math.sin(t*(Math.PI/2)); },
-  // accelerating until halfway, then decelerating
-  inOutSine: function(t) { return .5-.5*Math.cos(Math.PI*t); },
-
-  // accelerating from zero velocity
-  inExpo: function(t) { return Math.pow(2, 10*(t-1)); },
-  // decelerating to zero velocity
-  outExpo: function(t) { return 1-Math.pow(2, -10*t); },
-  // accelerating until halfway, then decelerating
-  inOutExpo: function(t) { t=t*2-1; return t<0 ? .5*Math.pow(2, 10*t) : 1-.5*Math.pow(2, -10*t); },
-
-  // accelerating from zero velocity
-  inCirc: function(t) { return 1-Math.sqrt(1-t*t); },
-  // decelerating to zero velocity
-  outCirc: function(t) { t--; return Math.sqrt(1-t*t); },
-  // acceleration until halfway, then deceleration
-  inOutCirc: function(t) { t*=2; return t<1 ? .5-.5*Math.sqrt(1-t*t) : .5+.5*Math.sqrt(1-(t-=2)*t); }
-};
-// jscs:enable
-/* jshint ignore:end */
-// @formatter:off
-
-/**
- * Returns a function, that, when invoked, will only be triggered at most once during a given window of time.
- * @copyright underscore.js - modified by Clément Prévost http://stackoverflow.com/a/27078401
- * @param func (Function)
- * @param wait (int)
- * @returns (Function)
- */
-PSVUtils.throttle = function(func, wait) {
-  var self, args, result;
-  var timeout = null;
-  var previous = 0;
-  var later = function() {
-    previous = Date.now();
-    timeout = null;
-    result = func.apply(self, args);
-    if (!timeout) self = args = null;
-  };
-  return function() {
-    var now = Date.now();
-    if (!previous) previous = now;
-    var remaining = wait - (now - previous);
-    self = this;
-    args = arguments;
-    if (remaining <= 0 || remaining > wait) {
-      if (timeout) {
-        clearTimeout(timeout);
-        timeout = null;
-      }
-      previous = now;
-      result = func.apply(self, args);
-      if (!timeout) self = args = null;
-    }
-    else if (!timeout) {
-      timeout = setTimeout(later, remaining);
-    }
-    return result;
-  };
-};
-
-/**
- * Merge the enumerable attributes of two objects.
- * Modified to replace arrays instead of merge.
- * @copyright Nicholas Fisher <nfisher110@gmail.com>"
- * @license MIT
- * @param target (Object)
- * @param src (Object)
- * @return (Object)
- */
-PSVUtils.deepmerge = function(target, src) {
-  var array = Array.isArray(src);
-  var dst = array && [] || {};
-
-  if (array) {
-    src.forEach(function(e, i) {
-      if (typeof dst[i] === 'undefined') {
-        dst[i] = e;
-      }
-      else {
-        dst[i] = PSVUtils.deepmerge(null, e);
-      }
-    });
-  }
-  else {
-    if (target && Array.isArray(target)) {
-      target = undefined;
-    }
-    if (target && typeof target === 'object') {
-      Object.keys(target).forEach(function(key) {
-        dst[key] = target[key];
-      });
-    }
-    Object.keys(src).forEach(function(key) {
-      if (typeof src[key] !== 'object' || !src[key]) {
-        dst[key] = src[key];
-      }
-      else {
-        if (!target[key]) {
-          dst[key] = src[key];
-        }
-        else {
-          dst[key] = PSVUtils.deepmerge(target[key], src[key]);
-        }
-      }
-    });
-  }
-
-  return dst;
-};
-
-/**
- * Clone an object
- * @param src (Object)
- * @return (Object)
- */
-PSVUtils.clone = function(src) {
-  return PSVUtils.deepmerge(Array.isArray(src) ? [] : {}, src);
-};
-
-
-/**
  * Viewer class
- * @param options (Object) Viewer settings
+ * @param {Object} options - Viewer settings
+ * @constructor
  */
 function PhotoSphereViewer(options) {
   if (!(this instanceof PhotoSphereViewer)) {
@@ -649,37 +32,16 @@ function PhotoSphereViewer(options) {
     PhotoSphereViewer.loadSystem();
   }
 
-  this.config = PSVUtils.deepmerge(PhotoSphereViewer.DEFAULTS, options);
+  this.config = PSVUtils.clone(PhotoSphereViewer.DEFAULTS);
+  PSVUtils.deepmerge(this.config, options);
 
-  // normalize config
-  this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
-  this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
-  this.config.tilt_up_max = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.tilt_up_max, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
-  this.config.tilt_down_max = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.tilt_down_max, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
-  if (this.config.default_fov === null) {
-    this.config.default_fov = this.config.max_fov / 2 + this.config.min_fov / 2;
-  }
-  else {
-    this.config.default_fov = PSVUtils.stayBetween(this.config.default_fov, this.config.min_fov, this.config.max_fov);
-  }
-  this.config.default_long = PSVUtils.parseAngle(this.config.default_long);
-  this.config.default_lat = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.default_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
-  if (this.config.anim_lat === null) {
-    this.config.anim_lat = this.config.default_lat;
-  }
-  else {
-    this.config.anim_lat = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.anim_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
-  }
-  this.config.long_offset = PSVUtils.parseAngle(this.config.long_offset);
-  this.config.lat_offset = PSVUtils.parseAngle(this.config.lat_offset);
-  this.config.anim_speed = PSVUtils.parseSpeed(this.config.anim_speed);
-  if (this.config.caption && !this.config.navbar) {
-    this.config.navbar = ['caption'];
+  // check system and config
+  if (!options.container) {
+    throw new PSVError('No value given for container.');
   }
 
-  // check config
-  if (!options.panorama || !options.container) {
-    throw new PSVError('No value given for panorama or container.');
+  if (!PhotoSphereViewer.SYSTEM.isCanvasSupported) {
+    throw new PSVError('Canvas is not supported.');
   }
 
   if ((!PhotoSphereViewer.SYSTEM.isWebGLSupported || !this.config.webgl) && !PSVUtils.checkTHREE('CanvasRenderer', 'Projector')) {
@@ -696,16 +58,69 @@ function PhotoSphereViewer(options) {
     }
   }
 
-  if (this.config.max_fov < this.config.min_fov) {
-    throw new PSVError('max_fov cannot be lower than min_fov.');
+  if (this.config.longitude_range && this.config.longitude_range.length !== 2) {
+    this.config.longitude_range = null;
+    console.warn('PhotoSphereViewer: longitude_range must have exactly two elements.');
   }
 
-  if (this.config.tilt_up_max < this.config.tilt_down_max) {
-    throw new PSVError('tilt_up_max cannot be lower than tilt_down_max.');
+  if (this.config.latitude_range) {
+    if (this.config.latitude_range.length !== 2) {
+      this.config.latitude_range = null;
+      console.warn('PhotoSphereViewer: latitude_range must have exactly two elements.');
+    }
+    else if (this.config.latitude_range[0] > this.config.latitude_range[1]) {
+      this.config.latitude_range = [this.config.latitude_range[1], this.config.latitude_range[0]];
+      console.warn('PhotoSphereViewer: latitude_range values must be ordered.');
+    }
+  }
+  else if (this.config.tilt_up_max !== undefined || this.config.tilt_down_max !== undefined) {
+    this.config.latitude_range = [
+      this.config.tilt_down_max !== undefined ? this.config.tilt_down_max - Math.PI / 4 : -PSVUtils.HalfPI,
+      this.config.tilt_up_max !== undefined ? this.config.tilt_up_max + Math.PI / 4 : PSVUtils.HalfPI
+    ];
+    console.warn('PhotoSphereViewer: tilt_up_max and tilt_down_max are deprecated, use latitude_range instead.');
+  }
+
+  if (this.config.max_fov < this.config.min_fov) {
+    this.config.max_fov = PhotoSphereViewer.DEFAULTS.max_fov;
+    this.config.min_fov = PhotoSphereViewer.DEFAULTS.min_fov;
+    console.warn('PhotoSphereViewer: max_fov cannot be lower than min_fov.');
+  }
+
+  // normalize config
+  this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
+  this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
+  if (this.config.default_fov === null) {
+    this.config.default_fov = this.config.max_fov / 2 + this.config.min_fov / 2;
+  }
+  else {
+    this.config.default_fov = PSVUtils.stayBetween(this.config.default_fov, this.config.min_fov, this.config.max_fov);
+  }
+  this.config.default_long = PSVUtils.parseAngle(this.config.default_long);
+  this.config.default_lat = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.default_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
+  if (this.config.anim_lat === null) {
+    this.config.anim_lat = this.config.default_lat;
+  }
+  else {
+    this.config.anim_lat = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.anim_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
+  }
+  this.config.anim_speed = PSVUtils.parseSpeed(this.config.anim_speed);
+  if (this.config.caption && !this.config.navbar) {
+    this.config.navbar = ['caption'];
+  }
+  if (this.config.longitude_range) {
+    this.config.longitude_range = this.config.longitude_range.map(function(angle) {
+      return PSVUtils.parseAngle(angle);
+    });
+  }
+  if (this.config.latitude_range) {
+    this.config.latitude_range = this.config.latitude_range.map(function(angle) {
+      return PSVUtils.stayBetween(PSVUtils.parseAngle(angle, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
+    });
   }
 
   // references to components
-  this.parent = (typeof this.config.container == 'string') ? document.getElementById(this.config.container) : this.config.container;
+  this.parent = (typeof options.container == 'string') ? document.getElementById(options.container) : options.container;
   this.container = null;
   this.loader = null;
   this.navbar = null;
@@ -721,7 +136,6 @@ function PhotoSphereViewer(options) {
   this.mesh = null;
   this.raycaster = null;
   this.doControls = null;
-  this.actions = {};
 
   // local properties
   this.prop = {
@@ -729,6 +143,10 @@ function PhotoSphereViewer(options) {
     longitude: 0, // current longitude of the center
     anim_speed: 0, // parsed anim speed (rad/sec)
     zoom_lvl: 0, // current zoom level
+    vFov: 0, // vertical FOV
+    hFov: 0, // horizontal FOV
+    aspect: 0, // viewer aspect ratio
+    move_speed: 0.1, // move speed (computed with pixel ratio and config move_speed)
     moving: false, // is the user moving
     zooming: false, // is the user zooming
     start_mouse_x: 0, // start x position of the click/touch
@@ -757,235 +175,88 @@ function PhotoSphereViewer(options) {
     }
   };
 
-  // compute zoom level
-  this.prop.zoom_lvl = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
-  this.prop.zoom_lvl -= 2 * (this.prop.zoom_lvl - 50);
+  // init templates
+  Object.keys(PhotoSphereViewer.TEMPLATES).forEach(function(tpl) {
+    if (!this.config.templates[tpl]) {
+      this.config.templates[tpl] = PhotoSphereViewer.TEMPLATES[tpl];
+    }
+    if (typeof this.config.templates[tpl] == 'string') {
+      this.config.templates[tpl] = doT.template(this.config.templates[tpl]);
+    }
+  }, this);
 
   // create actual container
   this.container = document.createElement('div');
   this.container.classList.add('psv-container');
   this.parent.appendChild(this.container);
 
-  // is canvas supported?
-  if (!PhotoSphereViewer.SYSTEM.isCanvasSupported) {
-    this.container.textContent = 'Canvas is not supported, update your browser!';
-    throw new PSVError('Canvas is not supported.');
-  }
-
-  // init
-  this.rotate({
-    longitude: this.config.default_long,
-    latitude: this.config.default_lat
-  });
-
+  // apply config
   if (this.config.size !== null) {
     this._setViewerSize(this.config.size);
   }
 
+  this._onResize();
+
+  var tempZoom = Math.round((this.config.default_fov - this.config.min_fov) / (this.config.max_fov - this.config.min_fov) * 100);
+  this.zoom(tempZoom - 2 * (tempZoom - 50), false);
+
+  this.prop.move_speed = 1 / PhotoSphereViewer.SYSTEM.pixelRatio * Math.PI / 180 * this.config.move_speed;
+
+  this.rotate({
+    longitude: this.config.default_long,
+    latitude: this.config.default_lat
+  }, false);
+
+  // load components
+  if (this.config.navbar) {
+    this.container.classList.add('has-navbar');
+    this.navbar = new PSVNavBar(this);
+    this.navbar.hide();
+  }
+
+  this.hud = new PSVHUD(this);
+  this.hud.hide();
+
+  this.panel = new PSVPanel(this);
+
+  this.tooltip = new PSVTooltip(this.hud);
+
+  // init
+  this.parent.photoSphereViewer = this;
+
+  this._bindEvents();
+
   if (this.config.autoload) {
     this.load();
   }
+
+  // enable GUI after first render
+  this.once('render', function() {
+    if (this.config.navbar) {
+      this.navbar.show();
+    }
+
+    this.hud.show();
+
+    if (this.config.markers) {
+      this.config.markers.forEach(function(marker) {
+        this.hud.addMarker(marker, false);
+      }, this);
+
+      this.hud.updatePositions();
+    }
+
+    this.trigger('ready');
+  }.bind(this));
 }
 
-/**
- * Number of pixels bellow which a mouse move will be considered as a click
- * @type (int)
- */
-PhotoSphereViewer.MOVE_THRESHOLD = 4;
-
-/**
- * Time size of the mouse position history used to compute inertia
- * @type (int)
- */
-PhotoSphereViewer.INERTIA_WINDOW = 300;
-
-/**
- * SVG icons sources
- * @type (Object)
- */
-PhotoSphereViewer.ICONS = {};
-
-/**
- * System properties
- * @type (Object)
- */
-PhotoSphereViewer.SYSTEM = {
-  loaded: false,
-  isWebGLSupported: false,
-  isCanvasSupported: false,
-  deviceOrientationSupported: null,
-  maxTextureWidth: 0,
-  mouseWheelEvent: null,
-  fullscreenEvent: null
-};
-
-/**
- * PhotoSphereViewer defaults
- * @type (Object)
- */
-PhotoSphereViewer.DEFAULTS = {
-  panorama: null,
-  container: null,
-  caption: null,
-  autoload: true,
-  usexmpdata: true,
-  pano_data: null,
-  webgl: true,
-  min_fov: 30,
-  max_fov: 90,
-  default_fov: null,
-  default_long: 0,
-  default_lat: 0,
-  tilt_up_max: PSVUtils.HalfPI,
-  tilt_down_max: -PSVUtils.HalfPI,
-  long_offset: Math.PI / 1440.0,
-  lat_offset: Math.PI / 720.0,
-  time_anim: 2000,
-  anim_speed: '2rpm',
-  anim_lat: null,
-  navbar: [
-    'autorotate',
-    'zoom',
-    'download',
-    'markers',
-    'caption',
-    'gyroscope',
-    'fullscreen'
-  ],
-  tooltip: {
-    offset: 5,
-    arrow_size: 7,
-    delay: 100
-  },
-  lang: {
-    autorotate: 'Automatic rotation',
-    zoom: 'Zoom',
-    zoomOut: 'Zoom out',
-    zoomIn: 'Zoom in',
-    download: 'Download',
-    fullscreen: 'Fullscreen',
-    markers: 'Markers',
-    gyroscope: 'Gyroscope'
-  },
-  mousewheel: true,
-  mousemove: true,
-  move_inertia: true,
-  click_event_on_marker: true,
-  transition: {
-    duration: 1500,
-    loader: true,
-    blur: false
-  },
-  loading_img: null,
-  loading_txt: 'Loading...',
-  size: null,
-  markers: []
-};
-
-
-/**
- * Base sub-component class
- * @param parent (PhotoSphereViewer | PSVComponent) The parent with a "container" property
- */
-function PSVComponent(parent) {
-  this.psv = parent instanceof PhotoSphereViewer ? parent : parent.psv;
-  this.parent = parent;
-  this.container = null;
-
-  // expose some methods to the viewer
-  if (this.constructor.publicMethods) {
-    this.constructor.publicMethods.forEach(function(method) {
-      this.psv[method] = this[method].bind(this);
-    }, this);
-  }
-}
-
-/**
- * Creates the component
- */
-PSVComponent.prototype.create = function() {
-  this.container = document.createElement('div');
-
-  if (this.constructor.className) {
-    this.container.className = this.constructor.className;
-  }
-
-  this.parent.container.appendChild(this.container);
-};
-
-/**
- * Destroys the component
- */
-PSVComponent.prototype.destroy = function() {
-  this.parent.container.removeChild(this.container);
-
-  this.container = null;
-  this.psv = null;
-  this.parent = null;
-};
-
-
-/**
- * Navigation bar button class
- * @param navbar (PSVNavBar) A PSVNavBar object
- */
-function PSVNavBarButton(navbar) {
-  PSVComponent.call(this, navbar);
-}
-
-PSVNavBarButton.prototype = Object.create(PSVComponent.prototype);
-PSVNavBarButton.prototype.constructor = PSVNavBarButton;
-
-/**
- * Creates the button
- */
-PSVNavBarButton.prototype.create = function() {
-  PSVComponent.prototype.create.call(this);
-
-  if (this.constructor.icon) {
-    this.container.innerHTML = PhotoSphereViewer.ICONS[this.constructor.icon];
-  }
-};
-
-/**
- * Changes the active state of the button
- * @param active (boolean) true if the button should be active, false otherwise
- * @return (void)
- */
-PSVNavBarButton.prototype.toggleActive = function(active) {
-  PSVUtils.toggleClass(this.container, 'active', active);
-
-  if (this.constructor.iconActive) {
-    this.container.innerHTML = PhotoSphereViewer.ICONS[active ? this.constructor.iconActive : this.constructor.icon];
-  }
-};
-
-
-/**
- * Custom error used in the lib
- * http://stackoverflow.com/a/27724419/1207670
- * @param message (Mixed)
- */
-function PSVError(message) {
-  this.message = message;
-
-  // Use V8's native method if available, otherwise fallback
-  if ('captureStackTrace' in Error) {
-    Error.captureStackTrace(this, PSVError);
-  }
-  else {
-    this.stack = (new Error()).stack;
-  }
-}
-
-PSVError.prototype = Object.create(Error.prototype);
-PSVError.prototype.name = 'PSVError';
-PSVError.prototype.constructor = PSVError;
+uEvent.mixin(PhotoSphereViewer);
 
 
 /**
  * Loads the XMP data with AJAX
- * @return (D.promise)
+ * @returns {promise}
+ * @private
  */
 PhotoSphereViewer.prototype._loadXMP = function() {
   if (!this.config.usexmpdata) {
@@ -1022,12 +293,18 @@ PhotoSphereViewer.prototype._loadXMP = function() {
             cropped_y: parseInt(PSVUtils.getXMPValue(data, 'CroppedAreaTopPixels'))
           };
 
-          defer.resolve(pano_data);
+          if (!pano_data.full_width || !pano_data.full_height || !pano_data.cropped_width || !pano_data.cropped_height) {
+            console.warn('PhotoSphereViewer: invalid XMP data');
+            defer.resolve(null);
+          }
+          else {
+            defer.resolve(pano_data);
+          }
         }
       }
       else {
         self.container.textContent = 'Cannot load image';
-        defer.reject();
+        throw new PSVError('Cannot load image');
       }
     }
     else if (xhr.readyState === 3) {
@@ -1049,7 +326,7 @@ PhotoSphereViewer.prototype._loadXMP = function() {
 
   xhr.onerror = function() {
     self.container.textContent = 'Cannot load image';
-    defer.reject();
+    throw new PSVError('Cannot load image');
   };
 
   xhr.open('GET', this.config.panorama, true);
@@ -1060,98 +337,99 @@ PhotoSphereViewer.prototype._loadXMP = function() {
 
 /**
  * Loads the sphere texture
- * @param pano_data (Object) An object containing the panorama XMP data
- * @return (D.promise)
+ * @returns {promise}
+ * @private
  */
-PhotoSphereViewer.prototype._loadTexture = function(pano_data) {
-  var defer = D();
-  var loader = new THREE.ImageLoader();
+PhotoSphereViewer.prototype._loadTexture = function() {
   var self = this;
-  var progress = pano_data ? 100 : 0;
 
-  // CORS when the panorama is not given as a base64 string
-  if (!this.config.panorama.match(/^data:image\/[a-z]+;base64/)) {
+  return this._loadXMP().then(function(pano_data) {
+    var defer = D();
+    var loader = new THREE.ImageLoader();
+    var progress = pano_data ? 100 : 0;
+
     loader.setCrossOrigin('anonymous');
-  }
 
-  var onload = function(img) {
-    if (self.loader) {
-      self.loader.setProgress(100);
-    }
-
-    // Config XMP data
-    if (!pano_data && self.config.pano_data) {
-      pano_data = PSVUtils.clone(self.config.pano_data);
-    }
-
-    // Default XMP data
-    if (!pano_data) {
-      pano_data = {
-        full_width: img.width,
-        full_height: img.height,
-        cropped_width: img.width,
-        cropped_height: img.height,
-        cropped_x: 0,
-        cropped_y: 0
-      };
-    }
-
-    self.prop.pano_data = pano_data;
-
-    var r = Math.min(pano_data.full_width, PhotoSphereViewer.SYSTEM.maxTextureWidth) / pano_data.full_width;
-    var resized_pano_data = PSVUtils.clone(pano_data);
-
-    resized_pano_data.full_width *= r;
-    resized_pano_data.full_height *= r;
-    resized_pano_data.cropped_width *= r;
-    resized_pano_data.cropped_height *= r;
-    resized_pano_data.cropped_x *= r;
-    resized_pano_data.cropped_y *= r;
-
-    img.width = resized_pano_data.cropped_width;
-    img.height = resized_pano_data.cropped_height;
-
-    // create a new image containing the source image and black for cropped parts
-    var buffer = document.createElement('canvas');
-    buffer.width = resized_pano_data.full_width;
-    buffer.height = resized_pano_data.full_height;
-
-    var ctx = buffer.getContext('2d');
-    ctx.drawImage(img, resized_pano_data.cropped_x, resized_pano_data.cropped_y, resized_pano_data.cropped_width, resized_pano_data.cropped_height);
-
-    var texture = new THREE.Texture(buffer);
-    texture.needsUpdate = true;
-    texture.minFilter = THREE.LinearFilter;
-    texture.generateMipmaps = false;
-
-    defer.resolve(texture);
-  };
-
-  var onprogress = function(e) {
-    if (e.lengthComputable && self.loader) {
-      var new_progress = parseInt(e.loaded / e.total * 100);
-      if (new_progress > progress) {
-        progress = new_progress;
-        self.loader.setProgress(progress);
+    var onload = function(img) {
+      if (self.loader) {
+        self.loader.setProgress(100);
       }
-    }
-  };
 
-  var onerror = function() {
-    self.container.textContent = 'Cannot load image';
-    defer.reject();
-  };
+      // Config XMP data
+      if (!pano_data && self.config.pano_data) {
+        pano_data = PSVUtils.clone(self.config.pano_data);
+      }
 
-  loader.load(this.config.panorama, onload, onprogress, onerror);
+      // Default XMP data
+      if (!pano_data) {
+        pano_data = {
+          full_width: img.width,
+          full_height: img.height,
+          cropped_width: img.width,
+          cropped_height: img.height,
+          cropped_x: 0,
+          cropped_y: 0
+        };
+      }
 
-  return defer.promise;
+      self.prop.pano_data = pano_data;
+
+      var r = Math.min(pano_data.full_width, PhotoSphereViewer.SYSTEM.maxTextureWidth) / pano_data.full_width;
+      var resized_pano_data = PSVUtils.clone(pano_data);
+
+      resized_pano_data.full_width *= r;
+      resized_pano_data.full_height *= r;
+      resized_pano_data.cropped_width *= r;
+      resized_pano_data.cropped_height *= r;
+      resized_pano_data.cropped_x *= r;
+      resized_pano_data.cropped_y *= r;
+
+      img.width = resized_pano_data.cropped_width;
+      img.height = resized_pano_data.cropped_height;
+
+      // create a new image containing the source image and black for cropped parts
+      var buffer = document.createElement('canvas');
+      buffer.width = resized_pano_data.full_width;
+      buffer.height = resized_pano_data.full_height;
+
+      var ctx = buffer.getContext('2d');
+      ctx.drawImage(img, resized_pano_data.cropped_x, resized_pano_data.cropped_y, resized_pano_data.cropped_width, resized_pano_data.cropped_height);
+
+      var texture = new THREE.Texture(buffer);
+      texture.needsUpdate = true;
+      texture.minFilter = THREE.LinearFilter;
+      texture.generateMipmaps = false;
+
+      defer.resolve(texture);
+    };
+
+    var onprogress = function(e) {
+      if (e.lengthComputable && self.loader) {
+        var new_progress = parseInt(e.loaded / e.total * 100);
+        if (new_progress > progress) {
+          progress = new_progress;
+          self.loader.setProgress(progress);
+        }
+      }
+    };
+
+    var onerror = function() {
+      self.container.textContent = 'Cannot load image';
+      throw new PSVError('Cannot load image');
+    };
+
+    loader.load(self.config.panorama, onload, onprogress, onerror);
+
+    return defer.promise;
+  });
 };
 
 /**
  * Applies the texture to the scene
  * Creates the scene if needed
- * @param texture (THREE.Texture) The sphere texture
- * @returns (D.promise)
+ * @param {THREE.Texture} texture - The sphere texture
+ * @returns {promise}
+ * @private
  */
 PhotoSphereViewer.prototype._setTexture = function(texture) {
   if (!this.scene) {
@@ -1173,10 +451,9 @@ PhotoSphereViewer.prototype._setTexture = function(texture) {
 
 /**
  * Creates the 3D scene and GUI components
+ * @private
  */
 PhotoSphereViewer.prototype._createScene = function() {
-  this._onResize();
-
   this.raycaster = new THREE.Raycaster();
 
   // Renderer depends on whether WebGL is supported or not
@@ -1186,7 +463,7 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.camera = new THREE.PerspectiveCamera(this.config.default_fov, this.prop.size.width / this.prop.size.height, 1, 300);
   this.camera.position.set(0, 0, 0);
 
-  if (PSVUtils.checkTHREE('DeviceOrientationControls')) {
+  if (this.config.gyroscope && PSVUtils.checkTHREE('DeviceOrientationControls')) {
     this.doControls = new THREE.DeviceOrientationControls(this.camera);
   }
 
@@ -1194,7 +471,7 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.scene.add(this.camera);
 
   // The middle of the panorama is placed at longitude=0
-  var geometry = new THREE.SphereGeometry(200, 32, 32, -PSVUtils.HalfPI);
+  var geometry = new THREE.SphereGeometry(200, this.config.sphere_segments, this.config.sphere_segments, -PSVUtils.HalfPI);
 
   var material = new THREE.MeshBasicMaterial();
   material.side = THREE.DoubleSide;
@@ -1209,24 +486,6 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.canvas_container.className = 'canvas-container';
   this.container.appendChild(this.canvas_container);
   this.canvas_container.appendChild(this.renderer.domElement);
-
-  // Navigation bar
-  if (this.config.navbar) {
-    this.container.classList.add('has-navbar');
-    this.navbar = new PSVNavBar(this);
-  }
-
-  // HUD
-  this.hud = new PSVHUD(this);
-  this.config.markers.forEach(function(marker) {
-    this.hud.addMarker(marker, false);
-  }, this);
-
-  // Panel
-  this.panel = new PSVPanel(this);
-
-  // Tooltip
-  this.tooltip = new PSVTooltip(this.hud);
 
   // Queue animation
   if (this.config.time_anim !== false) {
@@ -1256,16 +515,14 @@ PhotoSphereViewer.prototype._createScene = function() {
     this.composer.addPass(this.passes.copy);
     this.composer.addPass(this.passes.blur);
   }
-
-  this._bindEvents();
-  this.trigger('ready');
 };
 
 /**
  * Perform transition between current and new texture
- * @param texture (THREE.Texture)
- * @param position ({latitude: double, longitude: double})
- * @returns (D.promise)
+ * @param {THREE.Texture} texture
+ * @param {{latitude: float, longitude: float}} [position]
+ * @returns {promise}
+ * @private
  */
 PhotoSphereViewer.prototype._transition = function(texture, position) {
   var self = this;
@@ -1308,7 +565,7 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
 
     if (self.config.transition.blur) {
       self.passes.blur.uniforms.fDensity.value = properties.density;
-      self.prop.zoom_lvl = properties.zoom;
+      self.zoom(properties.zoom, false);
     }
 
     self.render();
@@ -1344,7 +601,7 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
         self.passes.copy.enabled = true;
         self.passes.blur.enabled = false;
 
-        self.prop.zoom_lvl = original_zoom_lvl;
+        self.zoom(original_zoom_lvl, false);
       }
 
       // remove temp sphere and transfer the texture to the main sphere
@@ -1360,6 +617,12 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
 
       // actually rotate the camera
       if (position) {
+        // FIXME: find a better way to handle ranges
+        if (self.config.latitude_range || self.config.longitude_range) {
+          self.config.longitude_range = self.config.latitude_range = null;
+          console.warn('PhotoSphereViewer: trying to perform transition with longitude_range and/or latitude_range, ranges cleared.');
+        }
+
         self.rotate(position);
       }
       else {
@@ -1368,9 +631,182 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
     });
 };
 
+/**
+ * Reverse autorotate direction with smooth transition
+ * @private
+ */
+PhotoSphereViewer.prototype._reverseAutorotate = function() {
+  var self = this;
+  var newSpeed = -this.config.anim_speed;
+  var range = this.config.longitude_range;
+  this.config.longitude_range = null;
+
+  PSVUtils.animation({
+      properties: {
+        speed: { start: this.config.anim_speed, end: 0 }
+      },
+      duration: 300,
+      easing: 'inSine',
+      onTick: function(properties) {
+        self.config.anim_speed = properties.speed;
+      }
+    })
+    .then(function() {
+      return PSVUtils.animation({
+        properties: {
+          speed: { start: 0, end: newSpeed }
+        },
+        duration: 300,
+        easing: 'outSine',
+        onTick: function(properties) {
+          self.config.anim_speed = properties.speed;
+        }
+      });
+    })
+    .then(function() {
+      self.config.longitude_range = range;
+      self.config.anim_speed = newSpeed;
+    });
+};
+
+
+/**
+ * Number of pixels bellow which a mouse move will be considered as a click
+ * @type {int}
+ */
+PhotoSphereViewer.MOVE_THRESHOLD = 4;
+
+/**
+ * Time size of the mouse position history used to compute inertia
+ * @type {int}
+ */
+PhotoSphereViewer.INERTIA_WINDOW = 300;
+
+/**
+ * Map between keyboard events "keyCode|which" and "key"
+ * @type {Object.<int, string>}
+ */
+PhotoSphereViewer.KEYMAP = {
+  33: 'PageUp',
+  34: 'PageDown',
+  37: 'ArrowLeft',
+  38: 'ArrowUp',
+  39: 'ArrowRight',
+  40: 'ArrowDown',
+  107: '+',
+  109: '-'
+};
+
+/**
+ * SVG icons sources
+ * @type {Object.<string, string>}
+ */
+PhotoSphereViewer.ICONS = {};
+
+/**
+ * System properties
+ * @type {Object}
+ */
+PhotoSphereViewer.SYSTEM = {
+  loaded: false,
+  pixelRatio: 1,
+  isWebGLSupported: false,
+  isCanvasSupported: false,
+  deviceOrientationSupported: null,
+  maxTextureWidth: 0,
+  mouseWheelEvent: null,
+  fullscreenEvent: null
+};
+
+/**
+ * PhotoSphereViewer defaults
+ * @type {Object}
+ */
+PhotoSphereViewer.DEFAULTS = {
+  panorama: null,
+  container: null,
+  caption: null,
+  autoload: true,
+  usexmpdata: true,
+  pano_data: null,
+  webgl: true,
+  sphere_segments: 64,
+  min_fov: 30,
+  max_fov: 90,
+  default_fov: null,
+  default_long: 0,
+  default_lat: 0,
+  longitude_range: null,
+  latitude_range: null,
+  move_speed: 1,
+  time_anim: 2000,
+  anim_speed: '2rpm',
+  anim_lat: null,
+  navbar: [
+    'autorotate',
+    'zoom',
+    'download',
+    'markers',
+    'caption',
+    'gyroscope',
+    'fullscreen'
+  ],
+  tooltip: {
+    offset: 5,
+    arrow_size: 7,
+    delay: 100
+  },
+  lang: {
+    autorotate: 'Automatic rotation',
+    zoom: 'Zoom',
+    zoomOut: 'Zoom out',
+    zoomIn: 'Zoom in',
+    download: 'Download',
+    fullscreen: 'Fullscreen',
+    markers: 'Markers',
+    gyroscope: 'Gyroscope'
+  },
+  mousewheel: true,
+  mousemove: true,
+  keyboard: true,
+  gyroscope: false,
+  move_inertia: true,
+  click_event_on_marker: true,
+  transition: {
+    duration: 1500,
+    loader: true,
+    blur: false
+  },
+  loading_img: null,
+  loading_txt: 'Loading...',
+  size: null,
+  templates: {},
+  markers: []
+};
+
+/**
+ * doT.js templates
+ * @type {Object.<string, string>}
+ */
+PhotoSphereViewer.TEMPLATES = {
+  markersList: '\
+<div class="psv-markers-list"> \
+  <h1>{{= it.config.lang.markers }}</h1> \
+  <ul> \
+  {{~ it.markers: marker }} \
+    <li data-psv-marker="{{= marker.id }}" {{? marker.className }}class="{{= marker.className }}"{{?}}> \
+      {{? marker.image }}<img class="marker-image" src="{{= marker.image }}"/>{{?}} \
+      <p class="marker-name {{? !marker.image }}no-image{{?}}">{{? marker.tooltip }}{{= marker.tooltip.content }}{{?? marker.html }}{{= marker.html }}{{??}}{{= marker.id }}{{?}}</p> \
+    </li> \
+  {{~}} \
+  </ul> \
+</div>'
+};
+
 
 /**
  * Add all needed event listeners
+ * @private
  */
 PhotoSphereViewer.prototype._bindEvents = function() {
   window.addEventListener('resize', this);
@@ -1390,41 +826,48 @@ PhotoSphereViewer.prototype._bindEvents = function() {
   if (this.config.mousewheel) {
     this.hud.container.addEventListener(PhotoSphereViewer.SYSTEM.mouseWheelEvent, this);
   }
+
+  this.on('_side-reached', function(side) {
+    if (this.isAutorotateEnabled()) {
+      if (side === 'left' || side === 'right') {
+        this._reverseAutorotate();
+      }
+    }
+  });
 };
 
 /**
  * Handle events
- * DO NOT RENAME THIS METHOD
- * @param e (Event)
+ * @param {Event} evt
+ * @private
  */
-PhotoSphereViewer.prototype.handleEvent = function(e) {
-  switch (e.type) {
+PhotoSphereViewer.prototype.handleEvent = function(evt) {
+  switch (evt.type) {
     // @formatter:off
     case 'resize': PSVUtils.throttle(this._onResize(), 50); break;
-    case 'mousedown':   this._onMouseDown(e);   break;
-    case 'touchstart':  this._onTouchStart(e);  break;
-    case 'mouseup':     this._onMouseUp(e);     break;
-    case 'touchend':    this._onTouchEnd(e);    break;
-    case 'mousemove':   this._onMouseMove(e);   break;
-    case 'touchmove':   this._onTouchMove(e);   break;
+    case 'keydown':     this._onKeyDown(evt);     break;
+    case 'mousedown':   this._onMouseDown(evt);   break;
+    case 'touchstart':  this._onTouchStart(evt);  break;
+    case 'mouseup':     this._onMouseUp(evt);     break;
+    case 'touchend':    this._onTouchEnd(evt);    break;
+    case 'mousemove':   this._onMouseMove(evt);   break;
+    case 'touchmove':   this._onTouchMove(evt);   break;
     case PhotoSphereViewer.SYSTEM.fullscreenEvent:  this._fullscreenToggled();  break;
-    case PhotoSphereViewer.SYSTEM.mouseWheelEvent:  this._onMouseWheel(e);      break;
+    case PhotoSphereViewer.SYSTEM.mouseWheelEvent:  this._onMouseWheel(evt);      break;
     // @formatter:on
   }
 };
 
 /**
  * Resizes the canvas when the window is resized
+ * @private
  */
 PhotoSphereViewer.prototype._onResize = function() {
   if (this.container.clientWidth != this.prop.size.width || this.container.clientHeight != this.prop.size.height) {
     this.prop.size.width = parseInt(this.container.clientWidth);
     this.prop.size.height = parseInt(this.container.clientHeight);
+    this.prop.aspect = this.prop.size.width / this.prop.size.height;
     this.prop.boundingRect = this.container.getBoundingClientRect();
-
-    if (this.camera) {
-      this.camera.aspect = this.prop.size.width / this.prop.size.height;
-    }
 
     if (this.renderer) {
       this.renderer.setSize(this.prop.size.width, this.prop.size.height);
@@ -1439,8 +882,43 @@ PhotoSphereViewer.prototype._onResize = function() {
 };
 
 /**
+ * Rotate or zoom on key down
+ * @param {KeyboardEvent} evt
+ * @private
+ */
+PhotoSphereViewer.prototype._onKeyDown = function(evt) {
+  var dLong = 0;
+  var dLat = 0;
+  var dZoom = 0;
+
+  var key = evt.key || PhotoSphereViewer.KEYMAP[evt.keyCode || evt.which];
+
+  switch (key) {
+    // @formatter:off
+    case 'ArrowUp': dLat = 0.01; break;
+    case 'ArrowDown': dLat = -0.01; break;
+    case 'ArrowRight': dLong = 0.01; break;
+    case 'ArrowLeft': dLong = -0.01; break;
+    case 'PageUp':case '+': dZoom = 1; break;
+    case 'PageDown':case '-': dZoom = -1; break;
+    // @formatter:on
+  }
+
+  if (dZoom !== 0) {
+    this.zoom(this.prop.zoom_lvl + dZoom);
+  }
+  else if (dLat !== 0 || dLong !== 0) {
+    this.rotate({
+      longitude: this.prop.longitude + dLong * this.prop.move_speed * this.prop.hFov,
+      latitude: this.prop.latitude + dLat * this.prop.move_speed * this.prop.vFov
+    });
+  }
+};
+
+/**
  * The user wants to move
- * @param evt (Event) The event
+ * @param {MouseEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onMouseDown = function(evt) {
   this._startMove(evt);
@@ -1448,7 +926,8 @@ PhotoSphereViewer.prototype._onMouseDown = function(evt) {
 
 /**
  * The user wants to move (touch version)
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onTouchStart = function(evt) {
   if (evt.touches.length === 1) {
@@ -1461,7 +940,8 @@ PhotoSphereViewer.prototype._onTouchStart = function(evt) {
 
 /**
  * Initializes the movement
- * @param evt (Event) The event
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._startMove = function(evt) {
   if (this.prop.orientation_reqid || this.prop.autorotate_reqid) {
@@ -1481,7 +961,8 @@ PhotoSphereViewer.prototype._startMove = function(evt) {
 
 /**
  * Initializes the zoom
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._startZoom = function(evt) {
   var t = [
@@ -1496,7 +977,8 @@ PhotoSphereViewer.prototype._startZoom = function(evt) {
 
 /**
  * The user wants to stop moving
- * @param evt (Event) The event
+ * @param {MouseEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onMouseUp = function(evt) {
   this._stopMove(evt);
@@ -1504,7 +986,8 @@ PhotoSphereViewer.prototype._onMouseUp = function(evt) {
 
 /**
  * The user wants to stop moving (touch version)
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
   this._stopMove(evt.changedTouches[0]);
@@ -1512,9 +995,10 @@ PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
 
 /**
  * Stops the movement
- * If the user was moving (one finger) : if the move threshold was not reached, a click event is triggered
+ * If the move threshold was not reached, a click event is triggered
  *    otherwise a animation is launched to simulate inertia
- * @param evt (Event) The event
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._stopMove = function(evt) {
   if (this.prop.moving) {
@@ -1539,7 +1023,8 @@ PhotoSphereViewer.prototype._stopMove = function(evt) {
 
 /**
  * Performs an animation to simulate inertia when stop moving
- * @param evt
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
   var self = this;
@@ -1563,44 +1048,31 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
     },
     onCancel: function() {
       self.prop.moving = false;
+    },
+    onDone: function() {
+      self.prop.moving = false;
     }
-  });
-
-  this.prop.animation_promise.then(function() {
-    self.prop.moving = false;
   });
 };
 
 /**
  * Trigger an event with all coordinates when a simple click is performed
- * @param evt (Event) The event
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._click = function(evt) {
-  this.trigger('_click', evt);
-  if (evt.defaultPrevented) {
-    return;
-  }
-
   var data = {
-    client_x: parseInt(evt.clientX - this.prop.boundingRect.left),
-    client_y: parseInt(evt.clientY - this.prop.boundingRect.top)
+    target: evt.target,
+    client_x: evt.clientX,
+    client_y: evt.clientY,
+    viewer_x: parseInt(evt.clientX - this.prop.boundingRect.left),
+    viewer_y: parseInt(evt.clientY - this.prop.boundingRect.top)
   };
 
-  if (evt.data) {
-    data = PSVUtils.deepmerge(data, evt.data);
-  }
+  var intersect = this.viewerCoordsToVector3(data.viewer_x, data.viewer_y);
 
-  var screen = new THREE.Vector2(
-    2 * data.client_x / this.prop.size.width - 1,
-    -2 * data.client_y / this.prop.size.height + 1
-  );
-
-  this.raycaster.setFromCamera(screen, this.camera);
-
-  var intersects = this.raycaster.intersectObjects(this.scene.children);
-
-  if (intersects.length === 1) {
-    var sphericalCoords = this.vector3ToSphericalCoords(intersects[0].point);
+  if (intersect) {
+    var sphericalCoords = this.vector3ToSphericalCoords(intersect);
 
     data.longitude = sphericalCoords.longitude;
     data.latitude = sphericalCoords.latitude;
@@ -1616,7 +1088,8 @@ PhotoSphereViewer.prototype._click = function(evt) {
 
 /**
  * The user moves the image
- * @param evt (Event) The event
+ * @param {MouseEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onMouseMove = function(evt) {
   if (evt.buttons !== 0) {
@@ -1627,7 +1100,8 @@ PhotoSphereViewer.prototype._onMouseMove = function(evt) {
 
 /**
  * The user moves the image (touch version)
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onTouchMove = function(evt) {
   if (evt.touches.length === 1) {
@@ -1642,7 +1116,8 @@ PhotoSphereViewer.prototype._onTouchMove = function(evt) {
 
 /**
  * Performs movement
- * @param evt (Event) The event
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._move = function(evt) {
   if (this.prop.moving) {
@@ -1650,8 +1125,8 @@ PhotoSphereViewer.prototype._move = function(evt) {
     var y = parseInt(evt.clientY);
 
     this.rotate({
-      longitude: this.prop.longitude - (x - this.prop.mouse_x) * this.config.long_offset,
-      latitude: this.prop.latitude + (y - this.prop.mouse_y) * this.config.lat_offset
+      longitude: this.prop.longitude - (x - this.prop.mouse_x) / this.prop.size.width * this.prop.move_speed * this.prop.hFov,
+      latitude: this.prop.latitude + (y - this.prop.mouse_y) / this.prop.size.height * this.prop.move_speed * this.prop.vFov
     });
 
     this.prop.mouse_x = x;
@@ -1663,7 +1138,8 @@ PhotoSphereViewer.prototype._move = function(evt) {
 
 /**
  * Zoom
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._zoom = function(evt) {
   if (this.prop.zooming) {
@@ -1683,7 +1159,8 @@ PhotoSphereViewer.prototype._zoom = function(evt) {
 
 /**
  * The user wants to zoom (wheel version)
- * @param evt (Event) The event
+ * @param {MouseWheelEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
   evt.preventDefault();
@@ -1699,16 +1176,29 @@ PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
 
 /**
  * Fullscreen state has changed
+ * @private
  */
 PhotoSphereViewer.prototype._fullscreenToggled = function() {
-  this.trigger('fullscreen-updated', this.isFullscreenEnabled());
+  var enabled = this.isFullscreenEnabled();
+
+  if (this.config.keyboard) {
+    if (enabled) {
+      this.startKeyboardControl();
+    }
+    else {
+      this.stopKeyboardControl();
+    }
+  }
+
+  this.trigger('fullscreen-updated', enabled);
 };
 
 /**
  * Store each mouse position during a mouse move
  * Positions older than "INERTIA_WINDOW" are removed
  * Positions before a pause of "INERTIA_WINDOW" / 10 are removed
- * @param evt (Event)
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._logMouseMove = function(evt) {
   var now = Date.now();
@@ -1738,12 +1228,16 @@ PhotoSphereViewer.prototype._logMouseMove = function(evt) {
  * Starts to load the panorama
  */
 PhotoSphereViewer.prototype.load = function() {
+  if (!this.config.panorama) {
+    throw new PSVError('No value given for panorama.');
+  }
+
   this.setPanorama(this.config.panorama, false);
 };
 
 /**
  * Returns teh current position on the camera
- * @returns ({longitude: double, latitude: double})
+ * @returns {{longitude: float, latitude: float}}
  */
 PhotoSphereViewer.prototype.getPosition = function() {
   return {
@@ -1754,7 +1248,7 @@ PhotoSphereViewer.prototype.getPosition = function() {
 
 /**
  * Returns the current zoom level
- * @returns (double)
+ * @returns {float}
  */
 PhotoSphereViewer.prototype.getZoomLevel = function() {
   return this.prop.zoom_lvl;
@@ -1762,7 +1256,7 @@ PhotoSphereViewer.prototype.getZoomLevel = function() {
 
 /**
  * Returns the current viewer size
- * @returns ({width: int, height: int})
+ * @returns {{width: int, height: int}}
  */
 PhotoSphereViewer.prototype.getSize = function() {
   return {
@@ -1773,7 +1267,7 @@ PhotoSphereViewer.prototype.getSize = function() {
 
 /**
  * Check if the automatic rotation is enabled
- * @returns (boolean)
+ * @returns {boolean}
  */
 PhotoSphereViewer.prototype.isAutorotateEnabled = function() {
   return !!this.prop.autorotate_reqid;
@@ -1781,7 +1275,7 @@ PhotoSphereViewer.prototype.isAutorotateEnabled = function() {
 
 /**
  * Check if the gyroscope is enabled
- * @returns (boolean)
+ * @returns {boolean}
  */
 PhotoSphereViewer.prototype.isGyroscopeEnabled = function() {
   return !!this.prop.orientation_reqid;
@@ -1789,7 +1283,7 @@ PhotoSphereViewer.prototype.isGyroscopeEnabled = function() {
 
 /**
  * Check if the viewer is in fullscreen
- * @returns (boolean)
+ * @returns {boolean}
  */
 PhotoSphereViewer.prototype.isFullscreenEnabled = function() {
   return PSVUtils.isFullscreenEnabled(this.container);
@@ -1797,16 +1291,17 @@ PhotoSphereViewer.prototype.isFullscreenEnabled = function() {
 
 /**
  * Performs a render
- * @param updateDirection (boolean) should update camera direction - default: true
+ * @param {boolean} [updateDirection=true] - should update camera direction
  */
 PhotoSphereViewer.prototype.render = function(updateDirection) {
   if (updateDirection !== false) {
     this.prop.direction = this.sphericalCoordsToVector3(this.prop.longitude, this.prop.latitude);
     this.camera.lookAt(this.prop.direction);
-    this.camera.rotation.z = 0;
+    // this.camera.rotation.z = 0;
   }
 
-  this.camera.fov = this.config.max_fov + (this.prop.zoom_lvl / 100) * (this.config.min_fov - this.config.max_fov);
+  this.camera.aspect = this.prop.aspect;
+  this.camera.fov = this.prop.vFov;
   this.camera.updateProjectionMatrix();
 
   if (this.composer) {
@@ -1820,9 +1315,16 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
 };
 
 /**
- * Destroy the viewer
+ * Destroys the viewer
  */
 PhotoSphereViewer.prototype.destroy = function() {
+  this.stopAll();
+  this.stopKeyboardControl();
+
+  if (this.isFullscreenEnabled()) {
+    PSVUtils.exitFullscreen();
+  }
+
   // remove listeners
   window.removeEventListener('resize', this);
   document.removeEventListener(PhotoSphereViewer.SYSTEM.fullscreenEvent, this);
@@ -1841,11 +1343,11 @@ PhotoSphereViewer.prototype.destroy = function() {
   }
 
   // destroy components
+  if (this.tooltip) this.tooltip.destroy();
   if (this.hud) this.hud.destroy();
   if (this.loader) this.loader.destroy();
   if (this.navbar) this.navbar.destroy();
   if (this.panel) this.panel.destroy();
-  if (this.tooltip) this.tooltip.destroy();
   if (this.doControls) this.doControls.disconnect();
 
   // destroy ThreeJS view
@@ -1855,8 +1357,8 @@ PhotoSphereViewer.prototype.destroy = function() {
   }
 
   if (this.mesh) {
-    this.mesh.material.geometry.dispose();
-    this.mesh.material.geometry = null;
+    this.mesh.geometry.dispose();
+    this.mesh.geometry = null;
     this.mesh.material.map.dispose();
     this.mesh.material.map = null;
     this.mesh.material.dispose();
@@ -1869,32 +1371,36 @@ PhotoSphereViewer.prototype.destroy = function() {
   }
   this.parent.removeChild(this.container);
 
+  delete this.parent.photoSphereViewer;
+
   // clean references
-  this.container = null;
-  this.loader = null;
-  this.navbar = null;
-  this.hud = null;
-  this.panel = null;
-  this.tooltip = null;
-  this.canvas_container = null;
-  this.renderer = null;
-  this.composer = null;
-  this.scene = null;
-  this.camera = null;
-  this.mesh = null;
-  this.raycaster = null;
-  this.passes = {};
-  this.actions = {};
+  delete this.parent;
+  delete this.container;
+  delete this.loader;
+  delete this.navbar;
+  delete this.hud;
+  delete this.panel;
+  delete this.tooltip;
+  delete this.canvas_container;
+  delete this.renderer;
+  delete this.composer;
+  delete this.scene;
+  delete this.camera;
+  delete this.mesh;
+  delete this.doControls;
+  delete this.raycaster;
+  delete this.passes;
+  delete this.config;
 };
 
 /**
  * Load a panorama file
  * If the "position" is not defined the camera will not move and the ongoing animation will continue
  * "config.transition" must be configured for "transition" to be taken in account
- * @param path (String)
- * @param position (Object, optional) latitude & longitude or x & y
- * @param transition (boolean, optional)
- * @return (D.promise)
+ * @param {string} path - URL of the new panorama file
+ * @param {Object} [position] - latitude & longitude or x & y
+ * @param {boolean} [transition=false]
+ * @returns {promise}
  */
 PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
   if (typeof position == 'boolean') {
@@ -1903,7 +1409,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
   }
 
   if (position) {
-    this._cleanPosition(position);
+    this.cleanPosition(position);
 
     this.stopAll();
   }
@@ -1915,8 +1421,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
   if (!transition || !this.config.transition || !this.scene) {
     this.loader = new PSVLoader(this);
 
-    return this._loadXMP()
-      .then(this._loadTexture.bind(this))
+    return this._loadTexture()
       .then(this._setTexture.bind(this))
       .then(function() {
         if (self.loader) {
@@ -1930,15 +1435,15 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
         else {
           self.render();
         }
-      });
+      })
+      .rethrow();
   }
   else {
     if (this.config.transition.loader) {
       this.loader = new PSVLoader(this);
     }
 
-    return this._loadXMP()
-      .then(this._loadTexture.bind(this))
+    return this._loadTexture()
       .then(function(texture) {
         if (self.loader) {
           self.loader.destroy();
@@ -1946,7 +1451,8 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
         }
 
         return self._transition(texture, position);
-      });
+      })
+      .rethrow();
   }
 };
 
@@ -2019,6 +1525,11 @@ PhotoSphereViewer.prototype.toggleAutorotate = function() {
  * Starts the gyroscope interaction
  */
 PhotoSphereViewer.prototype.startGyroscopeControl = function() {
+  if (!this.config.gyroscope) {
+    console.warn('PhotoSphereViewer: gyroscope disabled');
+    return;
+  }
+
   this.stopAll();
 
   var self = this;
@@ -2067,25 +1578,27 @@ PhotoSphereViewer.prototype.toggleGyroscopeControl = function() {
 
 /**
  * Rotate the camera
- * @param position (Object) latitude & longitude or x & y
+ * @param {object} position - latitude & longitude or x & y
+ * @param {boolean} [render=true]
  */
-PhotoSphereViewer.prototype.rotate = function(position) {
-  this._cleanPosition(position, true);
+PhotoSphereViewer.prototype.rotate = function(position, render) {
+  this.cleanPosition(position);
+  this.applyRanges(position);
 
   this.prop.longitude = position.longitude;
   this.prop.latitude = position.latitude;
 
-  if (this.renderer) {
+  if (render !== false && this.renderer) {
     this.render();
-  }
 
-  this.trigger('position-updated', this.getPosition());
+    this.trigger('position-updated', this.getPosition());
+  }
 };
 
 /**
  * Rotate the camera with animation
- * @param position (Object) latitude & longitude or x & y
- * @param duration (String|integer) Animation speed (per spec) or duration (milliseconds)
+ * @param {object} position - latitude & longitude or x & y
+ * @param {string|int} duration - animation speed (per spec) or duration (milliseconds)
  */
 PhotoSphereViewer.prototype.animate = function(position, duration) {
   this.stopAll();
@@ -2095,7 +1608,8 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
     return;
   }
 
-  this._cleanPosition(position, true);
+  this.cleanPosition(position);
+  this.applyRanges(position);
 
   if (!duration && typeof duration != 'number') {
     // desired radial speed
@@ -2110,16 +1624,7 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
   }
 
   // longitude offset for shortest arc
-  var tCandidates = [
-    0, // direct
-    PSVUtils.TwoPI, // clock-wise cross zero
-    -PSVUtils.TwoPI // counter-clock-wise cross zero
-  ];
-
-  var tOffset = tCandidates.reduce(function(value, candidate) {
-    candidate = position.longitude - this.prop.longitude + candidate;
-    return Math.abs(candidate) < Math.abs(value) ? candidate : value;
-  }.bind(this), Infinity);
+  var tOffset = this.getShortestArc(this.prop.longitude, position.longitude);
 
   this.prop.animation_promise = PSVUtils.animation({
     properties: {
@@ -2144,12 +1649,19 @@ PhotoSphereViewer.prototype.stopAnimation = function() {
 
 /**
  * Zoom
- * @param level (integer) New zoom level
+ * @param {int} level
+ * @param {boolean} [render=true]
  */
-PhotoSphereViewer.prototype.zoom = function(level) {
+PhotoSphereViewer.prototype.zoom = function(level, render) {
   this.prop.zoom_lvl = PSVUtils.stayBetween(Math.round(level), 0, 100);
-  this.render();
-  this.trigger('zoom-updated', this.getZoomLevel());
+  this.prop.vFov = this.config.max_fov + (this.prop.zoom_lvl / 100) * (this.config.min_fov - this.config.max_fov);
+  this.prop.hFov = 2 * Math.atan(Math.tan(this.prop.vFov * Math.PI / 180 / 2) * this.prop.aspect) * 180 / Math.PI;
+
+  if (render !== false && this.renderer) {
+    this.render();
+
+    this.trigger('zoom-updated', this.getZoomLevel());
+  }
 };
 
 /**
@@ -2183,61 +1695,17 @@ PhotoSphereViewer.prototype.toggleFullscreen = function() {
 };
 
 /**
- * Adds an event listener
- * If "func" is an object, its "handleEvent" method will be called with an object as paremeter
- *    - type: name of the event prefixed with "psv:"
- *    - args: array of action arguments
- * @param name (string) Action name
- * @param func (Function|Object) The handler function, or an object with an "handleEvent" method
- * @return (PhotoSphereViewer)
+ * Starts listening keyboard events
  */
-PhotoSphereViewer.prototype.on = function(name, func) {
-  if (!(name in this.actions)) {
-    this.actions[name] = [];
-  }
-
-  this.actions[name].push(func);
-
-  return this;
+PhotoSphereViewer.prototype.startKeyboardControl = function() {
+  window.addEventListener('keydown', this);
 };
 
 /**
- * Removes an event listener
- * @param name (string) Action name
- * @param func (Function|Object)
- * @return (PhotoSphereViewer)
+ * Stops listening keyboard events
  */
-PhotoSphereViewer.prototype.off = function(name, func) {
-  if (name in this.actions) {
-    var idx = this.actions[name].indexOf(func);
-    if (idx !== -1) {
-      this.actions[name].splice(idx, 1);
-    }
-  }
-
-  return this;
-};
-
-/**
- * Triggers an action
- * @param name (string) Action name
- * @param args... (mixed) Arguments to send to the handler functions
- */
-PhotoSphereViewer.prototype.trigger = function(name, args) {
-  args = Array.prototype.slice.call(arguments, 1);
-  if ((name in this.actions) && this.actions[name].length > 0) {
-    this.actions[name].forEach(function(func) {
-      if (typeof func === 'object') {
-        func.handleEvent({
-          type: 'psv:' + name,
-          args: args
-        });
-      }
-      else {
-        func.apply(this, args);
-      }
-    }, this);
-  }
+PhotoSphereViewer.prototype.stopKeyboardControl = function() {
+  window.removeEventListener('keydown', this);
 };
 
 
@@ -2247,6 +1715,7 @@ PhotoSphereViewer.prototype.trigger = function(name, args) {
 PhotoSphereViewer.loadSystem = function() {
   var S = PhotoSphereViewer.SYSTEM;
   S.loaded = true;
+  S.pixelRatio = window.devicePixelRatio || 1;
   S.isWebGLSupported = PSVUtils.isWebGLSupported();
   S.isCanvasSupported = PSVUtils.isCanvasSupported();
   S.maxTextureWidth = S.isWebGLSupported ? PSVUtils.getMaxTextureWidth() : 4096;
@@ -2260,7 +1729,7 @@ PhotoSphereViewer.loadSystem = function() {
 /**
  * Resolve or reject SYSTEM.deviceOrientationSupported
  * We can only be sure device orientation is supported once received an event with coherent data
- * @param event
+ * @param {DeviceOrientationEvent} event
  */
 PhotoSphereViewer.deviceOrientationListener = function(event) {
   if (event.alpha !== null) {
@@ -2275,7 +1744,8 @@ PhotoSphereViewer.deviceOrientationListener = function(event) {
 
 /**
  * Sets the viewer size
- * @param size (Object) An object containing the wanted width and height
+ * @param {object} size
+ * @private
  */
 PhotoSphereViewer.prototype._setViewerSize = function(size) {
   ['width', 'height'].forEach(function(dim) {
@@ -2288,9 +1758,9 @@ PhotoSphereViewer.prototype._setViewerSize = function(size) {
 
 /**
  * Converts pixel texture coordinates to spherical radians coordinates
- * @param x (int)
- * @param y (int)
- * @returns ({longitude: double, latitude: double})
+ * @param {int} x
+ * @param {int} y
+ * @returns {{longitude: float, latitude: float}}
  */
 PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(x, y) {
   var relativeX = (x + this.prop.pano_data.cropped_x) / this.prop.pano_data.full_width * PSVUtils.TwoPI;
@@ -2304,9 +1774,9 @@ PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(x, y) {
 
 /**
  * Converts spherical radians coordinates to pixel texture coordinates
- * @param longitude (double)
- * @param latitude (double)
- * @returns ({x: int, y: int})
+ * @param {float} longitude
+ * @param {float} latitude
+ * @returns {{x: int, y: int}}
  */
 PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(longitude, latitude) {
   var relativeLong = longitude / PSVUtils.TwoPI * this.prop.pano_data.full_width;
@@ -2320,9 +1790,9 @@ PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(longitude,
 
 /**
  * Converts spherical radians coordinates to a THREE.Vector3
- * @param longitude (double)
- * @param latitude (double)
- * @returns (THREE.Vector3)
+ * @param {float} longitude
+ * @param {float} latitude
+ * @returns {THREE.Vector3}
  */
 PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(longitude, latitude) {
   return new THREE.Vector3(
@@ -2334,8 +1804,8 @@ PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(longitude, latit
 
 /**
  * Converts a THREE.Vector3 to spherical radians coordinates
- * @param vector (THREE.Vector3)
- * @returns ({longitude: double, latitude: double})
+ * @param {THREE.Vector3} vector
+ * @returns {{longitude: float, latitude: float}}
  */
 PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
   var phi = Math.acos(vector.y / Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z));
@@ -2348,11 +1818,49 @@ PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
 };
 
 /**
- * Converts x/y to latitude/longitude if present and ensure boundaries
- * @param position (Object)
- * @param useTiltMax (boolean) use "tilt_down_max" and "tilt_up_max" for latitude - default: false
+ * Converts position on the viewer to a THREE.Vector3
+ * @param {int} viewer_x
+ * @param {int} viewer_y
+ * @returns {THREE.Vector3}
  */
-PhotoSphereViewer.prototype._cleanPosition = function(position, useTiltMax) {
+PhotoSphereViewer.prototype.viewerCoordsToVector3 = function(viewer_x, viewer_y) {
+  var screen = new THREE.Vector2(
+    2 * viewer_x / this.prop.size.width - 1,
+    -2 * viewer_y / this.prop.size.height + 1
+  );
+
+  this.raycaster.setFromCamera(screen, this.camera);
+
+  var intersects = this.raycaster.intersectObjects(this.scene.children);
+
+  if (intersects.length === 1) {
+    return intersects[0].point;
+  }
+  else {
+    return null;
+  }
+};
+
+/**
+ * Converts a THREE.Vector3 to position on the viewer
+ * @param {THREE.Vector3} vector
+ * @returns {{top: int, left: int}}
+ */
+PhotoSphereViewer.prototype.vector3ToViewerCoords = function(vector) {
+  vector = vector.clone();
+  vector.project(this.camera);
+
+  return {
+    top: parseInt((1 - vector.y) / 2 * this.prop.size.height),
+    left: parseInt((vector.x + 1) / 2 * this.prop.size.width)
+  };
+};
+
+/**
+ * Converts x/y to latitude/longitude if present and ensure boundaries
+ * @param {object} position - latitude & longitude or x & y
+ */
+PhotoSphereViewer.prototype.cleanPosition = function(position) {
   if (position.hasOwnProperty('x') && position.hasOwnProperty('y')) {
     var sphericalCoords = this.textureCoordsToSphericalCoords(position.x, position.y);
     position.longitude = sphericalCoords.longitude;
@@ -2360,648 +1868,152 @@ PhotoSphereViewer.prototype._cleanPosition = function(position, useTiltMax) {
   }
 
   position.longitude = PSVUtils.parseAngle(position.longitude);
-  position.latitude = PSVUtils.stayBetween(
-    PSVUtils.parseAngle(position.latitude, -Math.PI),
-    useTiltMax ? this.config.tilt_down_max : -PSVUtils.HalfPI,
-    useTiltMax ? this.config.tilt_up_max : PSVUtils.HalfPI
-  );
-};
-
-
-/**
- * Navigation bar autorotate button class
- * @param navbar (PSVNavBar) A PSVNavBar object
- */
-function PSVNavBarAutorotateButton(navbar) {
-  PSVNavBarButton.call(this, navbar);
-
-  this.create();
-}
-
-PSVNavBarAutorotateButton.prototype = Object.create(PSVNavBarButton.prototype);
-PSVNavBarAutorotateButton.prototype.constructor = PSVNavBarAutorotateButton;
-
-PSVNavBarAutorotateButton.className = 'psv-button hover-scale autorotate-button';
-PSVNavBarAutorotateButton.icon = 'play.svg';
-PSVNavBarAutorotateButton.iconActive = 'play-active.svg';
-
-/**
- * Creates the button
- * @return (void)
- */
-PSVNavBarAutorotateButton.prototype.create = function() {
-  PSVNavBarButton.prototype.create.call(this);
-
-  this.container.title = this.psv.config.lang.autorotate;
-
-  this.container.addEventListener('click', this.psv.toggleAutorotate.bind(this.psv));
-
-  this.psv.on('autorotate', this);
+  position.latitude = PSVUtils.stayBetween(PSVUtils.parseAngle(position.latitude, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
 };
 
 /**
- * Destroys the button
+ * Apply "longitude_range" and "latitude_range"
+ * @param {{latitude: float, longitude: float}} position
  */
-PSVNavBarAutorotateButton.prototype.destroy = function() {
-  this.psv.off('autorotate', this);
+PhotoSphereViewer.prototype.applyRanges = function(position) {
+  var range, offset;
 
-  PSVNavBarButton.prototype.destroy.call(this);
-};
+  if (this.config.longitude_range) {
+    range = PSVUtils.clone(this.config.longitude_range);
+    offset = this.prop.hFov / 180 * Math.PI / 2;
 
-/**
- * Handle events
- * @param e (Event)
- */
-PSVNavBarAutorotateButton.prototype.handleEvent = function(e) {
-  switch (e.type) {
-    // @formatter:off
-    case 'psv:autorotate': this.toggleActive(e.args[0]); break;
-    // @formatter:on
-  }
-};
+    range[0] = PSVUtils.parseAngle(range[0] + offset);
+    range[1] = PSVUtils.parseAngle(range[1] - offset);
 
-
-/**
- * Navigation bar custom button class
- * @param navbar (PSVNavBar) A PSVNavBar object
- * @param config (Object)
- */
-function PSVNavBarCustomButton(navbar, config) {
-  PSVNavBarButton.call(this, navbar);
-
-  this.config = config;
-
-  this.create();
-}
-
-PSVNavBarCustomButton.prototype = Object.create(PSVNavBarButton.prototype);
-PSVNavBarCustomButton.prototype.constructor = PSVNavBarCustomButton;
-
-PSVNavBarCustomButton.className = 'psv-button hoverable';
-
-/**
- * Creates the button
- * @return (void)
- */
-PSVNavBarCustomButton.prototype.create = function() {
-  PSVNavBarButton.prototype.create.call(this);
-
-  if (this.config.className) {
-    this.container.classList.add(this.config.className);
-  }
-
-  if (this.config.title) {
-    this.container.title = this.config.title;
-  }
-
-  if (this.config.content) {
-    this.container.innerHTML = this.config.content;
-  }
-
-  if (this.config.onClick) {
-    this.container.addEventListener('click', this.config.onClick);
-  }
-};
-
-
-/**
- * Navigation bar download button class
- * @param navbar (PSVNavBar) A PSVNavBar object
- */
-function PSVNavBarDownloadButton(navbar) {
-  PSVNavBarButton.call(this, navbar);
-
-  this.create();
-}
-
-PSVNavBarDownloadButton.prototype = Object.create(PSVNavBarButton.prototype);
-PSVNavBarDownloadButton.prototype.constructor = PSVNavBarDownloadButton;
-
-PSVNavBarDownloadButton.className = 'psv-button hover-scale download-button';
-PSVNavBarDownloadButton.icon = 'download.svg';
-
-/**
- * Creates the button
- * @return (void)
- */
-PSVNavBarDownloadButton.prototype.create = function() {
-  PSVNavBarButton.prototype.create.call(this);
-
-  this.container.title = this.psv.config.lang.download;
-
-  this.container.addEventListener('click', this._download.bind(this));
-};
-
-/**
- * Ask the browser to download the panorama source file
- */
-PSVNavBarDownloadButton.prototype._download = function() {
-  var link = document.createElement('a');
-  link.href = this.psv.config.panorama;
-  link.download = this.psv.config.panorama;
-  this.psv.container.appendChild(link);
-  link.click();
-};
-
-
-/**
- * Navigation bar fullscreen button class
- * @param navbar (PSVNavBar) A PSVNavBar object
- */
-function PSVNavBarFullscreenButton(navbar) {
-  PSVNavBarButton.call(this, navbar);
-
-  this.create();
-}
-
-PSVNavBarFullscreenButton.prototype = Object.create(PSVNavBarButton.prototype);
-PSVNavBarFullscreenButton.prototype.constructor = PSVNavBarFullscreenButton;
-
-PSVNavBarFullscreenButton.className = 'psv-button hover-scale fullscreen-button';
-PSVNavBarFullscreenButton.icon = 'fullscreen-in.svg';
-PSVNavBarFullscreenButton.iconActive = 'fullscreen-out.svg';
-
-/**
- * Creates the button
- * @return (void)
- */
-PSVNavBarFullscreenButton.prototype.create = function() {
-  PSVNavBarButton.prototype.create.call(this);
-
-  this.container.title = this.psv.config.lang.fullscreen;
-
-  this.container.addEventListener('click', this.psv.toggleFullscreen.bind(this.psv));
-
-  this.psv.on('fullscreen-updated', this);
-};
-
-/**
- * Destroys the button
- */
-PSVNavBarFullscreenButton.prototype.destroy = function() {
-  this.psv.off('fullscreen-updated', this);
-
-  PSVNavBarButton.prototype.destroy.call(this);
-};
-
-/**
- * Handle events
- * @param e (Event)
- */
-PSVNavBarFullscreenButton.prototype.handleEvent = function(e) {
-  switch (e.type) {
-    // @formatter:off
-    case 'psv:fullscreen-updated': this.toggleActive(e.args[0]); break;
-    // @formatter:on
-  }
-};
-
-
-/**
- * Navigation bar gyroscope button class
- * @param navbar (PSVNavBar) A PSVNavBar object
- */
-function PSVNavBarGyroscopeButton(navbar) {
-  PSVNavBarButton.call(this, navbar);
-
-  this.create();
-}
-
-PSVNavBarGyroscopeButton.prototype = Object.create(PSVNavBarButton.prototype);
-PSVNavBarGyroscopeButton.prototype.constructor = PSVNavBarGyroscopeButton;
-
-PSVNavBarGyroscopeButton.className = 'psv-button hover-scale gyroscope-button';
-PSVNavBarGyroscopeButton.icon = 'compass.svg';
-
-/**
- * Creates the button
- * @return (void)
- */
-PSVNavBarGyroscopeButton.prototype.create = function() {
-  PSVNavBarButton.prototype.create.call(this);
-
-  this.container.style.display = 'none';
-  this.container.title = this.psv.config.lang.gyroscope;
-
-  PhotoSphereViewer.SYSTEM.deviceOrientationSupported.promise.then(
-    this._onAvailabilityChange.bind(this, true),
-    this._onAvailabilityChange.bind(this, false)
-  );
-
-  this.container.addEventListener('click', this.psv.toggleGyroscopeControl.bind(this.psv));
-
-  this.psv.on('gyroscope-updated', this);
-};
-
-/**
- * Destroys the button
- */
-PSVNavBarGyroscopeButton.prototype.destroy = function() {
-  this.psv.off('gyroscope-updated', this);
-
-  PSVNavBarButton.prototype.destroy.call(this);
-};
-
-/**
- * Handle events
- * @param e (Event)
- */
-PSVNavBarGyroscopeButton.prototype.handleEvent = function(e) {
-  switch (e.type) {
-    // @formatter:off
-    case 'psv:gyroscope-updated': this.toggleActive(e.args[0]); break;
-    // @formatter:on
-  }
-};
-
-PSVNavBarGyroscopeButton.prototype._onAvailabilityChange = function(available) {
-  if (available) {
-    if (this.psv.doControls) {
-      this.container.style.display = 'block';
+    if (range[0] > range[1]) { // when the range cross longitude 0
+      if (position.longitude > range[1] && position.longitude < range[0]) {
+        if (position.longitude > (range[0] / 2 + range[1] / 2)) { // detect which side we are closer too
+          position.longitude = range[0];
+          this.trigger('_side-reached', 'left');
+        }
+        else {
+          position.longitude = range[1];
+          this.trigger('_side-reached', 'right');
+        }
+      }
     }
     else {
-      throw new PSVError('Missing Three.js components: DeviceOrientationControls. Get them from threejs-examples package.');
+      if (position.longitude < range[0]) {
+        position.longitude = range[0];
+        this.trigger('_side-reached', 'left');
+      }
+      else if (position.longitude > range[1]) {
+        position.longitude = range[1];
+        this.trigger('_side-reached', 'right');
+      }
     }
   }
-  else {
-    this.destroy();
+
+  if (this.config.latitude_range) {
+    range = PSVUtils.clone(this.config.latitude_range);
+    offset = this.prop.vFov / 180 * Math.PI / 2;
+
+    range[0] = PSVUtils.parseAngle(range[0] + offset, -Math.PI);
+    range[1] = PSVUtils.parseAngle(range[1] - offset, -Math.PI);
+
+    if (position.latitude < range[0]) {
+      position.latitude = range[0];
+      this.trigger('_side-reached', 'bottom');
+    }
+    else if (position.latitude > range[1]) {
+      position.latitude = range[1];
+      this.trigger('_side-reached', 'top');
+    }
   }
+};
+
+/**
+ * Compute the shortest offset between two longitudes
+ * @param {float} from
+ * @param {float} to
+ * @returns {float}
+ */
+PhotoSphereViewer.prototype.getShortestArc = function(from, to) {
+  var tCandidates = [
+    0, // direct
+    PSVUtils.TwoPI, // clock-wise cross zero
+    -PSVUtils.TwoPI // counter-clock-wise cross zero
+  ];
+
+  return tCandidates.reduce(function(value, candidate) {
+    candidate = to - from + candidate;
+    return Math.abs(candidate) < Math.abs(value) ? candidate : value;
+  }, Infinity);
 };
 
 
 /**
- * Navigation bar markers button class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * Base sub-component class
+ * @param {PhotoSphereViewer | PSVComponent} parent - the parent with a "container" property
+ * @constructor
  */
-function PSVNavBarMarkersButton(navbar) {
-  PSVNavBarButton.call(this, navbar);
+function PSVComponent(parent) {
+  this.psv = parent instanceof PhotoSphereViewer ? parent : parent.psv;
+  this.parent = parent;
+  this.container = null;
 
-  this.prop = {
-    panelOpened: false,
-    panelOpening: false
-  };
-
-  this.create();
+  // expose some methods to the viewer
+  if (this.constructor.publicMethods) {
+    this.constructor.publicMethods.forEach(function(method) {
+      this.psv[method] = this[method].bind(this);
+    }, this);
+  }
 }
 
-PSVNavBarMarkersButton.prototype = Object.create(PSVNavBarButton.prototype);
-PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;
-
-PSVNavBarMarkersButton.className = 'psv-button hover-scale markers-button';
-PSVNavBarMarkersButton.icon = 'pin.svg';
-
 /**
- * Creates the button
- * @return (void)
+ * Creates the component
  */
-PSVNavBarMarkersButton.prototype.create = function() {
-  PSVNavBarButton.prototype.create.call(this);
+PSVComponent.prototype.create = function() {
+  this.container = document.createElement('div');
 
-  this.container.title = this.psv.config.lang.markers;
-
-  this.container.addEventListener('click', this.toggleMarkers.bind(this));
-
-  this.psv.on('open-panel', this);
-  this.psv.on('close-panel', this);
-};
-
-/**
- * Destroys the button
- */
-PSVNavBarMarkersButton.prototype.destroy = function() {
-  this.psv.off('open-panel', this);
-  this.psv.off('close-panel', this);
-
-  PSVNavBarButton.prototype.destroy.call(this);
-};
-
-/**
- * Handle events
- * @param e (Event)
- */
-PSVNavBarMarkersButton.prototype.handleEvent = function(e) {
-  switch (e.type) {
-    // @formatter:off
-    case 'psv:open-panel': this._onPanelOpened(); break;
-    case 'psv:close-panel': this._onPanelClosed(); break;
-    // @formatter:on
-  }
-};
-
-/**
- * Toggle the visibility of markers list
- * @return (void)
- */
-PSVNavBarMarkersButton.prototype.toggleMarkers = function() {
-  if (this.prop.panelOpened) {
-    this.hideMarkers();
-  }
-  else {
-    this.showMarkers();
-  }
-};
-
-/**
- * Open side panel with list of markers
- * @return (void)
- */
-PSVNavBarMarkersButton.prototype.showMarkers = function() {
-  var html = '<div class="psv-markers-list">' +
-    '<h1>' + this.psv.config.lang.markers + '</h1>' +
-    '<ul>';
-
-  for (var id in this.psv.hud.markers) {
-    var marker = this.psv.hud.markers[id];
-
-    var name = marker.id;
-    if (marker.html) {
-      name = marker.html;
-    }
-    else if (marker.tooltip) {
-      name = typeof marker.tooltip === 'string' ? marker.tooltip : marker.tooltip.content;
-    }
-
-    html += '<li data-psv-marker="' + marker.id + '">';
-    if (marker.image) {
-      html += '<img class="marker-image" src="' + marker.image + '"/>';
-    }
-    html += '<p class="marker-name">' + name + '</p>' +
-      '</li>';
+  if (this.constructor.className) {
+    this.container.className = this.constructor.className;
   }
 
-  html += '</ul>' +
-    '</div>';
-
-  this.prop.panelOpening = true;
-  this.psv.panel.showPanel(html, true);
-
-  this.psv.panel.container.querySelector('.psv-markers-list').addEventListener('click', this._onClickItem.bind(this));
+  this.parent.container.appendChild(this.container);
 };
 
 /**
- * Close side panel
- * @return (void)
+ * Destroys the component
  */
-PSVNavBarMarkersButton.prototype.hideMarkers = function() {
-  this.psv.panel.hidePanel();
-};
+PSVComponent.prototype.destroy = function() {
+  this.parent.container.removeChild(this.container);
 
-/**
- * Click on an item
- * @param e (Event)
- * @return (void)
- */
-PSVNavBarMarkersButton.prototype._onClickItem = function(e) {
-  var li;
-  if (e.target && (li = PSVUtils.getClosest(e.target, 'li')) && li.dataset.psvMarker) {
-    this.psv.hud.gotoMarker(li.dataset.psvMarker, 1000);
-    this.psv.panel.hidePanel();
-  }
-};
-
-/**
- * Update status when the panel is updated
- * @return (void)
- */
-PSVNavBarMarkersButton.prototype._onPanelOpened = function() {
-  if (this.prop.panelOpening) {
-    this.prop.panelOpening = false;
-    this.prop.panelOpened = true;
-  }
-  else {
-    this.prop.panelOpened = false;
+  if (this.constructor.publicMethods) {
+    this.constructor.publicMethods.forEach(function(method) {
+      delete this.psv[method];
+    }, this);
   }
 
-  this.toggleActive(this.prop.panelOpened);
+  delete this.container;
+  delete this.psv;
+  delete this.parent;
 };
 
 /**
- * Update status when the panel is updated
- * @return (void)
+ * Hides the component
  */
-PSVNavBarMarkersButton.prototype._onPanelClosed = function() {
-  this.prop.panelOpened = false;
-  this.prop.panelOpening = false;
-
-  this.toggleActive(this.prop.panelOpened);
-};
-
-
-/**
- * Navigation bar zoom button class
- * @param navbar (PSVNavBar) A PSVNavBar object
- */
-function PSVNavBarZoomButton(navbar) {
-  PSVNavBarButton.call(this, navbar);
-
-  this.zoom_range = null;
-  this.zoom_value = null;
-
-  this.prop = {
-    mousedown: false,
-    buttondown: false,
-    longPressInterval: null
-  };
-
-  this.create();
-}
-
-PSVNavBarZoomButton.prototype = Object.create(PSVNavBarButton.prototype);
-PSVNavBarZoomButton.prototype.constructor = PSVNavBarZoomButton;
-
-PSVNavBarZoomButton.className = 'psv-button zoom-button';
-
-/**
- * Creates the button
- * @return (void)
- */
-PSVNavBarZoomButton.prototype.create = function() {
-  PSVNavBarButton.prototype.create.call(this);
-
-  var zoom_minus = document.createElement('div');
-  zoom_minus.className = 'minus';
-  zoom_minus.title = this.psv.config.lang.zoomOut;
-  zoom_minus.innerHTML = PhotoSphereViewer.ICONS['zoom-out.svg'];
-  this.container.appendChild(zoom_minus);
-
-  var zoom_range_bg = document.createElement('div');
-  zoom_range_bg.className = 'range';
-  this.container.appendChild(zoom_range_bg);
-
-  this.zoom_range = document.createElement('div');
-  this.zoom_range.className = 'line';
-  this.zoom_range.title = this.psv.config.lang.zoom;
-  zoom_range_bg.appendChild(this.zoom_range);
-
-  this.zoom_value = document.createElement('div');
-  this.zoom_value.className = 'handle';
-  this.zoom_value.title = this.psv.config.lang.zoom;
-  this.zoom_range.appendChild(this.zoom_value);
-
-  var zoom_plus = document.createElement('div');
-  zoom_plus.className = 'plus';
-  zoom_plus.title = this.psv.config.lang.zoomIn;
-  zoom_plus.innerHTML = PhotoSphereViewer.ICONS['zoom-in.svg'];
-  this.container.appendChild(zoom_plus);
-
-  this.zoom_range.addEventListener('mousedown', this);
-  this.zoom_range.addEventListener('touchstart', this);
-  this.psv.container.addEventListener('mousemove', this);
-  this.psv.container.addEventListener('touchmove', this);
-  this.psv.container.addEventListener('mouseup', this);
-  this.psv.container.addEventListener('touchend', this);
-  zoom_minus.addEventListener('mousedown', this._zoomOut.bind(this));
-  zoom_plus.addEventListener('mousedown', this._zoomIn.bind(this));
-
-  this.psv.on('zoom-updated', this);
-
-  var self = this;
-  window.setTimeout(function() {
-    self._moveZoomValue(self.psv.prop.zoom_lvl);
-  }, 0);
+PSVComponent.prototype.hide = function() {
+  this.container.style.display = 'none';
 };
 
 /**
- * Destroys the button
+ * Restores component visibility
  */
-PSVNavBarZoomButton.prototype.destroy = function() {
-  this.psv.container.removeEventListener('mousemove', this);
-  this.psv.container.removeEventListener('touchmove', this);
-  this.psv.container.removeEventListener('mouseup', this);
-  this.psv.container.removeEventListener('touchend', this);
-
-  this.psv.off('zoom-updated', this);
-
-  PSVNavBarButton.prototype.destroy.call(this);
-};
-
-/**
- * Handle events
- * @param e (Event)
- */
-PSVNavBarZoomButton.prototype.handleEvent = function(e) {
-  switch (e.type) {
-    // @formatter:off
-    case 'mousedown': this._initZoomChangeWithMouse(e); break;
-    case 'touchstart': this._initZoomChangeByTouch(e); break;
-    case 'mousemove': this._changeZoomWithMouse(e); break;
-    case 'touchmove': this._changeZoomByTouch(e); break;
-    case 'mouseup': this._stopZoomChange(e); break;
-    case 'touchend': this._stopZoomChange(e); break;
-    case 'psv:zoom-updated': this._moveZoomValue(e.args[0]); break;
-    // @formatter:on
-  }
-};
-
-/**
- * Moves the zoom cursor
- * @param level (integer) Zoom level (between 0 and 100)
- * @return (void)
- */
-PSVNavBarZoomButton.prototype._moveZoomValue = function(level) {
-  this.zoom_value.style.left = (level / 100 * this.zoom_range.offsetWidth - this.zoom_value.offsetWidth / 2) + 'px';
-};
-
-/**
- * The user wants to zoom
- * @param evt (Event) The event
- * @return (void)
- */
-PSVNavBarZoomButton.prototype._initZoomChangeWithMouse = function(evt) {
-  this.prop.mousedown = true;
-  this._changeZoom(evt.clientX);
-};
-
-/**
- * The user wants to zoom (mobile version)
- * @param evt (Event) The event
- * @return (void)
- */
-PSVNavBarZoomButton.prototype._initZoomChangeByTouch = function(evt) {
-  this.prop.mousedown = true;
-  this._changeZoom(evt.changedTouches[0].clientX);
-};
-
-/**
- * The user clicked the + button
- * Zoom in and register long press timer
- */
-PSVNavBarZoomButton.prototype._zoomIn = function() {
-  this.prop.buttondown = true;
-  this.psv.zoomIn();
-  window.setTimeout(this._startLongPressInterval.bind(this, 1), 200);
-};
-
-/**
- * The user clicked the - button
- * Zoom out and register long press timer
- */
-PSVNavBarZoomButton.prototype._zoomOut = function() {
-  this.prop.buttondown = true;
-  this.psv.zoomOut();
-  window.setTimeout(this._startLongPressInterval.bind(this, -1), 200);
-};
-
-/**
- * Continue zooming as long as the user press the button
- * @param value
- */
-PSVNavBarZoomButton.prototype._startLongPressInterval = function(value) {
-  if (this.prop.buttondown) {
-    this.prop.longPressInterval = window.setInterval(function() {
-      this.psv.zoom(this.psv.prop.zoom_lvl + value);
-    }.bind(this), 50);
-  }
-};
-
-/**
- * The user wants to stop zooming
- * @return (void)
- */
-PSVNavBarZoomButton.prototype._stopZoomChange = function() {
-  window.clearInterval(this.prop.longPressInterval);
-  this.prop.longPressInterval = null;
-  this.prop.mousedown = false;
-  this.prop.buttondown = false;
-};
-
-/**
- * The user moves the zoom cursor
- * @param evt (Event) The event
- * @return (void)
- */
-PSVNavBarZoomButton.prototype._changeZoomWithMouse = function(evt) {
-  evt.preventDefault();
-  this._changeZoom(evt.clientX);
-};
-
-/**
- * The user moves the zoom cursor (mobile version)
- * @param evt (Event) The event
- * @return (void)
- */
-PSVNavBarZoomButton.prototype._changeZoomByTouch = function(evt) {
-  evt.preventDefault();
-  this._changeZoom(evt.changedTouches[0].clientX);
-};
-
-/**
- * Zoom change
- * @param x (integer) Horizontal coordinate
- * @return (void)
- */
-PSVNavBarZoomButton.prototype._changeZoom = function(x) {
-  if (this.prop.mousedown) {
-    var user_input = parseInt(x) - this.zoom_range.getBoundingClientRect().left;
-    var zoom_level = user_input / this.zoom_range.offsetWidth * 100;
-    this.psv.zoom(zoom_level);
-  }
+PSVComponent.prototype.show = function() {
+  this.container.style.display = null;
 };
 
 
 /**
  * HUD class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param {PhotoSphereViewer} psv
+ * @constructor
  */
 function PSVHUD(psv) {
   PSVComponent.call(this, psv);
@@ -3018,13 +2030,23 @@ PSVHUD.prototype = Object.create(PSVComponent.prototype);
 PSVHUD.prototype.constructor = PSVHUD;
 
 PSVHUD.className = 'psv-hud';
-PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'updateMarker', 'getMarker', 'getCurrentMarker', 'gotoMarker', 'hideMarker', 'showMarker', 'toggleMarker'];
+PSVHUD.publicMethods = [
+  'addMarker',
+  'removeMarker',
+  'updateMarker',
+  'clearMarkers',
+  'getMarker',
+  'getCurrentMarker',
+  'gotoMarker',
+  'hideMarker',
+  'showMarker',
+  'toggleMarker'
+];
 
 PSVHUD.svgNS = 'http://www.w3.org/2000/svg';
 
 /**
  * Creates the HUD
- * @return (void)
  */
 PSVHUD.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -3039,7 +2061,7 @@ PSVHUD.prototype.create = function() {
   this.container.addEventListener('mousemove', this, true);
 
   // Viewer events
-  this.psv.on('_click', this);
+  this.psv.on('click', this);
   this.psv.on('render', this);
 };
 
@@ -3047,93 +2069,72 @@ PSVHUD.prototype.create = function() {
  * Destroys the HUD
  */
 PSVHUD.prototype.destroy = function() {
+  this.clearMarkers(false);
+
   this.container.removeEventListener('mouseenter', this);
   this.container.removeEventListener('mouseleave', this);
   this.container.removeEventListener('mousemove', this);
 
-  this.psv.off('_click', this);
+  this.psv.off('click', this);
   this.psv.off('render', this);
 
-  this.container.removeChild(this.$svg);
-  this.$svg = null;
+  delete this.$svg;
 
   PSVComponent.prototype.destroy.call(this);
 };
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVHUD.prototype.handleEvent = function(e) {
   switch (e.type) {
     // @formatter:off
-    case 'mouseenter': this._onMouseEnter(e);    break;
-    case 'mouseleave': this._onMouseLeave(e);    break;
-    case 'mousemove':  this._onMouseMove(e);     break;
-    case 'psv:_click': this._onClick(e.args[0]); break;
-    case 'psv:render': this.updatePositions();   break;
+    case 'mouseenter':  this._onMouseEnter(e);        break;
+    case 'mouseleave':  this._onMouseLeave(e);        break;
+    case 'mousemove':   this._onMouseMove(e);         break;
+    case 'click':       this._onClick(e.args[0], e);  break;
+    case 'render':      this.updatePositions();       break;
     // @formatter:on
   }
 };
 
 /**
  * Add a new marker to HUD
- * @param marker (Object)
- * @param render (Boolean) "false" to disable immediate render
- * @return (Object) a modified marker object
+ * @param {Object} properties
+ * @param {boolean} [render=true]
+ * @returns {PSVMarker}
  */
-PSVHUD.prototype.addMarker = function(marker, render) {
-  if (!marker.id) {
+PSVHUD.prototype.addMarker = function(properties, render) {
+  if (!properties.id) {
     throw new PSVError('missing marker id');
   }
 
-  if (this.markers[marker.id]) {
-    throw new PSVError('marker "' + marker.id + '" already exists');
+  if (this.markers[properties.id]) {
+    throw new PSVError('marker "' + properties.id + '" already exists');
   }
 
-  if (!marker.image && !marker.html && !marker.polygon_px && !marker.polygon_rad) {
-    throw new PSVError('missing marker content, image or html or polygon');
-  }
+  var marker = new PSVMarker(properties, this.psv);
 
-  if (marker.image && (!marker.width || !marker.height)) {
-    throw new PSVError('missing marker width/height');
-  }
-
-  if (marker.image || marker.html) {
-    if ((!marker.hasOwnProperty('x') || !marker.hasOwnProperty('y')) && (!marker.hasOwnProperty('latitude') || !marker.hasOwnProperty('longitude'))) {
-      throw new PSVError('missing marker position, latitude/longitude or x/y');
-    }
-  }
-
-  // temporary object replaced by updateMarker()
-  var temp = {
-    id: marker.id,
-    $el: null
-  };
-
-  // create DOM
-  if (marker.image || marker.html) {
-    temp.$el = document.createElement('div');
-    temp.$el.setAttribute('class', 'psv-marker');
-    this.container.appendChild(temp.$el);
+  if (marker.isNormal()) {
+    this.container.appendChild(marker.$el);
   }
   else {
-    temp.$el = document.createElementNS(PSVHUD.svgNS, 'polygon');
-    temp.$el.setAttribute('class', 'psv-marker svg-marker');
-    this.$svg.appendChild(temp.$el);
+    this.$svg.appendChild(marker.$el);
   }
 
-  temp.$el.id = 'psv-marker-' + temp.id;
+  this.markers[marker.id] = marker;
 
-  this.markers[marker.id] = temp;
-
-  return this.updateMarker(marker, render);
+  if (render !== false) {
+    this.updatePositions();
+  }
 };
 
 /**
  * Get a marker by it's id or external object
- * @param marker (Mixed)
- * @return (Object)
+ * @param {*} marker
+ * @returns {PSVMarker}
  */
 PSVHUD.prototype.getMarker = function(marker) {
   var id = typeof marker === 'object' ? marker.id : marker;
@@ -3147,7 +2148,7 @@ PSVHUD.prototype.getMarker = function(marker) {
 
 /**
  * Get the current selected marker
- * @return (Object)
+ * @returns {PSVMarker}
  */
 PSVHUD.prototype.getCurrentMarker = function() {
   return this.currentMarker;
@@ -3155,53 +2156,14 @@ PSVHUD.prototype.getCurrentMarker = function() {
 
 /**
  * Update a marker
- * @param marker (Object)
- * @param render (Boolean) "false" to disable immediate render
- * @return (Object) a modified marker object
+ * @param {*} marker
+ * @param {boolean} [render=true]
+ * @returns {PSVMarker}
  */
-PSVHUD.prototype.updateMarker = function(marker, render) {
-  var old = this.getMarker(marker);
+PSVHUD.prototype.updateMarker = function(input, render) {
+  var marker = this.getMarker(input);
 
-  // clean some previous data
-  if (old.className) {
-    old.$el.classList.remove(old.className);
-  }
-  if (old.tooltip) {
-    old.$el.classList.remove('has-tooltip');
-  }
-
-  // merge objects
-  if (marker == old) marker = PSVUtils.clone(marker);
-  delete marker.$el;
-  marker = PSVUtils.deepmerge(old, marker);
-
-  marker.position2D = null;
-
-  // add classes
-  if (marker.className) {
-    marker.$el.classList.add(marker.className);
-  }
-  if (marker.tooltip) {
-    marker.$el.classList.add('has-tooltip');
-    if (typeof marker.tooltip === 'string') {
-      marker.tooltip = { content: marker.tooltip };
-    }
-  }
-
-  if (marker.image || marker.html) {
-    this._updateNormalMarker(marker);
-  }
-  else {
-    this._updatePolygonMarker(marker);
-  }
-
-  if (!marker.hasOwnProperty('visible')) {
-    marker.visible = true;
-  }
-
-  // save
-  marker.$el.psvMarker = marker;
-  this.markers[marker.id] = marker;
+  marker.update(input);
 
   if (render !== false) {
     this.updatePositions();
@@ -3211,116 +2173,22 @@ PSVHUD.prototype.updateMarker = function(marker, render) {
 };
 
 /**
- * Update a marker of type point
- * @param marker
- * @private
- */
-PSVHUD.prototype._updateNormalMarker = function(marker) {
-  marker.isPolygon = false;
-
-  // set image
-  var style = marker.$el.style;
-
-  if (marker.width && marker.height) {
-    style.width = marker.width + 'px';
-    style.height = marker.height + 'px';
-    marker.dynamicSize = false;
-  }
-  else {
-    marker.dynamicSize = true;
-  }
-
-  if (marker.style) {
-    Object.getOwnPropertyNames(marker.style).forEach(function(prop) {
-      style[prop] = marker.style[prop];
-    });
-  }
-
-  if (marker.image) {
-    style.backgroundImage = 'url(' + marker.image + ')';
-  }
-  else {
-    marker.$el.innerHTML = marker.html;
-  }
-
-  // parse anchor
-  marker.anchor = PSVUtils.parsePosition(marker.anchor);
-  style.transformOrigin = marker.anchor.left * 100 + '% ' + marker.anchor.top * 100 + '%';
-
-  // convert texture coordinates to spherical coordinates
-  this.psv._cleanPosition(marker);
-
-  // compute x/y/z position
-  marker.position3D = this.psv.sphericalCoordsToVector3(marker.longitude, marker.latitude);
-};
-
-/**
- * Update a marker of type polygon
- * @param marker
- * @private
- */
-PSVHUD.prototype._updatePolygonMarker = function(marker) {
-  marker.isPolygon = true;
-  marker.dynamicSize = true;
-
-  if (marker.style) {
-    Object.getOwnPropertyNames(marker.style).forEach(function(prop) {
-      marker.$el.setAttribute(prop, marker.style[prop]);
-    });
-  }
-  else {
-    marker.$el.setAttribute('fill', 'rgba(0,0,0,0.5)');
-  }
-
-  // fold arrays: [1,2,3,4] => [[1,2],[3,4]]
-  [marker.polygon_rad, marker.polygon_px].forEach(function(polygon) {
-    if (polygon && typeof polygon[0] != 'object') {
-      for (var i = 0; i < polygon.length; i++) {
-        polygon.splice(i, 2, [polygon[i], polygon[i + 1]]);
-      }
-    }
-  });
-
-  // convert texture coordinates to spherical coordinates
-  if (marker.polygon_px) {
-    marker.polygon_rad = marker.polygon_px.map(function(coord) {
-      var sphericalCoords = this.psv.textureCoordsToSphericalCoords(coord[0], coord[1]);
-      return [sphericalCoords.longitude, sphericalCoords.latitude];
-    }, this);
-  }
-  else {
-    marker.polygon_rad = marker.polygon_rad.map(function(coord) {
-      return [
-        PSVUtils.parseAngle(coord[0]),
-        PSVUtils.stayBetween(PSVUtils.parseAngle(coord[1], -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI)
-      ];
-    });
-  }
-
-  // TODO : compute the center of the polygon
-  marker.longitude = marker.polygon_rad[0][0];
-  marker.latitude = marker.polygon_rad[0][1];
-
-  // compute x/y/z positions
-  marker.positions3D = marker.polygon_rad.map(function(coord) {
-    return this.psv.sphericalCoordsToVector3(coord[0], coord[1]);
-  }, this);
-};
-
-/**
  * Remove a marker
- * @param marker (Mixed)
- * @param render (Boolean) "false" to disable immediate render
- * @return (void)
+ * @param {*} marker
+ * @param {boolean} [render=true]
  */
 PSVHUD.prototype.removeMarker = function(marker, render) {
   marker = this.getMarker(marker);
 
-  if (marker.isPolygon) {
-    this.$svg.removeChild(marker.$el);
+  if (marker.isNormal()) {
+    this.container.removeChild(marker.$el);
   }
   else {
-    this.container.removeChild(marker.$el);
+    this.$svg.removeChild(marker.$el);
+  }
+
+  if (this.hoveringMarker == marker) {
+    this.psv.tooltip.hideTooltip();
   }
 
   delete this.markers[marker.id];
@@ -3331,10 +2199,23 @@ PSVHUD.prototype.removeMarker = function(marker, render) {
 };
 
 /**
+ * Remove all markers
+ * @param {boolean} [render=true]
+ */
+PSVHUD.prototype.clearMarkers = function(render) {
+  Object.keys(this.markers).forEach(function(marker) {
+    this.removeMarker(marker, false);
+  }, this);
+
+  if (render !== false) {
+    this.updatePositions();
+  }
+};
+
+/**
  * Go to a specific marker
- * @param marker (Mixed)
- * @param duration (Mixed, optional)
- * @return (void)
+ * @param {*} marker
+ * @param {string|int} [duration]
  */
 PSVHUD.prototype.gotoMarker = function(marker, duration) {
   marker = this.getMarker(marker);
@@ -3343,8 +2224,7 @@ PSVHUD.prototype.gotoMarker = function(marker, duration) {
 
 /**
  * Hide a marker
- * @param marker (Mixed)
- * @return (void)
+ * @param {*} marker
  */
 PSVHUD.prototype.hideMarker = function(marker) {
   this.getMarker(marker).visible = false;
@@ -3353,8 +2233,7 @@ PSVHUD.prototype.hideMarker = function(marker) {
 
 /**
  * Show a marker
- * @param marker (Mixed)
- * @return (void)
+ * @param {*} marker
  */
 PSVHUD.prototype.showMarker = function(marker) {
   this.getMarker(marker).visible = true;
@@ -3363,8 +2242,7 @@ PSVHUD.prototype.showMarker = function(marker) {
 
 /**
  * Toggle a marker
- * @param marker (Mixed)
- * @return (void)
+ * @param {*} marker
  */
 PSVHUD.prototype.toggleMarker = function(marker) {
   this.getMarker(marker).visible ^= true;
@@ -3373,21 +2251,18 @@ PSVHUD.prototype.toggleMarker = function(marker) {
 
 /**
  * Update visibility and position of all markers
- * @return (void)
  */
 PSVHUD.prototype.updatePositions = function() {
-  var rotation = this.psv.camera.rotation.z / Math.PI * 180;
+  var rotation = !this.psv.isGyroscopeEnabled() ? 0 : this.psv.camera.rotation.z / Math.PI * 180;
 
   for (var id in this.markers) {
     var marker = this.markers[id];
 
-    if (marker.isPolygon) {
+    if (marker.isPolygon()) {
       var positions = this._getPolygonPositions(marker);
 
       if (this._isPolygonVisible(marker, positions)) {
-        marker.position2D = this._getPolygonDimensions(positions);
-        marker.width = marker.position2D.width;
-        marker.height = marker.position2D.height;
+        marker.position2D = this._getPolygonDimensions(marker, positions);
 
         var points = '';
         positions.forEach(function(pos) {
@@ -3428,9 +2303,10 @@ PSVHUD.prototype.updatePositions = function() {
 /**
  * Determine if a point marker is visible
  * It tests if the point is in the general direction of the camera, then check if it's in the viewport
- * @param marker (Object)
- * @param position (Object)
- * @return (Boolean)
+ * @param {PSVMarker} marker
+ * @param {{top: int, left: int}} position
+ * @returns {boolean}
+ * @private
  */
 PSVHUD.prototype._isMarkerVisible = function(marker, position) {
   return marker.visible &&
@@ -3443,10 +2319,10 @@ PSVHUD.prototype._isMarkerVisible = function(marker, position) {
 
 /**
  * Determine if a polygon marker is visible
- * It tests if at least one point is in teh viewport
- * @param marker (Object)
- * @param positions (Object[])
- * @returns (boolean)
+ * It tests if at least one point is in the viewport
+ * @param {PSVMarker} marker
+ * @param {{top: int, left: int}[]} positions
+ * @returns {boolean}
  * @private
  */
 PSVHUD.prototype._isPolygonVisible = function(marker, positions) {
@@ -3462,8 +2338,9 @@ PSVHUD.prototype._isPolygonVisible = function(marker, positions) {
 
 /**
  * Compute HUD coordinates of a marker
- * @param marker (Object)
- * @return (Object) top and left position
+ * @param {PSVMarker} marker
+ * @returns {{top: int, left: int}}
+ * @private
  */
 PSVHUD.prototype._getMarkerPosition = function(marker) {
   if (marker.dynamicSize) {
@@ -3476,40 +2353,35 @@ PSVHUD.prototype._getMarkerPosition = function(marker) {
     marker.height = rect.bottom - rect.top;
   }
 
-  var vector = marker.position3D.clone();
-  vector.project(this.psv.camera);
+  var position = this.psv.vector3ToViewerCoords(marker.position3D);
 
-  return {
-    top: (1 - vector.y) / 2 * this.psv.prop.size.height - marker.height * marker.anchor.top,
-    left: (vector.x + 1) / 2 * this.psv.prop.size.width - marker.width * marker.anchor.left
-  };
+  position.top -= marker.height * marker.anchor.top;
+  position.left -= marker.width * marker.anchor.left;
+
+  return position;
 };
 
 /**
  * Compute HUD coordinates of each point of a polygon
- * @param marker (Object)
- * @returns (Object[])
+ * @param {PSVMarker} marker
+ * @returns {{top: int, left: int}[]}
  * @private
  */
 PSVHUD.prototype._getPolygonPositions = function(marker) {
   return marker.positions3D.map(function(pos) {
-    var vector = pos.clone();
-    vector.project(this.psv.camera);
-
-    return {
-      top: (1 - vector.y) / 2 * this.psv.prop.size.height,
-      left: (vector.x + 1) / 2 * this.psv.prop.size.width
-    };
+    return this.psv.vector3ToViewerCoords(pos);
   }, this);
 };
 
 /**
  * Compute the boundaries positions of a polygon marker
- * @param positions (Object[])
- * @returns (Object)
+ * Alters the marker width and height
+ * @param {PSVMarker} marker
+ * @param {{top: int, left: int}[]} positions
+ * @returns {{top: int, left: int}}
  * @private
  */
-PSVHUD.prototype._getPolygonDimensions = function(positions) {
+PSVHUD.prototype._getPolygonDimensions = function(marker, positions) {
   var minX = +Infinity;
   var minY = +Infinity;
   var maxX = -Infinity;
@@ -3522,22 +2394,23 @@ PSVHUD.prototype._getPolygonDimensions = function(positions) {
     maxY = Math.max(maxY, pos.top);
   });
 
+  marker.width = maxX - minX;
+  marker.height = maxY - minY;
+
   return {
     top: minY,
-    left: minX,
-    width: maxX - minX,
-    height: maxY - minY
+    left: minX
   };
 };
 
 /**
- * The mouse enters a marker : show the tooltip
- * @param e (Event)
- * @return (void)
+ * The mouse enters a point marker : show the tooltip
+ * @param {MouseEvent} e
+ * @private
  */
 PSVHUD.prototype._onMouseEnter = function(e) {
   var marker;
-  if (e.target && (marker = e.target.psvMarker) !== undefined && marker.tooltip && !marker.isPolygon) {
+  if (e.target && (marker = e.target.psvMarker) && marker.tooltip && !marker.isPolygon()) {
     this.hoveringMarker = marker;
 
     this.psv.tooltip.showTooltip({
@@ -3552,13 +2425,14 @@ PSVHUD.prototype._onMouseEnter = function(e) {
 
 /**
  * The mouse leaves a marker : hide the tooltip
- * @param e (Event)
- * @return (void)
+ * @param {MouseEvent} e
+ * @private
  */
 PSVHUD.prototype._onMouseLeave = function(e) {
-  if (e.target && e.target.psvMarker) {
-    // do not hide if we enter the tooltip while hovering a polygon
-    if (e.target.psvMarker.isPolygon && e.relatedTarget && PSVUtils.hasParent(e.relatedTarget, this.psv.tooltip.container)) {
+  var marker;
+  if (e.target && (marker = e.target.psvMarker)) {
+    // do not hide if we enter the tooltip itself while hovering a polygon
+    if (marker.isPolygon() && e.relatedTarget && PSVUtils.hasParent(e.relatedTarget, this.psv.tooltip.container)) {
       return;
     }
 
@@ -3570,14 +2444,14 @@ PSVHUD.prototype._onMouseLeave = function(e) {
 
 /**
  * The mouse hovers a polygon marker, the tooltip follow the cursor.
- * @param e
+ * @param {MouseEvent} e
  * @private
  */
 PSVHUD.prototype._onMouseMove = function(e) {
   if (!this.psv.prop.moving) {
     var marker;
     // do not hide if we enter the tooltip while hovering a polygon
-    if (e.target && (marker = e.target.psvMarker) && marker.tooltip && marker.isPolygon ||
+    if (e.target && (marker = e.target.psvMarker) && marker.tooltip && marker.isPolygon() ||
       e.target && PSVUtils.hasParent(e.target, this.psv.tooltip.container) && (marker = this.hoveringMarker)) {
 
       this.hoveringMarker = marker;
@@ -3594,7 +2468,7 @@ PSVHUD.prototype._onMouseMove = function(e) {
         }
       });
     }
-    else if (this.hoveringMarker && this.hoveringMarker.isPolygon) {
+    else if (this.hoveringMarker && this.hoveringMarker.isPolygon()) {
       this.psv.tooltip.hideTooltip();
     }
   }
@@ -3602,24 +2476,22 @@ PSVHUD.prototype._onMouseMove = function(e) {
 
 /**
  * The mouse button is release : show/hide the panel if threshold was not reached, or do nothing
- * @param e (Event)
- * @return (void)
+ * @param {Object} data
+ * @param {Event} e
+ * @private
  */
-PSVHUD.prototype._onClick = function(e) {
+PSVHUD.prototype._onClick = function(data, e) {
   var marker;
-  if (e.target && (marker = PSVUtils.getClosest(e.target, '.psv-marker')) && marker.psvMarker) {
+  if (data.target && (marker = PSVUtils.getClosest(data.target, '.psv-marker')) && marker.psvMarker) {
     this.currentMarker = marker.psvMarker;
     this.psv.trigger('select-marker', marker.psvMarker);
 
     if (this.psv.config.click_event_on_marker) {
       // add the marker to event data
-      e.data = {
-        marker: marker.psvMarker
-      };
+      data.marker = marker.psvMarker;
     }
     else {
-      // prevent the public "click" event
-      e.preventDefault();
+      e.stopPropagation();
     }
   }
   else if (this.currentMarker) {
@@ -3631,7 +2503,7 @@ PSVHUD.prototype._onClick = function(e) {
     this.psv.panel.showPanel(marker.psvMarker.content);
   }
   else if (this.psv.panel.prop.opened) {
-    e.preventDefault(); // prevent the public "click" event
+    e.stopPropagation();
     this.psv.panel.hidePanel();
   }
 };
@@ -3639,7 +2511,8 @@ PSVHUD.prototype._onClick = function(e) {
 
 /**
  * Loader class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param {PhotoSphereViewer} psv
+ * @constructor
  */
 function PSVLoader(psv) {
   PSVComponent.call(this, psv);
@@ -3694,8 +2567,18 @@ PSVLoader.prototype.create = function() {
 };
 
 /**
+ * Destroys the loader
+ */
+PSVLoader.prototype.destroy = function() {
+  delete this.loader;
+  delete this.canvas;
+
+  PSVComponent.prototype.destroy.call(this);
+};
+
+/**
  * Sets the loader progression
- * @param value (int) from 0 to 100
+ * @param {int} value - from 0 to 100
  */
 PSVLoader.prototype.setProgress = function(value) {
   var context = this.canvas.getContext('2d');
@@ -3716,8 +2599,388 @@ PSVLoader.prototype.setProgress = function(value) {
 
 
 /**
+ * Object representing a marker
+ * @param {Object} properties
+ * @param {PhotoSphereViewer} psv
+ * @constructor
+ */
+function PSVMarker(properties, psv) {
+  if (!properties.id) {
+    throw new PSVError('missing marker id');
+  }
+
+  if (properties.image && (!properties.width || !properties.height)) {
+    throw new PSVError('missing marker width/height');
+  }
+
+  if (properties.image || properties.html) {
+    if ((!properties.hasOwnProperty('x') || !properties.hasOwnProperty('y')) && (!properties.hasOwnProperty('latitude') || !properties.hasOwnProperty('longitude'))) {
+      throw new PSVError('missing marker position, latitude/longitude or x/y');
+    }
+  }
+
+  // public properties
+  this.psv = psv;
+  this.visible = true;
+  this.dynamicSize = false;
+
+  // private properties
+  var _id = properties.id;
+  var _type = PSVMarker.getType(properties, false);
+  var $el;
+
+  Object.defineProperties(this, {
+    id: {
+      configurable: false,
+      enumerable: true,
+      get: function() {
+        return _id;
+      },
+      set: function(value) {
+      }
+    },
+    type: {
+      configurable: false,
+      enumerable: true,
+      get: function() {
+        return _type;
+      },
+      set: function(value) {
+      }
+    },
+    $el: {
+      configurable: false,
+      enumerable: true,
+      get: function() {
+        return $el;
+      },
+      set: function(value) {
+      }
+    },
+    data: {
+      configurable: false,
+      enumerable: true,
+      get: function() {
+        return this[_type];
+      },
+      set: function(value) {
+        this[_type] = value;
+      }
+    }
+  });
+
+  // create element
+  if (this.isNormal()) {
+    $el = document.createElement('div');
+  }
+  else if (this.isPolygon()) {
+    $el = document.createElementNS(PSVHUD.svgNS, 'polygon');
+  }
+  else {
+    $el = document.createElementNS(PSVHUD.svgNS, this.type);
+  }
+
+  $el.id = 'psv-marker-' + this.id;
+  $el.psvMarker = this;
+
+  this.update(properties);
+}
+
+/**
+ * Determines the type of a marker by the available properties
+ * @param {object} properties
+ * @param {boolean} allowNone
+ * @returns {string}
+ */
+PSVMarker.getType = function(properties, allowNone) {
+  var definitions = ['image', 'html', 'polygon_px', 'polygon_rad', 'rect', 'circle', 'ellipse', 'path'];
+
+  var found = [];
+  definitions.forEach(function(type) {
+    if (properties[type]) {
+      found.push(type);
+    }
+  });
+
+  if (found.length === 0 && !allowNone) {
+    throw new PSVError('missing marker content, either ' + definitions.join(', '));
+  }
+  else if (found.length > 1) {
+    throw new PSVError('multiple marker content, either ' + definitions.join(', '));
+  }
+
+  return found[0];
+};
+
+/**
+ * Is it a normal marker (image or html)
+ * @returns {boolean}
+ */
+PSVMarker.prototype.isNormal = function() {
+  return this.type == 'image' || this.type == 'html';
+};
+
+/**
+ * Is it a polygon marker
+ * @returns {boolean}
+ */
+PSVMarker.prototype.isPolygon = function() {
+  return this.type == 'polygon_px' || this.type == 'polygon_rad';
+};
+
+/**
+ * Is it an SVG marker
+ * @returns {boolean}
+ */
+PSVMarker.prototype.isSvg = function() {
+  return this.type == 'rect' || this.type == 'circle' || this.type == 'ellipse' || this.type == 'path';
+};
+
+/**
+ * Update the marker with new or current properties
+ * @param {object} [properties]
+ */
+PSVMarker.prototype.update = function(properties) {
+  // merge objects
+  if (properties && properties !== this) {
+    var newType = PSVMarker.getType(properties, true);
+
+    if (newType !== undefined && newType !== this.type) {
+      throw new PSVError('cannot change marker type');
+    }
+
+    PSVUtils.deepmerge(this, properties);
+  }
+
+  // reset CSS class
+  if (this.isNormal()) {
+    this.$el.setAttribute('class', 'psv-marker');
+  }
+  else {
+    this.$el.setAttribute('class', 'psv-marker svg-marker');
+  }
+
+  // add CSS classes
+  if (this.className) {
+    PSVUtils.addClasses(this.$el, this.className);
+  }
+  if (this.tooltip) {
+    this.$el.classList.add('has-tooltip');
+    if (typeof this.tooltip === 'string') {
+      this.tooltip = { content: this.tooltip };
+    }
+  }
+
+  // apply style
+  if (this.style) {
+    PSVUtils.deepmerge(this.$el.style, this.style);
+  }
+
+  // parse anchor
+  this.anchor = PSVUtils.parsePosition(this.anchor);
+  this.$el.style.transformOrigin = this.anchor.left * 100 + '% ' + this.anchor.top * 100 + '%';
+
+  if (this.isNormal()) {
+    this._updateNormal();
+  }
+  else if (this.isPolygon()) {
+    this._updatePolygon();
+  }
+  else {
+    this._updateSvg();
+  }
+};
+
+/**
+ * Update a normal marker
+ * @private
+ */
+PSVMarker.prototype._updateNormal = function() {
+  if (this.width && this.height) {
+    this.$el.style.width = this.width + 'px';
+    this.$el.style.height = this.height + 'px';
+    this.dynamicSize = false;
+  }
+  else {
+    this.dynamicSize = true;
+  }
+
+  if (this.image) {
+    this.$el.style.backgroundImage = 'url(' + this.image + ')';
+  }
+  else {
+    this.$el.innerHTML = this.html;
+  }
+
+  // convert texture coordinates to spherical coordinates
+  this.psv.cleanPosition(this);
+
+  // compute x/y/z position
+  this.position3D = this.psv.sphericalCoordsToVector3(this.longitude, this.latitude);
+};
+
+/**
+ * Update an SVG marker
+ * @private
+ */
+PSVMarker.prototype._updateSvg = function() {
+  this.dynamicSize = true;
+
+  // set content
+  switch (this.type) {
+    case 'rect':
+      if (typeof this.data == 'number') {
+        this.data = {
+          x: 0,
+          y: 0,
+          width: this.data,
+          height: this.data
+        };
+      }
+      else if (Array.isArray(this.data)) {
+        this.data = {
+          x: 0,
+          y: 0,
+          width: this.data[0],
+          height: this.data[1]
+        };
+      }
+      else {
+        this.data.x = this.data.y = 0;
+      }
+      break;
+
+    case 'circle':
+      if (typeof this.data == 'number') {
+        this.data = {
+          cx: this.data,
+          cy: this.data,
+          r: this.data
+        };
+      }
+      else if (Array.isArray(this.data)) {
+        this.data = {
+          cx: this.data[0],
+          cy: this.data[0],
+          r: this.data[0]
+        };
+      }
+      else {
+        this.data.cx = this.data.cy = this.data.r;
+      }
+      break;
+
+    case 'ellipse':
+      if (typeof this.data == 'number') {
+        this.data = {
+          cx: this.data,
+          cy: this.data,
+          rx: this.data,
+          ry: this.data
+        };
+      }
+      else if (Array.isArray(this.data)) {
+        this.data = {
+          cx: this.data[0],
+          cy: this.data[1],
+          rx: this.data[0],
+          ry: this.data[1]
+        };
+      }
+      else {
+        this.data.cx = this.data.rx;
+        this.data.cy = this.data.ry;
+      }
+      break;
+
+    case 'path':
+      if (typeof this.data == 'string') {
+        this.data = {
+          d: this.data
+        };
+      }
+      break;
+  }
+
+  Object.getOwnPropertyNames(this.data).forEach(function(prop) {
+    this.$el.setAttributeNS(null, prop, this.data[prop]);
+  }, this);
+
+  // set style
+  if (this.svgStyle) {
+    Object.getOwnPropertyNames(this.svgStyle).forEach(function(prop) {
+      this.$el.setAttributeNS(null, prop, this.svgStyle[prop]);
+    }, this);
+  }
+  else {
+    this.$el.setAttributeNS(null, 'fill', 'rgba(0,0,0,0.5)');
+  }
+
+  // convert texture coordinates to spherical coordinates
+  this.psv.cleanPosition(this);
+
+  // compute x/y/z position
+  this.position3D = this.psv.sphericalCoordsToVector3(this.longitude, this.latitude);
+};
+
+/**
+ * Update a polygon marker
+ * @private
+ */
+PSVMarker.prototype._updatePolygon = function() {
+  this.dynamicSize = true;
+
+  // set style
+  if (this.svgStyle) {
+    Object.getOwnPropertyNames(this.svgStyle).forEach(function(prop) {
+      this.$el.setAttributeNS(null, prop, this.svgStyle[prop]);
+    }, this);
+  }
+  else {
+    this.$el.setAttributeNS(null, 'fill', 'rgba(0,0,0,0.5)');
+  }
+
+  // fold arrays: [1,2,3,4] => [[1,2],[3,4]]
+  [this.polygon_rad, this.polygon_px].forEach(function(polygon) {
+    if (polygon && typeof polygon[0] != 'object') {
+      for (var i = 0; i < polygon.length; i++) {
+        polygon.splice(i, 2, [polygon[i], polygon[i + 1]]);
+      }
+    }
+  });
+
+  // convert texture coordinates to spherical coordinates
+  if (this.polygon_px) {
+    this.polygon_rad = this.polygon_px.map(function(coord) {
+      var sphericalCoords = this.psv.textureCoordsToSphericalCoords(coord[0], coord[1]);
+      return [sphericalCoords.longitude, sphericalCoords.latitude];
+    }, this);
+  }
+  // clean angles
+  else {
+    this.polygon_rad = this.polygon_rad.map(function(coord) {
+      return [
+        PSVUtils.parseAngle(coord[0]),
+        PSVUtils.stayBetween(PSVUtils.parseAngle(coord[1], -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI)
+      ];
+    });
+  }
+
+  // TODO : compute the center of the polygon
+  this.longitude = this.polygon_rad[0][0];
+  this.latitude = this.polygon_rad[0][1];
+
+  // compute x/y/z positions
+  this.positions3D = this.polygon_rad.map(function(coord) {
+    return this.psv.sphericalCoordsToVector3(coord[0], coord[1]);
+  }, this);
+};
+
+
+/**
  * Navigation bar class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param {PhotoSphereViewer} psv
+ * @constructor
  */
 function PSVNavBar(psv) {
   PSVComponent.call(this, psv);
@@ -3757,11 +3020,10 @@ PSVNavBar.prototype = Object.create(PSVComponent.prototype);
 PSVNavBar.prototype.constructor = PSVNavBar;
 
 PSVNavBar.className = 'psv-navbar open';
-PSVNavBar.publicMethods = ['showNavbar', 'hideNavbar', 'toggleNavbar'];
+PSVNavBar.publicMethods = ['showNavbar', 'hideNavbar', 'toggleNavbar', 'getNavbarButton'];
 
 /**
  * Creates the navbar
- * @return (void)
  */
 PSVNavBar.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -3772,28 +3034,30 @@ PSVNavBar.prototype.create = function() {
     }
     else {
       switch (button) {
-        case 'autorotate':
+        case PSVNavBarAutorotateButton.id:
           this.items.push(new PSVNavBarAutorotateButton(this));
           break;
 
-        case 'zoom':
+        case PSVNavBarZoomButton.id:
           this.items.push(new PSVNavBarZoomButton(this));
           break;
 
-        case 'download':
+        case PSVNavBarDownloadButton.id:
           this.items.push(new PSVNavBarDownloadButton(this));
           break;
 
-        case 'markers':
+        case PSVNavBarMarkersButton.id:
           this.items.push(new PSVNavBarMarkersButton(this));
           break;
 
-        case 'fullscreen':
+        case PSVNavBarFullscreenButton.id:
           this.items.push(new PSVNavBarFullscreenButton(this));
           break;
 
-        case 'gyroscope':
-          this.items.push(new PSVNavBarGyroscopeButton(this));
+        case PSVNavBarGyroscopeButton.id:
+          if (this.psv.config.gyroscope) {
+            this.items.push(new PSVNavBarGyroscopeButton(this));
+          }
           break;
 
         case 'caption':
@@ -3804,7 +3068,7 @@ PSVNavBar.prototype.create = function() {
           button = 'spacer-5';
         /* falls through */
         default:
-          var matches = button.match(/spacer\-([0-9]+)/);
+          var matches = button.match(/^spacer\-([0-9]+)$/);
           if (matches !== null) {
             this.items.push(new PSVNavBarSpacer(this, matches[1]));
           }
@@ -3825,9 +3089,32 @@ PSVNavBar.prototype.destroy = function() {
     item.destroy();
   });
 
-  this.items.length = 0;
+  delete this.items;
+  delete this.config;
 
   PSVComponent.prototype.destroy.call(this);
+};
+
+/**
+ * Returns a button by it's identifier
+ * @param {string|number} id
+ * @returns {PSVNavBarButton}
+ */
+PSVNavBar.prototype.getNavbarButton = function(id) {
+  var button = null;
+
+  this.items.some(function(item) {
+    if (item.id === id) {
+      button = item;
+      return true;
+    }
+  });
+
+  if (!button) {
+    console.warn('PhotoSphereViewer: button "' + id + '" not found in the navbar.');
+  }
+
+  return button;
 };
 
 /**
@@ -3855,8 +3142,9 @@ PSVNavBar.prototype.toggleNavbar = function(active) {
 
 /**
  * Navbar caption class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * @param {PSVNavBar} navbar
  * @param caption (String)
+ * @constructor
  */
 function PSVNavBarCaption(navbar, caption) {
   PSVComponent.call(this, navbar);
@@ -3874,7 +3162,7 @@ PSVNavBarCaption.publicMethods = ['setCaption'];
 
 /**
  * Sets the bar caption
- * @param (string) html
+ * @param {string} html
  */
 PSVNavBarCaption.prototype.setCaption = function(html) {
   if (!html) {
@@ -3888,11 +3176,14 @@ PSVNavBarCaption.prototype.setCaption = function(html) {
 
 /**
  * Navbar spacer class
- * @param navbar (PSVNavBar) A PSVNavBar object
- * @param weight (int)
+ * @param {PSVNavBar} navbar
+ * @param {int} weight
+ * @constructor
  */
 function PSVNavBarSpacer(navbar, weight) {
   PSVComponent.call(this, navbar);
+
+  this.weight = weight;
 
   this.create();
 
@@ -3907,7 +3198,8 @@ PSVNavBarSpacer.className = 'psv-spacer';
 
 /**
  * Panel class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param {PhotoSphereViewer} psv
+ * @constructor
  */
 function PSVPanel(psv) {
   PSVComponent.call(this, psv);
@@ -3932,7 +3224,6 @@ PSVPanel.publicMethods = ['showPanel', 'hidePanel'];
 
 /**
  * Creates the panel
- * @return (void)
  */
 PSVPanel.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -3973,12 +3264,16 @@ PSVPanel.prototype.destroy = function() {
   this.psv.container.removeEventListener('mouseup', this);
   this.psv.container.removeEventListener('touchend', this);
 
+  delete this.prop;
+  delete this.content;
+
   PSVComponent.prototype.destroy.call(this);
 };
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVPanel.prototype.handleEvent = function(e) {
   switch (e.type) {
@@ -3994,10 +3289,9 @@ PSVPanel.prototype.handleEvent = function(e) {
 };
 
 /**
- * Show the panel
- * @param content (String)
- * @param noMargin (Boolean)
- * @return (void)
+ * Shows the panel
+ * @param {string} content
+ * @param {boolean} noMargin
  */
 PSVPanel.prototype.showPanel = function(content, noMargin) {
   this.content.innerHTML = content;
@@ -4019,10 +3313,10 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
 
 
 /**
- * Hide the panel
- * @return (void)
+ * Hides the panel
  */
 PSVPanel.prototype.hidePanel = function() {
+  this.content.innerHTML = null;
   this.prop.opened = false;
   this.container.classList.remove('open');
   this.psv.trigger('close-panel');
@@ -4030,8 +3324,8 @@ PSVPanel.prototype.hidePanel = function() {
 
 /**
  * The user wants to move
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent} evt
+ * @private
  */
 PSVPanel.prototype._onMouseDown = function(evt) {
   evt.stopPropagation();
@@ -4040,8 +3334,8 @@ PSVPanel.prototype._onMouseDown = function(evt) {
 
 /**
  * The user wants to move (mobile version)
- * @param evt (Event) The event
- * @return (void)
+ * @param {TouchEvent} evt
+ * @private
  */
 PSVPanel.prototype._onTouchStart = function(evt) {
   evt.stopPropagation();
@@ -4050,8 +3344,8 @@ PSVPanel.prototype._onTouchStart = function(evt) {
 
 /**
  * Initializes the movement
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PSVPanel.prototype._startResize = function(evt) {
   this.prop.mouse_x = parseInt(evt.clientX);
@@ -4062,8 +3356,8 @@ PSVPanel.prototype._startResize = function(evt) {
 
 /**
  * The user wants to stop moving
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent} evt
+ * @private
  */
 PSVPanel.prototype._onMouseUp = function(evt) {
   if (this.prop.mousedown) {
@@ -4075,8 +3369,8 @@ PSVPanel.prototype._onMouseUp = function(evt) {
 
 /**
  * The user resizes the panel
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent} evt
+ * @private
  */
 PSVPanel.prototype._onMouseMove = function(evt) {
   if (this.prop.mousedown) {
@@ -4087,8 +3381,8 @@ PSVPanel.prototype._onMouseMove = function(evt) {
 
 /**
  * The user resizes the panel (mobile version)
- * @param evt (Event) The event
- * @return (void)
+ * @param {TouchEvent} evt
+ * @private
  */
 PSVPanel.prototype._onTouchMove = function(evt) {
   if (this.prop.mousedown) {
@@ -4099,8 +3393,8 @@ PSVPanel.prototype._onTouchMove = function(evt) {
 
 /**
  * Panel resizing
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PSVPanel.prototype._resize = function(evt) {
   var x = parseInt(evt.clientX);
@@ -4115,12 +3409,15 @@ PSVPanel.prototype._resize = function(evt) {
 
 /**
  * Tooltip class
- * @param hud (PSVHUD) A PSVHUD object
+ * @param {PSVHUD} hud
+ * @constructor
  */
 function PSVTooltip(hud) {
   PSVComponent.call(this, hud);
 
   this.config = this.psv.config.tooltip;
+
+  this.timeout = null;
 
   this.create();
 }
@@ -4136,7 +3433,6 @@ PSVTooltip.topMap = { 0: 'top', 0.5: 'center', 1: 'bottom' };
 
 /**
  * Creates the tooltip
- * @return (void)
  */
 PSVTooltip.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -4154,37 +3450,48 @@ PSVTooltip.prototype.create = function() {
 PSVTooltip.prototype.destroy = function() {
   this.psv.off('render', this);
 
+  delete this.config;
+
   PSVComponent.prototype.destroy.call(this);
 };
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVTooltip.prototype.handleEvent = function(e) {
   switch (e.type) {
     // @formatter:off
-    case 'psv:render': this.hideTooltip(); break;
+    case 'render': this.hideTooltip(); break;
     // @formatter:on
   }
 };
 
+/**
+ * Returns if the tooltip is visible
+ * @returns {boolean}
+ */
 PSVTooltip.prototype.isTooltipVisible = function() {
   return this.container.classList.contains('visible');
 };
 
 /**
  * Show the tooltip
- * @param config (Object)
- *    - content
- *    - top
- *    - left
- *    - position (default: 'top center')
- *    - className (optional)
- *    - marker (optional) -- take marker dimensions in account when positioning the tooltip
- * @return (void)
+ * @param {Object} config
+ * @param {string} config.content
+ * @param {int} config.top
+ * @param {int} config.left
+ * @param {string} [config.position='top center']
+ * @param {string} [config.className]
+ * @param {PSVMarker} [config.marker]
  */
 PSVTooltip.prototype.showTooltip = function(config) {
+  if (this.timeout) {
+    window.clearTimeout(this.timeout);
+    this.timeout = null;
+  }
+
   var isUpdate = this.isTooltipVisible();
   var t = this.container;
   var c = t.querySelector('.content');
@@ -4227,9 +3534,10 @@ PSVTooltip.prototype.showTooltip = function(config) {
   }
   else {
     t.className = 'psv-tooltip'; // reset the class
-    if (config.className) {
-      t.classList.add(config.className);
-    }
+  }
+
+  if (config.className) {
+    PSVUtils.addClasses(t, config.className);
   }
 
   c.innerHTML = config.content;
@@ -4285,35 +3593,42 @@ PSVTooltip.prototype.showTooltip = function(config) {
   // delay for correct transition between the two classes
   if (!isUpdate) {
     var self = this;
-    window.setTimeout(function() {
+    this.timeout = window.setTimeout(function() {
       t.classList.add('visible');
       self.psv.trigger('show-tooltip');
+      self.timeout = null;
     }, this.config.delay);
   }
 };
 
 /**
  * Hide the tooltip
- * @return (void)
  */
 PSVTooltip.prototype.hideTooltip = function() {
+  if (this.timeout) {
+    window.clearTimeout(this.timeout);
+    this.timeout = null;
+  }
+
   if (this.isTooltipVisible()) {
     this.container.classList.remove('visible');
     this.psv.trigger('hide-tooltip');
 
     var self = this;
-    window.setTimeout(function() {
+    this.timeout = window.setTimeout(function() {
+      self.container.querySelector('.content').innerHTML = null;
       self.container.style.top = '-1000px';
       self.container.style.left = '-1000px';
+      self.timeout = null;
     }, this.config.delay);
   }
 };
 
 /**
  * Compute the position of the tooltip and its arrow
- * @param style (Object)
- * @param config (Object)
- * @return (void)
+ * @param {Object} style
+ * @param {Object} config
+ * @private
  */
 PSVTooltip.prototype._computeTooltipPosition = function(style, config) {
   var topBottom = false;
@@ -4369,10 +3684,1495 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, config) {
 
 
 /**
- * Godrays shader
- * from http://demo.bkcore.com/threejs/webgl_tron_godrays.html
+ * Navigation bar button class
+ * @param {PSVNavBar} navbar
+ * @constructor
  */
+function PSVNavBarButton(navbar) {
+  PSVComponent.call(this, navbar);
 
+  if (this.constructor.id) {
+    this.id = this.constructor.id;
+  }
+
+  this.enabled = true;
+}
+
+PSVNavBarButton.prototype = Object.create(PSVComponent.prototype);
+PSVNavBarButton.prototype.constructor = PSVNavBarButton;
+
+/**
+ * Creates the button
+ */
+PSVNavBarButton.prototype.create = function() {
+  PSVComponent.prototype.create.call(this);
+
+  if (this.constructor.icon) {
+    this.container.innerHTML = PhotoSphereViewer.ICONS[this.constructor.icon];
+  }
+
+  this.container.addEventListener('click', function() {
+    if (this.enabled) {
+      this._onClick();
+    }
+  }.bind(this));
+};
+
+/**
+ * Changes the active state of the button
+ * @param {boolean} [active] - forced state
+ */
+PSVNavBarButton.prototype.toggleActive = function(active) {
+  active = PSVUtils.toggleClass(this.container, 'active', active);
+
+  if (this.constructor.iconActive) {
+    this.container.innerHTML = PhotoSphereViewer.ICONS[active ? this.constructor.iconActive : this.constructor.icon];
+  }
+};
+
+/**
+ * Disables the button
+ */
+PSVNavBarButton.prototype.disable = function() {
+  this.container.classList.add('disabled');
+
+  this.enabled = false;
+};
+
+/**
+ * Enables the button
+ */
+PSVNavBarButton.prototype.enable = function() {
+  this.container.classList.remove('disabled');
+
+  this.enabled = true;
+};
+
+/**
+ * Action when the button is clicked
+ * @private
+ * @abstract
+ */
+PSVNavBarButton.prototype._onClick = function() {
+
+};
+
+
+/**
+ * Navigation bar autorotate button class
+ * @param {PSVNavBar} navbar
+ * @constructor
+ */
+function PSVNavBarAutorotateButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
+
+  this.create();
+}
+
+PSVNavBarAutorotateButton.prototype = Object.create(PSVNavBarButton.prototype);
+PSVNavBarAutorotateButton.prototype.constructor = PSVNavBarAutorotateButton;
+
+PSVNavBarAutorotateButton.id = 'autorotate';
+PSVNavBarAutorotateButton.className = 'psv-button hover-scale autorotate-button';
+PSVNavBarAutorotateButton.icon = 'play.svg';
+PSVNavBarAutorotateButton.iconActive = 'play-active.svg';
+
+/**
+ * Creates the button
+ */
+PSVNavBarAutorotateButton.prototype.create = function() {
+  PSVNavBarButton.prototype.create.call(this);
+
+  this.container.title = this.psv.config.lang.autorotate;
+
+  this.psv.on('autorotate', this);
+};
+
+/**
+ * Destroys the button
+ */
+PSVNavBarAutorotateButton.prototype.destroy = function() {
+  this.psv.off('autorotate', this);
+
+  PSVNavBarButton.prototype.destroy.call(this);
+};
+
+/**
+ * Handle events
+ * @param {Event} e
+ * @private
+ */
+PSVNavBarAutorotateButton.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    // @formatter:off
+    case 'autorotate': this.toggleActive(e.args[0]); break;
+    // @formatter:on
+  }
+};
+
+/**
+ * Toggles autorotate on click
+ * @private
+ */
+PSVNavBarAutorotateButton.prototype._onClick = function() {
+  this.psv.toggleAutorotate();
+};
+
+
+/**
+ * Navigation bar custom button class
+ * @param {PSVNavBar} navbar
+ * @param config {Object}
+ * @constructor
+ */
+function PSVNavBarCustomButton(navbar, config) {
+  PSVNavBarButton.call(this, navbar);
+
+  this.config = config;
+
+  if (this.config.id) {
+    this.id = this.config.id;
+  }
+
+  this.create();
+}
+
+PSVNavBarCustomButton.prototype = Object.create(PSVNavBarButton.prototype);
+PSVNavBarCustomButton.prototype.constructor = PSVNavBarCustomButton;
+
+PSVNavBarCustomButton.className = 'psv-button';
+
+/**
+ * Creates the button
+ */
+PSVNavBarCustomButton.prototype.create = function() {
+  PSVNavBarButton.prototype.create.call(this);
+
+  if (this.config.className) {
+    PSVUtils.addClasses(this.container, this.config.className);
+  }
+
+  if (this.config.title) {
+    this.container.title = this.config.title;
+  }
+
+  if (this.config.content) {
+    this.container.innerHTML = this.config.content;
+  }
+
+  if (this.config.enabled === false || this.config.disabled === true) {
+    this.disable();
+  }
+
+  if (this.config.visible === false || this.config.hidden === true) {
+    this.hide();
+  }
+};
+
+/**
+ * Destroys the button
+ */
+PSVNavBarCustomButton.prototype.destroy = function() {
+  delete this.config;
+
+  PSVNavBarButton.prototype.destroy.call(this);
+};
+
+/**
+ * Calls user method on click
+ * @private
+ */
+PSVNavBarCustomButton.prototype._onClick = function() {
+  if (this.config.onClick) {
+    this.config.onClick.apply(this.psv);
+  }
+};
+
+
+/**
+ * Navigation bar download button class
+ * @param {PSVNavBar} navbar
+ * @constructor
+ */
+function PSVNavBarDownloadButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
+
+  this.create();
+}
+
+PSVNavBarDownloadButton.prototype = Object.create(PSVNavBarButton.prototype);
+PSVNavBarDownloadButton.prototype.constructor = PSVNavBarDownloadButton;
+
+PSVNavBarDownloadButton.id = 'download';
+PSVNavBarDownloadButton.className = 'psv-button hover-scale download-button';
+PSVNavBarDownloadButton.icon = 'download.svg';
+
+/**
+ * Creates the button
+ */
+PSVNavBarDownloadButton.prototype.create = function() {
+  PSVNavBarButton.prototype.create.call(this);
+
+  this.container.title = this.psv.config.lang.download;
+};
+
+/**
+ * Asks the browser to download the panorama source file
+ * @private
+ */
+PSVNavBarDownloadButton.prototype._onClick = function() {
+  var link = document.createElement('a');
+  link.href = this.psv.config.panorama;
+  link.download = this.psv.config.panorama;
+  this.psv.container.appendChild(link);
+  link.click();
+};
+
+
+/**
+ * Navigation bar fullscreen button class
+ * @param {PSVNavBar} navbar
+ * @constructor
+ */
+function PSVNavBarFullscreenButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
+
+  this.create();
+}
+
+PSVNavBarFullscreenButton.prototype = Object.create(PSVNavBarButton.prototype);
+PSVNavBarFullscreenButton.prototype.constructor = PSVNavBarFullscreenButton;
+
+PSVNavBarFullscreenButton.id = 'fullscreen';
+PSVNavBarFullscreenButton.className = 'psv-button hover-scale fullscreen-button';
+PSVNavBarFullscreenButton.icon = 'fullscreen-in.svg';
+PSVNavBarFullscreenButton.iconActive = 'fullscreen-out.svg';
+
+/**
+ * Creates the button
+ */
+PSVNavBarFullscreenButton.prototype.create = function() {
+  PSVNavBarButton.prototype.create.call(this);
+
+  this.container.title = this.psv.config.lang.fullscreen;
+
+  this.psv.on('fullscreen-updated', this);
+};
+
+/**
+ * Destroys the button
+ */
+PSVNavBarFullscreenButton.prototype.destroy = function() {
+  this.psv.off('fullscreen-updated', this);
+
+  PSVNavBarButton.prototype.destroy.call(this);
+};
+
+/**
+ * Handle events
+ * @param {Event} e
+ * @private
+ */
+PSVNavBarFullscreenButton.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    // @formatter:off
+    case 'fullscreen-updated': this.toggleActive(e.args[0]); break;
+    // @formatter:on
+  }
+};
+
+/**
+ * Toggles fullscreen on click
+ * @private
+ */
+PSVNavBarFullscreenButton.prototype._onClick = function() {
+  this.psv.toggleFullscreen();
+};
+
+
+/**
+ * Navigation bar gyroscope button class
+ * @param {PSVNavBar} navbar
+ * @constructor
+ */
+function PSVNavBarGyroscopeButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
+
+  this.create();
+}
+
+PSVNavBarGyroscopeButton.prototype = Object.create(PSVNavBarButton.prototype);
+PSVNavBarGyroscopeButton.prototype.constructor = PSVNavBarGyroscopeButton;
+
+PSVNavBarGyroscopeButton.id = 'gyroscope';
+PSVNavBarGyroscopeButton.className = 'psv-button hover-scale gyroscope-button';
+PSVNavBarGyroscopeButton.icon = 'compass.svg';
+
+/**
+ * Creates the button
+ * The buttons get visible once the gyroscope API is ready
+ */
+PSVNavBarGyroscopeButton.prototype.create = function() {
+  PSVNavBarButton.prototype.create.call(this);
+
+  this.container.title = this.psv.config.lang.gyroscope;
+
+  PhotoSphereViewer.SYSTEM.deviceOrientationSupported.promise.then(
+    this._onAvailabilityChange.bind(this, true),
+    this._onAvailabilityChange.bind(this, false)
+  );
+
+  this.hide();
+
+  this.psv.on('gyroscope-updated', this);
+};
+
+/**
+ * Destroys the button
+ */
+PSVNavBarGyroscopeButton.prototype.destroy = function() {
+  this.psv.off('gyroscope-updated', this);
+
+  PSVNavBarButton.prototype.destroy.call(this);
+};
+
+/**
+ * Handle events
+ * @param {Event} e
+ * @private
+ */
+PSVNavBarGyroscopeButton.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    // @formatter:off
+    case 'gyroscope-updated': this.toggleActive(e.args[0]); break;
+    // @formatter:on
+  }
+};
+
+/**
+ * Toggle gyroscope on click
+ * @private
+ */
+PSVNavBarGyroscopeButton.prototype._onClick = function() {
+  this.psv.toggleGyroscopeControl();
+};
+
+/**
+ * Update button display when API is ready
+ * @param {boolean} available
+ * @private
+ */
+PSVNavBarGyroscopeButton.prototype._onAvailabilityChange = function(available) {
+  if (available) {
+    if (this.psv.doControls) {
+      this.show();
+    }
+    else {
+      throw new PSVError('Missing Three.js components: DeviceOrientationControls. Get them from threejs-examples package.');
+    }
+  }
+};
+
+
+/**
+ * Navigation bar markers button class
+ * @param {PSVNavBar} navbar
+ * @constructor
+ */
+function PSVNavBarMarkersButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
+
+  this.prop = {
+    panelOpened: false,
+    panelOpening: false
+  };
+
+  this.create();
+}
+
+PSVNavBarMarkersButton.prototype = Object.create(PSVNavBarButton.prototype);
+PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;
+
+PSVNavBarMarkersButton.id = 'markers';
+PSVNavBarMarkersButton.className = 'psv-button hover-scale markers-button';
+PSVNavBarMarkersButton.icon = 'pin.svg';
+PSVNavBarMarkersButton.publicMethods = ['toggleMarkersList', 'showMarkersList', 'hideMarkersList'];
+
+/**
+ * Creates the button
+ */
+PSVNavBarMarkersButton.prototype.create = function() {
+  PSVNavBarButton.prototype.create.call(this);
+
+  this.container.title = this.psv.config.lang.markers;
+
+  this.psv.on('open-panel', this);
+  this.psv.on('close-panel', this);
+};
+
+/**
+ * Destroys the button
+ */
+PSVNavBarMarkersButton.prototype.destroy = function() {
+  this.psv.off('open-panel', this);
+  this.psv.off('close-panel', this);
+
+  delete this.prop;
+
+  PSVNavBarButton.prototype.destroy.call(this);
+};
+
+/**
+ * Handle events
+ * @param {Event} e
+ * @private
+ */
+PSVNavBarMarkersButton.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    // @formatter:off
+    case 'open-panel': this._onPanelOpened(); break;
+    case 'close-panel': this._onPanelClosed(); break;
+    // @formatter:on
+  }
+};
+
+/**
+ * Toggles markers list on click
+ * @private
+ */
+PSVNavBarMarkersButton.prototype._onClick = function() {
+  this.toggleMarkersList();
+};
+
+/**
+ * Toggle the visibility of markers list
+ */
+PSVNavBarMarkersButton.prototype.toggleMarkersList = function() {
+  if (this.prop.panelOpened) {
+    this.hideMarkersList();
+  }
+  else {
+    this.showMarkersList();
+  }
+};
+
+/**
+ * Open side panel with list of markers
+ */
+PSVNavBarMarkersButton.prototype.showMarkersList = function() {
+  var markers = [];
+  for (var id in this.psv.hud.markers) {
+    markers.push(this.psv.hud.markers[id]);
+  }
+
+  var html = this.psv.config.templates.markersList({
+    markers: this.psv.change('render-markers-list', markers),
+    config: this.psv.config
+  });
+
+  this.prop.panelOpening = true;
+  this.psv.panel.showPanel(html, true);
+
+  this.psv.panel.container.querySelector('.psv-markers-list').addEventListener('click', this._onClickItem.bind(this));
+};
+
+/**
+ * Close side panel
+ */
+PSVNavBarMarkersButton.prototype.hideMarkersList = function() {
+  if (this.prop.panelOpened) {
+    this.psv.panel.hidePanel();
+  }
+};
+
+/**
+ * Click on an item
+ * @param {MouseEvent} e
+ * @private
+ */
+PSVNavBarMarkersButton.prototype._onClickItem = function(e) {
+  var li;
+  if (e.target && (li = PSVUtils.getClosest(e.target, 'li')) && li.dataset.psvMarker) {
+    this.psv.hud.gotoMarker(li.dataset.psvMarker, 1000);
+    this.psv.panel.hidePanel();
+  }
+};
+
+/**
+ * Update status when the panel is updated
+ * @private
+ */
+PSVNavBarMarkersButton.prototype._onPanelOpened = function() {
+  if (this.prop.panelOpening) {
+    this.prop.panelOpening = false;
+    this.prop.panelOpened = true;
+  }
+  else {
+    this.prop.panelOpened = false;
+  }
+
+  this.toggleActive(this.prop.panelOpened);
+};
+
+/**
+ * Update status when the panel is updated
+ * @private
+ */
+PSVNavBarMarkersButton.prototype._onPanelClosed = function() {
+  this.prop.panelOpened = false;
+  this.prop.panelOpening = false;
+
+  this.toggleActive(this.prop.panelOpened);
+};
+
+
+/**
+ * Navigation bar zoom button class
+ * @param {PSVNavBar} navbar
+ * @constructor
+ */
+function PSVNavBarZoomButton(navbar) {
+  PSVNavBarButton.call(this, navbar);
+
+  this.zoom_range = null;
+  this.zoom_value = null;
+
+  this.prop = {
+    mousedown: false,
+    buttondown: false,
+    longPressInterval: null
+  };
+
+  this.create();
+}
+
+PSVNavBarZoomButton.prototype = Object.create(PSVNavBarButton.prototype);
+PSVNavBarZoomButton.prototype.constructor = PSVNavBarZoomButton;
+
+PSVNavBarZoomButton.id = 'zoom';
+PSVNavBarZoomButton.className = 'psv-button zoom-button';
+
+/**
+ * Creates the button
+ */
+PSVNavBarZoomButton.prototype.create = function() {
+  PSVNavBarButton.prototype.create.call(this);
+
+  var zoom_minus = document.createElement('div');
+  zoom_minus.className = 'minus';
+  zoom_minus.title = this.psv.config.lang.zoomOut;
+  zoom_minus.innerHTML = PhotoSphereViewer.ICONS['zoom-out.svg'];
+  this.container.appendChild(zoom_minus);
+
+  var zoom_range_bg = document.createElement('div');
+  zoom_range_bg.className = 'range';
+  this.container.appendChild(zoom_range_bg);
+
+  this.zoom_range = document.createElement('div');
+  this.zoom_range.className = 'line';
+  this.zoom_range.title = this.psv.config.lang.zoom;
+  zoom_range_bg.appendChild(this.zoom_range);
+
+  this.zoom_value = document.createElement('div');
+  this.zoom_value.className = 'handle';
+  this.zoom_value.title = this.psv.config.lang.zoom;
+  this.zoom_range.appendChild(this.zoom_value);
+
+  var zoom_plus = document.createElement('div');
+  zoom_plus.className = 'plus';
+  zoom_plus.title = this.psv.config.lang.zoomIn;
+  zoom_plus.innerHTML = PhotoSphereViewer.ICONS['zoom-in.svg'];
+  this.container.appendChild(zoom_plus);
+
+  this.zoom_range.addEventListener('mousedown', this);
+  this.zoom_range.addEventListener('touchstart', this);
+  this.psv.container.addEventListener('mousemove', this);
+  this.psv.container.addEventListener('touchmove', this);
+  this.psv.container.addEventListener('mouseup', this);
+  this.psv.container.addEventListener('touchend', this);
+  zoom_minus.addEventListener('mousedown', this._zoomOut.bind(this));
+  zoom_plus.addEventListener('mousedown', this._zoomIn.bind(this));
+
+  this.psv.on('zoom-updated', this);
+
+  this.psv.once('ready', function() {
+    this._moveZoomValue(this.psv.prop.zoom_lvl);
+  }.bind(this));
+};
+
+/**
+ * Destroys the button
+ */
+PSVNavBarZoomButton.prototype.destroy = function() {
+  this.psv.container.removeEventListener('mousemove', this);
+  this.psv.container.removeEventListener('touchmove', this);
+  this.psv.container.removeEventListener('mouseup', this);
+  this.psv.container.removeEventListener('touchend', this);
+
+  delete this.zoom_range;
+  delete this.zoom_value;
+
+  this.psv.off('zoom-updated', this);
+
+  PSVNavBarButton.prototype.destroy.call(this);
+};
+
+/**
+ * Handle events
+ * @param {Event} e
+ * @private
+ */
+PSVNavBarZoomButton.prototype.handleEvent = function(e) {
+  switch (e.type) {
+    // @formatter:off
+    case 'mousedown': this._initZoomChangeWithMouse(e); break;
+    case 'touchstart': this._initZoomChangeByTouch(e); break;
+    case 'mousemove': this._changeZoomWithMouse(e); break;
+    case 'touchmove': this._changeZoomByTouch(e); break;
+    case 'mouseup': this._stopZoomChange(e); break;
+    case 'touchend': this._stopZoomChange(e); break;
+    case 'zoom-updated': this._moveZoomValue(e.args[0]); break;
+    // @formatter:on
+  }
+};
+
+/**
+ * Moves the zoom cursor
+ * @param {int} level
+ * @private
+ */
+PSVNavBarZoomButton.prototype._moveZoomValue = function(level) {
+  this.zoom_value.style.left = (level / 100 * this.zoom_range.offsetWidth - this.zoom_value.offsetWidth / 2) + 'px';
+};
+
+/**
+ * The user wants to zoom
+ * @param {MouseEvent} evt
+ * @private
+ */
+PSVNavBarZoomButton.prototype._initZoomChangeWithMouse = function(evt) {
+  if (!this.enabled) {
+    return;
+  }
+
+  this.prop.mousedown = true;
+  this._changeZoom(evt.clientX);
+};
+
+/**
+ * The user wants to zoom (mobile version)
+ * @param {TouchEvent} evt
+ * @private
+ */
+PSVNavBarZoomButton.prototype._initZoomChangeByTouch = function(evt) {
+  if (!this.enabled) {
+    return;
+  }
+
+  this.prop.mousedown = true;
+  this._changeZoom(evt.changedTouches[0].clientX);
+};
+
+/**
+ * The user clicked the + button
+ * Zoom in and register long press timer
+ * @private
+ */
+PSVNavBarZoomButton.prototype._zoomIn = function() {
+  if (!this.enabled) {
+    return;
+  }
+
+  this.prop.buttondown = true;
+  this.psv.zoomIn();
+  window.setTimeout(this._startLongPressInterval.bind(this, 1), 200);
+};
+
+/**
+ * The user clicked the - button
+ * Zoom out and register long press timer
+ * @private
+ */
+PSVNavBarZoomButton.prototype._zoomOut = function() {
+  if (!this.enabled) {
+    return;
+  }
+
+  this.prop.buttondown = true;
+  this.psv.zoomOut();
+  window.setTimeout(this._startLongPressInterval.bind(this, -1), 200);
+};
+
+/**
+ * Continue zooming as long as the user press the button
+ * @param value
+ * @private
+ */
+PSVNavBarZoomButton.prototype._startLongPressInterval = function(value) {
+  if (this.prop.buttondown) {
+    this.prop.longPressInterval = window.setInterval(function() {
+      this.psv.zoom(this.psv.prop.zoom_lvl + value);
+    }.bind(this), 50);
+  }
+};
+
+/**
+ * The user wants to stop zooming
+ * @private
+ */
+PSVNavBarZoomButton.prototype._stopZoomChange = function() {
+  if (!this.enabled) {
+    return;
+  }
+
+  window.clearInterval(this.prop.longPressInterval);
+  this.prop.longPressInterval = null;
+  this.prop.mousedown = false;
+  this.prop.buttondown = false;
+};
+
+/**
+ * The user moves the zoom cursor
+ * @param {MouseEvent} evt
+ * @private
+ */
+PSVNavBarZoomButton.prototype._changeZoomWithMouse = function(evt) {
+  if (!this.enabled) {
+    return;
+  }
+
+  evt.preventDefault();
+  this._changeZoom(evt.clientX);
+};
+
+/**
+ * The user moves the zoom cursor (mobile version)
+ * @param {TouchEvent} evt
+ * @private
+ */
+PSVNavBarZoomButton.prototype._changeZoomByTouch = function(evt) {
+  if (!this.enabled) {
+    return;
+  }
+
+  evt.preventDefault();
+  this._changeZoom(evt.changedTouches[0].clientX);
+};
+
+/**
+ * Zoom change
+ * @param {int} x - mouse/touch position
+ * @private
+ */
+PSVNavBarZoomButton.prototype._changeZoom = function(x) {
+  if (this.prop.mousedown) {
+    var user_input = parseInt(x) - this.zoom_range.getBoundingClientRect().left;
+    var zoom_level = user_input / this.zoom_range.offsetWidth * 100;
+    this.psv.zoom(zoom_level);
+  }
+};
+
+
+/**
+ * Custom error used in the lib
+ * {@link http://stackoverflow.com/a/27724419/1207670}
+ * @param {*} message
+ * @constructor
+ */
+function PSVError(message) {
+  this.message = message;
+
+  // Use V8's native method if available, otherwise fallback
+  if ('captureStackTrace' in Error) {
+    Error.captureStackTrace(this, PSVError);
+  }
+  else {
+    this.stack = (new Error()).stack;
+  }
+}
+
+PSVError.prototype = Object.create(Error.prototype);
+PSVError.prototype.name = 'PSVError';
+PSVError.prototype.constructor = PSVError;
+
+
+/**
+ * Static utilities for PSV
+ * @type {object}
+ */
+var PSVUtils = {};
+
+/**
+ * Short-Hand for PI*2
+ * @type {float}
+ */
+PSVUtils.TwoPI = Math.PI * 2.0;
+
+/**
+ * Short-Hand for PI/2
+ * @type {float}
+ */
+PSVUtils.HalfPI = Math.PI / 2.0;
+
+/**
+ * Check if some Three.js components are loaded
+ * @param {...string} components
+ * @returns {boolean}
+ */
+PSVUtils.checkTHREE = function(components) {
+  for (var i = 0, l = arguments.length; i < l; i++) {
+    if (!(arguments[i] in THREE)) {
+      return false;
+    }
+  }
+
+  return true;
+};
+
+/**
+ * Detects whether canvas is supported
+ * @returns {boolean}
+ */
+PSVUtils.isCanvasSupported = function() {
+  var canvas = document.createElement('canvas');
+  return !!(canvas.getContext && canvas.getContext('2d'));
+};
+
+/**
+ * Tries to return a canvas webgl context
+ * @returns {WebGLRenderingContext}
+ */
+PSVUtils.getWebGLCtx = function() {
+  var canvas = document.createElement('canvas');
+  var names = ['webgl', 'experimental-webgl', 'moz-webgl', 'webkit-3d'];
+  var context = null;
+
+  if (!canvas.getContext) {
+    return null;
+  }
+
+  if (names.some(function(name) {
+      try {
+        context = canvas.getContext(name);
+        return (context && typeof context.getParameter == 'function');
+      } catch (e) {
+        return false;
+      }
+    })) {
+    return context;
+  }
+  else {
+    return null;
+  }
+};
+
+/**
+ * Detects whether WebGL is supported
+ * @returns {boolean}
+ */
+PSVUtils.isWebGLSupported = function() {
+  return !!window.WebGLRenderingContext && PSVUtils.getWebGLCtx() !== null;
+};
+
+/**
+ * Gets max texture width in WebGL context
+ * @returns {int}
+ */
+PSVUtils.getMaxTextureWidth = function() {
+  var ctx = PSVUtils.getWebGLCtx();
+  if (ctx !== null) {
+    return ctx.getParameter(ctx.MAX_TEXTURE_SIZE);
+  }
+};
+
+/**
+ * Toggles a CSS class
+ * @param {HTMLElement} element
+ * @param {string} className
+ * @param {boolean} [active] - forced state
+ * @return {boolean} new state
+ */
+PSVUtils.toggleClass = function(element, className, active) {
+  if (active === undefined) {
+    return element.classList.toggle(className);
+  }
+  else if (active && !element.classList.contains(className)) {
+    element.classList.add(className);
+    return true;
+  }
+  else if (!active) {
+    element.classList.remove(className);
+    return false;
+  }
+};
+
+/**
+ * Adds one or several CSS classes to an element
+ * @param {HTMLElement} element
+ * @param {string} className
+ */
+PSVUtils.addClasses = function(element, className) {
+  if (!className) {
+    return;
+  }
+  className.split(' ').forEach(function(name) {
+    element.classList.add(name);
+  });
+};
+
+/**
+ * Removes one or several CSS classes to an element
+ * @param {HTMLElement} element
+ * @param {string} className
+ */
+PSVUtils.removeClasses = function(element, className) {
+  if (!className) {
+    return;
+  }
+  className.split(' ').forEach(function(name) {
+    element.classList.remove(name);
+  });
+};
+
+/**
+ * Search if an element has a particular, at any level including itself
+ * @param {HTMLElement} el
+ * @param {HTMLElement} parent
+ * @returns {boolean}
+ */
+PSVUtils.hasParent = function(el, parent) {
+  do {
+    if (el === parent) {
+      return true;
+    }
+  } while (!!(el = el.parentNode));
+
+  return false;
+};
+
+/**
+ * Get closest parent (can by itself)
+ * @param {HTMLElement} el (HTMLElement)
+ * @param {string} selector
+ * @returns {HTMLElement}
+ */
+PSVUtils.getClosest = function(el, selector) {
+  var matches = el.matches || el.msMatchesSelector;
+
+  do {
+    if (matches.bind(el)(selector)) {
+      return el;
+    }
+  } while (!!(el = el.parentElement));
+
+  return null;
+};
+
+/**
+ * Get the event name for mouse wheel
+ * @returns {string}
+ */
+PSVUtils.mouseWheelEvent = function() {
+  return 'onwheel' in document.createElement('div') ? 'wheel' : // Modern browsers support "wheel"
+    document.onmousewheel !== undefined ? 'mousewheel' : // Webkit and IE support at least "mousewheel"
+      'DOMMouseScroll'; // let's assume that remaining browsers are older Firefox
+};
+
+/**
+ * Get the event name for fullscreen event
+ * @returns {string}
+ */
+PSVUtils.fullscreenEvent = function() {
+  var map = {
+    'exitFullscreen': 'fullscreenchange',
+    'webkitExitFullscreen': 'webkitfullscreenchange',
+    'mozCancelFullScreen': 'mozfullscreenchange',
+    'msExitFullscreen': 'msFullscreenEnabled'
+  };
+
+  for (var exit in map) {
+    if (exit in document) return map[exit];
+  }
+
+  return 'fullscreenchange';
+};
+
+/**
+ * Ensures that a number is in a given interval
+ * @param {number} x
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
+ */
+PSVUtils.stayBetween = function(x, min, max) {
+  return Math.max(min, Math.min(max, x));
+};
+
+/**
+ * Returns the value of a given attribute in the panorama metadata
+ * @param {string} data
+ * @param {string} attr
+ * @returns (string)
+ */
+PSVUtils.getXMPValue = function(data, attr) {
+  var result;
+  // XMP data are stored in children
+  if ((result = data.match('<GPano:' + attr + '>(.*)</GPano:' + attr + '>')) !== null) {
+    return result[1];
+  }
+  // XMP data are stored in attributes
+  else if ((result = data.match('GPano:' + attr + '="(.*?)"')) !== null) {
+    return result[1];
+  }
+  else {
+    return null;
+  }
+};
+
+/**
+ * Detects whether fullscreen is enabled or not
+ * @param {HTMLElement} elt
+ * @returns {boolean}
+ */
+PSVUtils.isFullscreenEnabled = function(elt) {
+  return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) === elt;
+};
+
+/**
+ * Enters fullscreen mode
+ * @param {HTMLElement} elt
+ */
+PSVUtils.requestFullscreen = function(elt) {
+  (elt.requestFullscreen || elt.mozRequestFullScreen || elt.webkitRequestFullscreen || elt.msRequestFullscreen).call(elt);
+};
+
+/**
+ * Exits fullscreen mode
+ */
+PSVUtils.exitFullscreen = function() {
+  (document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen).call(document);
+};
+
+/**
+ * Gets an element style
+ * @param {HTMLElement} elt
+ * @param {string} prop
+ * @returns {*}
+ */
+PSVUtils.getStyle = function(elt, prop) {
+  return window.getComputedStyle(elt, null)[prop];
+};
+
+/**
+ * Translate CSS values like "top center" or "10% 50%" as top and left positions
+ * The implementation is as close as possible to the "background-position" specification
+ * {@link https://developer.mozilla.org/en-US/docs/Web/CSS/background-position}
+ * @param {string} value
+ * @returns {{top: float, left: float}}
+ */
+PSVUtils.parsePosition = function(value) {
+  if (!value) {
+    return { top: 0.5, left: 0.5 };
+  }
+
+  if (typeof value === 'object') {
+    return value;
+  }
+
+  var tokens = value.toLocaleLowerCase().split(' ').slice(0, 2);
+
+  if (tokens.length === 1) {
+    if (PSVUtils.parsePosition.positions[tokens[0]] !== undefined) {
+      tokens = [tokens[0], 'center'];
+    }
+    else {
+      tokens = [tokens[0], tokens[0]];
+    }
+  }
+
+  var xFirst = tokens[1] != 'left' && tokens[1] != 'right' && tokens[0] != 'top' && tokens[0] != 'bottom';
+
+  tokens = tokens.map(function(token) {
+    return PSVUtils.parsePosition.positions[token] || token;
+  });
+
+  if (!xFirst) {
+    tokens.reverse();
+  }
+
+  var parsed = tokens.join(' ').match(/^([0-9.]+)% ([0-9.]+)%$/);
+
+  if (parsed) {
+    return {
+      left: parsed[1] / 100,
+      top: parsed[2] / 100
+    };
+  }
+  else {
+    return { top: 0.5, left: 0.5 };
+  }
+};
+
+PSVUtils.parsePosition.positions = { 'top': '0%', 'bottom': '100%', 'left': '0%', 'right': '100%', 'center': '50%' };
+
+/**
+ * Parse an speed
+ * @param {string} speed - The speed, in radians/degrees/revolutions per second/minute
+ * @returns {float} radians per second
+ */
+PSVUtils.parseSpeed = function(speed) {
+  if (typeof speed == 'string') {
+    speed = speed.toString().trim();
+
+    // Speed extraction
+    var speed_value = parseFloat(speed.replace(/^(-?[0-9]+(?:\.[0-9]*)?).*$/, '$1'));
+    var speed_unit = speed.replace(/^-?[0-9]+(?:\.[0-9]*)?(.*)$/, '$1').trim();
+
+    // "per minute" -> "per second"
+    if (speed_unit.match(/(pm|per minute)$/)) {
+      speed_value /= 60;
+    }
+
+    // Which unit?
+    switch (speed_unit) {
+      // Degrees per minute / second
+      case 'dpm':
+      case 'degrees per minute':
+      case 'dps':
+      case 'degrees per second':
+        speed = speed_value * Math.PI / 180;
+        break;
+
+      // Radians per minute / second
+      case 'radians per minute':
+      case 'radians per second':
+        speed = speed_value;
+        break;
+
+      // Revolutions per minute / second
+      case 'rpm':
+      case 'revolutions per minute':
+      case 'rps':
+      case 'revolutions per second':
+        speed = speed_value * PSVUtils.TwoPI;
+        break;
+
+      // Unknown unit
+      default:
+        throw new PSVError('unknown speed unit "' + speed_unit + '"');
+    }
+  }
+
+  return speed;
+};
+
+/**
+ * Parses an angle value in radians or degrees and return a normalized value in radians
+ * @param {string|number} angle - eg: 3.14, 3.14rad, 180deg
+ * @param {float|boolean} [reference =0] - base value for normalization, false to disable
+ * @returns (double)
+ */
+PSVUtils.parseAngle = function(angle, reference) {
+  if (typeof angle == 'string') {
+    var match = angle.toLowerCase().trim().match(/^(-?[0-9]+(?:\.[0-9]*)?)(.*)$/);
+
+    if (!match) {
+      throw new PSVError('unknown angle "' + angle + '"');
+    }
+
+    var value = parseFloat(match[1]);
+    var unit = match[2];
+
+    if (unit) {
+      switch (unit) {
+        case 'deg':
+        case 'degs':
+          angle = value / 180 * Math.PI;
+          break;
+        case 'rad':
+        case 'rads':
+          angle = value;
+          break;
+        default:
+          throw new PSVError('unknown angle unit "' + unit + '"');
+      }
+    }
+  }
+
+  if (reference !== false) {
+    if (reference === undefined) {
+      reference = 0;
+    }
+
+    angle = (angle - reference) % PSVUtils.TwoPI;
+
+    if (angle < 0) {
+      angle = PSVUtils.TwoPI + angle;
+    }
+
+    angle += reference;
+  }
+
+  return angle;
+};
+
+/**
+ * Utility for animations, interpolates each property with an easing and optional delay
+ * @param {Object} options
+ * @param {Object[]} options.properties
+ * @param {number} options.properties[].start
+ * @param {number} options.properties[].end
+ * @param {int} options.duration
+ * @param {int} [options.delay]
+ * @param {string} [options.easing='linear']
+ * @param {Function} options.onTick - called with interpolated properties and progression (0 to 1)
+ * @param {Function} [options.onDone]
+ * @param {Function} [options.onCancel]
+ * @returns {promise} with an additional "cancel" method
+ */
+PSVUtils.animation = function(options) {
+  var defer = D();
+  var start = null;
+
+  if (!options.easing || typeof options.easing == 'string') {
+    options.easing = PSVUtils.animation.easings[options.easing || 'linear'];
+  }
+
+  function run(timestamp) {
+    // the animation has been cancelled
+    if (defer.promise.getStatus() === -1) {
+      return;
+    }
+
+    // first iteration
+    if (start === null) {
+      start = timestamp;
+    }
+
+    // compute progress
+    var progress = (timestamp - start) / options.duration;
+    var current = {};
+    var name;
+
+    if (progress < 1.0) {
+      // interpolate properties
+      for (name in options.properties) {
+        current[name] = options.properties[name].start + (options.properties[name].end - options.properties[name].start) * options.easing(progress);
+      }
+
+      options.onTick(current, progress);
+
+      window.requestAnimationFrame(run);
+    }
+    else {
+      // call onTick one last time with final values
+      for (name in options.properties) {
+        current[name] = options.properties[name].end;
+      }
+
+      options.onTick(current, 1.0);
+
+      if (options.onDone) {
+        options.onDone();
+      }
+
+      defer.resolve();
+    }
+  }
+
+  if (options.delay !== undefined) {
+    window.setTimeout(function() {
+      window.requestAnimationFrame(run);
+    }, options.delay);
+  }
+  else {
+    window.requestAnimationFrame(run);
+  }
+
+  // add a "cancel" to the promise
+  var promise = defer.promise;
+  promise.cancel = function() {
+    if (options.onCancel) {
+      options.onCancel();
+    }
+    defer.reject();
+  };
+  return promise;
+};
+
+/**
+ * Collection of easing functions
+ * {@link https://gist.github.com/frederickk/6165768}
+ * @type {Object.<string, Function>}
+ */
+// @formatter:off
+// jscs:disable
+/* jshint ignore:start */
+PSVUtils.animation.easings = {
+  linear: function(t) { return t; },
+
+  inQuad: function(t) { return t*t; },
+  outQuad: function(t) { return t*(2-t); },
+  inOutQuad: function(t) { return t<.5 ? 2*t*t : -1+(4-2*t)*t; },
+
+  inCubic: function(t) { return t*t*t; },
+  outCubic: function(t) { return (--t)*t*t+1; },
+  inOutCubic: function(t) { return t<.5 ? 4*t*t*t : (t-1)*(2*t-2)*(2*t-2)+1; },
+
+  inQuart: function(t) { return t*t*t*t; },
+  outQuart: function(t) { return 1-(--t)*t*t*t; },
+  inOutQuart: function(t) { return t<.5 ? 8*t*t*t*t : 1-8*(--t)*t*t*t; },
+
+  inQuint: function(t) { return t*t*t*t*t; },
+  outQuint: function(t) { return 1+(--t)*t*t*t*t; },
+  inOutQuint: function(t) { return t<.5 ? 16*t*t*t*t*t : 1+16*(--t)*t*t*t*t; },
+
+  inSine: function(t) { return 1-Math.cos(t*(Math.PI/2)); },
+  outSine: function(t) { return Math.sin(t*(Math.PI/2)); },
+  inOutSine: function(t) { return .5-.5*Math.cos(Math.PI*t); },
+
+  inExpo: function(t) { return Math.pow(2, 10*(t-1)); },
+  outExpo: function(t) { return 1-Math.pow(2, -10*t); },
+  inOutExpo: function(t) { t=t*2-1; return t<0 ? .5*Math.pow(2, 10*t) : 1-.5*Math.pow(2, -10*t); },
+
+  inCirc: function(t) { return 1-Math.sqrt(1-t*t); },
+  outCirc: function(t) { t--; return Math.sqrt(1-t*t); },
+  inOutCirc: function(t) { t*=2; return t<1 ? .5-.5*Math.sqrt(1-t*t) : .5+.5*Math.sqrt(1-(t-=2)*t); }
+};
+/* jshint ignore:end */
+// jscs:enable
+// @formatter:off
+
+/**
+ * Returns a function, that, when invoked, will only be triggered at most once during a given window of time.
+ * @copyright underscore.js - modified by Clément Prévost {@link http://stackoverflow.com/a/27078401}
+ * @param {Function} func
+ * @param {int} wait
+ * @returns {Function}
+ */
+PSVUtils.throttle = function(func, wait) {
+  var self, args, result;
+  var timeout = null;
+  var previous = 0;
+  var later = function() {
+    previous = Date.now();
+    timeout = null;
+    result = func.apply(self, args);
+    if (!timeout) self = args = null;
+  };
+  return function() {
+    var now = Date.now();
+    if (!previous) previous = now;
+    var remaining = wait - (now - previous);
+    self = this;
+    args = arguments;
+    if (remaining <= 0 || remaining > wait) {
+      if (timeout) {
+        clearTimeout(timeout);
+        timeout = null;
+      }
+      previous = now;
+      result = func.apply(self, args);
+      if (!timeout) self = args = null;
+    }
+    else if (!timeout) {
+      timeout = setTimeout(later, remaining);
+    }
+    return result;
+  };
+};
+
+/**
+ *  Function to test if an object is a plain object, i.e. is constructed
+ *  by the built-in Object constructor and inherits directly from Object.prototype
+ *  or null. Some built-in objects pass the test, e.g. Math which is a plain object
+ *  and some host or exotic objects may pass also.
+ *  {@link http://stackoverflow.com/a/5878101/1207670}
+ *  @param {*} obj
+ *  @returns {boolean}
+ */
+PSVUtils.isPlainObject = function(obj) {
+  // Basic check for Type object that's not null
+  if (typeof obj == 'object' && obj !== null) {
+    // If Object.getPrototypeOf supported, use it
+    if (typeof Object.getPrototypeOf == 'function') {
+      var proto = Object.getPrototypeOf(obj);
+      return proto === Object.prototype || proto === null;
+    }
+
+    // Otherwise, use internal class
+    // This should be reliable as if getPrototypeOf not supported, is pre-ES5
+    return Object.prototype.toString.call(obj) == '[object Object]';
+  }
+
+  // Not an object
+  return false;
+};
+
+/**
+ * Merge the enumerable attributes of two objects.
+ * Modified to replace arrays instead of merge.
+ * Modified to alter the target object.
+ * @copyright Nicholas Fisher {@link mailto:nfisher110@gmail.com} - modified by Damien "Mistic" Sorel
+ * @param {Object} target
+ * @param {Object} src
+ * @returns {Object} target
+ */
+PSVUtils.deepmerge = function(target, src) {
+  var first = src;
+
+  return (function merge(target, src) {
+    if (Array.isArray(src)) {
+      if (!target || !Array.isArray(target)) {
+        target = [];
+      }
+      else {
+        target.length = 0;
+      }
+      src.forEach(function(e, i) {
+        target[i] = merge(null, e);
+      });
+    }
+    else if (typeof src == 'object') {
+      if (!target || Array.isArray(target)) {
+        target = {};
+      }
+      Object.keys(src).forEach(function(key) {
+        if (typeof src[key] != 'object' || !src[key] || !PSVUtils.isPlainObject(src[key])) {
+          target[key] = src[key];
+        }
+        else if (src[key] != first) {
+          if (!target[key]) {
+            target[key] = merge(null, src[key]);
+          }
+          else {
+            merge(target[key], src[key]);
+          }
+        }
+      });
+    }
+    else {
+      target = src;
+    }
+
+    return target;
+  }(target, src));
+};
+
+/**
+ * Clone an object
+ * @param {Object} src
+ * @returns {Object}
+ */
+PSVUtils.clone = function(src) {
+  return PSVUtils.deepmerge(null, src);
+};
+
+
+/**
+ * Godrays shader for THREE.js
+ * {@link http://demo.bkcore.com/threejs/webgl_tron_godrays.html}
+ */
 THREE.GodraysShader = {
   uniforms: {
     tDiffuse: { type: 't', value: 0, texture: null },
@@ -4440,9 +5240,11 @@ THREE.GodraysShader = {
 };
 
 
-// Modified from http://mattsnider.com/cross-browser-and-legacy-supported-requestframeanimation/
-// LICENSE: MIT: http://mattsnider.com/projects/license/
-
+/**
+ * requestAnimationFrame polyfill
+ * {@link http://mattsnider.com/cross-browser-and-legacy-supported-requestframeanimation}
+ * @license MIT
+ */
 (function(w) {
     "use strict";
     // most browsers have an implementation
@@ -4532,6 +5334,9 @@ PhotoSphereViewer.ICONS['play.svg'] = '<svg xmlns="http://www.w3.org/2000/svg" x
 PhotoSphereViewer.ICONS['zoom-in.svg'] = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 20 20" enable-background="new 0 0 20 20" xml:space="preserve"><path d="M14.043,12.22c2.476-3.483,1.659-8.313-1.823-10.789C8.736-1.044,3.907-0.228,1.431,3.255c-2.475,3.482-1.66,8.312,1.824,10.787c2.684,1.908,6.281,1.908,8.965,0l4.985,4.985c0.503,0.504,1.32,0.504,1.822,0c0.505-0.503,0.505-1.319,0-1.822L14.043,12.22z M7.738,13.263c-3.053,0-5.527-2.475-5.527-5.525c0-3.053,2.475-5.527,5.527-5.527c3.05,0,5.524,2.474,5.524,5.527C13.262,10.789,10.788,13.263,7.738,13.263z"/><polygon points="8.728,4.009 6.744,4.009 6.744,6.746 4.006,6.746 4.006,8.73 6.744,8.73 6.744,11.466 8.728,11.466 8.728,8.73 11.465,8.73 11.465,6.746 8.728,6.746"/><!--Created by Ryan Canning from the Noun Project--></svg>';
 
 PhotoSphereViewer.ICONS['zoom-out.svg'] = '<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" x="0px" y="0px" viewBox="0 0 20 20" enable-background="new 0 0 20 20" xml:space="preserve"><path d="M14.043,12.22c2.476-3.483,1.659-8.313-1.823-10.789C8.736-1.044,3.907-0.228,1.431,3.255c-2.475,3.482-1.66,8.312,1.824,10.787c2.684,1.908,6.281,1.908,8.965,0l4.985,4.985c0.503,0.504,1.32,0.504,1.822,0c0.505-0.503,0.505-1.319,0-1.822L14.043,12.22z M7.738,13.263c-3.053,0-5.527-2.475-5.527-5.525c0-3.053,2.475-5.527,5.527-5.527c3.05,0,5.524,2.474,5.524,5.527C13.262,10.789,10.788,13.263,7.738,13.263z"/><rect x="4.006" y="6.746" width="7.459" height="1.984"/><!--Created by Ryan Canning from the Noun Project--></svg>';
+
+PhotoSphereViewer.Error = PSVError;
+PhotoSphereViewer.Utils = PSVUtils;
 
 return PhotoSphereViewer;
 }));
