@@ -1,6 +1,7 @@
 /**
  * Base sub-component class
- * @param parent (PhotoSphereViewer | PSVComponent) The parent with a "container" property
+ * @param {PhotoSphereViewer | PSVComponent} parent - the parent with a "container" property
+ * @constructor
  */
 function PSVComponent(parent) {
   this.psv = parent instanceof PhotoSphereViewer ? parent : parent.psv;

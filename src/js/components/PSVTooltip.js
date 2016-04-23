@@ -1,6 +1,7 @@
 /**
  * Tooltip class
- * @param hud (PSVHUD) A PSVHUD object
+ * @param {PSVHUD} hud
+ * @constructor
  */
 function PSVTooltip(hud) {
   PSVComponent.call(this, hud);
@@ -23,7 +24,6 @@ PSVTooltip.topMap = { 0: 'top', 0.5: 'center', 1: 'bottom' };
 
 /**
  * Creates the tooltip
- * @return (void)
  */
 PSVTooltip.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -48,7 +48,8 @@ PSVTooltip.prototype.destroy = function() {
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVTooltip.prototype.handleEvent = function(e) {
   switch (e.type) {
@@ -58,20 +59,23 @@ PSVTooltip.prototype.handleEvent = function(e) {
   }
 };
 
+/**
+ * Returns if the tooltip is visible
+ * @returns {boolean}
+ */
 PSVTooltip.prototype.isTooltipVisible = function() {
   return this.container.classList.contains('visible');
 };
 
 /**
  * Show the tooltip
- * @param config (Object)
- *    - content
- *    - top
- *    - left
- *    - position (default: 'top center')
- *    - className (optional)
- *    - marker (optional) -- take marker dimensions in account when positioning the tooltip
- * @return (void)
+ * @param {Object} config
+ * @param {string} config.content
+ * @param {int} config.top
+ * @param {int} config.left
+ * @param {string} [config.position='top center']
+ * @param {string} [config.className]
+ * @param {PSVMarker} [config.marker]
  */
 PSVTooltip.prototype.showTooltip = function(config) {
   if (this.timeout) {
@@ -121,9 +125,10 @@ PSVTooltip.prototype.showTooltip = function(config) {
   }
   else {
     t.className = 'psv-tooltip'; // reset the class
-    if (config.className) {
-      PSVUtils.addClasses(t, config.className);
-    }
+  }
+
+  if (config.className) {
+    PSVUtils.addClasses(t, config.className);
   }
 
   c.innerHTML = config.content;
@@ -189,7 +194,6 @@ PSVTooltip.prototype.showTooltip = function(config) {
 
 /**
  * Hide the tooltip
- * @return (void)
  */
 PSVTooltip.prototype.hideTooltip = function() {
   if (this.timeout) {
@@ -213,9 +217,9 @@ PSVTooltip.prototype.hideTooltip = function() {
 
 /**
  * Compute the position of the tooltip and its arrow
- * @param style (Object)
- * @param config (Object)
- * @return (void)
+ * @param {Object} style
+ * @param {Object} config
+ * @private
  */
 PSVTooltip.prototype._computeTooltipPosition = function(style, config) {
   var topBottom = false;

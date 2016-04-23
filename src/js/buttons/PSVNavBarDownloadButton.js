@@ -1,6 +1,7 @@
 /**
  * Navigation bar download button class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * @param {PSVNavBar} navbar
+ * @constructor
  */
 function PSVNavBarDownloadButton(navbar) {
   PSVNavBarButton.call(this, navbar);
@@ -17,7 +18,6 @@ PSVNavBarDownloadButton.icon = 'download.svg';
 
 /**
  * Creates the button
- * @return (void)
  */
 PSVNavBarDownloadButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
@@ -27,6 +27,7 @@ PSVNavBarDownloadButton.prototype.create = function() {
 
 /**
  * Asks the browser to download the panorama source file
+ * @private
  */
 PSVNavBarDownloadButton.prototype._onClick = function() {
   var link = document.createElement('a');

@@ -1,6 +1,7 @@
 /**
  * Navigation bar autorotate button class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * @param {PSVNavBar} navbar
+ * @constructor
  */
 function PSVNavBarAutorotateButton(navbar) {
   PSVNavBarButton.call(this, navbar);
@@ -18,7 +19,6 @@ PSVNavBarAutorotateButton.iconActive = 'play-active.svg';
 
 /**
  * Creates the button
- * @return (void)
  */
 PSVNavBarAutorotateButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
@@ -39,7 +39,8 @@ PSVNavBarAutorotateButton.prototype.destroy = function() {
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVNavBarAutorotateButton.prototype.handleEvent = function(e) {
   switch (e.type) {
@@ -51,6 +52,7 @@ PSVNavBarAutorotateButton.prototype.handleEvent = function(e) {
 
 /**
  * Toggles autorotate on click
+ * @private
  */
 PSVNavBarAutorotateButton.prototype._onClick = function() {
   this.psv.toggleAutorotate();

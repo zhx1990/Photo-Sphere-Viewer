@@ -1,6 +1,7 @@
 /**
  * Loads the XMP data with AJAX
- * @return (D.promise)
+ * @returns {promise}
+ * @private
  */
 PhotoSphereViewer.prototype._loadXMP = function() {
   if (!this.config.usexmpdata) {
@@ -81,7 +82,8 @@ PhotoSphereViewer.prototype._loadXMP = function() {
 
 /**
  * Loads the sphere texture
- * @return (D.promise)
+ * @returns {promise}
+ * @private
  */
 PhotoSphereViewer.prototype._loadTexture = function() {
   var self = this;
@@ -170,8 +172,9 @@ PhotoSphereViewer.prototype._loadTexture = function() {
 /**
  * Applies the texture to the scene
  * Creates the scene if needed
- * @param texture (THREE.Texture) The sphere texture
- * @returns (D.promise)
+ * @param {THREE.Texture} texture - The sphere texture
+ * @returns {promise}
+ * @private
  */
 PhotoSphereViewer.prototype._setTexture = function(texture) {
   if (!this.scene) {
@@ -193,6 +196,7 @@ PhotoSphereViewer.prototype._setTexture = function(texture) {
 
 /**
  * Creates the 3D scene and GUI components
+ * @private
  */
 PhotoSphereViewer.prototype._createScene = function() {
   this.raycaster = new THREE.Raycaster();
@@ -260,9 +264,10 @@ PhotoSphereViewer.prototype._createScene = function() {
 
 /**
  * Perform transition between current and new texture
- * @param texture (THREE.Texture)
- * @param position ({latitude: double, longitude: double})
- * @returns (D.promise)
+ * @param {THREE.Texture} texture
+ * @param {{latitude: float, longitude: float}} [position]
+ * @returns {promise}
+ * @private
  */
 PhotoSphereViewer.prototype._transition = function(texture, position) {
   var self = this;
@@ -373,6 +378,7 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
 
 /**
  * Reverse autorotate direction with smooth transition
+ * @private
  */
 PhotoSphereViewer.prototype._reverseAutorotate = function() {
   var self = this;

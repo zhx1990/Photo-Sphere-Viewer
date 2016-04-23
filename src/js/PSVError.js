@@ -1,7 +1,8 @@
 /**
  * Custom error used in the lib
- * http://stackoverflow.com/a/27724419/1207670
- * @param message (Mixed)
+ * {@link http://stackoverflow.com/a/27724419/1207670}
+ * @param {*} message
+ * @constructor
  */
 function PSVError(message) {
   this.message = message;

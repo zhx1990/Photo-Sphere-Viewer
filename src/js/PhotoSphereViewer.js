@@ -1,6 +1,7 @@
 /**
  * Viewer class
- * @param options (Object) Viewer settings
+ * @param {Object} options - Viewer settings
+ * @constructor
  */
 function PhotoSphereViewer(options) {
   if (!(this instanceof PhotoSphereViewer)) {
@@ -188,6 +189,7 @@ function PhotoSphereViewer(options) {
 
   // load components
   if (this.config.navbar) {
+    this.container.classList.add('has-navbar');
     this.navbar = new PSVNavBar(this);
     this.navbar.hide();
   }

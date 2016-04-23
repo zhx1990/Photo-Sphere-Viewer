@@ -1,7 +1,8 @@
 /**
  * Navigation bar custom button class
- * @param navbar (PSVNavBar) A PSVNavBar object
- * @param config (Object)
+ * @param {PSVNavBar} navbar
+ * @param config {Object}
+ * @constructor
  */
 function PSVNavBarCustomButton(navbar, config) {
   PSVNavBarButton.call(this, navbar);
@@ -22,7 +23,6 @@ PSVNavBarCustomButton.className = 'psv-button';
 
 /**
  * Creates the button
- * @return (void)
  */
 PSVNavBarCustomButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
@@ -42,8 +42,15 @@ PSVNavBarCustomButton.prototype.create = function() {
   if (this.config.enabled === false || this.config.disabled === true) {
     this.disable();
   }
+
+  if (this.config.visible === false || this.config.hidden === true) {
+    this.hide();
+  }
 };
 
+/**
+ * Destroys the button
+ */
 PSVNavBarCustomButton.prototype.destroy = function() {
   delete this.config;
 
@@ -52,6 +59,7 @@ PSVNavBarCustomButton.prototype.destroy = function() {
 
 /**
  * Calls user method on click
+ * @private
  */
 PSVNavBarCustomButton.prototype._onClick = function() {
   if (this.config.onClick) {

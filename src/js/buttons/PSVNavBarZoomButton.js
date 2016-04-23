@@ -1,6 +1,7 @@
 /**
  * Navigation bar zoom button class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * @param {PSVNavBar} navbar
+ * @constructor
  */
 function PSVNavBarZoomButton(navbar) {
   PSVNavBarButton.call(this, navbar);
@@ -25,7 +26,6 @@ PSVNavBarZoomButton.className = 'psv-button zoom-button';
 
 /**
  * Creates the button
- * @return (void)
  */
 PSVNavBarZoomButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
@@ -91,7 +91,8 @@ PSVNavBarZoomButton.prototype.destroy = function() {
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVNavBarZoomButton.prototype.handleEvent = function(e) {
   switch (e.type) {
@@ -109,8 +110,8 @@ PSVNavBarZoomButton.prototype.handleEvent = function(e) {
 
 /**
  * Moves the zoom cursor
- * @param level (integer) Zoom level (between 0 and 100)
- * @return (void)
+ * @param {int} level
+ * @private
  */
 PSVNavBarZoomButton.prototype._moveZoomValue = function(level) {
   this.zoom_value.style.left = (level / 100 * this.zoom_range.offsetWidth - this.zoom_value.offsetWidth / 2) + 'px';
@@ -118,8 +119,8 @@ PSVNavBarZoomButton.prototype._moveZoomValue = function(level) {
 
 /**
  * The user wants to zoom
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent} evt
+ * @private
  */
 PSVNavBarZoomButton.prototype._initZoomChangeWithMouse = function(evt) {
   if (!this.enabled) {
@@ -132,8 +133,8 @@ PSVNavBarZoomButton.prototype._initZoomChangeWithMouse = function(evt) {
 
 /**
  * The user wants to zoom (mobile version)
- * @param evt (Event) The event
- * @return (void)
+ * @param {TouchEvent} evt
+ * @private
  */
 PSVNavBarZoomButton.prototype._initZoomChangeByTouch = function(evt) {
   if (!this.enabled) {
@@ -147,6 +148,7 @@ PSVNavBarZoomButton.prototype._initZoomChangeByTouch = function(evt) {
 /**
  * The user clicked the + button
  * Zoom in and register long press timer
+ * @private
  */
 PSVNavBarZoomButton.prototype._zoomIn = function() {
   if (!this.enabled) {
@@ -161,6 +163,7 @@ PSVNavBarZoomButton.prototype._zoomIn = function() {
 /**
  * The user clicked the - button
  * Zoom out and register long press timer
+ * @private
  */
 PSVNavBarZoomButton.prototype._zoomOut = function() {
   if (!this.enabled) {
@@ -175,6 +178,7 @@ PSVNavBarZoomButton.prototype._zoomOut = function() {
 /**
  * Continue zooming as long as the user press the button
  * @param value
+ * @private
  */
 PSVNavBarZoomButton.prototype._startLongPressInterval = function(value) {
   if (this.prop.buttondown) {
@@ -186,7 +190,7 @@ PSVNavBarZoomButton.prototype._startLongPressInterval = function(value) {
 
 /**
  * The user wants to stop zooming
- * @return (void)
+ * @private
  */
 PSVNavBarZoomButton.prototype._stopZoomChange = function() {
   if (!this.enabled) {
@@ -201,8 +205,8 @@ PSVNavBarZoomButton.prototype._stopZoomChange = function() {
 
 /**
  * The user moves the zoom cursor
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent} evt
+ * @private
  */
 PSVNavBarZoomButton.prototype._changeZoomWithMouse = function(evt) {
   if (!this.enabled) {
@@ -215,8 +219,8 @@ PSVNavBarZoomButton.prototype._changeZoomWithMouse = function(evt) {
 
 /**
  * The user moves the zoom cursor (mobile version)
- * @param evt (Event) The event
- * @return (void)
+ * @param {TouchEvent} evt
+ * @private
  */
 PSVNavBarZoomButton.prototype._changeZoomByTouch = function(evt) {
   if (!this.enabled) {
@@ -229,8 +233,8 @@ PSVNavBarZoomButton.prototype._changeZoomByTouch = function(evt) {
 
 /**
  * Zoom change
- * @param x (integer) Horizontal coordinate
- * @return (void)
+ * @param {int} x - mouse/touch position
+ * @private
  */
 PSVNavBarZoomButton.prototype._changeZoom = function(x) {
   if (this.prop.mousedown) {

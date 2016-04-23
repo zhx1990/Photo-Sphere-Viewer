@@ -1,6 +1,7 @@
 /**
  * Navigation bar class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param {PhotoSphereViewer} psv
+ * @constructor
  */
 function PSVNavBar(psv) {
   PSVComponent.call(this, psv);
@@ -44,7 +45,6 @@ PSVNavBar.publicMethods = ['showNavbar', 'hideNavbar', 'toggleNavbar', 'getNavba
 
 /**
  * Creates the navbar
- * @return (void)
  */
 PSVNavBar.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -118,8 +118,8 @@ PSVNavBar.prototype.destroy = function() {
 
 /**
  * Returns a button by it's identifier
- * @param id
- * @returns (Object|null)
+ * @param {string|number} id
+ * @returns {PSVNavBarButton}
  */
 PSVNavBar.prototype.getNavbarButton = function(id) {
   var button = null;

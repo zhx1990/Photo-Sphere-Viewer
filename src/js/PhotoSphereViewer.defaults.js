@@ -1,18 +1,18 @@
 /**
  * Number of pixels bellow which a mouse move will be considered as a click
- * @type (int)
+ * @type {int}
  */
 PhotoSphereViewer.MOVE_THRESHOLD = 4;
 
 /**
  * Time size of the mouse position history used to compute inertia
- * @type (int)
+ * @type {int}
  */
 PhotoSphereViewer.INERTIA_WINDOW = 300;
 
 /**
  * Map between keyboard events "keyCode|which" and "key"
- * @type (Object)
+ * @type {Object.<int, string>}
  */
 PhotoSphereViewer.KEYMAP = {
   33: 'PageUp',
@@ -27,13 +27,13 @@ PhotoSphereViewer.KEYMAP = {
 
 /**
  * SVG icons sources
- * @type (Object)
+ * @type {Object.<string, string>}
  */
 PhotoSphereViewer.ICONS = {};
 
 /**
  * System properties
- * @type (Object)
+ * @type {Object}
  */
 PhotoSphereViewer.SYSTEM = {
   loaded: false,
@@ -48,7 +48,7 @@ PhotoSphereViewer.SYSTEM = {
 
 /**
  * PhotoSphereViewer defaults
- * @type (Object)
+ * @type {Object}
  */
 PhotoSphereViewer.DEFAULTS = {
   panorama: null,
@@ -114,7 +114,7 @@ PhotoSphereViewer.DEFAULTS = {
 
 /**
  * doT.js templates
- * @type (Object)
+ * @type {Object.<string, string>}
  */
 PhotoSphereViewer.TEMPLATES = {
   markersList: '\
@@ -122,9 +122,9 @@ PhotoSphereViewer.TEMPLATES = {
   <h1>{{= it.config.lang.markers }}</h1> \
   <ul> \
   {{~ it.markers: marker }} \
-    <li data-psv-marker="{{= marker.id }}" class="{{= marker.className }}"> \
+    <li data-psv-marker="{{= marker.id }}" {{? marker.className }}class="{{= marker.className }}"{{?}}> \
       {{? marker.image }}<img class="marker-image" src="{{= marker.image }}"/>{{?}} \
-      <p class="marker-name">{{? marker.tooltip }}{{= marker.tooltip.content }}{{?? marker.html }}{{= marker.html }}{{??}}{{= marker.id }}{{?}}</p> \
+      <p class="marker-name {{? !marker.image }}no-image{{?}}">{{? marker.tooltip }}{{= marker.tooltip.content }}{{?? marker.html }}{{= marker.html }}{{??}}{{= marker.id }}{{?}}</p> \
     </li> \
   {{~}} \
   </ul> \

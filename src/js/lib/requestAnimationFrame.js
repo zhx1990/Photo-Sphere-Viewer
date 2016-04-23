@@ -1,6 +1,8 @@
-// Modified from http://mattsnider.com/cross-browser-and-legacy-supported-requestframeanimation/
-// LICENSE: MIT: http://mattsnider.com/projects/license/
-
+/**
+ * requestAnimationFrame polyfill
+ * {@link http://mattsnider.com/cross-browser-and-legacy-supported-requestframeanimation}
+ * @license MIT
+ */
 (function(w) {
     "use strict";
     // most browsers have an implementation

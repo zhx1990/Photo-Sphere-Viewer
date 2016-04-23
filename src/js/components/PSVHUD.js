@@ -1,6 +1,7 @@
 /**
  * HUD class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param {PhotoSphereViewer} psv
+ * @constructor
  */
 function PSVHUD(psv) {
   PSVComponent.call(this, psv);
@@ -17,14 +18,23 @@ PSVHUD.prototype = Object.create(PSVComponent.prototype);
 PSVHUD.prototype.constructor = PSVHUD;
 
 PSVHUD.className = 'psv-hud';
-PSVHUD.publicMethods = ['addMarker', 'removeMarker', 'updateMarker', 'clearMarkers', 'getMarker', 'getCurrentMarker',
-  'gotoMarker', 'hideMarker', 'showMarker', 'toggleMarker'];
+PSVHUD.publicMethods = [
+  'addMarker',
+  'removeMarker',
+  'updateMarker',
+  'clearMarkers',
+  'getMarker',
+  'getCurrentMarker',
+  'gotoMarker',
+  'hideMarker',
+  'showMarker',
+  'toggleMarker'
+];
 
 PSVHUD.svgNS = 'http://www.w3.org/2000/svg';
 
 /**
  * Creates the HUD
- * @return (void)
  */
 PSVHUD.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -63,7 +73,8 @@ PSVHUD.prototype.destroy = function() {
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVHUD.prototype.handleEvent = function(e) {
   switch (e.type) {
@@ -79,9 +90,9 @@ PSVHUD.prototype.handleEvent = function(e) {
 
 /**
  * Add a new marker to HUD
- * @param properties (Object)
- * @param render (Boolean) "false" to disable immediate render
- * @return (PSVMarker)
+ * @param {Object} properties
+ * @param {boolean} [render=true]
+ * @returns {PSVMarker}
  */
 PSVHUD.prototype.addMarker = function(properties, render) {
   if (!properties.id) {
@@ -110,8 +121,8 @@ PSVHUD.prototype.addMarker = function(properties, render) {
 
 /**
  * Get a marker by it's id or external object
- * @param marker (Mixed)
- * @return (PSVMarker)
+ * @param {*} marker
+ * @returns {PSVMarker}
  */
 PSVHUD.prototype.getMarker = function(marker) {
   var id = typeof marker === 'object' ? marker.id : marker;
@@ -125,7 +136,7 @@ PSVHUD.prototype.getMarker = function(marker) {
 
 /**
  * Get the current selected marker
- * @return (PSVMarker)
+ * @returns {PSVMarker}
  */
 PSVHUD.prototype.getCurrentMarker = function() {
   return this.currentMarker;
@@ -133,9 +144,9 @@ PSVHUD.prototype.getCurrentMarker = function() {
 
 /**
  * Update a marker
- * @param input (Object)
- * @param render (Boolean) "false" to disable immediate render
- * @return (PSVMarker)
+ * @param {*} marker
+ * @param {boolean} [render=true]
+ * @returns {PSVMarker}
  */
 PSVHUD.prototype.updateMarker = function(input, render) {
   var marker = this.getMarker(input);
@@ -151,9 +162,8 @@ PSVHUD.prototype.updateMarker = function(input, render) {
 
 /**
  * Remove a marker
- * @param marker (Mixed)
- * @param render (Boolean) "false" to disable immediate render
- * @return (void)
+ * @param {*} marker
+ * @param {boolean} [render=true]
  */
 PSVHUD.prototype.removeMarker = function(marker, render) {
   marker = this.getMarker(marker);
@@ -165,6 +175,10 @@ PSVHUD.prototype.removeMarker = function(marker, render) {
     this.$svg.removeChild(marker.$el);
   }
 
+  if (this.hoveringMarker == marker) {
+    this.psv.tooltip.hideTooltip();
+  }
+
   delete this.markers[marker.id];
 
   if (render !== false) {
@@ -174,7 +188,7 @@ PSVHUD.prototype.removeMarker = function(marker, render) {
 
 /**
  * Remove all markers
- * @param render (Boolean) "false" to disable immediate render
+ * @param {boolean} [render=true]
  */
 PSVHUD.prototype.clearMarkers = function(render) {
   Object.keys(this.markers).forEach(function(marker) {
@@ -188,9 +202,8 @@ PSVHUD.prototype.clearMarkers = function(render) {
 
 /**
  * Go to a specific marker
- * @param marker (Mixed)
- * @param duration (Mixed, optional)
- * @return (void)
+ * @param {*} marker
+ * @param {string|int} [duration]
  */
 PSVHUD.prototype.gotoMarker = function(marker, duration) {
   marker = this.getMarker(marker);
@@ -199,8 +212,7 @@ PSVHUD.prototype.gotoMarker = function(marker, duration) {
 
 /**
  * Hide a marker
- * @param marker (Mixed)
- * @return (void)
+ * @param {*} marker
  */
 PSVHUD.prototype.hideMarker = function(marker) {
   this.getMarker(marker).visible = false;
@@ -209,8 +221,7 @@ PSVHUD.prototype.hideMarker = function(marker) {
 
 /**
  * Show a marker
- * @param marker (Mixed)
- * @return (void)
+ * @param {*} marker
  */
 PSVHUD.prototype.showMarker = function(marker) {
   this.getMarker(marker).visible = true;
@@ -219,8 +230,7 @@ PSVHUD.prototype.showMarker = function(marker) {
 
 /**
  * Toggle a marker
- * @param marker (Mixed)
- * @return (void)
+ * @param {*} marker
  */
 PSVHUD.prototype.toggleMarker = function(marker) {
   this.getMarker(marker).visible ^= true;
@@ -229,7 +239,6 @@ PSVHUD.prototype.toggleMarker = function(marker) {
 
 /**
  * Update visibility and position of all markers
- * @return (void)
  */
 PSVHUD.prototype.updatePositions = function() {
   var rotation = !this.psv.isGyroscopeEnabled() ? 0 : this.psv.camera.rotation.z / Math.PI * 180;
@@ -282,9 +291,9 @@ PSVHUD.prototype.updatePositions = function() {
 /**
  * Determine if a point marker is visible
  * It tests if the point is in the general direction of the camera, then check if it's in the viewport
- * @param marker (PSVMarker)
- * @param position (Object)
- * @return (Boolean)
+ * @param {PSVMarker} marker
+ * @param {{top: int, left: int}} position
+ * @returns {boolean}
  * @private
  */
 PSVHUD.prototype._isMarkerVisible = function(marker, position) {
@@ -299,9 +308,9 @@ PSVHUD.prototype._isMarkerVisible = function(marker, position) {
 /**
  * Determine if a polygon marker is visible
  * It tests if at least one point is in the viewport
- * @param marker (PSVMarker)
- * @param positions (Object[])
- * @returns (boolean)
+ * @param {PSVMarker} marker
+ * @param {{top: int, left: int}[]} positions
+ * @returns {boolean}
  * @private
  */
 PSVHUD.prototype._isPolygonVisible = function(marker, positions) {
@@ -317,8 +326,8 @@ PSVHUD.prototype._isPolygonVisible = function(marker, positions) {
 
 /**
  * Compute HUD coordinates of a marker
- * @param marker (PSVMarker)
- * @returns (Object) top and left position
+ * @param {PSVMarker} marker
+ * @returns {{top: int, left: int}}
  * @private
  */
 PSVHUD.prototype._getMarkerPosition = function(marker) {
@@ -342,8 +351,8 @@ PSVHUD.prototype._getMarkerPosition = function(marker) {
 
 /**
  * Compute HUD coordinates of each point of a polygon
- * @param marker (PSVMarker)
- * @returns (Object[])
+ * @param {PSVMarker} marker
+ * @returns {{top: int, left: int}[]}
  * @private
  */
 PSVHUD.prototype._getPolygonPositions = function(marker) {
@@ -354,9 +363,10 @@ PSVHUD.prototype._getPolygonPositions = function(marker) {
 
 /**
  * Compute the boundaries positions of a polygon marker
- * @param marker (PSVMarker)
- * @param positions (Object[])
- * @returns (Object)
+ * Alters the marker width and height
+ * @param {PSVMarker} marker
+ * @param {{top: int, left: int}[]} positions
+ * @returns {{top: int, left: int}}
  * @private
  */
 PSVHUD.prototype._getPolygonDimensions = function(marker, positions) {
@@ -382,9 +392,9 @@ PSVHUD.prototype._getPolygonDimensions = function(marker, positions) {
 };
 
 /**
- * The mouse enters a marker : show the tooltip
- * @param e (Event)
- * @return (void)
+ * The mouse enters a point marker : show the tooltip
+ * @param {MouseEvent} e
+ * @private
  */
 PSVHUD.prototype._onMouseEnter = function(e) {
   var marker;
@@ -403,8 +413,8 @@ PSVHUD.prototype._onMouseEnter = function(e) {
 
 /**
  * The mouse leaves a marker : hide the tooltip
- * @param e (Event)
- * @return (void)
+ * @param {MouseEvent} e
+ * @private
  */
 PSVHUD.prototype._onMouseLeave = function(e) {
   var marker;
@@ -422,7 +432,7 @@ PSVHUD.prototype._onMouseLeave = function(e) {
 
 /**
  * The mouse hovers a polygon marker, the tooltip follow the cursor.
- * @param e
+ * @param {MouseEvent} e
  * @private
  */
 PSVHUD.prototype._onMouseMove = function(e) {
@@ -454,9 +464,9 @@ PSVHUD.prototype._onMouseMove = function(e) {
 
 /**
  * The mouse button is release : show/hide the panel if threshold was not reached, or do nothing
- * @param data (Object)
- * @param e (Event)
- * @return (void)
+ * @param {Object} data
+ * @param {Event} e
+ * @private
  */
 PSVHUD.prototype._onClick = function(data, e) {
   var marker;

@@ -1,6 +1,7 @@
 /**
  * Navigation bar button class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * @param {PSVNavBar} navbar
+ * @constructor
  */
 function PSVNavBarButton(navbar) {
   PSVComponent.call(this, navbar);
@@ -34,11 +35,10 @@ PSVNavBarButton.prototype.create = function() {
 
 /**
  * Changes the active state of the button
- * @param active (boolean) true if the button should be active, false otherwise
- * @return (void)
+ * @param {boolean} [active] - forced state
  */
 PSVNavBarButton.prototype.toggleActive = function(active) {
-  PSVUtils.toggleClass(this.container, 'active', active);
+  active = PSVUtils.toggleClass(this.container, 'active', active);
 
   if (this.constructor.iconActive) {
     this.container.innerHTML = PhotoSphereViewer.ICONS[active ? this.constructor.iconActive : this.constructor.icon];
@@ -65,6 +65,8 @@ PSVNavBarButton.prototype.enable = function() {
 
 /**
  * Action when the button is clicked
+ * @private
+ * @abstract
  */
 PSVNavBarButton.prototype._onClick = function() {
 

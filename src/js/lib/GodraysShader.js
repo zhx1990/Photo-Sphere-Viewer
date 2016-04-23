@@ -1,8 +1,7 @@
 /**
- * Godrays shader
- * from http://demo.bkcore.com/threejs/webgl_tron_godrays.html
+ * Godrays shader for THREE.js
+ * {@link http://demo.bkcore.com/threejs/webgl_tron_godrays.html}
  */
-
 THREE.GodraysShader = {
   uniforms: {
     tDiffuse: { type: 't', value: 0, texture: null },

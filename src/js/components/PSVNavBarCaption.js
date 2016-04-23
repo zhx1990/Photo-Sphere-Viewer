@@ -1,7 +1,8 @@
 /**
  * Navbar caption class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * @param {PSVNavBar} navbar
  * @param caption (String)
+ * @constructor
  */
 function PSVNavBarCaption(navbar, caption) {
   PSVComponent.call(this, navbar);
@@ -19,7 +20,7 @@ PSVNavBarCaption.publicMethods = ['setCaption'];
 
 /**
  * Sets the bar caption
- * @param (string) html
+ * @param {string} html
  */
 PSVNavBarCaption.prototype.setCaption = function(html) {
   if (!html) {

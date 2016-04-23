@@ -1,7 +1,8 @@
 /**
  * Navbar spacer class
- * @param navbar (PSVNavBar) A PSVNavBar object
- * @param weight (int)
+ * @param {PSVNavBar} navbar
+ * @param {int} weight
+ * @constructor
  */
 function PSVNavBarSpacer(navbar, weight) {
   PSVComponent.call(this, navbar);

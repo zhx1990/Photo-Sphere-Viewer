@@ -1,17 +1,27 @@
 /**
  * Static utilities for PSV
+ * @type {object}
  */
 var PSVUtils = {};
 
+/**
+ * Short-Hand for PI*2
+ * @type {float}
+ */
 PSVUtils.TwoPI = Math.PI * 2.0;
+
+/**
+ * Short-Hand for PI/2
+ * @type {float}
+ */
 PSVUtils.HalfPI = Math.PI / 2.0;
 
 /**
  * Check if some Three.js components are loaded
- * @param components (String...)
- * @returns (boolean)
+ * @param {...string} components
+ * @returns {boolean}
  */
-PSVUtils.checkTHREE = function(/* components */) {
+PSVUtils.checkTHREE = function(components) {
   for (var i = 0, l = arguments.length; i < l; i++) {
     if (!(arguments[i] in THREE)) {
       return false;
@@ -23,7 +33,7 @@ PSVUtils.checkTHREE = function(/* components */) {
 
 /**
  * Detects whether canvas is supported
- * @return (boolean) true if canvas is supported, false otherwise
+ * @returns {boolean}
  */
 PSVUtils.isCanvasSupported = function() {
   var canvas = document.createElement('canvas');
@@ -32,7 +42,7 @@ PSVUtils.isCanvasSupported = function() {
 
 /**
  * Tries to return a canvas webgl context
- * @return (ctx) if canvas is supported, undefined otherwise
+ * @returns {WebGLRenderingContext}
  */
 PSVUtils.getWebGLCtx = function() {
   var canvas = document.createElement('canvas');
@@ -60,7 +70,7 @@ PSVUtils.getWebGLCtx = function() {
 
 /**
  * Detects whether WebGL is supported
- * @return (boolean) true if WebGL is supported, false otherwise
+ * @returns {boolean}
  */
 PSVUtils.isWebGLSupported = function() {
   return !!window.WebGLRenderingContext && PSVUtils.getWebGLCtx() !== null;
@@ -68,35 +78,40 @@ PSVUtils.isWebGLSupported = function() {
 
 /**
  * Gets max texture width in WebGL context
- * @return (int)
+ * @returns {int}
  */
 PSVUtils.getMaxTextureWidth = function() {
   var ctx = PSVUtils.getWebGLCtx();
-  return ctx.getParameter(ctx.MAX_TEXTURE_SIZE);
+  if (ctx !== null) {
+    return ctx.getParameter(ctx.MAX_TEXTURE_SIZE);
+  }
 };
 
 /**
  * Toggles a CSS class
- * @param element (HTMLElement)
- * @param className (String)
- * @param active (boolean,optional) forced state
+ * @param {HTMLElement} element
+ * @param {string} className
+ * @param {boolean} [active] - forced state
+ * @return {boolean} new state
  */
 PSVUtils.toggleClass = function(element, className, active) {
   if (active === undefined) {
-    element.classList.toggle(className);
+    return element.classList.toggle(className);
   }
   else if (active && !element.classList.contains(className)) {
     element.classList.add(className);
+    return true;
   }
   else if (!active) {
     element.classList.remove(className);
+    return false;
   }
 };
 
 /**
  * Adds one or several CSS classes to an element
- * @param element (HTMLElement)
- * @param className (String)
+ * @param {HTMLElement} element
+ * @param {string} className
  */
 PSVUtils.addClasses = function(element, className) {
   if (!className) {
@@ -109,8 +124,8 @@ PSVUtils.addClasses = function(element, className) {
 
 /**
  * Removes one or several CSS classes to an element
- * @param element (HTMLElement)
- * @param className (String)
+ * @param {HTMLElement} element
+ * @param {string} className
  */
 PSVUtils.removeClasses = function(element, className) {
   if (!className) {
@@ -123,9 +138,9 @@ PSVUtils.removeClasses = function(element, className) {
 
 /**
  * Search if an element has a particular, at any level including itself
- * @param el (HTMLElement)
- * @param parent (HTMLElement)
- * @return (Boolean)
+ * @param {HTMLElement} el
+ * @param {HTMLElement} parent
+ * @returns {boolean}
  */
 PSVUtils.hasParent = function(el, parent) {
   do {
@@ -139,9 +154,9 @@ PSVUtils.hasParent = function(el, parent) {
 
 /**
  * Get closest parent (can by itself)
- * @param el (HTMLElement)
- * @param selector (String)
- * @return (HTMLElement)
+ * @param {HTMLElement} el (HTMLElement)
+ * @param {string} selector
+ * @returns {HTMLElement}
  */
 PSVUtils.getClosest = function(el, selector) {
   var matches = el.matches || el.msMatchesSelector;
@@ -157,7 +172,7 @@ PSVUtils.getClosest = function(el, selector) {
 
 /**
  * Get the event name for mouse wheel
- * @return (string)
+ * @returns {string}
  */
 PSVUtils.mouseWheelEvent = function() {
   return 'onwheel' in document.createElement('div') ? 'wheel' : // Modern browsers support "wheel"
@@ -167,7 +182,7 @@ PSVUtils.mouseWheelEvent = function() {
 
 /**
  * Get the event name for fullscreen event
- * @return (string)
+ * @returns {string}
  */
 PSVUtils.fullscreenEvent = function() {
   var map = {
@@ -186,10 +201,10 @@ PSVUtils.fullscreenEvent = function() {
 
 /**
  * Ensures that a number is in a given interval
- * @param x (number) The number to check
- * @param min (number) First endpoint
- * @param max (number) Second endpoint
- * @return (number) The checked number
+ * @param {number} x
+ * @param {number} min
+ * @param {number} max
+ * @returns {number}
  */
 PSVUtils.stayBetween = function(x, min, max) {
   return Math.max(min, Math.min(max, x));
@@ -197,9 +212,9 @@ PSVUtils.stayBetween = function(x, min, max) {
 
 /**
  * Returns the value of a given attribute in the panorama metadata
- * @param data (string) The panorama metadata
- * @param attr (string) The wanted attribute
- * @return (string) The value of the attribute
+ * @param {string} data
+ * @param {string} attr
+ * @returns (string)
  */
 PSVUtils.getXMPValue = function(data, attr) {
   var result;
@@ -218,8 +233,8 @@ PSVUtils.getXMPValue = function(data, attr) {
 
 /**
  * Detects whether fullscreen is enabled or not
- * @param elt (HTMLElement)
- * @return (boolean) true if fullscreen is enabled, false otherwise
+ * @param {HTMLElement} elt
+ * @returns {boolean}
  */
 PSVUtils.isFullscreenEnabled = function(elt) {
   return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) === elt;
@@ -227,7 +242,7 @@ PSVUtils.isFullscreenEnabled = function(elt) {
 
 /**
  * Enters fullscreen mode
- * @param elt (HTMLElement)
+ * @param {HTMLElement} elt
  */
 PSVUtils.requestFullscreen = function(elt) {
   (elt.requestFullscreen || elt.mozRequestFullScreen || elt.webkitRequestFullscreen || elt.msRequestFullscreen).call(elt);
@@ -235,17 +250,16 @@ PSVUtils.requestFullscreen = function(elt) {
 
 /**
  * Exits fullscreen mode
- * @param elt (HTMLElement)
  */
-PSVUtils.exitFullscreen = function(elt) {
+PSVUtils.exitFullscreen = function() {
   (document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen).call(document);
 };
 
 /**
  * Gets an element style
- * @param elt (HTMLElement)
- * @param prop (string)
- * @return mixed
+ * @param {HTMLElement} elt
+ * @param {string} prop
+ * @returns {*}
  */
 PSVUtils.getStyle = function(elt, prop) {
   return window.getComputedStyle(elt, null)[prop];
@@ -254,9 +268,9 @@ PSVUtils.getStyle = function(elt, prop) {
 /**
  * Translate CSS values like "top center" or "10% 50%" as top and left positions
  * The implementation is as close as possible to the "background-position" specification
- * @link https://developer.mozilla.org/en-US/docs/Web/CSS/background-position
- * @param value (String)
- * @return Object ({top: double: left: double})
+ * {@link https://developer.mozilla.org/en-US/docs/Web/CSS/background-position}
+ * @param {string} value
+ * @returns {{top: float, left: float}}
  */
 PSVUtils.parsePosition = function(value) {
   if (!value) {
@@ -304,9 +318,9 @@ PSVUtils.parsePosition = function(value) {
 PSVUtils.parsePosition.positions = { 'top': '0%', 'bottom': '100%', 'left': '0%', 'right': '100%', 'center': '50%' };
 
 /**
- * Parse the animation speed
- * @param speed (string) The speed, in radians/degrees/revolutions per second/minute
- * @return (double) radians per second
+ * Parse an speed
+ * @param {string} speed - The speed, in radians/degrees/revolutions per second/minute
+ * @returns {float} radians per second
  */
 PSVUtils.parseSpeed = function(speed) {
   if (typeof speed == 'string') {
@@ -356,8 +370,8 @@ PSVUtils.parseSpeed = function(speed) {
 
 /**
  * Parses an angle value in radians or degrees and return a normalized value in radians
- * @param angle (String|int|double) - 3.14, 3.14rad, 180deg
- * @param reference (boolean) base value for normalization, false to disable - default: 0
+ * @param {string|number} angle - eg: 3.14, 3.14rad, 180deg
+ * @param {float|boolean} [reference =0] - base value for normalization, false to disable
  * @returns (double)
  */
 PSVUtils.parseAngle = function(angle, reference) {
@@ -405,16 +419,18 @@ PSVUtils.parseAngle = function(angle, reference) {
 };
 
 /**
- * Utility for animations
- * @param options (Object)
- *    - properties ({name: {end: number, start: number}})
- *    - duration (int)
- *    - delay (int, optional)
- *    - easing (string|function, optional)
- *    - onTick (function(properties))
- *    - onCancel (function)
- *    - onDone (function)
- * @returns (D.promise) with an additional "cancel" method
+ * Utility for animations, interpolates each property with an easing and optional delay
+ * @param {Object} options
+ * @param {Object[]} options.properties
+ * @param {number} options.properties[].start
+ * @param {number} options.properties[].end
+ * @param {int} options.duration
+ * @param {int} [options.delay]
+ * @param {string} [options.easing='linear']
+ * @param {Function} options.onTick - called with interpolated properties and progression (0 to 1)
+ * @param {Function} [options.onDone]
+ * @param {Function} [options.onCancel]
+ * @returns {promise} with an additional "cancel" method
  */
 PSVUtils.animation = function(options) {
   var defer = D();
@@ -488,7 +504,8 @@ PSVUtils.animation = function(options) {
 
 /**
  * Collection of easing functions
- * @link https://gist.github.com/frederickk/6165768
+ * {@link https://gist.github.com/frederickk/6165768}
+ * @type {Object.<string, Function>}
  */
 // @formatter:off
 // jscs:disable
@@ -524,16 +541,16 @@ PSVUtils.animation.easings = {
   outCirc: function(t) { t--; return Math.sqrt(1-t*t); },
   inOutCirc: function(t) { t*=2; return t<1 ? .5-.5*Math.sqrt(1-t*t) : .5+.5*Math.sqrt(1-(t-=2)*t); }
 };
-// jscs:enable
 /* jshint ignore:end */
+// jscs:enable
 // @formatter:off
 
 /**
  * Returns a function, that, when invoked, will only be triggered at most once during a given window of time.
- * @copyright underscore.js - modified by Clément Prévost http://stackoverflow.com/a/27078401
- * @param func (Function)
- * @param wait (int)
- * @returns (Function)
+ * @copyright underscore.js - modified by Clément Prévost {@link http://stackoverflow.com/a/27078401}
+ * @param {Function} func
+ * @param {int} wait
+ * @returns {Function}
  */
 PSVUtils.throttle = function(func, wait) {
   var self, args, result;
@@ -572,9 +589,9 @@ PSVUtils.throttle = function(func, wait) {
  *  by the built-in Object constructor and inherits directly from Object.prototype
  *  or null. Some built-in objects pass the test, e.g. Math which is a plain object
  *  and some host or exotic objects may pass also.
- *  @link http://stackoverflow.com/a/5878101/1207670
- *  @param {} obj - value to test
- *  @returns {Boolean} true if passes tests, false otherwise
+ *  {@link http://stackoverflow.com/a/5878101/1207670}
+ *  @param {*} obj
+ *  @returns {boolean}
  */
 PSVUtils.isPlainObject = function(obj) {
   // Basic check for Type object that's not null
@@ -598,11 +615,10 @@ PSVUtils.isPlainObject = function(obj) {
  * Merge the enumerable attributes of two objects.
  * Modified to replace arrays instead of merge.
  * Modified to alter the target object.
- * @copyright Nicholas Fisher <nfisher110@gmail.com>"
- * @license MIT
- * @param target (Object)
- * @param src (Object)
- * @return target (Object)
+ * @copyright Nicholas Fisher {@link mailto:nfisher110@gmail.com} - modified by Damien "Mistic" Sorel
+ * @param {Object} target
+ * @param {Object} src
+ * @returns {Object} target
  */
 PSVUtils.deepmerge = function(target, src) {
   var first = src;
@@ -647,8 +663,8 @@ PSVUtils.deepmerge = function(target, src) {
 
 /**
  * Clone an object
- * @param src (Object)
- * @return (Object)
+ * @param {Object} src
+ * @returns {Object}
  */
 PSVUtils.clone = function(src) {
   return PSVUtils.deepmerge(null, src);

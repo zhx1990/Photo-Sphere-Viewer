@@ -11,7 +11,7 @@ PhotoSphereViewer.prototype.load = function() {
 
 /**
  * Returns teh current position on the camera
- * @returns ({longitude: double, latitude: double})
+ * @returns {{longitude: float, latitude: float}}
  */
 PhotoSphereViewer.prototype.getPosition = function() {
   return {
@@ -22,7 +22,7 @@ PhotoSphereViewer.prototype.getPosition = function() {
 
 /**
  * Returns the current zoom level
- * @returns (double)
+ * @returns {float}
  */
 PhotoSphereViewer.prototype.getZoomLevel = function() {
   return this.prop.zoom_lvl;
@@ -30,7 +30,7 @@ PhotoSphereViewer.prototype.getZoomLevel = function() {
 
 /**
  * Returns the current viewer size
- * @returns ({width: int, height: int})
+ * @returns {{width: int, height: int}}
  */
 PhotoSphereViewer.prototype.getSize = function() {
   return {
@@ -41,7 +41,7 @@ PhotoSphereViewer.prototype.getSize = function() {
 
 /**
  * Check if the automatic rotation is enabled
- * @returns (boolean)
+ * @returns {boolean}
  */
 PhotoSphereViewer.prototype.isAutorotateEnabled = function() {
   return !!this.prop.autorotate_reqid;
@@ -49,7 +49,7 @@ PhotoSphereViewer.prototype.isAutorotateEnabled = function() {
 
 /**
  * Check if the gyroscope is enabled
- * @returns (boolean)
+ * @returns {boolean}
  */
 PhotoSphereViewer.prototype.isGyroscopeEnabled = function() {
   return !!this.prop.orientation_reqid;
@@ -57,7 +57,7 @@ PhotoSphereViewer.prototype.isGyroscopeEnabled = function() {
 
 /**
  * Check if the viewer is in fullscreen
- * @returns (boolean)
+ * @returns {boolean}
  */
 PhotoSphereViewer.prototype.isFullscreenEnabled = function() {
   return PSVUtils.isFullscreenEnabled(this.container);
@@ -65,7 +65,7 @@ PhotoSphereViewer.prototype.isFullscreenEnabled = function() {
 
 /**
  * Performs a render
- * @param updateDirection (boolean) should update camera direction - default: true
+ * @param {boolean} [updateDirection=true] - should update camera direction
  */
 PhotoSphereViewer.prototype.render = function(updateDirection) {
   if (updateDirection !== false) {
@@ -89,7 +89,7 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
 };
 
 /**
- * Destroy the viewer
+ * Destroys the viewer
  */
 PhotoSphereViewer.prototype.destroy = function() {
   this.stopAll();
@@ -171,10 +171,10 @@ PhotoSphereViewer.prototype.destroy = function() {
  * Load a panorama file
  * If the "position" is not defined the camera will not move and the ongoing animation will continue
  * "config.transition" must be configured for "transition" to be taken in account
- * @param path (String)
- * @param position (Object, optional) latitude & longitude or x & y
- * @param transition (boolean, optional)
- * @return (D.promise)
+ * @param {string} path - URL of the new panorama file
+ * @param {Object} [position] - latitude & longitude or x & y
+ * @param {boolean} [transition=false]
+ * @returns {promise}
  */
 PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
   if (typeof position == 'boolean') {
@@ -183,7 +183,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
   }
 
   if (position) {
-    this._cleanPosition(position);
+    this.cleanPosition(position);
 
     this.stopAll();
   }
@@ -352,12 +352,12 @@ PhotoSphereViewer.prototype.toggleGyroscopeControl = function() {
 
 /**
  * Rotate the camera
- * @param position (Object) latitude & longitude or x & y
- * @param render (boolean) default true
+ * @param {object} position - latitude & longitude or x & y
+ * @param {boolean} [render=true]
  */
 PhotoSphereViewer.prototype.rotate = function(position, render) {
-  this._cleanPosition(position);
-  this._applyRanges(position);
+  this.cleanPosition(position);
+  this.applyRanges(position);
 
   this.prop.longitude = position.longitude;
   this.prop.latitude = position.latitude;
@@ -371,8 +371,8 @@ PhotoSphereViewer.prototype.rotate = function(position, render) {
 
 /**
  * Rotate the camera with animation
- * @param position (Object) latitude & longitude or x & y
- * @param duration (String|integer) Animation speed (per spec) or duration (milliseconds)
+ * @param {object} position - latitude & longitude or x & y
+ * @param {string|int} duration - animation speed (per spec) or duration (milliseconds)
  */
 PhotoSphereViewer.prototype.animate = function(position, duration) {
   this.stopAll();
@@ -382,8 +382,8 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
     return;
   }
 
-  this._cleanPosition(position);
-  this._applyRanges(position);
+  this.cleanPosition(position);
+  this.applyRanges(position);
 
   if (!duration && typeof duration != 'number') {
     // desired radial speed
@@ -398,7 +398,7 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
   }
 
   // longitude offset for shortest arc
-  var tOffset = this._getShortestArc(this.prop.longitude, position.longitude);
+  var tOffset = this.getShortestArc(this.prop.longitude, position.longitude);
 
   this.prop.animation_promise = PSVUtils.animation({
     properties: {
@@ -423,8 +423,8 @@ PhotoSphereViewer.prototype.stopAnimation = function() {
 
 /**
  * Zoom
- * @param level (integer) New zoom level
- * @param render (boolean) default true
+ * @param {int} level
+ * @param {boolean} [render=true]
  */
 PhotoSphereViewer.prototype.zoom = function(level, render) {
   this.prop.zoom_lvl = PSVUtils.stayBetween(Math.round(level), 0, 100);

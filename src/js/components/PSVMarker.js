@@ -1,7 +1,8 @@
 /**
  * Object representing a marker
- * @param {object} properties
+ * @param {Object} properties
  * @param {PhotoSphereViewer} psv
+ * @constructor
  */
 function PSVMarker(properties, psv) {
   if (!properties.id) {
@@ -87,9 +88,9 @@ function PSVMarker(properties, psv) {
 
 /**
  * Determines the type of a marker by the available properties
- * @param properties
- * @param allowNone
- * @returns {String}
+ * @param {object} properties
+ * @param {boolean} allowNone
+ * @returns {string}
  */
 PSVMarker.getType = function(properties, allowNone) {
   var definitions = ['image', 'html', 'polygon_px', 'polygon_rad', 'rect', 'circle', 'ellipse', 'path'];
@@ -212,7 +213,7 @@ PSVMarker.prototype._updateNormal = function() {
   }
 
   // convert texture coordinates to spherical coordinates
-  this.psv._cleanPosition(this);
+  this.psv.cleanPosition(this);
 
   // compute x/y/z position
   this.position3D = this.psv.sphericalCoordsToVector3(this.longitude, this.latitude);
@@ -316,7 +317,7 @@ PSVMarker.prototype._updateSvg = function() {
   }
 
   // convert texture coordinates to spherical coordinates
-  this.psv._cleanPosition(this);
+  this.psv.cleanPosition(this);
 
   // compute x/y/z position
   this.position3D = this.psv.sphericalCoordsToVector3(this.longitude, this.latitude);

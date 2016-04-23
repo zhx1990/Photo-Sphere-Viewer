@@ -1,6 +1,7 @@
 /**
  * Navigation bar markers button class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * @param {PSVNavBar} navbar
+ * @constructor
  */
 function PSVNavBarMarkersButton(navbar) {
   PSVNavBarButton.call(this, navbar);
@@ -19,10 +20,10 @@ PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;
 PSVNavBarMarkersButton.id = 'markers';
 PSVNavBarMarkersButton.className = 'psv-button hover-scale markers-button';
 PSVNavBarMarkersButton.icon = 'pin.svg';
+PSVNavBarMarkersButton.publicMethods = ['toggleMarkersList', 'showMarkersList', 'hideMarkersList'];
 
 /**
  * Creates the button
- * @return (void)
  */
 PSVNavBarMarkersButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
@@ -47,7 +48,8 @@ PSVNavBarMarkersButton.prototype.destroy = function() {
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVNavBarMarkersButton.prototype.handleEvent = function(e) {
   switch (e.type) {
@@ -60,29 +62,28 @@ PSVNavBarMarkersButton.prototype.handleEvent = function(e) {
 
 /**
  * Toggles markers list on click
+ * @private
  */
 PSVNavBarMarkersButton.prototype._onClick = function() {
-  this.toggleMarkers();
+  this.toggleMarkersList();
 };
 
 /**
  * Toggle the visibility of markers list
- * @return (void)
  */
-PSVNavBarMarkersButton.prototype.toggleMarkers = function() {
+PSVNavBarMarkersButton.prototype.toggleMarkersList = function() {
   if (this.prop.panelOpened) {
-    this.hideMarkers();
+    this.hideMarkersList();
   }
   else {
-    this.showMarkers();
+    this.showMarkersList();
   }
 };
 
 /**
  * Open side panel with list of markers
- * @return (void)
  */
-PSVNavBarMarkersButton.prototype.showMarkers = function() {
+PSVNavBarMarkersButton.prototype.showMarkersList = function() {
   var markers = [];
   for (var id in this.psv.hud.markers) {
     markers.push(this.psv.hud.markers[id]);
@@ -101,16 +102,17 @@ PSVNavBarMarkersButton.prototype.showMarkers = function() {
 
 /**
  * Close side panel
- * @return (void)
  */
-PSVNavBarMarkersButton.prototype.hideMarkers = function() {
-  this.psv.panel.hidePanel();
+PSVNavBarMarkersButton.prototype.hideMarkersList = function() {
+  if (this.prop.panelOpened) {
+    this.psv.panel.hidePanel();
+  }
 };
 
 /**
  * Click on an item
- * @param e (Event)
- * @return (void)
+ * @param {MouseEvent} e
+ * @private
  */
 PSVNavBarMarkersButton.prototype._onClickItem = function(e) {
   var li;
@@ -122,7 +124,7 @@ PSVNavBarMarkersButton.prototype._onClickItem = function(e) {
 
 /**
  * Update status when the panel is updated
- * @return (void)
+ * @private
  */
 PSVNavBarMarkersButton.prototype._onPanelOpened = function() {
   if (this.prop.panelOpening) {
@@ -138,7 +140,7 @@ PSVNavBarMarkersButton.prototype._onPanelOpened = function() {
 
 /**
  * Update status when the panel is updated
- * @return (void)
+ * @private
  */
 PSVNavBarMarkersButton.prototype._onPanelClosed = function() {
   this.prop.panelOpened = false;

@@ -1,6 +1,7 @@
 /**
  * Panel class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param {PhotoSphereViewer} psv
+ * @constructor
  */
 function PSVPanel(psv) {
   PSVComponent.call(this, psv);
@@ -25,7 +26,6 @@ PSVPanel.publicMethods = ['showPanel', 'hidePanel'];
 
 /**
  * Creates the panel
- * @return (void)
  */
 PSVPanel.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -74,7 +74,8 @@ PSVPanel.prototype.destroy = function() {
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVPanel.prototype.handleEvent = function(e) {
   switch (e.type) {
@@ -90,10 +91,9 @@ PSVPanel.prototype.handleEvent = function(e) {
 };
 
 /**
- * Show the panel
- * @param content (String)
- * @param noMargin (Boolean)
- * @return (void)
+ * Shows the panel
+ * @param {string} content
+ * @param {boolean} noMargin
  */
 PSVPanel.prototype.showPanel = function(content, noMargin) {
   this.content.innerHTML = content;
@@ -115,10 +115,10 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
 
 
 /**
- * Hide the panel
- * @return (void)
+ * Hides the panel
  */
 PSVPanel.prototype.hidePanel = function() {
+  this.content.innerHTML = null;
   this.prop.opened = false;
   this.container.classList.remove('open');
   this.psv.trigger('close-panel');
@@ -126,8 +126,8 @@ PSVPanel.prototype.hidePanel = function() {
 
 /**
  * The user wants to move
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent} evt
+ * @private
  */
 PSVPanel.prototype._onMouseDown = function(evt) {
   evt.stopPropagation();
@@ -136,8 +136,8 @@ PSVPanel.prototype._onMouseDown = function(evt) {
 
 /**
  * The user wants to move (mobile version)
- * @param evt (Event) The event
- * @return (void)
+ * @param {TouchEvent} evt
+ * @private
  */
 PSVPanel.prototype._onTouchStart = function(evt) {
   evt.stopPropagation();
@@ -146,8 +146,8 @@ PSVPanel.prototype._onTouchStart = function(evt) {
 
 /**
  * Initializes the movement
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PSVPanel.prototype._startResize = function(evt) {
   this.prop.mouse_x = parseInt(evt.clientX);
@@ -158,8 +158,8 @@ PSVPanel.prototype._startResize = function(evt) {
 
 /**
  * The user wants to stop moving
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent} evt
+ * @private
  */
 PSVPanel.prototype._onMouseUp = function(evt) {
   if (this.prop.mousedown) {
@@ -171,8 +171,8 @@ PSVPanel.prototype._onMouseUp = function(evt) {
 
 /**
  * The user resizes the panel
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent} evt
+ * @private
  */
 PSVPanel.prototype._onMouseMove = function(evt) {
   if (this.prop.mousedown) {
@@ -183,8 +183,8 @@ PSVPanel.prototype._onMouseMove = function(evt) {
 
 /**
  * The user resizes the panel (mobile version)
- * @param evt (Event) The event
- * @return (void)
+ * @param {TouchEvent} evt
+ * @private
  */
 PSVPanel.prototype._onTouchMove = function(evt) {
   if (this.prop.mousedown) {
@@ -195,8 +195,8 @@ PSVPanel.prototype._onTouchMove = function(evt) {
 
 /**
  * Panel resizing
- * @param evt (Event) The event
- * @return (void)
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PSVPanel.prototype._resize = function(evt) {
   var x = parseInt(evt.clientX);

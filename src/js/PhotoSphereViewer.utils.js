@@ -18,7 +18,7 @@ PhotoSphereViewer.loadSystem = function() {
 /**
  * Resolve or reject SYSTEM.deviceOrientationSupported
  * We can only be sure device orientation is supported once received an event with coherent data
- * @param event
+ * @param {DeviceOrientationEvent} event
  */
 PhotoSphereViewer.deviceOrientationListener = function(event) {
   if (event.alpha !== null) {
@@ -33,7 +33,8 @@ PhotoSphereViewer.deviceOrientationListener = function(event) {
 
 /**
  * Sets the viewer size
- * @param size (Object) An object containing the wanted width and height
+ * @param {object} size
+ * @private
  */
 PhotoSphereViewer.prototype._setViewerSize = function(size) {
   ['width', 'height'].forEach(function(dim) {
@@ -46,9 +47,9 @@ PhotoSphereViewer.prototype._setViewerSize = function(size) {
 
 /**
  * Converts pixel texture coordinates to spherical radians coordinates
- * @param x (int)
- * @param y (int)
- * @returns ({longitude: double, latitude: double})
+ * @param {int} x
+ * @param {int} y
+ * @returns {{longitude: float, latitude: float}}
  */
 PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(x, y) {
   var relativeX = (x + this.prop.pano_data.cropped_x) / this.prop.pano_data.full_width * PSVUtils.TwoPI;
@@ -62,9 +63,9 @@ PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(x, y) {
 
 /**
  * Converts spherical radians coordinates to pixel texture coordinates
- * @param longitude (double)
- * @param latitude (double)
- * @returns ({x: int, y: int})
+ * @param {float} longitude
+ * @param {float} latitude
+ * @returns {{x: int, y: int}}
  */
 PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(longitude, latitude) {
   var relativeLong = longitude / PSVUtils.TwoPI * this.prop.pano_data.full_width;
@@ -78,9 +79,9 @@ PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(longitude,
 
 /**
  * Converts spherical radians coordinates to a THREE.Vector3
- * @param longitude (double)
- * @param latitude (double)
- * @returns (THREE.Vector3)
+ * @param {float} longitude
+ * @param {float} latitude
+ * @returns {THREE.Vector3}
  */
 PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(longitude, latitude) {
   return new THREE.Vector3(
@@ -92,8 +93,8 @@ PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(longitude, latit
 
 /**
  * Converts a THREE.Vector3 to spherical radians coordinates
- * @param vector (THREE.Vector3)
- * @returns ({longitude: double, latitude: double})
+ * @param {THREE.Vector3} vector
+ * @returns {{longitude: float, latitude: float}}
  */
 PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
   var phi = Math.acos(vector.y / Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z));
@@ -107,9 +108,9 @@ PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
 
 /**
  * Converts position on the viewer to a THREE.Vector3
- * @param viewer_x (int)
- * @param viewer_y (int)
- * @returns (THREE.Vector3)
+ * @param {int} viewer_x
+ * @param {int} viewer_y
+ * @returns {THREE.Vector3}
  */
 PhotoSphereViewer.prototype.viewerCoordsToVector3 = function(viewer_x, viewer_y) {
   var screen = new THREE.Vector2(
@@ -131,8 +132,8 @@ PhotoSphereViewer.prototype.viewerCoordsToVector3 = function(viewer_x, viewer_y)
 
 /**
  * Converts a THREE.Vector3 to position on the viewer
- * @param vector
- * @returns ({top: int, left: int})
+ * @param {THREE.Vector3} vector
+ * @returns {{top: int, left: int}}
  */
 PhotoSphereViewer.prototype.vector3ToViewerCoords = function(vector) {
   vector = vector.clone();
@@ -146,9 +147,9 @@ PhotoSphereViewer.prototype.vector3ToViewerCoords = function(vector) {
 
 /**
  * Converts x/y to latitude/longitude if present and ensure boundaries
- * @param position (Object)
+ * @param {object} position - latitude & longitude or x & y
  */
-PhotoSphereViewer.prototype._cleanPosition = function(position) {
+PhotoSphereViewer.prototype.cleanPosition = function(position) {
   if (position.hasOwnProperty('x') && position.hasOwnProperty('y')) {
     var sphericalCoords = this.textureCoordsToSphericalCoords(position.x, position.y);
     position.longitude = sphericalCoords.longitude;
@@ -161,9 +162,9 @@ PhotoSphereViewer.prototype._cleanPosition = function(position) {
 
 /**
  * Apply "longitude_range" and "latitude_range"
- * @param position
+ * @param {{latitude: float, longitude: float}} position
  */
-PhotoSphereViewer.prototype._applyRanges = function(position) {
+PhotoSphereViewer.prototype.applyRanges = function(position) {
   var range, offset;
 
   if (this.config.longitude_range) {
@@ -217,11 +218,11 @@ PhotoSphereViewer.prototype._applyRanges = function(position) {
 
 /**
  * Compute the shortest offset between two longitudes
- * @param from (Double)
- * @param to (Double)
- * @returns (Double)
+ * @param {float} from
+ * @param {float} to
+ * @returns {float}
  */
-PhotoSphereViewer.prototype._getShortestArc = function(from, to) {
+PhotoSphereViewer.prototype.getShortestArc = function(from, to) {
   var tCandidates = [
     0, // direct
     PSVUtils.TwoPI, // clock-wise cross zero

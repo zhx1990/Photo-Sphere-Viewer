@@ -1,6 +1,7 @@
 /**
  * Loader class
- * @param psv (PhotoSphereViewer) A PhotoSphereViewer object
+ * @param {PhotoSphereViewer} psv
+ * @constructor
  */
 function PSVLoader(psv) {
   PSVComponent.call(this, psv);
@@ -66,7 +67,7 @@ PSVLoader.prototype.destroy = function() {
 
 /**
  * Sets the loader progression
- * @param value (int) from 0 to 100
+ * @param {int} value - from 0 to 100
  */
 PSVLoader.prototype.setProgress = function(value) {
   var context = this.canvas.getContext('2d');

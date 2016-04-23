@@ -1,6 +1,7 @@
 /**
  * Navigation bar gyroscope button class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * @param {PSVNavBar} navbar
+ * @constructor
  */
 function PSVNavBarGyroscopeButton(navbar) {
   PSVNavBarButton.call(this, navbar);
@@ -17,7 +18,7 @@ PSVNavBarGyroscopeButton.icon = 'compass.svg';
 
 /**
  * Creates the button
- * @return (void)
+ * The buttons get visible once the gyroscope API is ready
  */
 PSVNavBarGyroscopeButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
@@ -45,7 +46,8 @@ PSVNavBarGyroscopeButton.prototype.destroy = function() {
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVNavBarGyroscopeButton.prototype.handleEvent = function(e) {
   switch (e.type) {
@@ -57,6 +59,7 @@ PSVNavBarGyroscopeButton.prototype.handleEvent = function(e) {
 
 /**
  * Toggle gyroscope on click
+ * @private
  */
 PSVNavBarGyroscopeButton.prototype._onClick = function() {
   this.psv.toggleGyroscopeControl();
@@ -64,7 +67,8 @@ PSVNavBarGyroscopeButton.prototype._onClick = function() {
 
 /**
  * Update button display when API is ready
- * @param available
+ * @param {boolean} available
+ * @private
  */
 PSVNavBarGyroscopeButton.prototype._onAvailabilityChange = function(available) {
   if (available) {

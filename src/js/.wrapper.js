@@ -13,5 +13,8 @@
 
 @@js
 
+PhotoSphereViewer.Error = PSVError;
+PhotoSphereViewer.Utils = PSVUtils;
+
 return PhotoSphereViewer;
 }));

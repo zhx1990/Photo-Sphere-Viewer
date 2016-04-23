@@ -1,5 +1,6 @@
 /**
  * Add all needed event listeners
+ * @private
  */
 PhotoSphereViewer.prototype._bindEvents = function() {
   window.addEventListener('resize', this);
@@ -31,28 +32,29 @@ PhotoSphereViewer.prototype._bindEvents = function() {
 
 /**
  * Handle events
- * DO NOT RENAME THIS METHOD
- * @param e (Event)
+ * @param {Event} evt
+ * @private
  */
-PhotoSphereViewer.prototype.handleEvent = function(e) {
-  switch (e.type) {
+PhotoSphereViewer.prototype.handleEvent = function(evt) {
+  switch (evt.type) {
     // @formatter:off
     case 'resize': PSVUtils.throttle(this._onResize(), 50); break;
-    case 'keydown':     this._onKeyDown(e);     break;
-    case 'mousedown':   this._onMouseDown(e);   break;
-    case 'touchstart':  this._onTouchStart(e);  break;
-    case 'mouseup':     this._onMouseUp(e);     break;
-    case 'touchend':    this._onTouchEnd(e);    break;
-    case 'mousemove':   this._onMouseMove(e);   break;
-    case 'touchmove':   this._onTouchMove(e);   break;
+    case 'keydown':     this._onKeyDown(evt);     break;
+    case 'mousedown':   this._onMouseDown(evt);   break;
+    case 'touchstart':  this._onTouchStart(evt);  break;
+    case 'mouseup':     this._onMouseUp(evt);     break;
+    case 'touchend':    this._onTouchEnd(evt);    break;
+    case 'mousemove':   this._onMouseMove(evt);   break;
+    case 'touchmove':   this._onTouchMove(evt);   break;
     case PhotoSphereViewer.SYSTEM.fullscreenEvent:  this._fullscreenToggled();  break;
-    case PhotoSphereViewer.SYSTEM.mouseWheelEvent:  this._onMouseWheel(e);      break;
+    case PhotoSphereViewer.SYSTEM.mouseWheelEvent:  this._onMouseWheel(evt);      break;
     // @formatter:on
   }
 };
 
 /**
  * Resizes the canvas when the window is resized
+ * @private
  */
 PhotoSphereViewer.prototype._onResize = function() {
   if (this.container.clientWidth != this.prop.size.width || this.container.clientHeight != this.prop.size.height) {
@@ -75,7 +77,7 @@ PhotoSphereViewer.prototype._onResize = function() {
 
 /**
  * Rotate or zoom on key down
- * @param evt (KeyboardEvent)
+ * @param {KeyboardEvent} evt
  * @private
  */
 PhotoSphereViewer.prototype._onKeyDown = function(evt) {
@@ -109,7 +111,8 @@ PhotoSphereViewer.prototype._onKeyDown = function(evt) {
 
 /**
  * The user wants to move
- * @param evt (Event) The event
+ * @param {MouseEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onMouseDown = function(evt) {
   this._startMove(evt);
@@ -117,7 +120,8 @@ PhotoSphereViewer.prototype._onMouseDown = function(evt) {
 
 /**
  * The user wants to move (touch version)
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onTouchStart = function(evt) {
   if (evt.touches.length === 1) {
@@ -130,7 +134,8 @@ PhotoSphereViewer.prototype._onTouchStart = function(evt) {
 
 /**
  * Initializes the movement
- * @param evt (Event) The event
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._startMove = function(evt) {
   if (this.prop.orientation_reqid || this.prop.autorotate_reqid) {
@@ -150,7 +155,8 @@ PhotoSphereViewer.prototype._startMove = function(evt) {
 
 /**
  * Initializes the zoom
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._startZoom = function(evt) {
   var t = [
@@ -165,7 +171,8 @@ PhotoSphereViewer.prototype._startZoom = function(evt) {
 
 /**
  * The user wants to stop moving
- * @param evt (Event) The event
+ * @param {MouseEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onMouseUp = function(evt) {
   this._stopMove(evt);
@@ -173,7 +180,8 @@ PhotoSphereViewer.prototype._onMouseUp = function(evt) {
 
 /**
  * The user wants to stop moving (touch version)
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
   this._stopMove(evt.changedTouches[0]);
@@ -181,9 +189,10 @@ PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
 
 /**
  * Stops the movement
- * If the user was moving (one finger) : if the move threshold was not reached, a click event is triggered
+ * If the move threshold was not reached, a click event is triggered
  *    otherwise a animation is launched to simulate inertia
- * @param evt (Event) The event
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._stopMove = function(evt) {
   if (this.prop.moving) {
@@ -208,7 +217,8 @@ PhotoSphereViewer.prototype._stopMove = function(evt) {
 
 /**
  * Performs an animation to simulate inertia when stop moving
- * @param evt
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
   var self = this;
@@ -241,7 +251,8 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
 
 /**
  * Trigger an event with all coordinates when a simple click is performed
- * @param evt (Event) The event
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._click = function(evt) {
   var data = {
@@ -271,7 +282,8 @@ PhotoSphereViewer.prototype._click = function(evt) {
 
 /**
  * The user moves the image
- * @param evt (Event) The event
+ * @param {MouseEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onMouseMove = function(evt) {
   if (evt.buttons !== 0) {
@@ -282,7 +294,8 @@ PhotoSphereViewer.prototype._onMouseMove = function(evt) {
 
 /**
  * The user moves the image (touch version)
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onTouchMove = function(evt) {
   if (evt.touches.length === 1) {
@@ -297,7 +310,8 @@ PhotoSphereViewer.prototype._onTouchMove = function(evt) {
 
 /**
  * Performs movement
- * @param evt (Event) The event
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._move = function(evt) {
   if (this.prop.moving) {
@@ -318,7 +332,8 @@ PhotoSphereViewer.prototype._move = function(evt) {
 
 /**
  * Zoom
- * @param evt (Event) The event
+ * @param {TouchEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._zoom = function(evt) {
   if (this.prop.zooming) {
@@ -338,7 +353,8 @@ PhotoSphereViewer.prototype._zoom = function(evt) {
 
 /**
  * The user wants to zoom (wheel version)
- * @param evt (Event) The event
+ * @param {MouseWheelEvent} evt
+ * @private
  */
 PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
   evt.preventDefault();
@@ -354,6 +370,7 @@ PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
 
 /**
  * Fullscreen state has changed
+ * @private
  */
 PhotoSphereViewer.prototype._fullscreenToggled = function() {
   var enabled = this.isFullscreenEnabled();
@@ -374,7 +391,8 @@ PhotoSphereViewer.prototype._fullscreenToggled = function() {
  * Store each mouse position during a mouse move
  * Positions older than "INERTIA_WINDOW" are removed
  * Positions before a pause of "INERTIA_WINDOW" / 10 are removed
- * @param evt (Event)
+ * @param {MouseEvent|Touch} evt
+ * @private
  */
 PhotoSphereViewer.prototype._logMouseMove = function(evt) {
   var now = Date.now();

@@ -1,6 +1,7 @@
 /**
  * Navigation bar fullscreen button class
- * @param navbar (PSVNavBar) A PSVNavBar object
+ * @param {PSVNavBar} navbar
+ * @constructor
  */
 function PSVNavBarFullscreenButton(navbar) {
   PSVNavBarButton.call(this, navbar);
@@ -18,7 +19,6 @@ PSVNavBarFullscreenButton.iconActive = 'fullscreen-out.svg';
 
 /**
  * Creates the button
- * @return (void)
  */
 PSVNavBarFullscreenButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
@@ -39,7 +39,8 @@ PSVNavBarFullscreenButton.prototype.destroy = function() {
 
 /**
  * Handle events
- * @param e (Event)
+ * @param {Event} e
+ * @private
  */
 PSVNavBarFullscreenButton.prototype.handleEvent = function(e) {
   switch (e.type) {
@@ -51,6 +52,7 @@ PSVNavBarFullscreenButton.prototype.handleEvent = function(e) {
 
 /**
  * Toggles fullscreen on click
+ * @private
  */
 PSVNavBarFullscreenButton.prototype._onClick = function() {
   this.psv.toggleFullscreen();
