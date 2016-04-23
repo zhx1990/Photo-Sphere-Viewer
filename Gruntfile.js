@@ -9,9 +9,13 @@ module.exports = function(grunt) {
   // some classes have to be executed before other
   var files_in_order = grunt.file.expand([
     'src/js/PhotoSphereViewer.js',
+    'src/js/PhotoSphereViewer.*.js',
     'src/js/components/PSVComponent.js',
+    'src/js/components/*.js',
     'src/js/buttons/PSVNavBarButton.js',
-    'src/js/**/*.js'
+    'src/js/buttons/*.js',
+    'src/js/*.js',
+    'src/js/lib/*.js'
   ]);
 
   grunt.initConfig({
