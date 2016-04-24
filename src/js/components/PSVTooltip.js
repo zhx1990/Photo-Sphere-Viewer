@@ -246,8 +246,8 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, config) {
   switch (style.posClass[1]) {
     case 'right':
       if (topBottom) {
-        style.left = config.left;
-        style.arrow_left = config.marker.width / 2 - this.config.arrow_size;
+        style.left = config.left + config.marker.width / 2 - this.config.offset - this.config.arrow_size;
+        style.arrow_left = this.config.offset;
       }
       else {
         style.left = config.left + config.marker.width + this.config.offset + this.config.arrow_size;
@@ -262,8 +262,8 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, config) {
 
     case 'left':
       if (topBottom) {
-        style.left = config.left - style.width + config.marker.width;
-        style.arrow_left = style.width - config.marker.width / 2 - this.config.arrow_size;
+        style.left = config.left - style.width + config.marker.width / 2 + this.config.offset + this.config.arrow_size;
+        style.arrow_left = style.width - this.config.offset - this.config.arrow_size * 2;
       }
       else {
         style.left = config.left - style.width - this.config.offset - this.config.arrow_size;

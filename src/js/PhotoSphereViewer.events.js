@@ -61,7 +61,6 @@ PhotoSphereViewer.prototype._onResize = function() {
     this.prop.size.width = parseInt(this.container.clientWidth);
     this.prop.size.height = parseInt(this.container.clientHeight);
     this.prop.aspect = this.prop.size.width / this.prop.size.height;
-    this.prop.boundingRect = this.container.getBoundingClientRect();
 
     if (this.renderer) {
       this.renderer.setSize(this.prop.size.width, this.prop.size.height);
@@ -255,12 +254,14 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
  * @private
  */
 PhotoSphereViewer.prototype._click = function(evt) {
+  var boundingRect = this.container.getBoundingClientRect();
+
   var data = {
     target: evt.target,
     client_x: evt.clientX,
     client_y: evt.clientY,
-    viewer_x: parseInt(evt.clientX - this.prop.boundingRect.left),
-    viewer_y: parseInt(evt.clientY - this.prop.boundingRect.top)
+    viewer_x: parseInt(evt.clientX - boundingRect.left),
+    viewer_y: parseInt(evt.clientY - boundingRect.top)
   };
 
   var intersect = this.viewerCoordsToVector3(data.viewer_x, data.viewer_y);

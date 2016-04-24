@@ -444,12 +444,14 @@ PSVHUD.prototype._onMouseMove = function(e) {
 
       this.hoveringMarker = marker;
 
+      var boundingRect = this.psv.container.getBoundingClientRect();
+
       // simulate a marker with the size of the tooltip arrow to separate it from the cursor
       this.psv.tooltip.showTooltip({
         content: marker.tooltip.content,
         position: marker.tooltip.position,
-        top: e.clientY - this.psv.prop.boundingRect.top - this.psv.config.tooltip.arrow_size,
-        left: e.clientX - this.psv.prop.boundingRect.left - this.psv.config.tooltip.arrow_size,
+        top: e.clientY - boundingRect.top - this.psv.config.tooltip.arrow_size / 2,
+        left: e.clientX - boundingRect.left - this.psv.config.tooltip.arrow_size,
         marker: {
           width: this.psv.config.tooltip.arrow_size * 2,
           height: this.psv.config.tooltip.arrow_size * 2
@@ -483,8 +485,8 @@ PSVHUD.prototype._onClick = function(data, e) {
     }
   }
   else if (this.currentMarker) {
+    this.psv.trigger('unselect-marker', this.currentMarker);
     this.currentMarker = null;
-    this.psv.trigger('unselect-marker');
   }
 
   if (marker && marker.psvMarker && marker.psvMarker.content) {

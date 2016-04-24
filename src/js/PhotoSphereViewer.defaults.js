@@ -99,7 +99,7 @@ PhotoSphereViewer.DEFAULTS = {
   keyboard: true,
   gyroscope: false,
   move_inertia: true,
-  click_event_on_marker: true,
+  click_event_on_marker: false,
   transition: {
     duration: 1500,
     loader: true,

@@ -140,7 +140,6 @@ function PhotoSphereViewer(options) {
     autorotate_reqid: null, // animationRequest id of the automatic rotation
     animation_promise: null, // promise of the current animation (either go to position or image transition)
     start_timeout: null, // timeout id of the automatic rotation delay
-    boundingRect: null, // DOMRect of the container
     size: { // size of the container
       width: 0,
       height: 0

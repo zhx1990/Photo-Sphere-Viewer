@@ -160,7 +160,6 @@ function PhotoSphereViewer(options) {
     autorotate_reqid: null, // animationRequest id of the automatic rotation
     animation_promise: null, // promise of the current animation (either go to position or image transition)
     start_timeout: null, // timeout id of the automatic rotation delay
-    boundingRect: null, // DOMRect of the container
     size: { // size of the container
       width: 0,
       height: 0
@@ -771,7 +770,7 @@ PhotoSphereViewer.DEFAULTS = {
   keyboard: true,
   gyroscope: false,
   move_inertia: true,
-  click_event_on_marker: true,
+  click_event_on_marker: false,
   transition: {
     duration: 1500,
     loader: true,
@@ -867,7 +866,6 @@ PhotoSphereViewer.prototype._onResize = function() {
     this.prop.size.width = parseInt(this.container.clientWidth);
     this.prop.size.height = parseInt(this.container.clientHeight);
     this.prop.aspect = this.prop.size.width / this.prop.size.height;
-    this.prop.boundingRect = this.container.getBoundingClientRect();
 
     if (this.renderer) {
       this.renderer.setSize(this.prop.size.width, this.prop.size.height);
@@ -1061,12 +1059,14 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
  * @private
  */
 PhotoSphereViewer.prototype._click = function(evt) {
+  var boundingRect = this.container.getBoundingClientRect();
+
   var data = {
     target: evt.target,
     client_x: evt.clientX,
     client_y: evt.clientY,
-    viewer_x: parseInt(evt.clientX - this.prop.boundingRect.left),
-    viewer_y: parseInt(evt.clientY - this.prop.boundingRect.top)
+    viewer_x: parseInt(evt.clientX - boundingRect.left),
+    viewer_y: parseInt(evt.clientY - boundingRect.top)
   };
 
   var intersect = this.viewerCoordsToVector3(data.viewer_x, data.viewer_y);
@@ -2456,12 +2456,14 @@ PSVHUD.prototype._onMouseMove = function(e) {
 
       this.hoveringMarker = marker;
 
+      var boundingRect = this.psv.container.getBoundingClientRect();
+
       // simulate a marker with the size of the tooltip arrow to separate it from the cursor
       this.psv.tooltip.showTooltip({
         content: marker.tooltip.content,
         position: marker.tooltip.position,
-        top: e.clientY - this.psv.prop.boundingRect.top - this.psv.config.tooltip.arrow_size,
-        left: e.clientX - this.psv.prop.boundingRect.left - this.psv.config.tooltip.arrow_size,
+        top: e.clientY - boundingRect.top - this.psv.config.tooltip.arrow_size / 2,
+        left: e.clientX - boundingRect.left - this.psv.config.tooltip.arrow_size,
         marker: {
           width: this.psv.config.tooltip.arrow_size * 2,
           height: this.psv.config.tooltip.arrow_size * 2
@@ -2495,8 +2497,8 @@ PSVHUD.prototype._onClick = function(data, e) {
     }
   }
   else if (this.currentMarker) {
+    this.psv.trigger('unselect-marker', this.currentMarker);
     this.currentMarker = null;
-    this.psv.trigger('unselect-marker');
   }
 
   if (marker && marker.psvMarker && marker.psvMarker.content) {
@@ -3655,8 +3657,8 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, config) {
   switch (style.posClass[1]) {
     case 'right':
       if (topBottom) {
-        style.left = config.left;
-        style.arrow_left = config.marker.width / 2 - this.config.arrow_size;
+        style.left = config.left + config.marker.width / 2 - this.config.offset - this.config.arrow_size;
+        style.arrow_left = this.config.offset;
       }
       else {
         style.left = config.left + config.marker.width + this.config.offset + this.config.arrow_size;
@@ -3671,8 +3673,8 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, config) {
 
     case 'left':
       if (topBottom) {
-        style.left = config.left - style.width + config.marker.width;
-        style.arrow_left = style.width - config.marker.width / 2 - this.config.arrow_size;
+        style.left = config.left - style.width + config.marker.width / 2 + this.config.offset + this.config.arrow_size;
+        style.arrow_left = style.width - this.config.offset - this.config.arrow_size * 2;
       }
       else {
         style.left = config.left - style.width - this.config.offset - this.config.arrow_size;
