@@ -31,13 +31,13 @@ PSVPanel.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
   this.container.innerHTML =
-    '<div class="resizer"></div>' +
-    '<div class="close-button"></div>' +
-    '<div class="content"></div>';
+    '<div class="psv-panel-resizer"></div>' +
+    '<div class="psv-panel-close-button"></div>' +
+    '<div class="psv-panel-content"></div>';
 
-  this.content = this.container.querySelector('.content');
+  this.content = this.container.querySelector('.psv-panel-content');
 
-  var closeBtn = this.container.querySelector('.close-button');
+  var closeBtn = this.container.querySelector('.psv-panel-close-button');
   closeBtn.addEventListener('click', this.hidePanel.bind(this));
 
   // Stop event bubling from panel
@@ -48,7 +48,7 @@ PSVPanel.prototype.create = function() {
   }
 
   // Event for panel resizing + stop bubling
-  var resizer = this.container.querySelector('.resizer');
+  var resizer = this.container.querySelector('.psv-panel-resizer');
   resizer.addEventListener('mousedown', this);
   resizer.addEventListener('touchstart', this);
   this.psv.container.addEventListener('mouseup', this);
@@ -98,16 +98,9 @@ PSVPanel.prototype.handleEvent = function(e) {
 PSVPanel.prototype.showPanel = function(content, noMargin) {
   this.content.innerHTML = content;
   this.content.scrollTop = 0;
-  this.container.classList.add('open');
+  this.container.classList.add('psv-panel--open');
 
-  if (noMargin) {
-    if (!this.content.classList.contains('no-margin')) {
-      this.content.classList.add('no-margin');
-    }
-  }
-  else {
-    this.content.classList.remove('no-margin');
-  }
+  PSVUtils.toggleClass(this.content, 'psv-panel-content--no-margin', !!noMargin);
 
   this.prop.opened = true;
   this.psv.trigger('open-panel');
@@ -120,7 +113,7 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
 PSVPanel.prototype.hidePanel = function() {
   this.content.innerHTML = null;
   this.prop.opened = false;
-  this.container.classList.remove('open');
+  this.container.classList.remove('psv-panel--open');
   this.psv.trigger('close-panel');
 };
 
@@ -153,7 +146,7 @@ PSVPanel.prototype._startResize = function(evt) {
   this.prop.mouse_x = parseInt(evt.clientX);
   this.prop.mouse_y = parseInt(evt.clientY);
   this.prop.mousedown = true;
-  this.content.classList.add('no-interaction');
+  this.content.classList.add('psv-panel-content--no-interaction');
 };
 
 /**
@@ -165,7 +158,7 @@ PSVPanel.prototype._onMouseUp = function(evt) {
   if (this.prop.mousedown) {
     evt.stopPropagation();
     this.prop.mousedown = false;
-    this.content.classList.remove('no-interaction');
+    this.content.classList.remove('psv-panel-content--no-interaction');
   }
 };
 

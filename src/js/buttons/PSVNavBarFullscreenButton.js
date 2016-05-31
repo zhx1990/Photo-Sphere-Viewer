@@ -13,7 +13,7 @@ PSVNavBarFullscreenButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarFullscreenButton.prototype.constructor = PSVNavBarFullscreenButton;
 
 PSVNavBarFullscreenButton.id = 'fullscreen';
-PSVNavBarFullscreenButton.className = 'psv-button hover-scale fullscreen-button';
+PSVNavBarFullscreenButton.className = 'psv-button psv-button--hover-scale psv-fullscreen-button';
 PSVNavBarFullscreenButton.icon = 'fullscreen-in.svg';
 PSVNavBarFullscreenButton.iconActive = 'fullscreen-out.svg';
 

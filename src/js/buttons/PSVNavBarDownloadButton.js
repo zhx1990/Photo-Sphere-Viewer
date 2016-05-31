@@ -13,7 +13,7 @@ PSVNavBarDownloadButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarDownloadButton.prototype.constructor = PSVNavBarDownloadButton;
 
 PSVNavBarDownloadButton.id = 'download';
-PSVNavBarDownloadButton.className = 'psv-button hover-scale download-button';
+PSVNavBarDownloadButton.className = 'psv-button psv-button--hover-scale psv-download-button';
 PSVNavBarDownloadButton.icon = 'download.svg';
 
 /**

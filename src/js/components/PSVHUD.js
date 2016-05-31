@@ -40,7 +40,7 @@ PSVHUD.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
   this.$svg = document.createElementNS(PSVHUD.svgNS, 'svg');
-  this.$svg.setAttribute('class', 'psv-svg-container');
+  this.$svg.setAttribute('class', 'psv-hud-svg-container');
   this.container.appendChild(this.$svg);
 
   // Markers events via delegation
@@ -259,13 +259,13 @@ PSVHUD.prototype.updatePositions = function() {
 
         marker.$el.setAttributeNS(null, 'points', points);
 
-        if (!marker.$el.classList.contains('visible')) {
-          marker.$el.classList.add('visible');
+        if (!marker.$el.classList.contains('psv-marker--visible')) {
+          marker.$el.classList.add('psv-marker--visible');
         }
       }
       else {
         marker.position2D = null;
-        marker.$el.classList.remove('visible');
+        marker.$el.classList.remove('psv-marker--visible');
       }
     }
     else {
@@ -276,13 +276,13 @@ PSVHUD.prototype.updatePositions = function() {
 
         marker.$el.style.transform = 'translate3D(' + position.left + 'px, ' + position.top + 'px, ' + '0px) rotateZ(' + rotation + 'deg)';
 
-        if (!marker.$el.classList.contains('visible')) {
-          marker.$el.classList.add('visible');
+        if (!marker.$el.classList.contains('psv-marker--visible')) {
+          marker.$el.classList.add('psv-marker--visible');
         }
       }
       else {
         marker.position2D = null;
-        marker.$el.classList.remove('visible');
+        marker.$el.classList.remove('psv-marker--visible');
       }
     }
   }
@@ -333,9 +333,9 @@ PSVHUD.prototype._isPolygonVisible = function(marker, positions) {
 PSVHUD.prototype._getMarkerPosition = function(marker) {
   if (marker.dynamicSize) {
     // make the marker visible to get it's size
-    marker.$el.classList.add('transparent');
+    marker.$el.classList.add('psv-marker--transparent');
     var rect = marker.$el.getBoundingClientRect();
-    marker.$el.classList.remove('transparent');
+    marker.$el.classList.remove('psv-marker--transparent');
 
     marker.width = rect.right - rect.left;
     marker.height = rect.bottom - rect.top;

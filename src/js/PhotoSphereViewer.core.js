@@ -228,7 +228,8 @@ PhotoSphereViewer.prototype._createScene = function() {
 
   // create canvas container
   this.canvas_container = document.createElement('div');
-  this.canvas_container.className = 'canvas-container';
+  this.canvas_container.className = 'psv-canvas-container';
+  this.renderer.domElement.className = 'psv-canvas';
   this.container.appendChild(this.canvas_container);
   this.canvas_container.appendChild(this.renderer.domElement);
 

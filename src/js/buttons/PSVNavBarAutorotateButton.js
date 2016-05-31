@@ -13,7 +13,7 @@ PSVNavBarAutorotateButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarAutorotateButton.prototype.constructor = PSVNavBarAutorotateButton;
 
 PSVNavBarAutorotateButton.id = 'autorotate';
-PSVNavBarAutorotateButton.className = 'psv-button hover-scale autorotate-button';
+PSVNavBarAutorotateButton.className = 'psv-button psv-button--hover-scale psv-autorotate-button';
 PSVNavBarAutorotateButton.icon = 'play.svg';
 PSVNavBarAutorotateButton.iconActive = 'play-active.svg';
 

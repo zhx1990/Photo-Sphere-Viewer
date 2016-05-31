@@ -15,7 +15,7 @@ function PSVLoader(psv) {
 PSVLoader.prototype = Object.create(PSVComponent.prototype);
 PSVLoader.prototype.constructor = PSVLoader;
 
-PSVLoader.className = 'loader-container';
+PSVLoader.className = 'psv-loader-container';
 
 /**
  * Creates the loader content
@@ -28,7 +28,7 @@ PSVLoader.prototype.create = function() {
   this.container.appendChild(this.loader);
 
   this.canvas = document.createElement('canvas');
-  this.canvas.className = 'loader-canvas';
+  this.canvas.className = 'psv-loader-canvas';
 
   this.canvas.width = this.loader.clientWidth;
   this.canvas.height = this.loader.clientWidth;
@@ -39,12 +39,12 @@ PSVLoader.prototype.create = function() {
   var inner;
   if (this.psv.config.loading_img) {
     inner = document.createElement('img');
-    inner.className = 'loader-image';
+    inner.className = 'psv-loader-image';
     inner.src = this.psv.config.loading_img;
   }
   else if (this.psv.config.loading_txt) {
     inner = document.createElement('div');
-    inner.className = 'loader-text';
+    inner.className = 'psv-loader-text';
     inner.innerHTML = this.psv.config.loading_txt;
   }
   if (inner) {

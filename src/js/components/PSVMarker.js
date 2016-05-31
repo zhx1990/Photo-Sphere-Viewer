@@ -154,10 +154,10 @@ PSVMarker.prototype.update = function(properties) {
 
   // reset CSS class
   if (this.isNormal()) {
-    this.$el.setAttribute('class', 'psv-marker');
+    this.$el.setAttribute('class', 'psv-marker psv-marker--normal');
   }
   else {
-    this.$el.setAttribute('class', 'psv-marker svg-marker');
+    this.$el.setAttribute('class', 'psv-marker psv-marker--svg');
   }
 
   // add CSS classes

@@ -23,7 +23,7 @@ PSVNavBarButton.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
   if (this.constructor.icon) {
-    this.container.innerHTML = PhotoSphereViewer.ICONS[this.constructor.icon];
+    this.setIcon(this.constructor.icon);
   }
 
   this.container.addEventListener('click', function() {
@@ -34,14 +34,32 @@ PSVNavBarButton.prototype.create = function() {
 };
 
 /**
+ * Set the button icon (from PSV icons list)
+ * @param {string} icon
+ * @param {HTMLElement} [container] - default is the main button container
+ */
+PSVNavBarButton.prototype.setIcon = function(icon, container) {
+  if (!container) {
+    container = this.container;
+  }
+  if (icon) {
+    container.innerHTML = PhotoSphereViewer.ICONS[icon];
+    container.querySelector('svg').classList.add('psv-button-svg');
+  }
+  else {
+    container.innerHTML = '';
+  }
+};
+
+/**
  * Changes the active state of the button
  * @param {boolean} [active] - forced state
  */
 PSVNavBarButton.prototype.toggleActive = function(active) {
-  active = PSVUtils.toggleClass(this.container, 'active', active);
+  active = PSVUtils.toggleClass(this.container, 'psv-button--active', active);
 
   if (this.constructor.iconActive) {
-    this.container.innerHTML = PhotoSphereViewer.ICONS[active ? this.constructor.iconActive : this.constructor.icon];
+    this.setIcon(active ? this.constructor.iconActive : this.constructor.icon);
   }
 };
 
@@ -49,7 +67,7 @@ PSVNavBarButton.prototype.toggleActive = function(active) {
  * Disables the button
  */
 PSVNavBarButton.prototype.disable = function() {
-  this.container.classList.add('disabled');
+  this.container.classList.add('psv-button--disabled');
 
   this.enabled = false;
 };
@@ -58,7 +76,7 @@ PSVNavBarButton.prototype.disable = function() {
  * Enables the button
  */
 PSVNavBarButton.prototype.enable = function() {
-  this.container.classList.remove('disabled');
+  this.container.classList.remove('psv-button--disabled');
 
   this.enabled = true;
 };

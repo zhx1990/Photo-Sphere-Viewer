@@ -118,13 +118,13 @@ PhotoSphereViewer.DEFAULTS = {
  */
 PhotoSphereViewer.TEMPLATES = {
   markersList: '\
-<div class="psv-markers-list"> \
-  <h1>{{= it.config.lang.markers }}</h1> \
-  <ul> \
+<div class="psv-markers-list-container"> \
+  <h1 class="psv-markers-list-title">{{= it.config.lang.markers }}</h1> \
+  <ul class="psv-markers-list"> \
   {{~ it.markers: marker }} \
-    <li data-psv-marker="{{= marker.id }}" {{? marker.className }}class="{{= marker.className }}"{{?}}> \
-      {{? marker.image }}<img class="marker-image" src="{{= marker.image }}"/>{{?}} \
-      <p class="marker-name {{? !marker.image }}no-image{{?}}">{{? marker.tooltip }}{{= marker.tooltip.content }}{{?? marker.html }}{{= marker.html }}{{??}}{{= marker.id }}{{?}}</p> \
+    <li data-psv-marker="{{= marker.id }}" class="psv-markers-list-item {{? marker.className }}{{= marker.className }}{{?}}"> \
+      {{? marker.image }}<img class="psv-markers-list-image" src="{{= marker.image }}"/>{{?}} \
+      <p class="psv-markers-list-name">{{? marker.tooltip }}{{= marker.tooltip.content }}{{?? marker.html }}{{= marker.html }}{{??}}{{= marker.id }}{{?}}</p> \
     </li> \
   {{~}} \
   </ul> \

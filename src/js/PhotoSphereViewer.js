@@ -188,7 +188,7 @@ function PhotoSphereViewer(options) {
 
   // load components
   if (this.config.navbar) {
-    this.container.classList.add('has-navbar');
+    this.container.classList.add('psv-container--has-navbar');
     this.navbar = new PSVNavBar(this);
     this.navbar.hide();
   }

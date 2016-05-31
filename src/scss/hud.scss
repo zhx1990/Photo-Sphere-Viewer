@@ -4,42 +4,36 @@
   z-index: $psv-hud-zindex;
   width: 100%;
   height: 100%;
+}
 
-  .psv-marker:not(.svg-marker) {
+.psv-hud-svg-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: $psv-polygon-marker-zindex;
+}
+
+.psv-marker {
+  cursor: pointer;
+  display: none;
+
+  &--normal {
     position: absolute;
     top: 0;
     left: 0;
     z-index: $psv-marker-zindex;
     background-size: contain;
     background-repeat: no-repeat;
-    cursor: pointer;
-    display: none;
-
-    &.transparent {
-      display: block;
-      opacity: 0;
-    }
-
-    &.visible {
-      display: block;
-    }
   }
 
-  .psv-svg-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: $psv-polygon-marker-zindex;
+  &--transparent {
+    display: block;
+    opacity: 0;
+  }
 
-    .svg-marker {
-      cursor: pointer;
-      display: none;
-
-      &.visible {
-        display: block;
-      }
-    }
+  &--visible {
+    display: block;
   }
 }

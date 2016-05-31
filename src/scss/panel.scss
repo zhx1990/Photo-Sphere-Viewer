@@ -16,11 +16,11 @@ $psv-panel-resizer-grip-width: $psv-panel-resizer-width - 4px;
   cursor: default;
   margin-left: $psv-panel-resizer-width;
 
-  .psv-container.has-navbar & {
+  .psv-container--has-navbar & {
     height: calc(100% - #{$psv-buttons-height + 2 * $psv-buttons-padding});
   }
 
-  .close-button {
+  &-close-button {
     display: none;
     position: absolute;
     top: 0;
@@ -65,7 +65,7 @@ $psv-panel-resizer-grip-width: $psv-panel-resizer-width - 4px;
     }
   }
 
-  .resizer {
+  &-resizer {
     display: none;
     position: absolute;
     top: 0;
@@ -90,7 +90,7 @@ $psv-panel-resizer-grip-width: $psv-panel-resizer-width - 4px;
     }
   }
 
-  .content {
+  &-content {
     width: 100%;
     height: 100%;
     box-sizing: border-box;
@@ -98,22 +98,22 @@ $psv-panel-resizer-grip-width: $psv-panel-resizer-width - 4px;
     font: $psv-panel-font;
     overflow: auto;
 
-    &:not(.no-margin) {
+    &:not(&--no-margin) {
       padding: $psv-panel-padding;
     }
 
-    &.no-interaction {
+    &--no-interaction {
       @include user-select(none);
       pointer-events: none;
     }
   }
 
-  &.open {
+  &--open {
     transform: translate3d(0, 0, 0);
     opacity: 1;
     transition-duration: .2s;
 
-    .close-button, .resizer {
+    .psv-panel-close-button, .psv-panel-close-resizer {
       display: block;
     }
   }

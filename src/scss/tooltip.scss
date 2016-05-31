@@ -11,100 +11,100 @@
   transition-timing-function: ease-in-out;
   transition-duration: $psv-tooltip-animate-delay;
 
-  .content {
+  &-content {
     color: $psv-tooltip-text-color;
     font: $psv-tooltip-font;
     text-shadow: $psv-tooltip-text-shadow;
   }
 
-  .arrow {
+  &-arrow {
     position: absolute;
     height: 0;
     width: 0;
     border: $psv-tooltip-arrow-size solid transparent;
   }
 
-  &.bottom-center {
+  &--bottom-center {
     box-shadow: 0 $psv-tooltip-shadow-offset 0 $psv-tooltip-shadow-color;
     transform: translate3d(0, -$psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
-    .arrow {
+    .psv-tooltip-arrow {
       border-bottom-color: $psv-tooltip-background-color;
     }
   }
 
-  &.center-left {
+  &--center-left {
     box-shadow: #{-$psv-tooltip-shadow-offset} 0 0 $psv-tooltip-shadow-color;
     transform: translate3d($psv-tooltip-animate-offset, 0, 0);
     transition-property: opacity, transform;
 
-    .arrow {
+    .psv-tooltip-arrow {
       border-left-color: $psv-tooltip-background-color;
     }
   }
 
-  &.top-center {
+  &--top-center {
     box-shadow: 0 #{-$psv-tooltip-shadow-offset} 0 $psv-tooltip-shadow-color;
     transform: translate3d(0, $psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
-    .arrow {
+    .psv-tooltip-arrow {
       border-top-color: $psv-tooltip-background-color;
     }
   }
 
-  &.center-right {
+  &--center-right {
     box-shadow: $psv-tooltip-shadow-offset 0 0 $psv-tooltip-shadow-color;
     transform: translate3d(-$psv-tooltip-animate-offset, 0, 0);
     transition-property: opacity, transform;
 
-    .arrow {
+    .psv-tooltip-arrow {
       border-right-color: $psv-tooltip-background-color;
     }
   }
 
-  &.bottom-left {
+  &--bottom-left {
     box-shadow: #{-$psv-tooltip-shadow-offset} $psv-tooltip-shadow-offset 0 $psv-tooltip-shadow-color;
     transform: translate3d(0, -$psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
-    .arrow {
+    .psv-tooltip-arrow {
       border-bottom-color: $psv-tooltip-background-color;
     }
   }
 
-  &.bottom-right {
+  &--bottom-right {
     box-shadow: $psv-tooltip-shadow-offset $psv-tooltip-shadow-offset 0 $psv-tooltip-shadow-color;
     transform: translate3d(0, -$psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
-    .arrow {
+    .psv-tooltip-arrow {
       border-bottom-color: $psv-tooltip-background-color;
     }
   }
 
-  &.top-left {
+  &--top-left {
     box-shadow: #{-$psv-tooltip-shadow-offset} #{-$psv-tooltip-shadow-offset} 0 $psv-tooltip-shadow-color;
     transform: translate3d(0, $psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
-    .arrow {
+    .psv-tooltip-arrow {
       border-top-color: $psv-tooltip-background-color;
     }
   }
 
-  &.top-right {
+  &--top-right {
     box-shadow: $psv-tooltip-shadow-offset #{-$psv-tooltip-shadow-offset} 0 $psv-tooltip-shadow-color;
     transform: translate3d(0, $psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
-    .arrow {
+    .psv-tooltip-arrow {
       border-top-color: $psv-tooltip-background-color;
     }
   }
 
-  &.visible {
+  &--visible {
     transform: translate3d(0, 0, 0);
     opacity: 1;
     transition-duration: $psv-tooltip-animate-delay;

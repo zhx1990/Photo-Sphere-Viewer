@@ -13,7 +13,7 @@ PSVNavBarGyroscopeButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarGyroscopeButton.prototype.constructor = PSVNavBarGyroscopeButton;
 
 PSVNavBarGyroscopeButton.id = 'gyroscope';
-PSVNavBarGyroscopeButton.className = 'psv-button hover-scale gyroscope-button';
+PSVNavBarGyroscopeButton.className = 'psv-button psv-button--hover-scale psv-gyroscope-button';
 PSVNavBarGyroscopeButton.icon = 'compass.svg';
 
 /**

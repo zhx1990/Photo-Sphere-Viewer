@@ -28,9 +28,12 @@ PSVTooltip.topMap = { 0: 'top', 0.5: 'center', 1: 'bottom' };
 PSVTooltip.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
-  this.container.innerHTML = '<div class="arrow"></div><div class="content"></div>';
+  this.container.innerHTML = '<div class="psv-tooltip-arrow"></div><div class="psv-tooltip-content"></div>';
   this.container.style.top = '-1000px';
   this.container.style.left = '-1000px';
+
+  this.content = this.container.querySelector('.psv-tooltip-content');
+  this.arrow = this.container.querySelector('.psv-tooltip-arrow');
 
   this.psv.on('render', this);
 };
@@ -64,7 +67,7 @@ PSVTooltip.prototype.handleEvent = function(e) {
  * @returns {boolean}
  */
 PSVTooltip.prototype.isTooltipVisible = function() {
-  return this.container.classList.contains('visible');
+  return this.container.classList.contains('psv-tooltip--visible');
 };
 
 /**
@@ -85,8 +88,8 @@ PSVTooltip.prototype.showTooltip = function(config) {
 
   var isUpdate = this.isTooltipVisible();
   var t = this.container;
-  var c = t.querySelector('.content');
-  var a = t.querySelector('.arrow');
+  var c = this.content;
+  var a = this.arrow;
 
   if (!config.position) {
     config.position = ['top', 'center'];
@@ -179,13 +182,13 @@ PSVTooltip.prototype.showTooltip = function(config) {
   a.style.top = style.arrow_top + 'px';
   a.style.left = style.arrow_left + 'px';
 
-  t.classList.add(style.posClass.join('-'));
+  t.classList.add('psv-tooltip--' + style.posClass.join('-'));
 
   // delay for correct transition between the two classes
   if (!isUpdate) {
     var self = this;
     this.timeout = window.setTimeout(function() {
-      t.classList.add('visible');
+      t.classList.add('psv-tooltip--visible');
       self.psv.trigger('show-tooltip');
       self.timeout = null;
     }, this.config.delay);
@@ -202,12 +205,12 @@ PSVTooltip.prototype.hideTooltip = function() {
   }
 
   if (this.isTooltipVisible()) {
-    this.container.classList.remove('visible');
+    this.container.classList.remove('psv-tooltip--visible');
     this.psv.trigger('hide-tooltip');
 
     var self = this;
     this.timeout = window.setTimeout(function() {
-      self.container.querySelector('.content').innerHTML = null;
+      self.content.innerHTML = null;
       self.container.style.top = '-1000px';
       self.container.style.left = '-1000px';
       self.timeout = null;

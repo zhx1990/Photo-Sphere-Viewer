@@ -11,7 +11,7 @@ function PSVNavBarSpacer(navbar, weight) {
 
   this.create();
 
-  this.container.classList.add('weight-' + (weight || 5));
+  this.container.classList.add('psv-spacer--weight-' + (weight || 5));
 }
 
 PSVNavBarSpacer.prototype = Object.create(PSVComponent.prototype);

@@ -18,7 +18,7 @@ PSVNavBarMarkersButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarMarkersButton.prototype.constructor = PSVNavBarMarkersButton;
 
 PSVNavBarMarkersButton.id = 'markers';
-PSVNavBarMarkersButton.className = 'psv-button hover-scale markers-button';
+PSVNavBarMarkersButton.className = 'psv-button psv-button--hover-scale psv-markers-button';
 PSVNavBarMarkersButton.icon = 'pin.svg';
 PSVNavBarMarkersButton.publicMethods = ['toggleMarkersList', 'showMarkersList', 'hideMarkersList'];
 

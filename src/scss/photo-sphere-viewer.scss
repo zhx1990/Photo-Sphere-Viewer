@@ -9,17 +9,17 @@
   position: relative;
   background: $psv-main-background;
   overflow: hidden;
+}
 
-  .canvas-container {
-    position: absolute;
-    top: 0;
-    left: 0;
-    z-index: $psv-canvas-zindex;
+.psv-canvas-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: $psv-canvas-zindex;
+}
 
-    canvas {
-      display: block;
-    }
-  }
+.psv-canvas {
+  display: block;
 }
 
 @import 'loader';

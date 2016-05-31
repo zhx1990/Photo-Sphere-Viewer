@@ -19,7 +19,7 @@ function PSVNavBarCustomButton(navbar, config) {
 PSVNavBarCustomButton.prototype = Object.create(PSVNavBarButton.prototype);
 PSVNavBarCustomButton.prototype.constructor = PSVNavBarCustomButton;
 
-PSVNavBarCustomButton.className = 'psv-button';
+PSVNavBarCustomButton.className = 'psv-button psv-custom-button';
 
 /**
  * Creates the button

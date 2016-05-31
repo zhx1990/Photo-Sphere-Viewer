@@ -9,7 +9,7 @@
   background: $psv-navbar-background;
   transition: bottom ease-in-out .1s;
 
-  &.open {
+  &--open {
     bottom: 0;
   }
 
@@ -17,62 +17,60 @@
   &, & * {
     box-sizing: content-box;
   }
+}
 
-  .psv-caption {
-    @include flex-grow(10);
-    color: $psv-caption-color;
-    margin: $psv-buttons-padding;
-    white-space: nowrap;
-    overflow: hidden;
-    text-align: center;
-    font-family: $psv-caption-font;
-  }
+.psv-caption {
+  @include flex-grow(10);
+  color: $psv-caption-color;
+  margin: $psv-buttons-padding;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: center;
+  font-family: $psv-caption-font;
 
   @media (max-width: 800px) {
-    .psv-caption {
-      visibility: hidden;
+    visibility: hidden;
+  }
+}
+
+.psv-spacer {
+  @for $i from 1 through 10 {
+    &--weight-#{$i} {
+      @include flex-grow($i);
     }
   }
+}
 
-  .psv-spacer {
-    @for $i from 1 through 10 {
-      &.weight-#{$i} {
-        @include flex-grow($i);
-      }
-    }
+.psv-button {
+  @include flex-grow(0);
+  @include flex-shrink(0);
+  padding: $psv-buttons-padding;
+  position: relative;
+  cursor: pointer;
+  height: $psv-buttons-height;
+  width: $psv-buttons-height;
+  background: $psv-buttons-background;
+  color: $psv-buttons-color;
+
+  &--active {
+    background: $psv-buttons-active-background;
   }
 
-  .psv-button {
-    @include flex-grow(0);
-    @include flex-shrink(0);
-    padding: $psv-buttons-padding;
-    position: relative;
-    cursor: pointer;
-    height: $psv-buttons-height;
-    width: $psv-buttons-height;
-    background: $psv-buttons-background;
-    color: $psv-buttons-color;
+  &--disabled {
+    pointer-events: none;
+    opacity: $psv-buttons-disabled-opacity;
+  }
 
-    &.active {
-      background: $psv-buttons-active-background;
+  .psv-button-svg {
+    width: 100%;
+    transform: scale(1);
+    transition: transform .3s ease;
+
+    * {
+      fill: $psv-buttons-color;
     }
 
-    &.disabled {
-      pointer-events: none;
-      opacity: $psv-buttons-disabled-opacity;
-    }
-
-    svg {
-      width: 100%;
-      transform: scale(1);
-      transition: transform .3s ease;
-
-      * {
-        fill: $psv-buttons-color;
-      }
-    }
-
-    &.hover-scale:not(.disabled):hover svg {
+    .psv-button--hover-scale:not(.psv-button--disabled):hover & {
       transform: scale(1.2);
     }
   }
