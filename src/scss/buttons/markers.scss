@@ -1,9 +1,9 @@
 .psv-markers-list {
   h1 {
-    font: $markers-list-title-font;
+    font: $psv-markers-list-title-font;
     margin: 1em 0;
     text-align: center;
-    text-shadow: $markers-list-title-shadow;
+    text-shadow: $psv-markers-list-title-shadow;
   }
 
   ul {
@@ -15,8 +15,8 @@
 
   li {
     clear: both;
-    min-height: $markers-list-image-size;
-    padding: $markers-list-padding;
+    min-height: $psv-markers-list-image-size;
+    padding: $psv-markers-list-padding;
     cursor: pointer;
     transform: translateX(0);
     transition: transform .3s ease-in-out;
@@ -28,33 +28,33 @@
       top: 0;
       left: 0;
       height: 100%;
-      width: $markers-list-hover-translation;
-      margin-left: -$markers-list-hover-translation;
+      width: $psv-markers-list-hover-translation;
+      margin-left: -$psv-markers-list-hover-translation;
     }
 
     &:nth-child(odd), &:nth-child(odd)::before {
-      background: $markers-list-odd-background;
+      background: $psv-markers-list-odd-background;
     }
 
     &:nth-child(even), &:nth-child(even)::before {
-      background: $markers-list-even-background;
+      background: $psv-markers-list-even-background;
     }
 
     &:hover {
-      transform: translateX($markers-list-hover-translation);
+      transform: translateX($psv-markers-list-hover-translation);
       transition: transform .1s ease-in-out;
     }
   }
 
   .marker-image {
     float: left;
-    width: $markers-list-image-size;
+    width: $psv-markers-list-image-size;
   }
 
   .marker-name {
     margin: 0;
     padding: 0;
-    padding-left: calc(#{$markers-list-image-size} + #{nth($markers-list-padding, 1)});
+    padding-left: calc(#{$psv-markers-list-image-size} + #{nth($psv-markers-list-padding, 1)});
 
     &.no-image {
       padding-left: 0;

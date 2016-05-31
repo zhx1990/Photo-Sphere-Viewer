@@ -7,16 +7,16 @@
   left: 0;
   width: 100%;
   height: 100%;
-  z-index: $loader-zindex;
+  z-index: $psv-loader-zindex;
 
   // Pseudo element trick to vertically center elements
   .psv-loader {
     position: relative;
     text-align: center;
-    color: $loader-color;
-    width: $loader-width;
-    height: $loader-width;
-    border: $loader-tickness solid transparent;
+    color: $psv-loader-color;
+    width: $psv-loader-width;
+    height: $psv-loader-width;
+    border: $psv-loader-tickness solid transparent;
 
     &::before {
       content: '';
@@ -37,7 +37,7 @@
     }
 
     .loader-text {
-      font: $loader-font;
+      font: $psv-loader-font;
     }
   }
 }

@@ -1,86 +1,4 @@
-// scss-lint:disable ColorVariable
-$main-background: radial-gradient(#ffffff, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%, #efefef 66%, #dfdfdf 82%, #bfbfbf 100%);
-
-$loader-color: rgba(61, 61, 61, .7);
-$loader-width: 150px;
-$loader-tickness: 10px;
-$loader-font: 14px sans-serif;
-
-$navbar-height: 40px;
-$navbar-background: rgba(61, 61, 61, .5);
-
-$caption-font: sans-serif;
-$caption-color: rgba(255, 255, 255, .7);
-
-$buttons-height: 20px;
-$buttons-padding: 10px;
-$buttons-background: transparent;
-$buttons-active-background: rgba(255, 255, 255, .1);
-$buttons-color: rgba(255, 255, 255, .7);
-$buttons-disabled-opacity: .5;
-
-$zoom-range-width: 80px;
-$zoom-range-tickness: 1px;
-$zoom-disk-diameter: 7px;
-$zoom-buttons-width: 16px;
-
-$tooltip-background-color: rgba(61, 61, 61, .8);
-
-// set tooltip.offset JS config to the same value
-$tooltip-animate-offset: 5px;
-// set tooltip.delay JS config to teh same value
-$tooltip-animate-delay: .1s;
-$tooltip-radius: 4px;
-$tooltip-padding: .5em 1em;
-// set tooltip.arrow_size JS config to the same value
-$tooltip-arrow-size: 7px;
-$tooltip-max-width: 200px;
-
-$tooltip-text-color: rgb(255, 255, 255);
-$tooltip-font: 14px sans-serif;
-$tooltip-text-shadow: 0 1px #000000;
-
-$tooltip-shadow-color: rgba(90, 90, 90, .7);
-// the shadow is always at the opposite side of the arrow
-$tooltip-shadow-offset: 3px;
-
-$panel-background: rgba(10, 10, 10, .7);
-$panel-text-color: rgb(220, 220, 220);
-
-$panel-width: 400px;
-$panel-padding: 1em;
-
-// must be odd
-$panel-resizer-width: 9px;
-$panel-resizer-background: rgba(0, 0, 0, .9);
-$panel-resizer-grip-color: #ffffff;
-// must be odd
-$panel-resizer-grip-height: 29px;
-$panel-close-button-width: 24px;
-$panel-close-button-background: $panel-resizer-background;
-$panel-close-button-color: #ffffff;
-
-$panel-font: 16px sans-serif;
-
-$markers-list-image-size: 20px;
-$markers-list-padding: .5em 1em;
-$markers-list-hover-translation: 10px;
-
-$markers-list-odd-background: rgba(255, 255, 255, .1);
-$markers-list-even-background: transparent;
-
-$markers-list-title-shadow: 2px 1px #000000;
-$markers-list-title-font: 24px sans-serif;
-
-$canvas-zindex: 0;
-$hud-zindex: 10;
-$polygon-marker-zindex: 20;
-$marker-zindex: 30;
-$tooltip-zindex: 50;
-$panel-zindex: 90;
-$navbar-zindex: 90;
-$loader-zindex: 100;
-
+@import 'vars';
 @import 'mixins';
 
 .psv-container {
@@ -89,14 +7,14 @@ $loader-zindex: 100;
   margin: 0;
   padding: 0;
   position: relative;
-  background: $main-background;
+  background: $psv-main-background;
   overflow: hidden;
 
   .canvas-container {
     position: absolute;
     top: 0;
     left: 0;
-    z-index: $canvas-zindex;
+    z-index: $psv-canvas-zindex;
 
     canvas {
       display: block;

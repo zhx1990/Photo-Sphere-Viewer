@@ -1,12 +1,12 @@
 .psv-navbar {
   @include flexbox();
   position: absolute;
-  z-index: $navbar-zindex;
-  bottom: -$navbar-height;
+  z-index: $psv-navbar-zindex;
+  bottom: -$psv-navbar-height;
   left: 0;
   width: 100%;
-  height: $navbar-height;
-  background: $navbar-background;
+  height: $psv-navbar-height;
+  background: $psv-navbar-background;
   transition: bottom ease-in-out .1s;
 
   &.open {
@@ -20,12 +20,12 @@
 
   .psv-caption {
     @include flex-grow(10);
-    color: $caption-color;
-    margin: $buttons-padding;
+    color: $psv-caption-color;
+    margin: $psv-buttons-padding;
     white-space: nowrap;
     overflow: hidden;
     text-align: center;
-    font-family: $caption-font;
+    font-family: $psv-caption-font;
   }
 
   @media (max-width: 800px) {
@@ -45,21 +45,21 @@
   .psv-button {
     @include flex-grow(0);
     @include flex-shrink(0);
-    padding: $buttons-padding;
+    padding: $psv-buttons-padding;
     position: relative;
     cursor: pointer;
-    height: $buttons-height;
-    width: $buttons-height;
-    background: $buttons-background;
-    color: $buttons-color;
+    height: $psv-buttons-height;
+    width: $psv-buttons-height;
+    background: $psv-buttons-background;
+    color: $psv-buttons-color;
 
     &.active {
-      background: $buttons-active-background;
+      background: $psv-buttons-active-background;
     }
 
     &.disabled {
       pointer-events: none;
-      opacity: $buttons-disabled-opacity;
+      opacity: $psv-buttons-disabled-opacity;
     }
 
     svg {
@@ -68,7 +68,7 @@
       transition: transform .3s ease;
 
       * {
-        fill: $buttons-color;
+        fill: $psv-buttons-color;
       }
     }
 

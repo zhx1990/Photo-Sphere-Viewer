@@ -1,13 +1,13 @@
 .psv-navbar .zoom-button {
   cursor: default;
-  width: #{$zoom-buttons-width * 3 + $zoom-range-width};
+  width: #{$psv-zoom-buttons-width * 3 + $psv-zoom-range-width};
 
   .minus, .plus {
     float: left;
     position: relative;
     cursor: pointer;
-    width: $zoom-buttons-width;
-    height: $zoom-buttons-width;
+    width: $psv-zoom-buttons-width;
+    height: $psv-zoom-buttons-width;
 
     svg {
       position: relative;
@@ -17,24 +17,24 @@
 
   .range {
     float: left;
-    padding: #{($buttons-height - $zoom-range-tickness) / 2} #{$zoom-buttons-width / 2};
+    padding: #{($psv-buttons-height - $psv-zoom-range-tickness) / 2} #{$psv-zoom-buttons-width / 2};
 
     .line {
       position: relative;
       cursor: pointer;
-      width: $zoom-range-width;
-      height: $zoom-range-tickness;
-      background: $buttons-color;
+      width: $psv-zoom-range-width;
+      height: $psv-zoom-range-tickness;
+      background: $psv-buttons-color;
       transition: all .3s ease;
     }
 
     .handle {
       position: absolute;
       border-radius: 50%;
-      top: #{($zoom-range-tickness - $zoom-disk-diameter) / 2};
-      width: $zoom-disk-diameter;
-      height: $zoom-disk-diameter;
-      background: $buttons-color;
+      top: #{($psv-zoom-range-tickness - $psv-zoom-disk-diameter) / 2};
+      width: $psv-zoom-disk-diameter;
+      height: $psv-zoom-disk-diameter;
+      background: $psv-buttons-color;
       transform: scale(1);
       transition: transform .3s ease;
     }
@@ -43,7 +43,7 @@
   &:not(.disabled):hover {
     .range {
       .line {
-        box-shadow: 0 0 2px $buttons-color;
+        box-shadow: 0 0 2px $psv-buttons-color;
       }
 
       .handle {
@@ -63,9 +63,9 @@
     }
 
     .minus, .plus {
-      width: $buttons-height;
-      height: $buttons-height;
-      padding: $buttons-padding;
+      width: $psv-buttons-height;
+      height: $psv-buttons-height;
+      padding: $psv-buttons-padding;
 
       svg {
         top: 0;

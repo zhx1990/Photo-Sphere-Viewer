@@ -1,112 +1,112 @@
 .psv-tooltip {
   position: absolute;
-  z-index: $tooltip-zindex;
+  z-index: $psv-tooltip-zindex;
   box-sizing: border-box;
-  max-width: $tooltip-max-width;
-  background-color: $tooltip-background-color;
-  border-radius: $tooltip-radius;
-  padding: $tooltip-padding;
+  max-width: $psv-tooltip-max-width;
+  background-color: $psv-tooltip-background-color;
+  border-radius: $psv-tooltip-radius;
+  padding: $psv-tooltip-padding;
   opacity: 0;
   transition-property: opacity;
   transition-timing-function: ease-in-out;
-  transition-duration: $tooltip-animate-delay;
+  transition-duration: $psv-tooltip-animate-delay;
 
   .content {
-    color: $tooltip-text-color;
-    font: $tooltip-font;
-    text-shadow: $tooltip-text-shadow;
+    color: $psv-tooltip-text-color;
+    font: $psv-tooltip-font;
+    text-shadow: $psv-tooltip-text-shadow;
   }
 
   .arrow {
     position: absolute;
     height: 0;
     width: 0;
-    border: $tooltip-arrow-size solid transparent;
+    border: $psv-tooltip-arrow-size solid transparent;
   }
 
   &.bottom-center {
-    box-shadow: 0 $tooltip-shadow-offset 0 $tooltip-shadow-color;
-    transform: translate3d(0, -$tooltip-animate-offset, 0);
+    box-shadow: 0 $psv-tooltip-shadow-offset 0 $psv-tooltip-shadow-color;
+    transform: translate3d(0, -$psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
     .arrow {
-      border-bottom-color: $tooltip-background-color;
+      border-bottom-color: $psv-tooltip-background-color;
     }
   }
 
   &.center-left {
-    box-shadow: #{-$tooltip-shadow-offset} 0 0 $tooltip-shadow-color;
-    transform: translate3d($tooltip-animate-offset, 0, 0);
+    box-shadow: #{-$psv-tooltip-shadow-offset} 0 0 $psv-tooltip-shadow-color;
+    transform: translate3d($psv-tooltip-animate-offset, 0, 0);
     transition-property: opacity, transform;
 
     .arrow {
-      border-left-color: $tooltip-background-color;
+      border-left-color: $psv-tooltip-background-color;
     }
   }
 
   &.top-center {
-    box-shadow: 0 #{-$tooltip-shadow-offset} 0 $tooltip-shadow-color;
-    transform: translate3d(0, $tooltip-animate-offset, 0);
+    box-shadow: 0 #{-$psv-tooltip-shadow-offset} 0 $psv-tooltip-shadow-color;
+    transform: translate3d(0, $psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
     .arrow {
-      border-top-color: $tooltip-background-color;
+      border-top-color: $psv-tooltip-background-color;
     }
   }
 
   &.center-right {
-    box-shadow: $tooltip-shadow-offset 0 0 $tooltip-shadow-color;
-    transform: translate3d(-$tooltip-animate-offset, 0, 0);
+    box-shadow: $psv-tooltip-shadow-offset 0 0 $psv-tooltip-shadow-color;
+    transform: translate3d(-$psv-tooltip-animate-offset, 0, 0);
     transition-property: opacity, transform;
 
     .arrow {
-      border-right-color: $tooltip-background-color;
+      border-right-color: $psv-tooltip-background-color;
     }
   }
 
   &.bottom-left {
-    box-shadow: #{-$tooltip-shadow-offset} $tooltip-shadow-offset 0 $tooltip-shadow-color;
-    transform: translate3d(0, -$tooltip-animate-offset, 0);
+    box-shadow: #{-$psv-tooltip-shadow-offset} $psv-tooltip-shadow-offset 0 $psv-tooltip-shadow-color;
+    transform: translate3d(0, -$psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
     .arrow {
-      border-bottom-color: $tooltip-background-color;
+      border-bottom-color: $psv-tooltip-background-color;
     }
   }
 
   &.bottom-right {
-    box-shadow: $tooltip-shadow-offset $tooltip-shadow-offset 0 $tooltip-shadow-color;
-    transform: translate3d(0, -$tooltip-animate-offset, 0);
+    box-shadow: $psv-tooltip-shadow-offset $psv-tooltip-shadow-offset 0 $psv-tooltip-shadow-color;
+    transform: translate3d(0, -$psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
     .arrow {
-      border-bottom-color: $tooltip-background-color;
+      border-bottom-color: $psv-tooltip-background-color;
     }
   }
 
   &.top-left {
-    box-shadow: #{-$tooltip-shadow-offset} #{-$tooltip-shadow-offset} 0 $tooltip-shadow-color;
-    transform: translate3d(0, $tooltip-animate-offset, 0);
+    box-shadow: #{-$psv-tooltip-shadow-offset} #{-$psv-tooltip-shadow-offset} 0 $psv-tooltip-shadow-color;
+    transform: translate3d(0, $psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
     .arrow {
-      border-top-color: $tooltip-background-color;
+      border-top-color: $psv-tooltip-background-color;
     }
   }
 
   &.top-right {
-    box-shadow: $tooltip-shadow-offset #{-$tooltip-shadow-offset} 0 $tooltip-shadow-color;
-    transform: translate3d(0, $tooltip-animate-offset, 0);
+    box-shadow: $psv-tooltip-shadow-offset #{-$psv-tooltip-shadow-offset} 0 $psv-tooltip-shadow-color;
+    transform: translate3d(0, $psv-tooltip-animate-offset, 0);
     transition-property: opacity, transform;
 
     .arrow {
-      border-top-color: $tooltip-background-color;
+      border-top-color: $psv-tooltip-background-color;
     }
   }
 
   &.visible {
     transform: translate3d(0, 0, 0);
     opacity: 1;
-    transition-duration: $tooltip-animate-delay;
+    transition-duration: $psv-tooltip-animate-delay;
   }
 }

@@ -1,42 +1,42 @@
-$panel-resizer-grip-width: $panel-resizer-width - 4px;
+$psv-panel-resizer-grip-width: $psv-panel-resizer-width - 4px;
 
 .psv-panel {
   position: absolute;
-  z-index: $panel-zindex;
+  z-index: $psv-panel-zindex;
   right: 0;
   height: 100%;
-  width: $panel-width;
-  max-width: calc(100% - #{$panel-close-button-width});
-  background: $panel-background;
+  width: $psv-panel-width;
+  max-width: calc(100% - #{$psv-panel-close-button-width});
+  background: $psv-panel-background;
   transform: translate3d(100%, 0, 0);
   opacity: 0;
   transition-property: opacity, transform;
   transition-timing-function: ease-in-out;
   transition-duration: .1s;
   cursor: default;
-  margin-left: $panel-resizer-width;
+  margin-left: $psv-panel-resizer-width;
 
   .psv-container.has-navbar & {
-    height: calc(100% - #{$buttons-height + 2 * $buttons-padding});
+    height: calc(100% - #{$psv-buttons-height + 2 * $psv-buttons-padding});
   }
 
   .close-button {
     display: none;
     position: absolute;
     top: 0;
-    left: -$panel-close-button-width;
-    width: $panel-close-button-width;
-    height: $panel-close-button-width;
-    background: $panel-close-button-background;
+    left: -$psv-panel-close-button-width;
+    width: $psv-panel-close-button-width;
+    height: $psv-panel-close-button-width;
+    background: $psv-panel-close-button-background;
 
     &::before, &::after {
       content: '';
       position: absolute;
       top: 50%;
       left: 4px;
-      width: $panel-close-button-width - 9px;
+      width: $psv-panel-close-button-width - 9px;
       height: 1px;
-      background-color: $panel-close-button-color;
+      background-color: $psv-panel-close-button-color;
       transition: .2s ease-in-out;
       transition-property: width, left, transform;
     }
@@ -52,7 +52,7 @@ $panel-resizer-grip-width: $panel-resizer-width - 4px;
     &:hover {
       &::before, &::after {
         left: 0;
-        width: $panel-close-button-width - 1px;
+        width: $psv-panel-close-button-width - 1px;
       }
 
       &::before {
@@ -69,22 +69,22 @@ $panel-resizer-grip-width: $panel-resizer-width - 4px;
     display: none;
     position: absolute;
     top: 0;
-    left: -$panel-resizer-width;
-    width: $panel-resizer-width;
+    left: -$psv-panel-resizer-width;
+    width: $psv-panel-resizer-width;
     height: 100%;
-    background-color: $panel-resizer-background;
+    background-color: $psv-panel-resizer-background;
     cursor: col-resize;
 
-    @if $panel-resizer-grip-width > 0 {
+    @if $psv-panel-resizer-grip-width > 0 {
       &::before {
         content: '';
         position: absolute;
         top: 50%;
-        left: ($panel-resizer-width - $panel-resizer-grip-width) / 2 - 1px;
-        margin-top: (-$panel-resizer-grip-height / 2);
+        left: ($psv-panel-resizer-width - $psv-panel-resizer-grip-width) / 2 - 1px;
+        margin-top: (-$psv-panel-resizer-grip-height / 2);
         width: 1px;
         height: 1px;
-        box-shadow: make-dot-shadow($panel-resizer-grip-color, $panel-resizer-grip-width, $panel-resizer-grip-height);
+        box-shadow: make-dot-shadow($psv-panel-resizer-grip-color, $psv-panel-resizer-grip-width, $psv-panel-resizer-grip-height);
         background: transparent;
       }
     }
@@ -94,12 +94,12 @@ $panel-resizer-grip-width: $panel-resizer-width - 4px;
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-    color: $panel-text-color;
-    font: $panel-font;
+    color: $psv-panel-text-color;
+    font: $psv-panel-font;
     overflow: auto;
 
     &:not(.no-margin) {
-      padding: $panel-padding;
+      padding: $psv-panel-padding;
     }
 
     &.no-interaction {
