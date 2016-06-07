@@ -67,6 +67,11 @@ function PhotoSphereViewer(options) {
     console.warn('PhotoSphereViewer: max_fov cannot be lower than min_fov.');
   }
 
+  if (this.config.fisheye) {
+    console.warn('PhotoSphereViewer: fisheye is not compatible with markers.');
+    this.config.markers = null;
+  }
+
   // normalize config
   this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
   this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
@@ -97,6 +102,12 @@ function PhotoSphereViewer(options) {
     this.config.latitude_range = this.config.latitude_range.map(function(angle) {
       return PSVUtils.stayBetween(PSVUtils.parseAngle(angle, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
     });
+  }
+  if (this.config.fisheye === true) {
+    this.config.fisheye = 1;
+  }
+  else if (this.config.fisheye === false) {
+    this.config.fisheye = 0;
   }
 
   // references to components

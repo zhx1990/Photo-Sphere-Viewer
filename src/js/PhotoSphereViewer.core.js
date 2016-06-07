@@ -204,8 +204,9 @@ PhotoSphereViewer.prototype._createScene = function() {
   // Renderer depends on whether WebGL is supported or not
   this.renderer = PhotoSphereViewer.SYSTEM.isWebGLSupported && this.config.webgl ? new THREE.WebGLRenderer() : new THREE.CanvasRenderer();
   this.renderer.setSize(this.prop.size.width, this.prop.size.height);
+  this.renderer.setPixelRatio(PhotoSphereViewer.SYSTEM.pixelRatio);
 
-  this.camera = new THREE.PerspectiveCamera(this.config.default_fov, this.prop.size.width / this.prop.size.height, 1, 300);
+  this.camera = new THREE.PerspectiveCamera(this.config.default_fov, this.prop.size.width / this.prop.size.height, 1, 600);
   this.camera.position.set(0, 0, 0);
 
   if (this.config.gyroscope && PSVUtils.checkTHREE('DeviceOrientationControls')) {
@@ -216,7 +217,7 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.scene.add(this.camera);
 
   // The middle of the panorama is placed at longitude=0
-  var geometry = new THREE.SphereGeometry(200, this.config.sphere_segments, this.config.sphere_segments, -PSVUtils.HalfPI);
+  var geometry = new THREE.SphereGeometry(300, this.config.sphere_segments, this.config.sphere_segments, -PSVUtils.HalfPI);
 
   var material = new THREE.MeshBasicMaterial();
   material.side = THREE.DoubleSide;

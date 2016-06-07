@@ -70,6 +70,15 @@ PhotoSphereViewer.prototype.isFullscreenEnabled = function() {
 PhotoSphereViewer.prototype.render = function(updateDirection) {
   if (updateDirection !== false) {
     this.prop.direction = this.sphericalCoordsToVector3(this.prop.longitude, this.prop.latitude);
+
+    if (this.config.fisheye) {
+      var fisheyeFactor = 150 * this.config.fisheye;
+      this.prop.direction.x *= fisheyeFactor;
+      this.prop.direction.y *= fisheyeFactor;
+      this.prop.direction.z *= fisheyeFactor;
+      this.camera.position.copy(this.prop.direction).negate();
+    }
+
     this.camera.lookAt(this.prop.direction);
     // this.camera.rotation.z = 0;
   }

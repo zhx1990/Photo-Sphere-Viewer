@@ -70,6 +70,7 @@ PhotoSphereViewer.DEFAULTS = {
   time_anim: 2000,
   anim_speed: '2rpm',
   anim_lat: null,
+  fisheye: false,
   navbar: [
     'autorotate',
     'zoom',
