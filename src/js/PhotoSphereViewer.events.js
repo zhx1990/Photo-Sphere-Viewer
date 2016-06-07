@@ -137,7 +137,7 @@ PhotoSphereViewer.prototype._onTouchStart = function(evt) {
  * @private
  */
 PhotoSphereViewer.prototype._startMove = function(evt) {
-  if (this.prop.orientation_reqid || this.prop.autorotate_reqid) {
+  if (this.isGyroscopeEnabled()) {
     return;
   }
 
