@@ -11,6 +11,12 @@ PhotoSphereViewer.MOVE_THRESHOLD = 4;
 PhotoSphereViewer.INERTIA_WINDOW = 300;
 
 /**
+ * Radius of the THREE.Sphere
+ * @type {int}
+ */
+PhotoSphereViewer.SPHERE_RADIUS = 100;
+
+/**
  * Map between keyboard events "keyCode|which" and "key"
  * @type {Object.<int, string>}
  */

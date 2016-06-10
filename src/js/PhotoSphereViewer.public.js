@@ -72,10 +72,7 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
     this.prop.direction = this.sphericalCoordsToVector3(this.prop.longitude, this.prop.latitude);
 
     if (this.config.fisheye) {
-      var fisheyeFactor = 150 * this.config.fisheye;
-      this.prop.direction.x *= fisheyeFactor;
-      this.prop.direction.y *= fisheyeFactor;
-      this.prop.direction.z *= fisheyeFactor;
+      this.prop.direction.multiplyScalar(this.config.fisheye / 2);
       this.camera.position.copy(this.prop.direction).negate();
     }
 

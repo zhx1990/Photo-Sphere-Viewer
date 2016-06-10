@@ -85,9 +85,9 @@ PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(longitude,
  */
 PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(longitude, latitude) {
   return new THREE.Vector3(
-    -Math.cos(latitude) * Math.sin(longitude),
-    Math.sin(latitude),
-    Math.cos(latitude) * Math.cos(longitude)
+    PhotoSphereViewer.SPHERE_RADIUS * -Math.cos(latitude) * Math.sin(longitude),
+    PhotoSphereViewer.SPHERE_RADIUS * Math.sin(latitude),
+    PhotoSphereViewer.SPHERE_RADIUS * Math.cos(latitude) * Math.cos(longitude)
   );
 };
 
