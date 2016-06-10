@@ -150,7 +150,10 @@
             image: 'pin.png',
             width: 32,
             height: 32,
-            anchor: 'bottom center'
+            anchor: 'bottom center',
+            data: {
+              deletable: true
+            }
           });
         }
       }
@@ -286,17 +289,21 @@
     }
     PSV.addMarker({
       id: '#' + Math.random(),
+      tooltip: 'Generated marker',
       longitude: e.longitude,
       latitude: e.latitude,
       image: 'pin.png',
       width: 32,
       height: 32,
-      anchor: 'bottom center'
+      anchor: 'bottom center',
+      data: {
+        deletable: true
+      }
     });
   });
 
   PSV.on('select-marker', function(marker) {
-    if (marker.id.indexOf('#') === 0) {
+    if (marker.data && marker.data.deletable) {
       PSV.removeMarker(marker);
     }
     else if (marker.id === 'gif') {

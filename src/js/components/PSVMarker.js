@@ -29,6 +29,7 @@ function PSVMarker(properties, psv) {
   var _type = PSVMarker.getType(properties, false);
   var $el;
 
+  // readonly properties
   Object.defineProperties(this, {
     id: {
       configurable: false,
@@ -57,7 +58,7 @@ function PSVMarker(properties, psv) {
       set: function(value) {
       }
     },
-    data: {
+    _def: {
       configurable: false,
       enumerable: true,
       get: function() {
@@ -229,81 +230,81 @@ PSVMarker.prototype._updateSvg = function() {
   // set content
   switch (this.type) {
     case 'rect':
-      if (typeof this.data == 'number') {
-        this.data = {
+      if (typeof this._def == 'number') {
+        this._def = {
           x: 0,
           y: 0,
-          width: this.data,
-          height: this.data
+          width: this._def,
+          height: this._def
         };
       }
-      else if (Array.isArray(this.data)) {
-        this.data = {
+      else if (Array.isArray(this._def)) {
+        this._def = {
           x: 0,
           y: 0,
-          width: this.data[0],
-          height: this.data[1]
+          width: this._def[0],
+          height: this._def[1]
         };
       }
       else {
-        this.data.x = this.data.y = 0;
+        this._def.x = this._def.y = 0;
       }
       break;
 
     case 'circle':
-      if (typeof this.data == 'number') {
-        this.data = {
-          cx: this.data,
-          cy: this.data,
-          r: this.data
+      if (typeof this._def == 'number') {
+        this._def = {
+          cx: this._def,
+          cy: this._def,
+          r: this._def
         };
       }
-      else if (Array.isArray(this.data)) {
-        this.data = {
-          cx: this.data[0],
-          cy: this.data[0],
-          r: this.data[0]
+      else if (Array.isArray(this._def)) {
+        this._def = {
+          cx: this._def[0],
+          cy: this._def[0],
+          r: this._def[0]
         };
       }
       else {
-        this.data.cx = this.data.cy = this.data.r;
+        this._def.cx = this._def.cy = this._def.r;
       }
       break;
 
     case 'ellipse':
-      if (typeof this.data == 'number') {
-        this.data = {
-          cx: this.data,
-          cy: this.data,
-          rx: this.data,
-          ry: this.data
+      if (typeof this._def == 'number') {
+        this._def = {
+          cx: this._def,
+          cy: this._def,
+          rx: this._def,
+          ry: this._def
         };
       }
-      else if (Array.isArray(this.data)) {
-        this.data = {
-          cx: this.data[0],
-          cy: this.data[1],
-          rx: this.data[0],
-          ry: this.data[1]
+      else if (Array.isArray(this._def)) {
+        this._def = {
+          cx: this._def[0],
+          cy: this._def[1],
+          rx: this._def[0],
+          ry: this._def[1]
         };
       }
       else {
-        this.data.cx = this.data.rx;
-        this.data.cy = this.data.ry;
+        this._def.cx = this._def.rx;
+        this._def.cy = this._def.ry;
       }
       break;
 
     case 'path':
-      if (typeof this.data == 'string') {
-        this.data = {
-          d: this.data
+      if (typeof this._def == 'string') {
+        this._def = {
+          d: this._def
         };
       }
       break;
   }
 
-  Object.getOwnPropertyNames(this.data).forEach(function(prop) {
-    this.$el.setAttributeNS(null, prop, this.data[prop]);
+  Object.getOwnPropertyNames(this._def).forEach(function(prop) {
+    this.$el.setAttributeNS(null, prop, this._def[prop]);
   }, this);
 
   // set style
