@@ -117,6 +117,8 @@ PSVHUD.prototype.addMarker = function(properties, render) {
   if (render !== false) {
     this.updatePositions();
   }
+
+  return marker;
 };
 
 /**
@@ -245,11 +247,13 @@ PSVHUD.prototype.updatePositions = function() {
 
   for (var id in this.markers) {
     var marker = this.markers[id];
+    var isVisible = marker.visible;
 
-    if (marker.isPolygon()) {
+    if (isVisible && marker.isPolygon()) {
       var positions = this._getPolygonPositions(marker);
+      isVisible = positions.length > 2;
 
-      if (this._isPolygonVisible(marker, positions)) {
+      if (isVisible) {
         marker.position2D = this._getPolygonDimensions(marker, positions);
 
         var points = '';
@@ -258,33 +262,21 @@ PSVHUD.prototype.updatePositions = function() {
         });
 
         marker.$el.setAttributeNS(null, 'points', points);
-
-        if (!marker.$el.classList.contains('psv-marker--visible')) {
-          marker.$el.classList.add('psv-marker--visible');
-        }
-      }
-      else {
-        marker.position2D = null;
-        marker.$el.classList.remove('psv-marker--visible');
       }
     }
-    else {
+    else if (isVisible) {
       var position = this._getMarkerPosition(marker);
+      isVisible = this._isMarkerVisible(marker, position);
 
-      if (this._isMarkerVisible(marker, position)) {
+      if (isVisible) {
         marker.position2D = position;
 
-        marker.$el.style.transform = 'translate3D(' + position.left + 'px, ' + position.top + 'px, ' + '0px) rotateZ(' + rotation + 'deg)';
-
-        if (!marker.$el.classList.contains('psv-marker--visible')) {
-          marker.$el.classList.add('psv-marker--visible');
-        }
-      }
-      else {
-        marker.position2D = null;
-        marker.$el.classList.remove('psv-marker--visible');
+        marker.$el.style.transform = 'translate3D(' + position.left + 'px, ' + position.top + 'px, ' + '0px)' +
+          (!marker.lockRotation && rotation ? ' rotateZ(' + rotation + 'deg)' : '');
       }
     }
+
+    PSVUtils.toggleClass(marker.$el, 'psv-marker--visible', isVisible);
   }
 };
 
@@ -297,31 +289,11 @@ PSVHUD.prototype.updatePositions = function() {
  * @private
  */
 PSVHUD.prototype._isMarkerVisible = function(marker, position) {
-  return marker.visible &&
-    marker.position3D.dot(this.psv.prop.direction) > 0 &&
+  return marker.position3D.dot(this.psv.prop.direction) > 0 &&
     position.left + marker.width >= 0 &&
     position.left - marker.width <= this.psv.prop.size.width &&
     position.top + marker.height >= 0 &&
     position.top - marker.height <= this.psv.prop.size.height;
-};
-
-/**
- * Determine if a polygon marker is visible
- * It tests if at least one point is in the viewport
- * @param {PSVMarker} marker
- * @param {{top: int, left: int}[]} positions
- * @returns {boolean}
- * @private
- */
-PSVHUD.prototype._isPolygonVisible = function(marker, positions) {
-  return marker.visible &&
-    positions.some(function(pos, i) {
-      return marker.positions3D[i].dot(this.psv.prop.direction) > 0 &&
-        pos.left >= 0 &&
-        pos.left <= this.psv.prop.size.width &&
-        pos.top >= 0 &&
-        pos.top <= this.psv.prop.size.height;
-    }, this);
 };
 
 /**
@@ -351,14 +323,87 @@ PSVHUD.prototype._getMarkerPosition = function(marker) {
 
 /**
  * Compute HUD coordinates of each point of a polygon
+ * It handles points behind the camera by creating intermediary points suitable for the projector
  * @param {PSVMarker} marker
  * @returns {{top: int, left: int}[]}
  * @private
  */
-PSVHUD.prototype._getPolygonPositions = function(marker) {
-  return marker.positions3D.map(function(pos) {
-    return this.psv.vector3ToViewerCoords(pos);
+PSVHUD.prototype._getPolygonPositions = function (marker) {
+  var nbVectors = marker.positions3D.length;
+
+  // compute if each vector is visible
+  var positions3D = marker.positions3D.map(function (vector) {
+    return {
+      vector: vector,
+      visible: vector.dot(this.psv.prop.direction) > 0
+    };
   }, this);
+
+  // get pairs of visible/invisible vector for each invisible vector connected to a visible vector
+  var toBeComputed = [];
+  positions3D.forEach(function (pos, i) {
+    if (!pos.visible) {
+      var neighbours = [
+        i === 0 ? positions3D[nbVectors - 1] : positions3D[i - 1],
+        i === nbVectors - 1 ? positions3D[0] : positions3D[i + 1]
+      ];
+
+      neighbours.forEach(function (neighbour) {
+        if (neighbour.visible) {
+          toBeComputed.push({
+            visible: neighbour,
+            invisible: pos,
+            index: i
+          });
+        }
+      });
+    }
+  });
+
+  // compute intermediary vector for each pair (the loop is reversed for splice to insert at the right place)
+  toBeComputed.reverse().forEach(function (pair) {
+    positions3D.splice(pair.index, 0, {
+      vector: this._getPolygonIntermediaryPoint(pair.visible.vector, pair.invisible.vector),
+      visible: true
+    });
+  }, this);
+
+  // translate vectors to screen pos
+  return positions3D
+    .filter(function (pos) {
+      return pos.visible;
+    })
+    .map(function (pos) {
+      return this.psv.vector3ToViewerCoords(pos.vector);
+    }, this);
+};
+
+/**
+ * Given one point in the same direction of the camera and one point behind the camera,
+ * computes an intermadiary point on the great circle delimiting the half sphere visible by the camera.
+ * The point is shifted by .01 rad because the projector cannot handle points exactly on this circle.
+ * @link http://math.stackexchange.com/a/1730410/327208
+ * @param P1 {THREE.Vector3}
+ * @param P2 {THREE.Vector3}
+ * @returns {THREE.Vector3}
+ * @private
+ */
+PSVHUD.prototype._getPolygonIntermediaryPoint = function (P1, P2) {
+  var n = new THREE.Vector3().crossVectors(P1, P2).normalize();
+  var v = new THREE.Vector3().crossVectors(n, P1).normalize();
+
+  var N = this.psv.prop.direction.clone().normalize();
+
+  var H = new THREE.Vector3().addVectors(P1.clone().multiplyScalar(-N.dot(v)), v.clone().multiplyScalar(N.dot(P1)))
+    .normalize();
+
+  var axis = new THREE.Vector3().crossVectors(H, N);
+
+  H.applyAxisAngle(axis, 0.01).multiplyScalar(PhotoSphereViewer.SPHERE_RADIUS);
+
+  console.log(H);
+
+  return H;
 };
 
 /**

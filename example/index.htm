@@ -224,6 +224,23 @@
       });
 
       a.push({
+        id: 'polygon-sky',
+        svgStyle: {
+          fill: 'rgba(0, 190, 255, 0.1)'
+        },
+        polygon_rad: (function() {
+          var points = [];
+
+          for (var i = 0; i < Math.PI*2; i+= Math.PI/8) {
+            points.push(i);
+            points.push(Math.PI/8);
+          }
+
+          return points;
+        }())
+      });
+
+      a.push({
         id: 'circle',
         tooltip: 'A circle of radius 30',
         circle: 30,

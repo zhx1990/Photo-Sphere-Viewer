@@ -22,6 +22,7 @@ function PSVMarker(properties, psv) {
   // public properties
   this.psv = psv;
   this.visible = true;
+  this.lockRotation = false,
   this.dynamicSize = false;
 
   // private properties
