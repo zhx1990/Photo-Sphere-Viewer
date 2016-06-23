@@ -54,7 +54,7 @@ PhotoSphereViewer.prototype._loadXMP = function() {
     }
     else if (xhr.readyState === 3) {
       if (self.loader) {
-        self.loader.setProgress(progress + 10);
+        self.loader.setProgress(progress += 10);
       }
     }
   };
