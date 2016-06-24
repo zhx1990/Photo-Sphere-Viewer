@@ -245,8 +245,8 @@ module.exports = function(grunt) {
    */
   grunt.registerTask('serve', [
     'default',
-    'open',
     'connect',
+    'open',
     'watch'
   ]);
 };

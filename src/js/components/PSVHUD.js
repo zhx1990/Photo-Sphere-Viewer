@@ -328,11 +328,11 @@ PSVHUD.prototype._getMarkerPosition = function(marker) {
  * @returns {{top: int, left: int}[]}
  * @private
  */
-PSVHUD.prototype._getPolygonPositions = function (marker) {
+PSVHUD.prototype._getPolygonPositions = function(marker) {
   var nbVectors = marker.positions3D.length;
 
   // compute if each vector is visible
-  var positions3D = marker.positions3D.map(function (vector) {
+  var positions3D = marker.positions3D.map(function(vector) {
     return {
       vector: vector,
       visible: vector.dot(this.psv.prop.direction) > 0
@@ -341,14 +341,14 @@ PSVHUD.prototype._getPolygonPositions = function (marker) {
 
   // get pairs of visible/invisible vector for each invisible vector connected to a visible vector
   var toBeComputed = [];
-  positions3D.forEach(function (pos, i) {
+  positions3D.forEach(function(pos, i) {
     if (!pos.visible) {
       var neighbours = [
         i === 0 ? positions3D[nbVectors - 1] : positions3D[i - 1],
         i === nbVectors - 1 ? positions3D[0] : positions3D[i + 1]
       ];
 
-      neighbours.forEach(function (neighbour) {
+      neighbours.forEach(function(neighbour) {
         if (neighbour.visible) {
           toBeComputed.push({
             visible: neighbour,
@@ -361,7 +361,7 @@ PSVHUD.prototype._getPolygonPositions = function (marker) {
   });
 
   // compute intermediary vector for each pair (the loop is reversed for splice to insert at the right place)
-  toBeComputed.reverse().forEach(function (pair) {
+  toBeComputed.reverse().forEach(function(pair) {
     positions3D.splice(pair.index, 0, {
       vector: this._getPolygonIntermediaryPoint(pair.visible.vector, pair.invisible.vector),
       visible: true
@@ -370,40 +370,32 @@ PSVHUD.prototype._getPolygonPositions = function (marker) {
 
   // translate vectors to screen pos
   return positions3D
-    .filter(function (pos) {
+    .filter(function(pos) {
       return pos.visible;
     })
-    .map(function (pos) {
+    .map(function(pos) {
       return this.psv.vector3ToViewerCoords(pos.vector);
     }, this);
 };
 
 /**
  * Given one point in the same direction of the camera and one point behind the camera,
- * computes an intermadiary point on the great circle delimiting the half sphere visible by the camera.
+ * computes an intermediary point on the great circle delimiting the half sphere visible by the camera.
  * The point is shifted by .01 rad because the projector cannot handle points exactly on this circle.
  * @link http://math.stackexchange.com/a/1730410/327208
+ *
  * @param P1 {THREE.Vector3}
  * @param P2 {THREE.Vector3}
  * @returns {THREE.Vector3}
  * @private
  */
-PSVHUD.prototype._getPolygonIntermediaryPoint = function (P1, P2) {
-  var n = new THREE.Vector3().crossVectors(P1, P2).normalize();
-  var v = new THREE.Vector3().crossVectors(n, P1).normalize();
-
-  var N = this.psv.prop.direction.clone().normalize();
-
-  var H = new THREE.Vector3().addVectors(P1.clone().multiplyScalar(-N.dot(v)), v.clone().multiplyScalar(N.dot(P1)))
-    .normalize();
-
-  var axis = new THREE.Vector3().crossVectors(H, N);
-
-  H.applyAxisAngle(axis, 0.01).multiplyScalar(PhotoSphereViewer.SPHERE_RADIUS);
-
-  console.log(H);
-
-  return H;
+PSVHUD.prototype._getPolygonIntermediaryPoint = function(P1, P2) {
+  var C = this.psv.prop.direction.clone().normalize();
+  var N = new THREE.Vector3().crossVectors(P1, P2).normalize();
+  var V = new THREE.Vector3().crossVectors(N, P1).normalize();
+  var H = new THREE.Vector3().addVectors(P1.clone().multiplyScalar(-C.dot(V)), V.clone().multiplyScalar(C.dot(P1))).normalize();
+  var a = new THREE.Vector3().crossVectors(H, C);
+  return H.applyAxisAngle(a, 0.01).multiplyScalar(PhotoSphereViewer.SPHERE_RADIUS);
 };
 
 /**
