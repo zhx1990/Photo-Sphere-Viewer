@@ -72,7 +72,7 @@ PSVNavBarGyroscopeButton.prototype._onClick = function() {
  */
 PSVNavBarGyroscopeButton.prototype._onAvailabilityChange = function(available) {
   if (available) {
-    if (this.psv.doControls) {
+    if (PSVUtils.checkTHREE('DeviceOrientationControls')) {
       this.show();
     }
     else {
