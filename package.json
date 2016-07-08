@@ -1,6 +1,6 @@
 {
   "name": "Photo-Sphere-Viewer",
-  "version": "3.2.0",
+  "version": "3.2.1",
   "authors": [
     {
       "name": "Jérémy Heleine",
@@ -24,13 +24,13 @@
     "grunt-contrib-sass": "^1.0.0",
     "grunt-contrib-uglify": "^1.0.0",
     "grunt-contrib-watch": "^1.0.0",
-    "grunt-jscs": "^2.8.0",
+    "grunt-jscs": "^3.0.1",
     "grunt-mocha-test": "^0.12.7",
     "grunt-open": "^0.2.3",
     "grunt-scss-lint": "^0.3.8",
     "grunt-wrap": "^0.3.0",
     "jit-grunt": "^0.10.0",
-    "mocha": "^2.4.5",
+    "mocha": "^2.5.3",
     "time-grunt": "^1.3.0"
   },
   "keywords": [
