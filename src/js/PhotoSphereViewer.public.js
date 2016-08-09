@@ -183,6 +183,10 @@ PhotoSphereViewer.prototype.destroy = function() {
  * @returns {promise}
  */
 PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
+  if (this.prop.loading_promise !== null) {
+    throw new PSVError('Loading already in progress');
+  }
+
   if (typeof position == 'boolean') {
     transition = position;
     position = undefined;
@@ -201,19 +205,20 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
   if (!transition || !this.config.transition || !this.scene) {
     this.loader = new PSVLoader(this);
 
-    return this._loadTexture()
-      .then(this._setTexture.bind(this))
-      .then(function() {
+    this.prop.loading_promise = this._loadTexture()
+      .ensure(function() {
         if (self.loader) {
           self.loader.destroy();
           self.loader = null;
         }
 
+        self.prop.loading_promise = null;
+      })
+      .then(function(texture) {
+        self._setTexture(texture);
+
         if (position) {
           self.rotate(position);
-        }
-        else {
-          self.render();
         }
       })
       .rethrow();
@@ -223,7 +228,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
       this.loader = new PSVLoader(this);
     }
 
-    return this._loadTexture()
+    this.prop.loading_promise = this._loadTexture()
       .then(function(texture) {
         if (self.loader) {
           self.loader.destroy();
@@ -232,8 +237,18 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
 
         return self._transition(texture, position);
       })
+      .ensure(function() {
+        if (self.loader) {
+          self.loader.destroy();
+          self.loader = null;
+        }
+
+        self.prop.loading_promise = null;
+      })
       .rethrow();
   }
+
+  return this.prop.loading_promise;
 };
 
 /**

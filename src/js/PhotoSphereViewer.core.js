@@ -173,7 +173,6 @@ PhotoSphereViewer.prototype._loadTexture = function() {
  * Applies the texture to the scene
  * Creates the scene if needed
  * @param {THREE.Texture} texture - The sphere texture
- * @returns {promise}
  * @private
  */
 PhotoSphereViewer.prototype._setTexture = function(texture) {
@@ -190,8 +189,6 @@ PhotoSphereViewer.prototype._setTexture = function(texture) {
   this.trigger('panorama-loaded');
 
   this.render();
-
-  return D.resolved();
 };
 
 /**
