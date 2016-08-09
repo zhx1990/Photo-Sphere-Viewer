@@ -221,6 +221,7 @@ PhotoSphereViewer.prototype._createScene = function() {
 
   var material = new THREE.MeshBasicMaterial();
   material.side = THREE.DoubleSide;
+  material.overdraw = PhotoSphereViewer.SYSTEM.isWebGLSupported && this.config.webgl ? 0 : 0.5;
 
   this.mesh = new THREE.Mesh(geometry, material);
   this.mesh.scale.x = -1;
@@ -275,10 +276,11 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
   var self = this;
 
   // create a new sphere with the new texture
-  var geometry = new THREE.SphereGeometry(150, 32, 32, -PSVUtils.HalfPI);
+  var geometry = new THREE.SphereGeometry(PhotoSphereViewer.SPHERE_RADIUS * 1.5, this.config.sphere_segments, this.config.sphere_segments, -PSVUtils.HalfPI);
 
   var material = new THREE.MeshBasicMaterial();
   material.side = THREE.DoubleSide;
+  material.overdraw = PhotoSphereViewer.SYSTEM.isWebGLSupported && this.config.webgl ? 0 : 0.5;
   material.map = texture;
   material.transparent = true;
   material.opacity = 0;
