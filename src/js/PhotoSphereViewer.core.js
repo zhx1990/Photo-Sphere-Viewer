@@ -1,9 +1,10 @@
 /**
  * Loads the XMP data with AJAX
+ * @param {string} panorama
  * @returns {promise}
  * @private
  */
-PhotoSphereViewer.prototype._loadXMP = function() {
+PhotoSphereViewer.prototype._loadXMP = function (panorama) {
   if (!this.config.usexmpdata) {
     return D.resolved(null);
   }
@@ -74,7 +75,7 @@ PhotoSphereViewer.prototype._loadXMP = function() {
     throw new PSVError('Cannot load image');
   };
 
-  xhr.open('GET', this.config.panorama, true);
+  xhr.open('GET', panorama, true);
   xhr.send(null);
 
   return defer.promise;
@@ -82,13 +83,24 @@ PhotoSphereViewer.prototype._loadXMP = function() {
 
 /**
  * Loads the sphere texture
+ * @param {string} panorama
  * @returns {promise}
  * @private
  */
-PhotoSphereViewer.prototype._loadTexture = function() {
+PhotoSphereViewer.prototype._loadTexture = function (panorama) {
   var self = this;
 
-  return this._loadXMP().then(function(pano_data) {
+  if (this.config.cache_texture) {
+    var cache = this.getPanoramaCache(panorama);
+
+    if (cache) {
+      this.prop.pano_data = cache.pano_data;
+
+      return D.resolved(cache.image);
+    }
+  }
+
+  return this._loadXMP(panorama).then(function (pano_data) {
     var defer = D();
     var loader = new THREE.ImageLoader();
     var progress = pano_data ? 100 : 0;
@@ -145,6 +157,14 @@ PhotoSphereViewer.prototype._loadTexture = function() {
       texture.minFilter = THREE.LinearFilter;
       texture.generateMipmaps = false;
 
+      if (self.config.cache_texture) {
+        self._putPanoramaCache({
+          panorama: panorama,
+          image: texture,
+          pano_data: pano_data
+        });
+      }
+
       defer.resolve(texture);
     };
 
@@ -163,7 +183,7 @@ PhotoSphereViewer.prototype._loadTexture = function() {
       throw new PSVError('Cannot load image');
     };
 
-    loader.load(self.config.panorama, onload, onprogress, onerror);
+    loader.load(panorama, onload, onprogress, onerror);
 
     return defer.promise;
   });
@@ -413,4 +433,31 @@ PhotoSphereViewer.prototype._reverseAutorotate = function() {
       self.config.longitude_range = range;
       self.config.anim_speed = newSpeed;
     });
+};
+
+/**
+ * Adds a panorama to the cache
+ * @param {object} cache
+ *    - panorama
+ *    - image
+ *    - pano_data
+ * @private
+ */
+PhotoSphereViewer.prototype._putPanoramaCache = function (cache) {
+  if (!this.config.cache_texture) {
+    throw new PSVError('Cannot add panorama to cache, cache_texture is disabled');
+  }
+
+  var existingCache = this.getPanoramaCache(cache.panorama);
+
+  if (existingCache) {
+    existingCache.image = cache.image;
+    existingCache.pano_data = cache.pano_data;
+  }
+  else {
+    this.prop.cache = this.prop.cache.slice(0, this.config.cache_texture - 1); // remove most ancient elements
+    this.prop.cache.unshift(cache);
+  }
+
+  this.trigger('panorama-cached', cache.panorama);
 };

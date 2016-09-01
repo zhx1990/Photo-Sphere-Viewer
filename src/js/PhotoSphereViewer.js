@@ -67,6 +67,11 @@ function PhotoSphereViewer(options) {
     console.warn('PhotoSphereViewer: max_fov cannot be lower than min_fov.');
   }
 
+  if (this.config.cache_texture && (!PSVUtils.isInteger(this.config.cache_texture) || this.config.cache_texture < 0)) {
+    this.config.cache_texture = PhotoSphereViewer.DEFAULTS.cache_texture;
+    console.warn('PhotoSphreViewer: invalid valud for cache_texture');
+  }
+
   // normalize config
   this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
   this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
@@ -147,6 +152,7 @@ function PhotoSphereViewer(options) {
     animation_promise: null, // promise of the current animation (either go to position or image transition)
     loading_promise: null, // promise of the setPanorama method
     start_timeout: null, // timeout id of the automatic rotation delay
+    cache: [],
     size: { // size of the container
       width: 0,
       height: 0
