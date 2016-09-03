@@ -4,7 +4,7 @@
  * @returns {promise}
  * @private
  */
-PhotoSphereViewer.prototype._loadXMP = function (panorama) {
+PhotoSphereViewer.prototype._loadXMP = function(panorama) {
   if (!this.config.usexmpdata) {
     return D.resolved(null);
   }
@@ -87,7 +87,7 @@ PhotoSphereViewer.prototype._loadXMP = function (panorama) {
  * @returns {promise}
  * @private
  */
-PhotoSphereViewer.prototype._loadTexture = function (panorama) {
+PhotoSphereViewer.prototype._loadTexture = function(panorama) {
   var self = this;
 
   if (this.config.cache_texture) {
@@ -100,7 +100,7 @@ PhotoSphereViewer.prototype._loadTexture = function (panorama) {
     }
   }
 
-  return this._loadXMP(panorama).then(function (pano_data) {
+  return this._loadXMP(panorama).then(function(pano_data) {
     var defer = D();
     var loader = new THREE.ImageLoader();
     var progress = pano_data ? 100 : 0;
@@ -339,15 +339,15 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
 
   // 1st half animation
   return PSVUtils.animation({
-      properties: {
-        density: { start: 0.0, end: 1.5 },
-        opacity: { start: 0.0, end: 0.5 },
-        zoom: { start: original_zoom_lvl, end: 100 }
-      },
-      duration: self.config.transition.duration / (self.config.transition.blur ? 4 / 3 : 2),
-      easing: self.config.transition.blur ? 'outCubic' : 'linear',
-      onTick: onTick
-    })
+    properties: {
+      density: { start: 0.0, end: 1.5 },
+      opacity: { start: 0.0, end: 0.5 },
+      zoom: { start: original_zoom_lvl, end: 100 }
+    },
+    duration: self.config.transition.duration / (self.config.transition.blur ? 4 / 3 : 2),
+    easing: self.config.transition.blur ? 'outCubic' : 'linear',
+    onTick: onTick
+  })
     .then(function() {
       // 2nd half animation
       return PSVUtils.animation({
@@ -408,15 +408,15 @@ PhotoSphereViewer.prototype._reverseAutorotate = function() {
   this.config.longitude_range = null;
 
   PSVUtils.animation({
-      properties: {
-        speed: { start: this.config.anim_speed, end: 0 }
-      },
-      duration: 300,
-      easing: 'inSine',
-      onTick: function(properties) {
-        self.config.anim_speed = properties.speed;
-      }
-    })
+    properties: {
+      speed: { start: this.config.anim_speed, end: 0 }
+    },
+    duration: 300,
+    easing: 'inSine',
+    onTick: function(properties) {
+      self.config.anim_speed = properties.speed;
+    }
+  })
     .then(function() {
       return PSVUtils.animation({
         properties: {
@@ -443,7 +443,7 @@ PhotoSphereViewer.prototype._reverseAutorotate = function() {
  *    - pano_data
  * @private
  */
-PhotoSphereViewer.prototype._putPanoramaCache = function (cache) {
+PhotoSphereViewer.prototype._putPanoramaCache = function(cache) {
   if (!this.config.cache_texture) {
     throw new PSVError('Cannot add panorama to cache, cache_texture is disabled');
   }

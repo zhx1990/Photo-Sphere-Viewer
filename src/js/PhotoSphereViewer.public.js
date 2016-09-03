@@ -206,7 +206,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
   if (!transition || !this.config.transition || !this.scene) {
     this.loader = new PSVLoader(this);
 
-    return this.prop.loading_promise = this._loadTexture(this.config.panorama)
+    this.prop.loading_promise = this._loadTexture(this.config.panorama)
       .ensure(function() {
         if (self.loader) {
           self.loader.destroy();
@@ -229,7 +229,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
       this.loader = new PSVLoader(this);
     }
 
-    return this.prop.loading_promise = this._loadTexture(this.config.panorama)
+    this.prop.loading_promise = this._loadTexture(this.config.panorama)
       .then(function(texture) {
         if (self.loader) {
           self.loader.destroy();
@@ -248,6 +248,8 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
       })
       .rethrow();
   }
+
+  return this.prop.loading_promise;
 };
 
 /**
@@ -420,7 +422,7 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
   // longitude offset for shortest arc
   var tOffset = this.getShortestArc(this.prop.longitude, position.longitude);
 
-  return this.prop.animation_promise = PSVUtils.animation({
+  this.prop.animation_promise = PSVUtils.animation({
     properties: {
       longitude: { start: this.prop.longitude, end: this.prop.longitude + tOffset },
       latitude: { start: this.prop.latitude, end: position.latitude }
@@ -429,6 +431,8 @@ PhotoSphereViewer.prototype.animate = function(position, duration) {
     easing: 'inOutSine',
     onTick: this.rotate.bind(this)
   });
+
+  return this.prop.animation_promise;
 };
 
 /**
