@@ -111,6 +111,7 @@ PhotoSphereViewer.prototype._loadTexture = function(panorama) {
       if (self.loader) {
         self.loader.setProgress(100);
       }
+      self.trigger('panorama-load-progress', panorama, 100);
 
       // Config XMP data
       if (!pano_data && self.config.pano_data) {
@@ -174,6 +175,7 @@ PhotoSphereViewer.prototype._loadTexture = function(panorama) {
         if (new_progress > progress) {
           progress = new_progress;
           self.loader.setProgress(progress);
+          self.trigger('panorama-load-progress', panorama, progress);
         }
       }
     };
