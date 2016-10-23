@@ -12,7 +12,12 @@ PhotoSphereViewer.loadSystem = function() {
   S.fullscreenEvent = PSVUtils.fullscreenEvent();
   S.deviceOrientationSupported = D();
 
-  window.addEventListener('deviceorientation', PhotoSphereViewer.deviceOrientationListener, false);
+  if ('DeviceOrientationEvent' in window) {
+    window.addEventListener('deviceorientation', PhotoSphereViewer.deviceOrientationListener, false);
+  }
+  else {
+    S.deviceOrientationSupported.reject();
+  }
 };
 
 /**

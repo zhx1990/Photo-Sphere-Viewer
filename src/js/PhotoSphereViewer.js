@@ -25,7 +25,7 @@ function PhotoSphereViewer(options) {
   }
 
   if ((!PhotoSphereViewer.SYSTEM.isWebGLSupported || !this.config.webgl) && !PSVUtils.checkTHREE('CanvasRenderer', 'Projector')) {
-    throw new PSVError('Missing Three.js components: CanvasRenderer, Projector. Get them from threejs-examples package.');
+    throw new PSVError('Missing Three.js components: CanvasRenderer, Projector. Get them from three.js-examples package.');
   }
 
   if (this.config.transition && this.config.transition.blur) {
@@ -34,7 +34,7 @@ function PhotoSphereViewer(options) {
       console.warn('PhotoSphereViewer: Using canvas rendering, blur transition disabled.');
     }
     else if (!PSVUtils.checkTHREE('EffectComposer', 'RenderPass', 'ShaderPass', 'MaskPass', 'CopyShader')) {
-      throw new PSVError('Missing Three.js components: EffectComposer, RenderPass, ShaderPass, MaskPass, CopyShader. Get them from threejs-examples package.');
+      throw new PSVError('Missing Three.js components: EffectComposer, RenderPass, ShaderPass, MaskPass, CopyShader. Get them from three.js-examples package.');
     }
   }
 
