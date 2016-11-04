@@ -60,7 +60,7 @@ PhotoSphereViewer.prototype.isGyroscopeEnabled = function() {
  * @returns {boolean}
  */
 PhotoSphereViewer.prototype.isFullscreenEnabled = function() {
-  return PSVUtils.isFullscreenEnabled(this.parent);
+  return PSVUtils.isFullscreenEnabled(this.container);
 };
 
 /**
@@ -485,7 +485,7 @@ PhotoSphereViewer.prototype.zoomOut = function() {
  */
 PhotoSphereViewer.prototype.toggleFullscreen = function() {
   if (!this.isFullscreenEnabled()) {
-    PSVUtils.requestFullscreen(this.parent);
+    PSVUtils.requestFullscreen(this.container);
   }
   else {
     PSVUtils.exitFullscreen();
