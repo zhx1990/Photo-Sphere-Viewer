@@ -1,12 +1,14 @@
 /**
  * Starts to load the panorama
+ *
+ * @returns {promise}
  */
 PhotoSphereViewer.prototype.load = function() {
   if (!this.config.panorama) {
     throw new PSVError('No value given for panorama.');
   }
 
-  this.setPanorama(this.config.panorama, false);
+  return this.setPanorama(this.config.panorama, false);
 };
 
 /**
