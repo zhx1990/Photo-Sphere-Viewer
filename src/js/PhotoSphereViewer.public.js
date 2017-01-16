@@ -397,13 +397,15 @@ PhotoSphereViewer.prototype.rotate = function(position, render) {
  * Rotate the camera with animation
  * @param {object} position - latitude & longitude or x & y
  * @param {string|int} duration - animation speed (per spec) or duration (milliseconds)
+ * @return {Promise} Returns a promise witch will be resolved when the animation finishes
  */
 PhotoSphereViewer.prototype.animate = function(position, duration) {
   this.stopAll();
 
   if (!duration) {
     this.rotate(position);
-    return;
+
+    return D.resolved();
   }
 
   this.cleanPosition(position);

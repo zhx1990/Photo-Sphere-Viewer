@@ -206,10 +206,11 @@ PSVHUD.prototype.clearMarkers = function(render) {
  * Go to a specific marker
  * @param {*} marker
  * @param {string|int} [duration]
+ * @return {Promise}  A promise that will be resolved When the animation finis
  */
 PSVHUD.prototype.gotoMarker = function(marker, duration) {
   marker = this.getMarker(marker);
-  this.psv.animate(marker, duration);
+  return this.psv.animate(marker, duration);
 };
 
 /**
