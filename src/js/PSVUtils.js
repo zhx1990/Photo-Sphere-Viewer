@@ -1,23 +1,32 @@
 /**
  * Static utilities for PSV
- * @type {object}
+ * @namespace
  */
 var PSVUtils = {};
 
 /**
  * Short-Hand for PI*2
  * @type {float}
+ * @readonly
  */
 PSVUtils.TwoPI = Math.PI * 2.0;
 
 /**
  * Short-Hand for PI/2
  * @type {float}
+ * @readonly
  */
 PSVUtils.HalfPI = Math.PI / 2.0;
 
 /**
- * Check if some Three.js components are loaded
+ * Namespace for SVG creation
+ * @type {string}
+ * @readonly
+ */
+PSVUtils.svgNS = 'http://www.w3.org/2000/svg';
+
+/**
+ * Checks if some Three.js components are loaded
  * @param {...string} components
  * @returns {boolean}
  */
@@ -137,7 +146,7 @@ PSVUtils.removeClasses = function(element, className) {
 };
 
 /**
- * Search if an element has a particular, at any level including itself
+ * Searches if an element has a particular parent at any level including itself
  * @param {HTMLElement} el
  * @param {HTMLElement} parent
  * @returns {boolean}
@@ -153,7 +162,7 @@ PSVUtils.hasParent = function(el, parent) {
 };
 
 /**
- * Get closest parent (can by itself)
+ * Gets the closest parent (can by itself)
  * @param {HTMLElement} el (HTMLElement)
  * @param {string} selector
  * @returns {HTMLElement}
@@ -171,7 +180,7 @@ PSVUtils.getClosest = function(el, selector) {
 };
 
 /**
- * Get the event name for mouse wheel
+ * Gets the event name for mouse wheel
  * @returns {string}
  */
 PSVUtils.mouseWheelEvent = function() {
@@ -181,7 +190,7 @@ PSVUtils.mouseWheelEvent = function() {
 };
 
 /**
- * Get the event name for fullscreen event
+ * Gets the event name for fullscreen event
  * @returns {string}
  */
 PSVUtils.fullscreenEvent = function() {
@@ -206,7 +215,7 @@ PSVUtils.fullscreenEvent = function() {
  * @param {number} max
  * @returns {number}
  */
-PSVUtils.stayBetween = function(x, min, max) {
+PSVUtils.bound = function(x, min, max) {
   return Math.max(min, Math.min(max, x));
 };
 
@@ -241,7 +250,7 @@ PSVUtils.getXMPValue = function(data, attr) {
 };
 
 /**
- * Detects whether fullscreen is enabled or not
+ * Detects whether fullscreen is enabled
  * @param {HTMLElement} elt
  * @returns {boolean}
  */
@@ -275,7 +284,26 @@ PSVUtils.getStyle = function(elt, prop) {
 };
 
 /**
- * Translate CSS values like "top center" or "10% 50%" as top and left positions
+ * Compute the shortest offset between two longitudes
+ * @param {float} from
+ * @param {float} to
+ * @returns {float}
+ */
+PSVUtils.getShortestArc = function(from, to) {
+  var tCandidates = [
+    0, // direct
+    PSVUtils.TwoPI, // clock-wise cross zero
+    -PSVUtils.TwoPI // counter-clock-wise cross zero
+  ];
+
+  return tCandidates.reduce(function(value, candidate) {
+    candidate = to - from + candidate;
+    return Math.abs(candidate) < Math.abs(value) ? candidate : value;
+  }, Infinity);
+};
+
+/**
+ * Translate CSS values like "top center" or "10% 50%" as top and left positions<br>
  * The implementation is as close as possible to the "background-position" specification
  * {@link https://developer.mozilla.org/en-US/docs/Web/CSS/background-position}
  * @param {string} value
@@ -327,7 +355,7 @@ PSVUtils.parsePosition = function(value) {
 PSVUtils.parsePosition.positions = { 'top': '0%', 'bottom': '100%', 'left': '0%', 'right': '100%', 'center': '50%' };
 
 /**
- * Parse an speed
+ * Parses an speed
  * @param {string} speed - The speed, in radians/degrees/revolutions per second/minute
  * @returns {float} radians per second
  */
@@ -378,10 +406,10 @@ PSVUtils.parseSpeed = function(speed) {
 };
 
 /**
- * Parses an angle value in radians or degrees and return a normalized value in radians
+ * Parses an angle value in radians or degrees and returns a normalized value in radians
  * @param {string|number} angle - eg: 3.14, 3.14rad, 180deg
- * @param {float|boolean} [reference =0] - base value for normalization, false to disable
- * @returns (double)
+ * @param {float|boolean} [reference=0] - base value for normalization, false to disable
+ * @returns {float}
  */
 PSVUtils.parseAngle = function(angle, reference) {
   if (typeof angle == 'string') {
@@ -428,18 +456,24 @@ PSVUtils.parseAngle = function(angle, reference) {
 };
 
 /**
+ * @callback AnimationOnTick
+ * @param {Object} properties - current values
+ * @param {float} progress - 0 to 1
+ */
+
+/**
  * Utility for animations, interpolates each property with an easing and optional delay
  * @param {Object} options
  * @param {Object[]} options.properties
  * @param {number} options.properties[].start
  * @param {number} options.properties[].end
  * @param {int} options.duration
- * @param {int} [options.delay]
+ * @param {int} [options.delay=0]
  * @param {string} [options.easing='linear']
- * @param {Function} options.onTick - called with interpolated properties and progression (0 to 1)
+ * @param {AnimationOnTick} options.onTick - called on each frame
  * @param {Function} [options.onDone]
  * @param {Function} [options.onCancel]
- * @returns {promise} with an additional "cancel" method
+ * @returns {Promise} Promise with an additional "cancel" method
  */
 PSVUtils.animation = function(options) {
   var defer = D();
@@ -621,10 +655,9 @@ PSVUtils.isPlainObject = function(obj) {
 };
 
 /**
- * Merge the enumerable attributes of two objects.
- * Modified to replace arrays instead of merge.
- * Modified to alter the target object.
- * @copyright Nicholas Fisher {@link mailto:nfisher110@gmail.com} - modified by Damien "Mistic" Sorel
+ * Merges the enumerable attributes of two objects.<br>
+ * Modified to replace arrays instead of merge and alter the target object.
+ * @copyright Nicholas Fisher <nfisher110@gmail.com>
  * @param {Object} target
  * @param {Object} src
  * @returns {Object} target
@@ -671,7 +704,7 @@ PSVUtils.deepmerge = function(target, src) {
 };
 
 /**
- * Clone an object
+ * Clones an object
  * @param {Object} src
  * @returns {Object}
  */

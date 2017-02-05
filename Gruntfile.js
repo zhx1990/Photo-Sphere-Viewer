@@ -166,6 +166,19 @@ module.exports = function(grunt) {
     },
 
     /**
+     * jsDoc generation
+     */
+    jsdoc: {
+      lib: {
+        src: ['src/js/**/*.js', '!src/js/.wrapper.js', '!src/js/lib/*.js'],
+        dest: 'doc',
+        options: {
+          private: false
+        }
+      }
+    },
+
+    /**
      * Mocha unit tests
      */
     mochaTest: {

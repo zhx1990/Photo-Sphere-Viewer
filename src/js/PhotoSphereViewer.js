@@ -1,6 +1,50 @@
 /**
+ * @typedef {Object} Point
+ * @property {int} x
+ * @property {int} y
+ */
+
+/**
+ * @typedef {Object} Size
+ * @property {int} width
+ * @property {int} height
+ */
+
+/**
+ * @typedef {Object} Position
+ * @property {float} longitude
+ * @property {float} latitude
+ */
+
+/**
+ * A position that can be expressed either in spherical coordinates (radians or degrees) or in texture coordinates (pixels)
+ * @typedef {Object} ExtendedPosition
+ * @property {float} longitude
+ * @property {float} latitude
+ * @property {int} x
+ * @property {int} y
+ */
+
+/**
+ * @typedef {Object} CacheItem
+ * @property {string} panorama
+ * @property {THREE.Texture} image
+ * @property {PanoData} pano_data
+ */
+
+/**
+ * @typedef {Object} PanoData
+ * @property {int} full_width
+ * @property {int} full_height
+ * @property {int} cropped_width
+ * @property {int} cropped_height
+ * @property {int} cropped_x
+ * @property {int} cropped_y
+ */
+
+/**
  * Viewer class
- * @param {Object} options - Viewer settings
+ * @param {Object} options see {@link http://photo-sphere-viewer.js.org/#options}
  * @constructor
  */
 function PhotoSphereViewer(options) {
@@ -9,9 +53,14 @@ function PhotoSphereViewer(options) {
   }
 
   if (!PhotoSphereViewer.SYSTEM.loaded) {
-    PhotoSphereViewer.loadSystem();
+    PhotoSphereViewer._loadSystem();
   }
 
+  /**
+   * Configuration object
+   * @member {Object}
+   * @readonly
+   */
   this.config = PSVUtils.clone(PhotoSphereViewer.DEFAULTS);
   PSVUtils.deepmerge(this.config, options);
 
@@ -73,21 +122,21 @@ function PhotoSphereViewer(options) {
   }
 
   // normalize config
-  this.config.min_fov = PSVUtils.stayBetween(this.config.min_fov, 1, 179);
-  this.config.max_fov = PSVUtils.stayBetween(this.config.max_fov, 1, 179);
+  this.config.min_fov = PSVUtils.bound(this.config.min_fov, 1, 179);
+  this.config.max_fov = PSVUtils.bound(this.config.max_fov, 1, 179);
   if (this.config.default_fov === null) {
     this.config.default_fov = this.config.max_fov / 2 + this.config.min_fov / 2;
   }
   else {
-    this.config.default_fov = PSVUtils.stayBetween(this.config.default_fov, this.config.min_fov, this.config.max_fov);
+    this.config.default_fov = PSVUtils.bound(this.config.default_fov, this.config.min_fov, this.config.max_fov);
   }
   this.config.default_long = PSVUtils.parseAngle(this.config.default_long);
-  this.config.default_lat = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.default_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
+  this.config.default_lat = PSVUtils.bound(PSVUtils.parseAngle(this.config.default_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
   if (this.config.anim_lat === null) {
     this.config.anim_lat = this.config.default_lat;
   }
   else {
-    this.config.anim_lat = PSVUtils.stayBetween(PSVUtils.parseAngle(this.config.anim_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
+    this.config.anim_lat = PSVUtils.bound(PSVUtils.parseAngle(this.config.anim_lat, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
   }
   this.config.anim_speed = PSVUtils.parseSpeed(this.config.anim_speed);
   if (this.config.caption && !this.config.navbar) {
@@ -100,7 +149,7 @@ function PhotoSphereViewer(options) {
   }
   if (this.config.latitude_range) {
     this.config.latitude_range = this.config.latitude_range.map(function(angle) {
-      return PSVUtils.stayBetween(PSVUtils.parseAngle(angle, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
+      return PSVUtils.bound(PSVUtils.parseAngle(angle, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
     });
   }
   if (this.config.fisheye === true) {
@@ -110,54 +159,162 @@ function PhotoSphereViewer(options) {
     this.config.fisheye = 0;
   }
 
-  // references to components
+  /**
+   * Top most parent
+   * @member {HTMLElement}
+   * @readonly
+   */
   this.parent = (typeof options.container == 'string') ? document.getElementById(options.container) : options.container;
+
+  /**
+   * Main container
+   * @member {HTMLElement}
+   * @readonly
+   */
   this.container = null;
+
+  /**
+   * @member {PSVLoader}
+   * @readonly
+   */
   this.loader = null;
+
+  /**
+   * @member {PSVNavBar}
+   * @readonly
+   */
   this.navbar = null;
+
+  /**
+   * @member {PSVHUD}
+   * @readonly
+   */
   this.hud = null;
+
+  /**
+   * @member {PSVPanel}
+   * @readonly
+   */
   this.panel = null;
+
+  /**
+   * @member {PSVTooltip}
+   * @readonly
+   */
   this.tooltip = null;
+
+  /**
+   * @member {HTMLElement}
+   * @readonly
+   */
   this.canvas_container = null;
+
+  /**
+   * @member {THREE.WebGLRenderer | THREE.CanvasRenderer}
+   * @readonly
+   */
   this.renderer = null;
+
+  /**
+   * @member {THREE.EffectComposer}
+   * @readonly
+   */
   this.composer = null;
+
+  /**
+   * @member {Object.<string, THREE.Pass>}
+   * @readonly
+   */
   this.passes = {};
+
+  /**
+   * @member {THREE.Scene}
+   * @readonly
+   */
   this.scene = null;
+
+  /**
+   * @member {THREE.PerspectiveCamera}
+   * @readonly
+   */
   this.camera = null;
+
+  /**
+   * @member {THREE.Mesh}
+   * @readonly
+   */
   this.mesh = null;
+
+  /**
+   * @member {THREE.Raycaster}
+   * @readonly
+   */
   this.raycaster = null;
+
+  /**
+   * @member {THREE.DeviceOrientationControls}
+   * @readonly
+   */
   this.doControls = null;
 
-  // local properties
+  /**
+   * Internal properties, must not be modified externally
+   * @member {Object}
+   * @property {float} longitude - current longitude of the center
+   * @property {float} longitude - current latitude of the center
+   * @property {THREE.Vector3} direction - direction of the camera
+   * @property {float} anim_speed - parsed animation speed (rad/sec)
+   * @property {int} zoom_lvl - current zoom level
+   * @property {float} vFov - vertical FOV
+   * @property {float} hFov - horizontal FOV
+   * @property {float} aspect - viewer aspect ratio
+   * @property {float} move_speed - move speed (computed with pixel ratio and configuration move_speed)
+   * @property {boolean} moving - is the user moving
+   * @property {boolean} zooming - is the user zooming
+   * @property {int} start_mouse_x - start x position of the click/touch
+   * @property {int} start_mouse_y - start y position of the click/touch
+   * @property {int} mouse_x - current x position of the cursor
+   * @property {int} mouse_y - current y position of the cursor
+   * @property {Array[]} mouse_history - list of latest positions of the cursor, [time, x, y]
+   * @property {int} pinch_dist - distance between fingers when zooming
+   * @property orientation_reqid - animationRequest id of the device orientation
+   * @property autorotate_reqid - animationRequest id of the automatic rotation
+   * @property {Promise} animation_promise - promise of the current animation (either go to position or image transition)
+   * @property {Promise} loading_promise - promise of the setPanorama method
+   * @property start_timeout - timeout id of the automatic rotation delay
+   * @propery {CacheItem[]} cache - cached panoramas
+   * @propery {Size} size - size of the container
+   * @property {PanoData} pano_data - panorama metadata
+   */
   this.prop = {
-    latitude: 0, // current latitude of the center
-    longitude: 0, // current longitude of the center
-    anim_speed: 0, // parsed anim speed (rad/sec)
-    zoom_lvl: 0, // current zoom level
-    vFov: 0, // vertical FOV
-    hFov: 0, // horizontal FOV
-    aspect: 0, // viewer aspect ratio
-    move_speed: 0.1, // move speed (computed with pixel ratio and config move_speed)
-    moving: false, // is the user moving
-    zooming: false, // is the user zooming
-    start_mouse_x: 0, // start x position of the click/touch
-    start_mouse_y: 0, // start y position of the click/touch
-    mouse_x: 0, // current x position of the cursor
-    mouse_y: 0, // current y position of the cursor
-    mouse_history: [], // list of latest positions of the cursor [time, x, y]
-    pinch_dist: 0, // distance between fingers when zooming
-    direction: null, // direction of the camera (Vector3)
-    orientation_reqid: null, // animationRequest id of the device orientation
-    autorotate_reqid: null, // animationRequest id of the automatic rotation
-    animation_promise: null, // promise of the current animation (either go to position or image transition)
-    loading_promise: null, // promise of the setPanorama method
-    start_timeout: null, // timeout id of the automatic rotation delay
+    longitude: 0,
+    latitude: 0,
+    direction: null,
+    anim_speed: 0,
+    zoom_lvl: 0,
+    vFov: 0,
+    hFov: 0,
+    aspect: 0,
+    move_speed: 0.1,
+    moving: false,
+    zooming: false,
+    start_mouse_x: 0,
+    start_mouse_y: 0,
+    mouse_x: 0,
+    mouse_y: 0,
+    mouse_history: [],
+    pinch_dist: 0,
+    orientation_reqid: null,
+    autorotate_reqid: null,
+    animation_promise: null,
+    loading_promise: null,
+    start_timeout: null,
     cache: [],
-    size: { // size of the container
+    size: {
       width: 0,
       height: 0
     },
-    pano_data: { // panorama metadata
+    pano_data: {
       full_width: 0,
       full_height: 0,
       cropped_width: 0,

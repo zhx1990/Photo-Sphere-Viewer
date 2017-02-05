@@ -1,5 +1,5 @@
 /**
- * Add all needed event listeners
+ * Adds all needed event listeners
  * @private
  */
 PhotoSphereViewer.prototype._bindEvents = function() {
@@ -31,7 +31,7 @@ PhotoSphereViewer.prototype._bindEvents = function() {
 };
 
 /**
- * Handle events
+ * Handles events
  * @param {Event} evt
  * @private
  */
@@ -75,7 +75,7 @@ PhotoSphereViewer.prototype._onResize = function() {
 };
 
 /**
- * Rotate or zoom on key down
+ * Handles keyboard events
  * @param {KeyboardEvent} evt
  * @private
  */
@@ -109,7 +109,7 @@ PhotoSphereViewer.prototype._onKeyDown = function(evt) {
 };
 
 /**
- * The user wants to move
+ * Handles mouse button events
  * @param {MouseEvent} evt
  * @private
  */
@@ -118,7 +118,28 @@ PhotoSphereViewer.prototype._onMouseDown = function(evt) {
 };
 
 /**
- * The user wants to move (touch version)
+ * Handles mouse buttons events
+ * @param {MouseEvent} evt
+ * @private
+ */
+PhotoSphereViewer.prototype._onMouseUp = function(evt) {
+  this._stopMove(evt);
+};
+
+/**
+ * Handles mouse move events
+ * @param {MouseEvent} evt
+ * @private
+ */
+PhotoSphereViewer.prototype._onMouseMove = function(evt) {
+  if (evt.buttons !== 0) {
+    evt.preventDefault();
+    this._move(evt);
+  }
+};
+
+/**
+ * Handles touch events
  * @param {TouchEvent} evt
  * @private
  */
@@ -128,6 +149,31 @@ PhotoSphereViewer.prototype._onTouchStart = function(evt) {
   }
   else if (evt.touches.length === 2) {
     this._startZoom(evt);
+  }
+};
+
+/**
+ * Handles touch events
+ * @param {TouchEvent} evt
+ * @private
+ */
+PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
+  this._stopMove(evt.changedTouches[0]);
+};
+
+/**
+ * Handles touch move events
+ * @param {TouchEvent} evt
+ * @private
+ */
+PhotoSphereViewer.prototype._onTouchMove = function(evt) {
+  if (evt.touches.length === 1) {
+    evt.preventDefault();
+    this._move(evt.touches[0]);
+  }
+  else if (evt.touches.length === 2) {
+    evt.preventDefault();
+    this._zoom(evt);
   }
 };
 
@@ -169,27 +215,8 @@ PhotoSphereViewer.prototype._startZoom = function(evt) {
 };
 
 /**
- * The user wants to stop moving
- * @param {MouseEvent} evt
- * @private
- */
-PhotoSphereViewer.prototype._onMouseUp = function(evt) {
-  this._stopMove(evt);
-};
-
-/**
- * The user wants to stop moving (touch version)
- * @param {TouchEvent} evt
- * @private
- */
-PhotoSphereViewer.prototype._onTouchEnd = function(evt) {
-  this._stopMove(evt.changedTouches[0]);
-};
-
-/**
- * Stops the movement
- * If the move threshold was not reached, a click event is triggered
- *    otherwise a animation is launched to simulate inertia
+ * Stops the movement<br>
+ * If the move threshold was not reached a click event is triggered, otherwise an animation is launched to simulate inertia
  * @param {MouseEvent|Touch} evt
  * @private
  */
@@ -220,7 +247,7 @@ PhotoSphereViewer.prototype._stopMove = function(evt) {
 };
 
 /**
- * Performs an animation to simulate inertia when stop moving
+ * Performs an animation to simulate inertia when the movement stops
  * @param {MouseEvent|Touch} evt
  * @private
  */
@@ -254,7 +281,7 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
 };
 
 /**
- * Trigger an event with all coordinates when a simple click is performed
+ * Triggers an event with all coordinates when a simple click is performed
  * @param {MouseEvent|Touch} evt
  * @private
  */
@@ -269,48 +296,18 @@ PhotoSphereViewer.prototype._click = function(evt) {
     viewer_y: parseInt(evt.clientY - boundingRect.top)
   };
 
-  var intersect = this.viewerCoordsToVector3(data.viewer_x, data.viewer_y);
+  var intersect = this.viewerCoordsToVector3({x: data.viewer_x, y: data.viewer_y});
 
   if (intersect) {
     var sphericalCoords = this.vector3ToSphericalCoords(intersect);
-
     data.longitude = sphericalCoords.longitude;
     data.latitude = sphericalCoords.latitude;
 
-    var textureCoords = this.sphericalCoordsToTextureCoords(data.longitude, data.latitude);
-
+    var textureCoords = this.sphericalCoordsToTextureCoords(data);
     data.texture_x = textureCoords.x;
     data.texture_y = textureCoords.y;
 
     this.trigger('click', data);
-  }
-};
-
-/**
- * The user moves the image
- * @param {MouseEvent} evt
- * @private
- */
-PhotoSphereViewer.prototype._onMouseMove = function(evt) {
-  if (evt.buttons !== 0) {
-    evt.preventDefault();
-    this._move(evt);
-  }
-};
-
-/**
- * The user moves the image (touch version)
- * @param {TouchEvent} evt
- * @private
- */
-PhotoSphereViewer.prototype._onTouchMove = function(evt) {
-  if (evt.touches.length === 1) {
-    evt.preventDefault();
-    this._move(evt.touches[0]);
-  }
-  else if (evt.touches.length === 2) {
-    evt.preventDefault();
-    this._zoom(evt);
   }
 };
 
@@ -337,7 +334,7 @@ PhotoSphereViewer.prototype._move = function(evt) {
 };
 
 /**
- * Zoom
+ * Perfoms zoom
  * @param {TouchEvent} evt
  * @private
  */
@@ -358,7 +355,7 @@ PhotoSphereViewer.prototype._zoom = function(evt) {
 };
 
 /**
- * The user wants to zoom (wheel version)
+ * Handles mouse wheel events
  * @param {MouseWheelEvent} evt
  * @private
  */
@@ -375,7 +372,7 @@ PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
 };
 
 /**
- * Fullscreen state has changed
+ * Handles fullscreen events
  * @private
  */
 PhotoSphereViewer.prototype._fullscreenToggled = function() {
@@ -394,9 +391,9 @@ PhotoSphereViewer.prototype._fullscreenToggled = function() {
 };
 
 /**
- * Store each mouse position during a mouse move
- * Positions older than "INERTIA_WINDOW" are removed
- * Positions before a pause of "INERTIA_WINDOW" / 10 are removed
+ * Stores each mouse position during a mouse move<br>
+ * - Positions older than "INERTIA_WINDOW" are removed<br>
+ * - Positions before a pause of "INERTIA_WINDOW" / 10 are removed <br>
  * @param {MouseEvent|Touch} evt
  * @private
  */
@@ -421,4 +418,3 @@ PhotoSphereViewer.prototype._logMouseMove = function(evt) {
     }
   }
 };
-

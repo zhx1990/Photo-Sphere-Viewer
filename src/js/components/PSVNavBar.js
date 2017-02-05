@@ -6,7 +6,16 @@
 function PSVNavBar(psv) {
   PSVComponent.call(this, psv);
 
+  /**
+   * @member {Object}
+   * @readonly
+   */
   this.config = this.psv.config.navbar;
+
+  /**
+   * @member {Array.<PSVNavBarButton|PSVComponent>}
+   * @readonly
+   */
   this.items = [];
 
   // all buttons
@@ -117,8 +126,8 @@ PSVNavBar.prototype.destroy = function() {
 };
 
 /**
- * Returns a button by it's identifier
- * @param {string|number} id
+ * Returns a button by its identifier
+ * @param {*} id
  * @returns {PSVNavBarButton}
  */
 PSVNavBar.prototype.getNavbarButton = function(id) {
@@ -139,7 +148,7 @@ PSVNavBar.prototype.getNavbarButton = function(id) {
 };
 
 /**
- * Show the navbar
+ * Shows the navbar
  */
 PSVNavBar.prototype.showNavbar = function() {
   this.toggleNavbar(true);

@@ -1,24 +1,28 @@
 /**
  * Number of pixels bellow which a mouse move will be considered as a click
  * @type {int}
+ * @readonly
  */
 PhotoSphereViewer.MOVE_THRESHOLD = 4;
 
 /**
  * Time size of the mouse position history used to compute inertia
  * @type {int}
+ * @readonly
  */
 PhotoSphereViewer.INERTIA_WINDOW = 300;
 
 /**
  * Radius of the THREE.Sphere
  * @type {int}
+ * @readonly
  */
 PhotoSphereViewer.SPHERE_RADIUS = 100;
 
 /**
  * Map between keyboard events "keyCode|which" and "key"
  * @type {Object.<int, string>}
+ * @readonly
  */
 PhotoSphereViewer.KEYMAP = {
   33: 'PageUp',
@@ -34,12 +38,14 @@ PhotoSphereViewer.KEYMAP = {
 /**
  * SVG icons sources
  * @type {Object.<string, string>}
+ * @readonly
  */
 PhotoSphereViewer.ICONS = {};
 
 /**
  * System properties
  * @type {Object}
+ * @readonly
  */
 PhotoSphereViewer.SYSTEM = {
   loaded: false,
@@ -53,8 +59,9 @@ PhotoSphereViewer.SYSTEM = {
 };
 
 /**
- * PhotoSphereViewer defaults
+ * Default options
  * @type {Object}
+ * @readonly
  */
 PhotoSphereViewer.DEFAULTS = {
   panorama: null,
@@ -123,6 +130,7 @@ PhotoSphereViewer.DEFAULTS = {
 /**
  * doT.js templates
  * @type {Object.<string, string>}
+ * @readonly
  */
 PhotoSphereViewer.TEMPLATES = {
   markersList: '\

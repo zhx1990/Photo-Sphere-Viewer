@@ -1,7 +1,7 @@
 /**
  * Loads the XMP data with AJAX
  * @param {string} panorama
- * @returns {promise}
+ * @returns {Promise.<PanoData>}
  * @private
  */
 PhotoSphereViewer.prototype._loadXMP = function(panorama) {
@@ -84,7 +84,7 @@ PhotoSphereViewer.prototype._loadXMP = function(panorama) {
 /**
  * Loads the sphere texture
  * @param {string} panorama
- * @returns {promise}
+ * @returns {Promise.<THREE.Texture>}
  * @private
  */
 PhotoSphereViewer.prototype._loadTexture = function(panorama) {
@@ -192,8 +192,7 @@ PhotoSphereViewer.prototype._loadTexture = function(panorama) {
 };
 
 /**
- * Applies the texture to the scene
- * Creates the scene if needed
+ * Applies the texture to the scene, creates the scene if needed
  * @param {THREE.Texture} texture - The sphere texture
  * @private
  */
@@ -285,10 +284,10 @@ PhotoSphereViewer.prototype._createScene = function() {
 };
 
 /**
- * Perform transition between current and new texture
+ * Performs transition between the current and a new texture
  * @param {THREE.Texture} texture
- * @param {{latitude: float, longitude: float}} [position]
- * @returns {promise}
+ * @param {Position} [position]
+ * @returns {Promise}
  * @private
  */
 PhotoSphereViewer.prototype._transition = function(texture, position) {
@@ -400,7 +399,7 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
 };
 
 /**
- * Reverse autorotate direction with smooth transition
+ * Reverses autorotate direction with smooth transition
  * @private
  */
 PhotoSphereViewer.prototype._reverseAutorotate = function() {
@@ -439,10 +438,7 @@ PhotoSphereViewer.prototype._reverseAutorotate = function() {
 
 /**
  * Adds a panorama to the cache
- * @param {object} cache
- *    - panorama
- *    - image
- *    - pano_data
+ * @param {CacheItem} cache
  * @private
  */
 PhotoSphereViewer.prototype._putPanoramaCache = function(cache) {

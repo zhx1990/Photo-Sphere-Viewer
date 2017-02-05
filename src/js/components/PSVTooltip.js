@@ -6,9 +6,19 @@
 function PSVTooltip(hud) {
   PSVComponent.call(this, hud);
 
+  /**
+   * @member {Object}
+   * @readonly
+   */
   this.config = this.psv.config.tooltip;
 
-  this.timeout = null;
+  /**
+   * @member {Object}
+   * @private
+   */
+  this.prop = {
+    timeout: null
+  };
 
   this.create();
 }
@@ -45,12 +55,13 @@ PSVTooltip.prototype.destroy = function() {
   this.psv.off('render', this);
 
   delete this.config;
+  delete this.prop;
 
   PSVComponent.prototype.destroy.call(this);
 };
 
 /**
- * Handle events
+ * Handles events
  * @param {Event} e
  * @private
  */
@@ -63,7 +74,7 @@ PSVTooltip.prototype.handleEvent = function(e) {
 };
 
 /**
- * Returns if the tooltip is visible
+ * Checks if the tooltip is visible
  * @returns {boolean}
  */
 PSVTooltip.prototype.isTooltipVisible = function() {
@@ -71,19 +82,21 @@ PSVTooltip.prototype.isTooltipVisible = function() {
 };
 
 /**
- * Show the tooltip
+ * Shows the tooltip
  * @param {Object} config
  * @param {string} config.content
  * @param {int} config.top
  * @param {int} config.left
  * @param {string} [config.position='top center']
  * @param {string} [config.className]
- * @param {PSVMarker} [config.marker]
+ * @param {Object} [config.box]
+ * @param {int} [config.box.width=0]
+ * @param {int} [config.box.height=0]
  */
 PSVTooltip.prototype.showTooltip = function(config) {
-  if (this.timeout) {
-    window.clearTimeout(this.timeout);
-    this.timeout = null;
+  if (this.prop.timeout) {
+    window.clearTimeout(this.prop.timeout);
+    this.prop.timeout = null;
   }
 
   var isUpdate = this.isTooltipVisible();
@@ -95,8 +108,8 @@ PSVTooltip.prototype.showTooltip = function(config) {
     config.position = ['top', 'center'];
   }
 
-  if (!config.marker) {
-    config.marker = {
+  if (!config.box) {
+    config.box = {
       width: 0,
       height: 0
     };
@@ -121,7 +134,7 @@ PSVTooltip.prototype.showTooltip = function(config) {
     // Remove every other classes (Firefox does not implements forEach)
     for (var i = t.classList.length - 1; i >= 0; i--) {
       var item = t.classList.item(i);
-      if (item != 'psv-tooltip' && item != 'visible') {
+      if (item != 'psv-tooltip' && item != 'psv-tooltip--visible') {
         t.classList.remove(item);
       }
     }
@@ -187,21 +200,21 @@ PSVTooltip.prototype.showTooltip = function(config) {
   // delay for correct transition between the two classes
   if (!isUpdate) {
     var self = this;
-    this.timeout = window.setTimeout(function() {
+    this.prop.timeout = window.setTimeout(function() {
       t.classList.add('psv-tooltip--visible');
       self.psv.trigger('show-tooltip');
-      self.timeout = null;
+      self.prop.timeout = null;
     }, this.config.delay);
   }
 };
 
 /**
- * Hide the tooltip
+ * Hides the tooltip
  */
 PSVTooltip.prototype.hideTooltip = function() {
-  if (this.timeout) {
-    window.clearTimeout(this.timeout);
-    this.timeout = null;
+  if (this.prop.timeout) {
+    window.clearTimeout(this.prop.timeout);
+    this.prop.timeout = null;
   }
 
   if (this.isTooltipVisible()) {
@@ -209,17 +222,17 @@ PSVTooltip.prototype.hideTooltip = function() {
     this.psv.trigger('hide-tooltip');
 
     var self = this;
-    this.timeout = window.setTimeout(function() {
+    this.prop.timeout = window.setTimeout(function() {
       self.content.innerHTML = null;
       self.container.style.top = '-1000px';
       self.container.style.left = '-1000px';
-      self.timeout = null;
+      self.prop.timeout = null;
     }, this.config.delay);
   }
 };
 
 /**
- * Compute the position of the tooltip and its arrow
+ * Computes the position of the tooltip and its arrow
  * @param {Object} style
  * @param {Object} config
  * @private
@@ -229,13 +242,13 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, config) {
 
   switch (style.posClass[0]) {
     case 'bottom':
-      style.top = config.top + config.marker.height + this.config.offset + this.config.arrow_size;
+      style.top = config.top + config.box.height + this.config.offset + this.config.arrow_size;
       style.arrow_top = -this.config.arrow_size * 2;
       topBottom = true;
       break;
 
     case 'center':
-      style.top = config.top + config.marker.height / 2 - style.height / 2;
+      style.top = config.top + config.box.height / 2 - style.height / 2;
       style.arrow_top = style.height / 2 - this.config.arrow_size;
       break;
 
@@ -249,23 +262,23 @@ PSVTooltip.prototype._computeTooltipPosition = function(style, config) {
   switch (style.posClass[1]) {
     case 'right':
       if (topBottom) {
-        style.left = config.left + config.marker.width / 2 - this.config.offset - this.config.arrow_size;
+        style.left = config.left + config.box.width / 2 - this.config.offset - this.config.arrow_size;
         style.arrow_left = this.config.offset;
       }
       else {
-        style.left = config.left + config.marker.width + this.config.offset + this.config.arrow_size;
+        style.left = config.left + config.box.width + this.config.offset + this.config.arrow_size;
         style.arrow_left = -this.config.arrow_size * 2;
       }
       break;
 
     case 'center':
-      style.left = config.left + config.marker.width / 2 - style.width / 2;
+      style.left = config.left + config.box.width / 2 - style.width / 2;
       style.arrow_left = style.width / 2 - this.config.arrow_size;
       break;
 
     case 'left':
       if (topBottom) {
-        style.left = config.left - style.width + config.marker.width / 2 + this.config.offset + this.config.arrow_size;
+        style.left = config.left - style.width + config.box.width / 2 + this.config.offset + this.config.arrow_size;
         style.arrow_left = style.width - this.config.offset - this.config.arrow_size * 2;
       }
       else {

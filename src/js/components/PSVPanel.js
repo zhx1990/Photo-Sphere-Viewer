@@ -6,8 +6,17 @@
 function PSVPanel(psv) {
   PSVComponent.call(this, psv);
 
+  /**
+   * Content container
+   * @member {HTMLElement}
+   * @readonly
+   */
   this.content = null;
 
+  /**
+   * @member {Object}
+   * @private
+   */
   this.prop = {
     mouse_x: 0,
     mouse_y: 0,
@@ -73,7 +82,7 @@ PSVPanel.prototype.destroy = function() {
 };
 
 /**
- * Handle events
+ * Handles events
  * @param {Event} e
  * @private
  */
@@ -93,7 +102,7 @@ PSVPanel.prototype.handleEvent = function(e) {
 /**
  * Shows the panel
  * @param {string} content
- * @param {boolean} noMargin
+ * @param {boolean} [noMargin=false]
  */
 PSVPanel.prototype.showPanel = function(content, noMargin) {
   this.content.innerHTML = content;
@@ -106,7 +115,6 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
   this.psv.trigger('open-panel');
 };
 
-
 /**
  * Hides the panel
  */
@@ -118,7 +126,7 @@ PSVPanel.prototype.hidePanel = function() {
 };
 
 /**
- * The user wants to move
+ * Handles mouse down events
  * @param {MouseEvent} evt
  * @private
  */
@@ -128,7 +136,7 @@ PSVPanel.prototype._onMouseDown = function(evt) {
 };
 
 /**
- * The user wants to move (mobile version)
+ * Handles touch events
  * @param {TouchEvent} evt
  * @private
  */
@@ -138,19 +146,7 @@ PSVPanel.prototype._onTouchStart = function(evt) {
 };
 
 /**
- * Initializes the movement
- * @param {MouseEvent|Touch} evt
- * @private
- */
-PSVPanel.prototype._startResize = function(evt) {
-  this.prop.mouse_x = parseInt(evt.clientX);
-  this.prop.mouse_y = parseInt(evt.clientY);
-  this.prop.mousedown = true;
-  this.content.classList.add('psv-panel-content--no-interaction');
-};
-
-/**
- * The user wants to stop moving
+ * Handles mouse up events
  * @param {MouseEvent} evt
  * @private
  */
@@ -163,7 +159,7 @@ PSVPanel.prototype._onMouseUp = function(evt) {
 };
 
 /**
- * The user resizes the panel
+ * Handles mouse move events
  * @param {MouseEvent} evt
  * @private
  */
@@ -175,7 +171,7 @@ PSVPanel.prototype._onMouseMove = function(evt) {
 };
 
 /**
- * The user resizes the panel (mobile version)
+ * Handles touch move events
  * @param {TouchEvent} evt
  * @private
  */
@@ -187,7 +183,19 @@ PSVPanel.prototype._onTouchMove = function(evt) {
 };
 
 /**
- * Panel resizing
+ * Initializes the panel resize
+ * @param {MouseEvent|Touch} evt
+ * @private
+ */
+PSVPanel.prototype._startResize = function(evt) {
+  this.prop.mouse_x = parseInt(evt.clientX);
+  this.prop.mouse_y = parseInt(evt.clientY);
+  this.prop.mousedown = true;
+  this.content.classList.add('psv-panel-content--no-interaction');
+};
+
+/**
+ * Resizes the panel
  * @param {MouseEvent|Touch} evt
  * @private
  */

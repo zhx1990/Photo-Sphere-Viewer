@@ -6,7 +6,18 @@
 function PSVLoader(psv) {
   PSVComponent.call(this, psv);
 
+  /**
+   * Animation canvas
+   * @member {HTMLCanvasElement}
+   * @readonly
+   */
   this.canvas = null;
+
+  /**
+   * Inner container for vertical center
+   * @member {HTMLElement}
+   * @readonly
+   */
   this.loader = null;
 
   this.create();
@@ -18,7 +29,7 @@ PSVLoader.prototype.constructor = PSVLoader;
 PSVLoader.className = 'psv-loader-container';
 
 /**
- * Creates the loader content
+ * Creates the loader
  */
 PSVLoader.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
