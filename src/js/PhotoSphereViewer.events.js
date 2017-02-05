@@ -296,7 +296,7 @@ PhotoSphereViewer.prototype._click = function(evt) {
     viewer_y: parseInt(evt.clientY - boundingRect.top)
   };
 
-  var intersect = this.viewerCoordsToVector3({x: data.viewer_x, y: data.viewer_y});
+  var intersect = this.viewerCoordsToVector3({ x: data.viewer_x, y: data.viewer_y });
 
   if (intersect) {
     var sphericalCoords = this.vector3ToSphericalCoords(intersect);

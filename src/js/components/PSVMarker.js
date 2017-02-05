@@ -421,6 +421,6 @@ PSVMarker.prototype._updatePolygon = function() {
 
   // compute x/y/z positions
   this.positions3D = this.polygon_rad.map(function(coord) {
-    return this.psv.sphericalCoordsToVector3({longitude: coord[0], latitude: coord[1]});
+    return this.psv.sphericalCoordsToVector3({ longitude: coord[0], latitude: coord[1] });
   }, this);
 };

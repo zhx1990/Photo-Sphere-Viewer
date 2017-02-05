@@ -108,7 +108,7 @@ PSVHUD.prototype.handleEvent = function(e) {
 
 /**
  * Adds a new marker to HUD
- * @param {Object} properties
+ * @param {Object} properties {@link PSVMarker}
  * @param {boolean} [render=true]
  * @returns {PSVMarker}
  */
@@ -164,7 +164,7 @@ PSVHUD.prototype.getCurrentMarker = function() {
 
 /**
  * Updates a marker
- * @param {Object} properties
+ * @param {Object} properties {@link PSVMarker}
  * @param {boolean} [render=true]
  * @returns {PSVMarker}
  */
