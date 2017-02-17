@@ -1,7 +1,9 @@
 /**
  * Navigation bar gyroscope button class
- * @param {PSVNavBar} navbar
+ * @param {module:components.PSVNavBar} navbar
  * @constructor
+ * @extends module:components/buttons.PSVNavBarButton
+ * @memberof module:components/buttons
  */
 function PSVNavBarGyroscopeButton(navbar) {
   PSVNavBarButton.call(this, navbar);
@@ -69,6 +71,7 @@ PSVNavBarGyroscopeButton.prototype._onClick = function() {
  * Update button display when API is ready
  * @param {boolean} available
  * @private
+ * @throws {PSVError} when {@link THREE.DeviceOrientationControls} is not loaded
  */
 PSVNavBarGyroscopeButton.prototype._onAvailabilityChange = function(available) {
   if (available) {

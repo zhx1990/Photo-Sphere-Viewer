@@ -1,7 +1,6 @@
 /**
  * Custom error used in the lib
- * {@link http://stackoverflow.com/a/27724419/1207670}
- * @param {*} message
+ * @param {string} message
  * @constructor
  */
 function PSVError(message) {
@@ -19,3 +18,10 @@ function PSVError(message) {
 PSVError.prototype = Object.create(Error.prototype);
 PSVError.prototype.name = 'PSVError';
 PSVError.prototype.constructor = PSVError;
+
+/**
+ * @member {object}
+ * @memberof PhotoSphereViewer
+ * @see PSVError
+ */
+PhotoSphereViewer.Error = PSVError;

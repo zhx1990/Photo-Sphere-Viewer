@@ -57,6 +57,7 @@ PhotoSphereViewer.prototype.handleEvent = function(evt) {
 
 /**
  * Resizes the canvas when the window is resized
+ * @fires PhotoSphereViewer.size-updated
  * @private
  */
 PhotoSphereViewer.prototype._onResize = function() {
@@ -73,6 +74,11 @@ PhotoSphereViewer.prototype._onResize = function() {
       this.render();
     }
 
+    /**
+     * @event size-updated
+     * @memberof PhotoSphereViewer
+     * @param {PhotoSphereViewer.Size} size
+     */
     this.trigger('size-updated', this.getSize());
   }
 };
@@ -286,6 +292,7 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
 /**
  * Triggers an event with all coordinates when a simple click is performed
  * @param {MouseEvent|Touch} evt
+ * @fires PhotoSphereViewer.click
  * @private
  */
 PhotoSphereViewer.prototype._click = function(evt) {
@@ -310,6 +317,11 @@ PhotoSphereViewer.prototype._click = function(evt) {
     data.texture_x = textureCoords.x;
     data.texture_y = textureCoords.y;
 
+    /**
+     * @event click
+     * @memberof PhotoSphereViewer
+     * @param {PhotoSphereViewer.ClickData} data
+     */
     this.trigger('click', data);
   }
 };
@@ -376,6 +388,7 @@ PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
 
 /**
  * Handles fullscreen events
+ * @fires PhotoSphereViewer.fullscreen-updated
  * @private
  */
 PhotoSphereViewer.prototype._fullscreenToggled = function() {
@@ -390,6 +403,11 @@ PhotoSphereViewer.prototype._fullscreenToggled = function() {
     }
   }
 
+  /**
+   * @event fullscreen-updated
+   * @memberof PhotoSphereViewer
+   * @param {boolean} enabled
+   */
   this.trigger('fullscreen-updated', enabled);
 };
 

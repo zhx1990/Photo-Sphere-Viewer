@@ -1,11 +1,17 @@
 /**
  * Navigation bar markers button class
- * @param {PSVNavBar} navbar
+ * @param {module:components.PSVNavBar} navbar
  * @constructor
+ * @extends module:components/buttons.PSVNavBarButton
+ * @memberof module:components/buttons
  */
 function PSVNavBarMarkersButton(navbar) {
   PSVNavBarButton.call(this, navbar);
 
+  /**
+   * @member {Object}
+   * @private
+   */
   this.prop = {
     panelOpened: false,
     panelOpening: false
@@ -82,6 +88,7 @@ PSVNavBarMarkersButton.prototype.toggleMarkersList = function() {
 
 /**
  * Open side panel with list of markers
+ * @fires module:components/buttons.PSVNavBarMarkersButton.render-markers-list
  */
 PSVNavBarMarkersButton.prototype.showMarkersList = function() {
   var markers = [];
@@ -89,6 +96,12 @@ PSVNavBarMarkersButton.prototype.showMarkersList = function() {
     markers.push(this.psv.hud.markers[id]);
   }
 
+  /**
+   * @event render-markers-list
+   * @memberof module:components/buttons.PSVNavBarMarkersButton
+   * @param {PSVMarker[]} markers
+   * @returns {PSVMarker[]}
+   */
   var html = this.psv.config.templates.markersList({
     markers: this.psv.change('render-markers-list', markers),
     config: this.psv.config

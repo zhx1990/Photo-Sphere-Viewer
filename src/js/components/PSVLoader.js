@@ -2,6 +2,8 @@
  * Loader class
  * @param {PhotoSphereViewer} psv
  * @constructor
+ * @extends module:components.PSVComponent
+ * @memberof module:components
  */
 function PSVLoader(psv) {
   PSVComponent.call(this, psv);
@@ -10,6 +12,7 @@ function PSVLoader(psv) {
    * Animation canvas
    * @member {HTMLCanvasElement}
    * @readonly
+   * @private
    */
   this.canvas = null;
 
@@ -17,6 +20,7 @@ function PSVLoader(psv) {
    * Inner container for vertical center
    * @member {HTMLElement}
    * @readonly
+   * @private
    */
   this.loader = null;
 

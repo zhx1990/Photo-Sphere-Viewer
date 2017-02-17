@@ -1,24 +1,24 @@
 /**
- * @typedef {Object} Point
+ * @typedef {Object} PhotoSphereViewer.Point
  * @property {int} x
  * @property {int} y
  */
 
 /**
- * @typedef {Object} Size
+ * @typedef {Object} PhotoSphereViewer.Size
  * @property {int} width
  * @property {int} height
  */
 
 /**
- * @typedef {Object} Position
+ * @typedef {Object} PhotoSphereViewer.Position
  * @property {float} longitude
  * @property {float} latitude
  */
 
 /**
- * A position that can be expressed either in spherical coordinates (radians or degrees) or in texture coordinates (pixels)
- * @typedef {Object} ExtendedPosition
+ * @typedef {Object} PhotoSphereViewer.ExtendedPosition
+ * @description A position that can be expressed either in spherical coordinates (radians or degrees) or in texture coordinates (pixels)
  * @property {float} longitude
  * @property {float} latitude
  * @property {int} x
@@ -26,14 +26,14 @@
  */
 
 /**
- * @typedef {Object} CacheItem
+ * @typedef {Object} PhotoSphereViewer.CacheItem
  * @property {string} panorama
  * @property {THREE.Texture} image
- * @property {PanoData} pano_data
+ * @property {PhotoSphereViewer.PanoData} pano_data
  */
 
 /**
- * @typedef {Object} PanoData
+ * @typedef {Object} PhotoSphereViewer.PanoData
  * @property {int} full_width
  * @property {int} full_height
  * @property {int} cropped_width
@@ -43,9 +43,25 @@
  */
 
 /**
+ * @typedef {Object} PhotoSphereViewer.ClickData
+ * @property {int} client_x
+ * @property {int} client_y
+ * @property {int} viewer_x
+ * @property {int} viewer_y
+ * @property {float} longitude
+ * @property {float} latitude
+ * @property {int} texture_x
+ * @property {int} texture_y
+ * @property {HTMLElement} [target]
+ * @property {PSVMarker} [marker]
+ */
+
+/**
  * Viewer class
- * @param {Object} options see {@link http://photo-sphere-viewer.js.org/#options}
+ * @param {Object} options - see {@link http://photo-sphere-viewer.js.org/#options}
  * @constructor
+ * @fires PhotoSphereViewer.ready
+ * @throws {PSVError} when the configuration is incorrect
  */
 function PhotoSphereViewer(options) {
   if (!(this instanceof PhotoSphereViewer)) {
@@ -174,31 +190,31 @@ function PhotoSphereViewer(options) {
   this.container = null;
 
   /**
-   * @member {PSVLoader}
+   * @member {module:components.PSVLoader}
    * @readonly
    */
   this.loader = null;
 
   /**
-   * @member {PSVNavBar}
+   * @member {module:components.PSVNavBar}
    * @readonly
    */
   this.navbar = null;
 
   /**
-   * @member {PSVHUD}
+   * @member {module:components.PSVHUD}
    * @readonly
    */
   this.hud = null;
 
   /**
-   * @member {PSVPanel}
+   * @member {module:components.PSVPanel}
    * @readonly
    */
   this.panel = null;
 
   /**
-   * @member {PSVTooltip}
+   * @member {module:components.PSVTooltip}
    * @readonly
    */
   this.tooltip = null;
@@ -206,60 +222,70 @@ function PhotoSphereViewer(options) {
   /**
    * @member {HTMLElement}
    * @readonly
+   * @private
    */
   this.canvas_container = null;
 
   /**
    * @member {THREE.WebGLRenderer | THREE.CanvasRenderer}
    * @readonly
+   * @private
    */
   this.renderer = null;
 
   /**
    * @member {THREE.EffectComposer}
    * @readonly
+   * @private
    */
   this.composer = null;
 
   /**
    * @member {Object.<string, THREE.Pass>}
    * @readonly
+   * @private
    */
   this.passes = {};
 
   /**
    * @member {THREE.Scene}
    * @readonly
+   * @private
    */
   this.scene = null;
 
   /**
    * @member {THREE.PerspectiveCamera}
    * @readonly
+   * @private
    */
   this.camera = null;
 
   /**
    * @member {THREE.Mesh}
    * @readonly
+   * @private
    */
   this.mesh = null;
 
   /**
    * @member {THREE.Raycaster}
    * @readonly
+   * @private
    */
   this.raycaster = null;
 
   /**
    * @member {THREE.DeviceOrientationControls}
    * @readonly
+   * @private
    */
   this.doControls = null;
 
   /**
    * Internal properties, must not be modified externally
    * @member {Object}
+   * @readonly
    * @property {float} longitude - current longitude of the center
    * @property {float} longitude - current latitude of the center
    * @property {THREE.Vector3} direction - direction of the camera
@@ -282,9 +308,9 @@ function PhotoSphereViewer(options) {
    * @property {Promise} animation_promise - promise of the current animation (either go to position or image transition)
    * @property {Promise} loading_promise - promise of the setPanorama method
    * @property start_timeout - timeout id of the automatic rotation delay
-   * @propery {CacheItem[]} cache - cached panoramas
-   * @propery {Size} size - size of the container
-   * @property {PanoData} pano_data - panorama metadata
+   * @property {PhotoSphereViewer.CacheItem[]} cache - cached panoramas
+   * @property {Size} size - size of the container
+   * @property {PhotoSphereViewer.PanoData} pano_data - panorama metadata
    */
   this.prop = {
     longitude: 0,
@@ -395,8 +421,63 @@ function PhotoSphereViewer(options) {
       this.hud.updatePositions();
     }
 
+    /**
+     * @event ready
+     * @memberof PhotoSphereViewer
+     */
     this.trigger('ready');
   }.bind(this));
 }
+
+/**
+ * Triggers an event on the viewer
+ * @function trigger
+ * @memberof PhotoSphereViewer
+ * @instance
+ * @param {string} name
+ * @param {...*} [arguments]
+ * @returns {uEvent.Event}
+ */
+
+/**
+ * Triggers an event on the viewer and returns the modified value
+ * @function change
+ * @memberof PhotoSphereViewer
+ * @instance
+ * @param {string} name
+ * @param {*} value
+ * @param {...*} [arguments]
+ * @returns {*}
+ */
+
+/**
+ * Attaches an event listener on the viewer
+ * @function on
+ * @memberof PhotoSphereViewer
+ * @instance
+ * @param {string|Object.<string, function>} name - event name or events map
+ * @param {function} [callback]
+ * @returns {PhotoSphereViewer}
+ */
+
+/**
+ * Removes an event listener from the viewer
+ * @function off
+ * @memberof PhotoSphereViewer
+ * @instance
+ * @param {string|Object.<string, function>} name - event name or events map
+ * @param {function} [callback]
+ * @returns {PhotoSphereViewer}
+ */
+
+/**
+ * Attaches an event listener called once on the viewer
+ * @function once
+ * @memberof PhotoSphereViewer
+ * @instance
+ * @param {string|Object.<string, function>} name - event name or events map
+ * @param {function} [callback]
+ * @returns {PhotoSphereViewer}
+ */
 
 uEvent.mixin(PhotoSphereViewer);

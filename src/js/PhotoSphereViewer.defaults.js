@@ -2,6 +2,7 @@
  * Number of pixels bellow which a mouse move will be considered as a click
  * @type {int}
  * @readonly
+ * @private
  */
 PhotoSphereViewer.MOVE_THRESHOLD = 4;
 
@@ -9,6 +10,7 @@ PhotoSphereViewer.MOVE_THRESHOLD = 4;
  * Time size of the mouse position history used to compute inertia
  * @type {int}
  * @readonly
+ * @private
  */
 PhotoSphereViewer.INERTIA_WINDOW = 300;
 
@@ -16,13 +18,15 @@ PhotoSphereViewer.INERTIA_WINDOW = 300;
  * Radius of the THREE.Sphere
  * @type {int}
  * @readonly
+ * @private
  */
 PhotoSphereViewer.SPHERE_RADIUS = 100;
 
 /**
- * Map between keyboard events "keyCode|which" and "key"
+ * Map between keyboard events `keyCode|which` and `key`
  * @type {Object.<int, string>}
  * @readonly
+ * @private
  */
 PhotoSphereViewer.KEYMAP = {
   33: 'PageUp',
@@ -36,16 +40,10 @@ PhotoSphereViewer.KEYMAP = {
 };
 
 /**
- * SVG icons sources
- * @type {Object.<string, string>}
- * @readonly
- */
-PhotoSphereViewer.ICONS = {};
-
-/**
  * System properties
  * @type {Object}
  * @readonly
+ * @private
  */
 PhotoSphereViewer.SYSTEM = {
   loaded: false,
@@ -59,7 +57,14 @@ PhotoSphereViewer.SYSTEM = {
 };
 
 /**
- * Default options
+ * SVG icons sources
+ * @type {Object.<string, string>}
+ * @readonly
+ */
+PhotoSphereViewer.ICONS = {};
+
+/**
+ * Default options, see {@link http://photo-sphere-viewer.js.org/#options}
  * @type {Object}
  * @readonly
  */

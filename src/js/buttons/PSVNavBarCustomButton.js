@@ -1,12 +1,26 @@
 /**
  * Navigation bar custom button class
- * @param {PSVNavBar} navbar
- * @param config {Object}
+ * @param {module:components.PSVNavBar} navbar
+ * @param {Object} config
+ * @param {string} [config.id]
+ * @param {string} [config.className]
+ * @param {string} [config.title]
+ * @param {string} [config.content]
+ * @param {boolean} [config.enabled=true]
+ * @param {boolean} [config.visible=true]
+ * @param {function} [config.visible=onClick]
  * @constructor
+ * @extends module:components/buttons.PSVNavBarButton
+ * @memberof module:components/buttons
  */
 function PSVNavBarCustomButton(navbar, config) {
   PSVNavBarButton.call(this, navbar);
 
+  /**
+   * @member {Object}
+   * @readonly
+   * @private
+   */
   this.config = config;
 
   if (this.config.id) {

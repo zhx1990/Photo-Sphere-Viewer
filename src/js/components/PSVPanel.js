@@ -2,6 +2,8 @@
  * Panel class
  * @param {PhotoSphereViewer} psv
  * @constructor
+ * @extends module:components.PSVComponent
+ * @memberof module:components
  */
 function PSVPanel(psv) {
   PSVComponent.call(this, psv);
@@ -10,6 +12,7 @@ function PSVPanel(psv) {
    * Content container
    * @member {HTMLElement}
    * @readonly
+   * @protected
    */
   this.content = null;
 
@@ -103,6 +106,7 @@ PSVPanel.prototype.handleEvent = function(e) {
  * Shows the panel
  * @param {string} content
  * @param {boolean} [noMargin=false]
+ * @fires module:components.PSVPanel.open-panel
  */
 PSVPanel.prototype.showPanel = function(content, noMargin) {
   this.content.innerHTML = content;
@@ -112,16 +116,27 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
   PSVUtils.toggleClass(this.content, 'psv-panel-content--no-margin', !!noMargin);
 
   this.prop.opened = true;
+
+  /**
+   * @event open-panel
+   * @memberof module:components.PSVPanel
+   */
   this.psv.trigger('open-panel');
 };
 
 /**
  * Hides the panel
+ * @fires module:components.PSVPanel.close-panel
  */
 PSVPanel.prototype.hidePanel = function() {
   this.content.innerHTML = null;
   this.prop.opened = false;
   this.container.classList.remove('psv-panel--open');
+
+  /**
+   * @event close-panel
+   * @memberof module:components.PSVPanel
+   */
   this.psv.trigger('close-panel');
 };
 

@@ -1,7 +1,9 @@
 /**
  * Navigation bar download button class
- * @param {PSVNavBar} navbar
+ * @param {module:components.PSVNavBar} navbar
  * @constructor
+ * @extends module:components/buttons.PSVNavBarButton
+ * @memberof module:components/buttons
  */
 function PSVNavBarDownloadButton(navbar) {
   PSVNavBarButton.call(this, navbar);

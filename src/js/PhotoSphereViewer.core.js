@@ -1,7 +1,8 @@
 /**
  * Loads the XMP data with AJAX
  * @param {string} panorama
- * @returns {Promise.<PanoData>}
+ * @returns {Promise.<PhotoSphereViewer.PanoData>}
+ * @throws {PSVError} when the image cannot be loaded
  * @private
  */
 PhotoSphereViewer.prototype._loadXMP = function(panorama) {
@@ -85,6 +86,8 @@ PhotoSphereViewer.prototype._loadXMP = function(panorama) {
  * Loads the sphere texture
  * @param {string} panorama
  * @returns {Promise.<THREE.Texture>}
+ * @fires PhotoSphereViewer.panorama-load-progress
+ * @throws {PSVError} when the image cannot be loaded
  * @private
  */
 PhotoSphereViewer.prototype._loadTexture = function(panorama) {
@@ -111,6 +114,13 @@ PhotoSphereViewer.prototype._loadTexture = function(panorama) {
       if (self.loader) {
         self.loader.setProgress(100);
       }
+
+      /**
+       * @event panorama-load-progress
+       * @memberof PhotoSphereViewer
+       * @param {string} panorama
+       * @param {int} progress
+       */
       self.trigger('panorama-load-progress', panorama, 100);
 
       // Config XMP data
@@ -194,6 +204,7 @@ PhotoSphereViewer.prototype._loadTexture = function(panorama) {
 /**
  * Applies the texture to the scene, creates the scene if needed
  * @param {THREE.Texture} texture - The sphere texture
+ * @fires PhotoSphereViewer.panorama-loaded
  * @private
  */
 PhotoSphereViewer.prototype._setTexture = function(texture) {
@@ -207,6 +218,10 @@ PhotoSphereViewer.prototype._setTexture = function(texture) {
 
   this.mesh.material.map = texture;
 
+  /**
+   * @event panorama-loaded
+   * @memberof PhotoSphereViewer
+   */
   this.trigger('panorama-loaded');
 
   this.render();
@@ -286,7 +301,7 @@ PhotoSphereViewer.prototype._createScene = function() {
 /**
  * Performs transition between the current and a new texture
  * @param {THREE.Texture} texture
- * @param {Position} [position]
+ * @param {PhotoSphereViewer.Position} [position]
  * @returns {Promise}
  * @private
  */
@@ -438,7 +453,9 @@ PhotoSphereViewer.prototype._reverseAutorotate = function() {
 
 /**
  * Adds a panorama to the cache
- * @param {CacheItem} cache
+ * @param {PhotoSphereViewer.CacheItem} cache
+ * @fires PhotoSphereViewer.panorama-cached
+ * @throws {PSVError} when the cache is disabled
  * @private
  */
 PhotoSphereViewer.prototype._putPanoramaCache = function(cache) {
@@ -457,5 +474,10 @@ PhotoSphereViewer.prototype._putPanoramaCache = function(cache) {
     this.prop.cache.unshift(cache);
   }
 
+  /**
+   * @event panorama-cached
+   * @memberof PhotoSphereViewer
+   * @param {string} panorama
+   */
   this.trigger('panorama-cached', cache.panorama);
 };

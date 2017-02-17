@@ -40,7 +40,7 @@ PhotoSphereViewer._deviceOrientationListener = function(event) {
 
 /**
  * Sets the viewer size
- * @param {Size} size
+ * @param {PhotoSphereViewer.Size} size
  * @private
  */
 PhotoSphereViewer.prototype._setViewerSize = function(size) {
@@ -54,8 +54,8 @@ PhotoSphereViewer.prototype._setViewerSize = function(size) {
 
 /**
  * Converts pixel texture coordinates to spherical radians coordinates
- * @param {Point} point
- * @returns {Position}
+ * @param {PhotoSphereViewer.Point} point
+ * @returns {PhotoSphereViewer.Position}
  */
 PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(point) {
   var relativeX = (point.x + this.prop.pano_data.cropped_x) / this.prop.pano_data.full_width * PSVUtils.TwoPI;
@@ -69,8 +69,8 @@ PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(point) {
 
 /**
  * Converts spherical radians coordinates to pixel texture coordinates
- * @param {Position} position
- * @returns {Point}
+ * @param {PhotoSphereViewer.Position} position
+ * @returns {PhotoSphereViewer.Point}
  */
 PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(position) {
   var relativeLong = position.longitude / PSVUtils.TwoPI * this.prop.pano_data.full_width;
@@ -84,7 +84,7 @@ PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(position) 
 
 /**
  * Converts spherical radians coordinates to a THREE.Vector3
- * @param {Position} position
+ * @param {PhotoSphereViewer.Position} position
  * @returns {THREE.Vector3}
  */
 PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(position) {
@@ -98,7 +98,7 @@ PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(position) {
 /**
  * Converts a THREE.Vector3 to spherical radians coordinates
  * @param {THREE.Vector3} vector
- * @returns {Position}
+ * @returns {PhotoSphereViewer.Position}
  */
 PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
   var phi = Math.acos(vector.y / Math.sqrt(vector.x * vector.x + vector.y * vector.y + vector.z * vector.z));
@@ -112,7 +112,7 @@ PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
 
 /**
  * Converts position on the viewer to a THREE.Vector3
- * @param {Point} viewerPoint
+ * @param {PhotoSphereViewer.Point} viewerPoint
  * @returns {THREE.Vector3}
  */
 PhotoSphereViewer.prototype.viewerCoordsToVector3 = function(viewerPoint) {
@@ -136,7 +136,7 @@ PhotoSphereViewer.prototype.viewerCoordsToVector3 = function(viewerPoint) {
 /**
  * Converts a THREE.Vector3 to position on the viewer
  * @param {THREE.Vector3} vector
- * @returns {Point}
+ * @returns {PhotoSphereViewer.Point}
  */
 PhotoSphereViewer.prototype.vector3ToViewerCoords = function(vector) {
   vector = vector.clone();
@@ -150,7 +150,7 @@ PhotoSphereViewer.prototype.vector3ToViewerCoords = function(vector) {
 
 /**
  * Converts x/y to latitude/longitude if present and ensure boundaries
- * @param {ExtendedPosition} position - mutated
+ * @param {PhotoSphereViewer.ExtendedPosition} position - mutated
  */
 PhotoSphereViewer.prototype.cleanPosition = function(position) {
   if (position.hasOwnProperty('x') && position.hasOwnProperty('y')) {
@@ -163,7 +163,7 @@ PhotoSphereViewer.prototype.cleanPosition = function(position) {
 
 /**
  * Apply "longitude_range" and "latitude_range"
- * @param {Position} position - mutated
+ * @param {PhotoSphereViewer.Position} position - mutated
  * @returns {string[]} list of sides that were reached
  */
 PhotoSphereViewer.prototype.applyRanges = function(position) {

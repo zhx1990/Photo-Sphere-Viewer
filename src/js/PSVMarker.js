@@ -3,6 +3,7 @@
  * @param {Object} properties - see {@link http://photo-sphere-viewer.js.org/markers.html#config} (merged with the object itself)
  * @param {PhotoSphereViewer} psv
  * @constructor
+ * @throws {PSVError} when the configuration is incorrect
  */
 function PSVMarker(properties, psv) {
   if (!properties.id) {
@@ -22,6 +23,7 @@ function PSVMarker(properties, psv) {
   /**
    * @member {PhotoSphereViewer}
    * @readonly
+   * @protected
    */
   this.psv = psv;
 
@@ -46,7 +48,7 @@ function PSVMarker(properties, psv) {
   Object.defineProperties(this, {
     /**
      * @memberof PSVMarker
-     * @type {*}
+     * @type {string}
      * @readonly
      */
     id: {
@@ -59,9 +61,9 @@ function PSVMarker(properties, psv) {
       }
     },
     /**
-     * 'image', 'html', 'polygon_px', 'polygon_rad', 'rect', 'circle', 'ellipse', 'path'
      * @memberof PSVMarker
      * @type {string}
+     * @see PSVMarker.types
      * @readonly
      */
     type: {
@@ -134,6 +136,7 @@ PSVMarker.types = ['image', 'html', 'polygon_px', 'polygon_rad', 'rect', 'circle
  * @param {object} properties
  * @param {boolean} [allowNone=false]
  * @returns {string}
+ * @throws {PSVError} when the marker's type cannot be found
  */
 PSVMarker.getType = function(properties, allowNone) {
   var found = [];
@@ -188,6 +191,7 @@ PSVMarker.prototype.isSvg = function() {
 /**
  * Updates the marker with new properties
  * @param {object} [properties]
+ * @throws {PSVError} when trying to change the marker's type
  */
 PSVMarker.prototype.update = function(properties) {
   // merge objects

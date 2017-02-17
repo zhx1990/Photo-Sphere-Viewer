@@ -5,6 +5,13 @@
 var PSVUtils = {};
 
 /**
+ * @member {object}
+ * @memberof PhotoSphereViewer
+ * @see PSVUtils
+ */
+PhotoSphereViewer.Utils = PSVUtils;
+
+/**
  * Short-Hand for PI*2
  * @type {float}
  * @readonly
@@ -219,6 +226,7 @@ PSVUtils.bound = function(x, min, max) {
 
 /**
  * Checks if a value is an integer
+ * @function
  * @param {*} value
  * @returns {boolean}
  */
@@ -356,6 +364,7 @@ PSVUtils.parsePosition.positions = { 'top': '0%', 'bottom': '100%', 'left': '0%'
  * Parses an speed
  * @param {string} speed - The speed, in radians/degrees/revolutions per second/minute
  * @returns {float} radians per second
+ * @throws {PSVError} when the speed cannot be parsed
  */
 PSVUtils.parseSpeed = function(speed) {
   if (typeof speed == 'string') {
@@ -408,6 +417,7 @@ PSVUtils.parseSpeed = function(speed) {
  * @param {string|number} angle - eg: 3.14, 3.14rad, 180deg
  * @param {float|boolean} [reference=0] - base value for normalization, false to disable
  * @returns {float}
+ * @throws {PSVError} when the angle cannot be parsed
  */
 PSVUtils.parseAngle = function(angle, reference) {
   if (typeof angle == 'string') {

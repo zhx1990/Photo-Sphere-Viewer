@@ -1,20 +1,54 @@
 /**
+ * @module components/buttons
+ */
+
+/**
  * Navigation bar button class
- * @param {PSVNavBar} navbar
+ * @param {module:components.PSVNavBar} navbar
  * @constructor
+ * @extends module:components.PSVComponent
+ * @memberof module:components/buttons
  */
 function PSVNavBarButton(navbar) {
   PSVComponent.call(this, navbar);
+
+  /**
+   * @member {string}
+   * @readonly
+   */
+  this.id = undefined;
 
   if (this.constructor.id) {
     this.id = this.constructor.id;
   }
 
+  /**
+   * @member {boolean}
+   * @readonly
+   */
   this.enabled = true;
 }
 
 PSVNavBarButton.prototype = Object.create(PSVComponent.prototype);
 PSVNavBarButton.prototype.constructor = PSVNavBarButton;
+
+/**
+ * Unique identifier of the button
+ * @member {string}
+ */
+PSVNavBarButton.id = null;
+
+/**
+ * SVG icon name injected in the button
+ * @member {string}
+ */
+PSVNavBarButton.icon = null;
+
+/**
+ * SVG icon name injected in the button when it is active
+ * @member {string}
+ */
+PSVNavBarButton.iconActive = null;
 
 /**
  * Creates the button
@@ -23,7 +57,7 @@ PSVNavBarButton.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
   if (this.constructor.icon) {
-    this.setIcon(this.constructor.icon);
+    this._setIcon(this.constructor.icon);
   }
 
   this.container.addEventListener('click', function() {
@@ -34,25 +68,6 @@ PSVNavBarButton.prototype.create = function() {
 };
 
 /**
- * Set the button icon (from PSV icons list)
- * @param {string} icon
- * @param {HTMLElement} [container] - default is the main button container
- */
-PSVNavBarButton.prototype.setIcon = function(icon, container) {
-  if (!container) {
-    container = this.container;
-  }
-  if (icon) {
-    container.innerHTML = PhotoSphereViewer.ICONS[icon];
-    // classList not supported on IE11, className is read-only !!!!
-    container.querySelector('svg').setAttribute('class', 'psv-button-svg');
-  }
-  else {
-    container.innerHTML = '';
-  }
-};
-
-/**
  * Changes the active state of the button
  * @param {boolean} [active] - forced state
  */
@@ -60,7 +75,7 @@ PSVNavBarButton.prototype.toggleActive = function(active) {
   active = PSVUtils.toggleClass(this.container, 'psv-button--active', active);
 
   if (this.constructor.iconActive) {
-    this.setIcon(active ? this.constructor.iconActive : this.constructor.icon);
+    this._setIcon(active ? this.constructor.iconActive : this.constructor.icon);
   }
 };
 
@@ -80,6 +95,26 @@ PSVNavBarButton.prototype.enable = function() {
   this.container.classList.remove('psv-button--disabled');
 
   this.enabled = true;
+};
+
+/**
+ * Set the button icon (from {@link PhotoSphereViewer.ICONS})
+ * @param {string} icon
+ * @param {HTMLElement} [container] - default is the main button container
+ * @private
+ */
+PSVNavBarButton.prototype._setIcon = function(icon, container) {
+  if (!container) {
+    container = this.container;
+  }
+  if (icon) {
+    container.innerHTML = PhotoSphereViewer.ICONS[icon];
+    // classList not supported on IE11, className is read-only !!!!
+    container.querySelector('svg').setAttribute('class', 'psv-button-svg');
+  }
+  else {
+    container.innerHTML = '';
+  }
 };
 
 /**

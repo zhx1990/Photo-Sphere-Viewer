@@ -1,7 +1,9 @@
 /**
  * Navigation bar autorotate button class
- * @param {PSVNavBar} navbar
+ * @param {module:components.PSVNavBar} navbar
  * @constructor
+ * @extends module:components/buttons.PSVNavBarButton
+ * @memberof module:components/buttons
  */
 function PSVNavBarAutorotateButton(navbar) {
   PSVNavBarButton.call(this, navbar);

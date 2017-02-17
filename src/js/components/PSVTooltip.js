@@ -2,6 +2,8 @@
  * Tooltip class
  * @param {PSVHUD} hud
  * @constructor
+ * @extends module:components.PSVComponent
+ * @memberof module:components
  */
 function PSVTooltip(hud) {
   PSVComponent.call(this, hud);
@@ -9,6 +11,7 @@ function PSVTooltip(hud) {
   /**
    * @member {Object}
    * @readonly
+   * @private
    */
   this.config = this.psv.config.tooltip;
 
@@ -92,6 +95,8 @@ PSVTooltip.prototype.isTooltipVisible = function() {
  * @param {Object} [config.box]
  * @param {int} [config.box.width=0]
  * @param {int} [config.box.height=0]
+ * @fires module:components.PSVTooltip.show-tooltip
+ * @throws {PSVError} when the configuration is incorrect
  */
 PSVTooltip.prototype.showTooltip = function(config) {
   if (this.prop.timeout) {
@@ -202,14 +207,20 @@ PSVTooltip.prototype.showTooltip = function(config) {
     var self = this;
     this.prop.timeout = window.setTimeout(function() {
       t.classList.add('psv-tooltip--visible');
-      self.psv.trigger('show-tooltip');
       self.prop.timeout = null;
+
+      /**
+       * @event show-tooltip
+       * @memberof module:components.PSVTooltip
+       */
+      self.psv.trigger('show-tooltip');
     }, this.config.delay);
   }
 };
 
 /**
  * Hides the tooltip
+ * @fires module:components.PSVTooltip.hide-tooltip
  */
 PSVTooltip.prototype.hideTooltip = function() {
   if (this.prop.timeout) {
@@ -219,7 +230,6 @@ PSVTooltip.prototype.hideTooltip = function() {
 
   if (this.isTooltipVisible()) {
     this.container.classList.remove('psv-tooltip--visible');
-    this.psv.trigger('hide-tooltip');
 
     var self = this;
     this.prop.timeout = window.setTimeout(function() {
@@ -228,6 +238,12 @@ PSVTooltip.prototype.hideTooltip = function() {
       self.container.style.left = '-1000px';
       self.prop.timeout = null;
     }, this.config.delay);
+
+    /**
+     * @event hide-tooltip
+     * @memberof module:components.PSVTooltip
+     */
+    this.psv.trigger('hide-tooltip');
   }
 };
 

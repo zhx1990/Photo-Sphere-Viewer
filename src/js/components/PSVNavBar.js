@@ -2,6 +2,8 @@
  * Navigation bar class
  * @param {PhotoSphereViewer} psv
  * @constructor
+ * @extends module:components.PSVComponent
+ * @memberof module:components
  */
 function PSVNavBar(psv) {
   PSVComponent.call(this, psv);
@@ -9,12 +11,14 @@ function PSVNavBar(psv) {
   /**
    * @member {Object}
    * @readonly
+   * @private
    */
   this.config = this.psv.config.navbar;
 
   /**
-   * @member {Array.<PSVNavBarButton|PSVComponent>}
+   * @member {Array.<module:components/buttons.PSVNavBarButton>}
    * @readonly
+   * @protected
    */
   this.items = [];
 
@@ -54,6 +58,7 @@ PSVNavBar.publicMethods = ['showNavbar', 'hideNavbar', 'toggleNavbar', 'getNavba
 
 /**
  * Creates the navbar
+ * @throws {PSVError} when the configuration is incorrect
  */
 PSVNavBar.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -127,8 +132,8 @@ PSVNavBar.prototype.destroy = function() {
 
 /**
  * Returns a button by its identifier
- * @param {*} id
- * @returns {PSVNavBarButton}
+ * @param {string} id
+ * @returns {module:components/buttons.PSVNavBarButton}
  */
 PSVNavBar.prototype.getNavbarButton = function(id) {
   var button = null;
@@ -163,7 +168,7 @@ PSVNavBar.prototype.hideNavbar = function() {
 
 /**
  * Toggles the navbar
- * @param active
+ * @param {boolean} active
  */
 PSVNavBar.prototype.toggleNavbar = function(active) {
   PSVUtils.toggleClass(this.container, 'psv-navbar--open', active);

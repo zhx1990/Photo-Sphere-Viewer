@@ -21,13 +21,12 @@ module.exports = function(grunt) {
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
 
-    banner:
-      '/*!\n' +
-      ' * Photo Sphere Viewer <%= pkg.version %>\n' +
-      ' * Copyright (c) 2014-2015 Jérémy Heleine\n' +
-      ' * Copyright (c) 2015-<%= grunt.template.today("yyyy") %> Damien "Mistic" Sorel\n' +
-      ' * Licensed under MIT (http://opensource.org/licenses/MIT)\n' +
-      ' */',
+    banner: '/*!\n' +
+    ' * Photo Sphere Viewer <%= pkg.version %>\n' +
+    ' * Copyright (c) 2014-2015 Jérémy Heleine\n' +
+    ' * Copyright (c) 2015-<%= grunt.template.today("yyyy") %> Damien "Mistic" Sorel\n' +
+    ' * Licensed under MIT (http://opensource.org/licenses/MIT)\n' +
+    ' */',
 
     concat: {
       /**
@@ -166,16 +165,31 @@ module.exports = function(grunt) {
     },
 
     /**
+     * Copy doc custom script
+     */
+    copy: {
+      doc_script: {
+        src: 'build/jsdoc.js',
+        dest: 'doc/js/custom.js'
+      }
+    },
+
+    /**
+     * Clean doc
+     */
+    clean: {
+      doc: ['doc']
+    },
+
+    /**
      * jsDoc generation
      */
     jsdoc: {
       lib: {
         src: ['src/js/**/*.js', '!src/js/.wrapper.js', '!src/js/lib/*.js'],
-        dest: 'doc',
         options: {
-          private: false,
-          template: 'node_modules/docdash',
-          readme: 'README.md'
+          destination: 'doc',
+          config: '.jsdoc.json'
         }
       }
     },
@@ -264,5 +278,14 @@ module.exports = function(grunt) {
     'connect',
     'open',
     'watch'
+  ]);
+
+  /**
+   * Documentation
+   */
+  grunt.registerTask('doc', [
+    'clean:doc',
+    'jsdoc',
+    'copy:doc_script'
   ]);
 };

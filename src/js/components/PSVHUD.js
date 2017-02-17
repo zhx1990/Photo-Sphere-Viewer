@@ -1,8 +1,9 @@
 /**
  * HUD class
  * @param {PhotoSphereViewer} psv
- * @extends PSVComponent
  * @constructor
+ * @extends module:components.PSVComponent
+ * @memberof module:components
  */
 function PSVHUD(psv) {
   PSVComponent.call(this, psv);
@@ -10,7 +11,7 @@ function PSVHUD(psv) {
   /**
    * SVG container
    * @member {SVGElement}
-   * @readonly
+   * @protected
    */
   this.$svg = null;
 
@@ -111,6 +112,7 @@ PSVHUD.prototype.handleEvent = function(e) {
  * @param {Object} properties {@link PSVMarker}
  * @param {boolean} [render=true]
  * @returns {PSVMarker}
+ * @throws {PSVError} when the marker's id is missing or already exists
  */
 PSVHUD.prototype.addMarker = function(properties, render) {
   if (!properties.id) {
@@ -143,6 +145,7 @@ PSVHUD.prototype.addMarker = function(properties, render) {
  * Gets a marker by it's id or external object
  * @param {*} marker
  * @returns {PSVMarker}
+ * @throws {PSVError} when the marker cannot be found
  */
 PSVHUD.prototype.getMarker = function(marker) {
   var id = typeof marker === 'object' ? marker.id : marker;
@@ -304,7 +307,7 @@ PSVHUD.prototype.updatePositions = function() {
  * Determines if a point marker is visible<br>
  * It tests if the point is in the general direction of the camera, then check if it's in the viewport
  * @param {PSVMarker} marker
- * @param {Point} position
+ * @param {PhotoSphereViewer.Point} position
  * @returns {boolean}
  * @private
  */
@@ -319,7 +322,7 @@ PSVHUD.prototype._isMarkerVisible = function(marker, position) {
 /**
  * Computes HUD coordinates of a marker
  * @param {PSVMarker} marker
- * @returns {Point}
+ * @returns {PhotoSphereViewer.Point}
  * @private
  */
 PSVHUD.prototype._getMarkerPosition = function(marker) {
@@ -345,7 +348,7 @@ PSVHUD.prototype._getMarkerPosition = function(marker) {
  * Computes HUD coordinates of each point of a polygon<br>
  * It handles points behind the camera by creating intermediary points suitable for the projector
  * @param {PSVMarker} marker
- * @returns {Point[]}
+ * @returns {PhotoSphereViewer.Point[]}
  * @private
  */
 PSVHUD.prototype._getPolygonPositions = function(marker) {
@@ -420,8 +423,8 @@ PSVHUD.prototype._getPolygonIntermediaryPoint = function(P1, P2) {
 /**
  * Computes the boundaries positions of a polygon marker
  * @param {PSVMarker} marker - alters width and height
- * @param {Point[]} positions
- * @returns {Point}
+ * @param {PhotoSphereViewer.Point[]} positions
+ * @returns {PhotoSphereViewer.Point}
  * @private
  */
 PSVHUD.prototype._getPolygonDimensions = function(marker, positions) {
@@ -525,13 +528,21 @@ PSVHUD.prototype._onMouseMove = function(e) {
  * Handles mouse click events, select the marker and open the panel if necessary
  * @param {Object} data
  * @param {Event} e
+ * @fires module:components.PSVHUD.select-marker
+ * @fires module:components.PSVHUD.unselect-marker
  * @private
  */
 PSVHUD.prototype._onClick = function(data, e) {
   var marker;
   if (data.target && (marker = PSVUtils.getClosest(data.target, '.psv-marker')) && marker.psvMarker) {
     this.currentMarker = marker.psvMarker;
-    this.psv.trigger('select-marker', marker.psvMarker);
+
+    /**
+     * @event select-marker
+     * @memberof module:components.PSVHUD
+     * @param {PSVMarker} marker
+     */
+    this.psv.trigger('select-marker', this.currentMarker);
 
     if (this.psv.config.click_event_on_marker) {
       // add the marker to event data
@@ -542,7 +553,13 @@ PSVHUD.prototype._onClick = function(data, e) {
     }
   }
   else if (this.currentMarker) {
+    /**
+     * @event unselect-marker
+     * @memberof module:components.PSVHUD
+     * @param {PSVMarker} marker
+     */
     this.psv.trigger('unselect-marker', this.currentMarker);
+
     this.currentMarker = null;
   }
 

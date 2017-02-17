@@ -1,24 +1,32 @@
 /**
+ * @module components
+ */
+
+/**
  * Base sub-component class
- * @param {PhotoSphereViewer | PSVComponent} parent - the parent with a "container" property
+ * @param {PhotoSphereViewer | module:components.PSVComponent} parent
  * @constructor
+ * @memberof module:components
  */
 function PSVComponent(parent) {
   /**
    * @member {PhotoSphereViewer}
    * @readonly
+   * @protected
    */
   this.psv = parent instanceof PhotoSphereViewer ? parent : parent.psv;
 
   /**
-   * @member {PhotoSphereViewer|PSVComponent}
+   * @member {PhotoSphereViewer|module:components.PSVComponent}
    * @readonly
+   * @protected
    */
   this.parent = parent;
 
   /**
    * @member {HTMLElement}
    * @readonly
+   * @protected
    */
   this.container = null;
 
@@ -31,22 +39,18 @@ function PSVComponent(parent) {
 }
 
 /**
- * @name publicMethods
- * @description List of component's methods which are bound the the main viewer
- * @memberof PSVComponent
- * @type {string[]}
- * @static
+ * CSS class added to the component's container
+ * @member {string}
  * @readonly
  */
+PSVComponent.className = null;
 
 /**
- * @name className
- * @description CSS class added to the component's container
- * @memberof PSVComponent
- * @type {string}
- * @static
+ * List of component's methods which are bound the the main viewer
+ * @member {string[]}
  * @readonly
  */
+PSVComponent.publicMethods = [];
 
 /**
  * Creates the component
