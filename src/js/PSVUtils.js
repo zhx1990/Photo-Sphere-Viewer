@@ -204,8 +204,6 @@ PSVUtils.fullscreenEvent = function() {
   for (var exit in map) {
     if (exit in document) return map[exit];
   }
-
-  return 'fullscreenchange';
 };
 
 /**

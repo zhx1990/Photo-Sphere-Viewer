@@ -108,7 +108,6 @@ PhotoSphereViewer.prototype.destroy = function() {
 
   // remove listeners
   window.removeEventListener('resize', this);
-  document.removeEventListener(PhotoSphereViewer.SYSTEM.fullscreenEvent, this);
 
   if (this.config.mousemove) {
     this.hud.container.removeEventListener('mousedown', this);
@@ -117,6 +116,10 @@ PhotoSphereViewer.prototype.destroy = function() {
     window.removeEventListener('touchend', this);
     this.hud.container.removeEventListener('mousemove', this);
     this.hud.container.removeEventListener('touchmove', this);
+  }
+
+  if (PhotoSphereViewer.SYSTEM.fullscreenEvent) {
+    document.removeEventListener(PhotoSphereViewer.SYSTEM.fullscreenEvent, this);
   }
 
   if (this.config.mousewheel) {

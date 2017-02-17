@@ -4,7 +4,6 @@
  */
 PhotoSphereViewer.prototype._bindEvents = function() {
   window.addEventListener('resize', this);
-  document.addEventListener(PhotoSphereViewer.SYSTEM.fullscreenEvent, this);
 
   // all interation events are binded to the HUD only
   if (this.config.mousemove) {
@@ -15,6 +14,10 @@ PhotoSphereViewer.prototype._bindEvents = function() {
     window.addEventListener('touchend', this);
     this.hud.container.addEventListener('mousemove', this);
     this.hud.container.addEventListener('touchmove', this);
+  }
+
+  if (PhotoSphereViewer.SYSTEM.fullscreenEvent) {
+    document.addEventListener(PhotoSphereViewer.SYSTEM.fullscreenEvent, this);
   }
 
   if (this.config.mousewheel) {
@@ -47,7 +50,7 @@ PhotoSphereViewer.prototype.handleEvent = function(evt) {
     case 'mousemove':   this._onMouseMove(evt);   break;
     case 'touchmove':   this._onTouchMove(evt);   break;
     case PhotoSphereViewer.SYSTEM.fullscreenEvent:  this._fullscreenToggled();  break;
-    case PhotoSphereViewer.SYSTEM.mouseWheelEvent:  this._onMouseWheel(evt);      break;
+    case PhotoSphereViewer.SYSTEM.mouseWheelEvent:  this._onMouseWheel(evt);    break;
     // @formatter:on
   }
 };
