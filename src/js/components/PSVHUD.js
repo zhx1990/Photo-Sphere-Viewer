@@ -294,8 +294,15 @@ PSVHUD.prototype.updatePositions = function() {
       if (isVisible) {
         marker.position2D = position;
 
-        marker.$el.style.transform = 'translate3D(' + position.x + 'px, ' + position.y + 'px, ' + '0px)' +
-          (!marker.lockRotation && rotation ? ' rotateZ(' + rotation + 'deg)' : '');
+        if (marker.$el instanceof SVGElement) {
+          marker.$el.setAttribute('transform', 'translate(' + position.x + ' ' + position.y + ')' +
+            (!marker.lockRotation && rotation ? ' rotate(' + rotation + ' ' + (marker.anchor.left * marker.width) + ' ' + (marker.anchor.top * marker.height) + ')' : ''));
+        }
+        else {
+          marker.$el.style.transform = 'translate3D(' + position.x + 'px, ' + position.y + 'px, ' + '0px)' +
+            (!marker.lockRotation && rotation ? ' rotateZ(' + rotation + 'deg)' : '');
+          marker.$el.style.transformOrigin = marker.anchor.left * 100 + '% ' + marker.anchor.top * 100 + '%';
+        }
       }
     }
 
@@ -328,9 +335,9 @@ PSVHUD.prototype._isMarkerVisible = function(marker, position) {
 PSVHUD.prototype._getMarkerPosition = function(marker) {
   if (marker._dynamicSize) {
     // make the marker visible to get it's size
-    marker.$el.classList.add('psv-marker--transparent');
+    PSVUtils.toggleClass(marker.$el, 'psv-marker--transparent', true);
     var rect = marker.$el.getBoundingClientRect();
-    marker.$el.classList.remove('psv-marker--transparent');
+    PSVUtils.toggleClass(marker.$el, 'psv-marker--transparent', false);
 
     marker.width = rect.right - rect.left;
     marker.height = rect.bottom - rect.top;

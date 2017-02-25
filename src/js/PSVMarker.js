@@ -218,7 +218,7 @@ PSVMarker.prototype.update = function(properties) {
     PSVUtils.addClasses(this.$el, this.className);
   }
   if (this.tooltip) {
-    this.$el.classList.add('has-tooltip');
+    PSVUtils.addClasses(this.$el, 'has-tooltip');
     if (typeof this.tooltip === 'string') {
       this.tooltip = { content: this.tooltip };
     }
@@ -231,7 +231,6 @@ PSVMarker.prototype.update = function(properties) {
 
   // parse anchor
   this.anchor = PSVUtils.parsePosition(this.anchor);
-  this.$el.style.transformOrigin = this.anchor.left * 100 + '% ' + this.anchor.top * 100 + '%';
 
   if (this.isNormal()) {
     this._updateNormal();

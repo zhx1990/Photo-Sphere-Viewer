@@ -105,22 +105,36 @@ PSVUtils.getMaxTextureWidth = function() {
 
 /**
  * Toggles a CSS class
- * @param {HTMLElement} element
+ * @param {HTMLElement|SVGElement} element
  * @param {string} className
  * @param {boolean} [active] - forced state
- * @return {boolean} new state
  */
 PSVUtils.toggleClass = function(element, className, active) {
-  if (active === undefined) {
-    return element.classList.toggle(className);
+  // manual implementation for IE11 and SVGElement
+  if (element instanceof SVGElement && !element.classList) {
+    var currentClassName = element.getAttribute('class') || '';
+    var currentActive = currentClassName.indexOf(className) !== -1;
+    var regex = new RegExp('(?:^|\\s)' + className + '(?:\\s|$)');
+
+    if ((active === undefined || active) && !currentActive) {
+      currentClassName += currentClassName.length > 0 ? ' ' + className : className;
+    }
+    else if (!active) {
+      currentClassName = currentClassName.replace(regex, ' ');
+    }
+
+    element.setAttribute('class', currentClassName);
   }
-  else if (active && !element.classList.contains(className)) {
-    element.classList.add(className);
-    return true;
-  }
-  else if (!active) {
-    element.classList.remove(className);
-    return false;
+  else {
+    if (active === undefined) {
+      element.classList.toggle(className);
+    }
+    else if (active && !element.classList.contains(className)) {
+      element.classList.add(className);
+    }
+    else if (!active) {
+      element.classList.remove(className);
+    }
   }
 };
 
@@ -134,7 +148,7 @@ PSVUtils.addClasses = function(element, className) {
     return;
   }
   className.split(' ').forEach(function(name) {
-    element.classList.add(name);
+    PSVUtils.toggleClass(element, name, true);
   });
 };
 

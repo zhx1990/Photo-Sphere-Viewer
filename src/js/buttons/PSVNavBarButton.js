@@ -72,7 +72,7 @@ PSVNavBarButton.prototype.create = function() {
  * @param {boolean} [active] - forced state
  */
 PSVNavBarButton.prototype.toggleActive = function(active) {
-  active = PSVUtils.toggleClass(this.container, 'psv-button--active', active);
+  PSVUtils.toggleClass(this.container, 'psv-button--active', active);
 
   if (this.constructor.iconActive) {
     this._setIcon(active ? this.constructor.iconActive : this.constructor.icon);

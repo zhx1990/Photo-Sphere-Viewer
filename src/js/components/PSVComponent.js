@@ -93,5 +93,5 @@ PSVComponent.prototype.hide = function() {
  * Displays the component
  */
 PSVComponent.prototype.show = function() {
-  this.container.style.display = null;
+  this.container.style.display = '';
 };
