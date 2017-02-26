@@ -313,9 +313,12 @@ PhotoSphereViewer.prototype._click = function(evt) {
     data.longitude = sphericalCoords.longitude;
     data.latitude = sphericalCoords.latitude;
 
-    var textureCoords = this.sphericalCoordsToTextureCoords(data);
-    data.texture_x = textureCoords.x;
-    data.texture_y = textureCoords.y;
+    // TODO: for cubemap, computes texture's index and coordinates
+    if (!this.prop.isCubemap) {
+      var textureCoords = this.sphericalCoordsToTextureCoords(data.longitude, data.latitude);
+      data.texture_x = textureCoords.x;
+      data.texture_y = textureCoords.y;
+    }
 
     /**
      * @event click

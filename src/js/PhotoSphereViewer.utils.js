@@ -58,6 +58,10 @@ PhotoSphereViewer.prototype._setViewerSize = function(size) {
  * @returns {PhotoSphereViewer.Position}
  */
 PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(point) {
+  if (this.prop.isCubemap) {
+    throw new PSVError('Unable to use texture coords with cubemap.');
+  }
+
   var relativeX = (point.x + this.prop.pano_data.cropped_x) / this.prop.pano_data.full_width * PSVUtils.TwoPI;
   var relativeY = (point.y + this.prop.pano_data.cropped_y) / this.prop.pano_data.full_height * Math.PI;
 
@@ -73,6 +77,10 @@ PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(point) {
  * @returns {PhotoSphereViewer.Point}
  */
 PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(position) {
+  if (this.prop.isCubemap) {
+    throw new PSVError('Unable to use texture coords with cubemap.');
+  }
+
   var relativeLong = position.longitude / PSVUtils.TwoPI * this.prop.pano_data.full_width;
   var relativeLat = position.latitude / Math.PI * this.prop.pano_data.full_height;
 

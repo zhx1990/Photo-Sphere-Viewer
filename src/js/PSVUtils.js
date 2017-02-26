@@ -111,7 +111,7 @@ PSVUtils.getMaxTextureWidth = function() {
  */
 PSVUtils.toggleClass = function(element, className, active) {
   // manual implementation for IE11 and SVGElement
-  if (element instanceof SVGElement && !element.classList) {
+  if (!element.classList) {
     var currentClassName = element.getAttribute('class') || '';
     var currentActive = currentClassName.indexOf(className) !== -1;
     var regex = new RegExp('(?:^|\\s)' + className + '(?:\\s|$)');
@@ -247,6 +247,17 @@ PSVUtils.bound = function(x, min, max) {
 PSVUtils.isInteger = Number.isInteger || function(value) {
     return typeof value === 'number' && isFinite(value) && Math.floor(value) === value;
   };
+
+/**
+ * Computes the sum of an array
+ * @param {number[]} array
+ * @returns {number}
+ */
+PSVUtils.sum = function(array) {
+  return array.reduce(function(a, b) {
+    return a + b;
+  }, 0);
+};
 
 /**
  * Returns the value of a given attribute in the panorama metadata
@@ -475,6 +486,47 @@ PSVUtils.parseAngle = function(angle, reference) {
   }
 
   return angle;
+};
+
+/**
+ * Removes all children of a scene and dispose all textures
+ * @param {THREE.Scene} scene
+ */
+PSVUtils.cleanTHREEScene = function(scene) {
+  scene.children.forEach(function(item) {
+    if (item instanceof THREE.Mesh) {
+      if (item.geometry) {
+        item.geometry.dispose();
+        item.geometry = null;
+      }
+
+      if (item.material) {
+        if (item.material.materials) {
+          item.material.materials.forEach(function(material) {
+            if (material.map) {
+              material.map.dispose();
+              material.map = null;
+            }
+
+            material.dispose();
+          });
+
+          item.material.materials.length = 0;
+        }
+        else {
+          if (item.material.map) {
+            item.material.map.dispose();
+            item.material.map = null;
+          }
+
+          item.material.dispose();
+        }
+
+        item.material = null;
+      }
+    }
+  });
+  scene.children.length = 0;
 };
 
 /**

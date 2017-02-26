@@ -15,12 +15,45 @@ PhotoSphereViewer.MOVE_THRESHOLD = 4;
 PhotoSphereViewer.INERTIA_WINDOW = 300;
 
 /**
- * Radius of the THREE.Sphere
+ * Radius of the THREE.SphereGeometry
+ * Half-length of the THREE.BoxGeometry
  * @type {int}
  * @readonly
  * @private
  */
 PhotoSphereViewer.SPHERE_RADIUS = 100;
+
+/**
+ * Number of vertice of the THREE.SphereGeometry
+ * @type {int}
+ * @readonly
+ * @private
+ */
+PhotoSphereViewer.SPHERE_VERTICES = 64;
+
+/**
+ * Number of vertices of each side of the THREE.BoxGeometry
+ * @type {int}
+ * @readonly
+ * @private
+ */
+PhotoSphereViewer.CUBE_VERTICES = 8;
+
+/**
+ * Order of cube textures for arrays
+ * @type {int[]}
+ * @readonly
+ * @private
+ */
+PhotoSphereViewer.CUBE_MAP = [0, 2, 4, 5, 3, 1];
+
+/**
+ * Order of cube textures for maps
+ * @type {string[]}
+ * @readonly
+ * @private
+ */
+PhotoSphereViewer.CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
 
 /**
  * Map between keyboard events `keyCode|which` and `key`
@@ -76,7 +109,6 @@ PhotoSphereViewer.DEFAULTS = {
   usexmpdata: true,
   pano_data: null,
   webgl: true,
-  sphere_segments: 64,
   min_fov: 30,
   max_fov: 90,
   default_fov: null,
