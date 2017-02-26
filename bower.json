@@ -22,7 +22,7 @@
     "three.js": ">= 0.70.0",
     "D.js": "~0.7.3",
     "uevent": "~1.0.0",
-    "doT": "master"
+    "doT": ">=1.0.3"
   },
   "devDependencies": {
     "three.js-examples": "master"
@@ -42,6 +42,7 @@
     "node_modules",
     "bower_components",
     "build",
+    "example",
     "src",
     "tests",
     "package.json",

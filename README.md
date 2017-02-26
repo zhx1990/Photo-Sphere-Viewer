@@ -13,7 +13,7 @@ Forked from [JeremyHeleine/Photo-Sphere-Viewer](https://github.com/JeremyHeleine
 
 ## Dependencies
  * [three.js](http://threejs.org)
- * [doT.js](http://olado.github.io/doT) (@master)
+ * [doT.js](http://olado.github.io/doT)
  * [uEvent](https://github.com/mistic100/uEvent)
  * [D.js](http://malko.github.io/D.js)
 
