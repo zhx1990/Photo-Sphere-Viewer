@@ -20,8 +20,8 @@ PSVError.prototype.name = 'PSVError';
 PSVError.prototype.constructor = PSVError;
 
 /**
- * @member {object}
+ * @summary exposes {@link PSVError}
  * @memberof PhotoSphereViewer
- * @see PSVError
+ * @readonly
  */
 PhotoSphereViewer.Error = PSVError;

@@ -5,35 +5,36 @@
 var PSVUtils = {};
 
 /**
+ * @summary exposes {@link PSVUtils}
  * @member {object}
  * @memberof PhotoSphereViewer
- * @see PSVUtils
+ * @readonly
  */
 PhotoSphereViewer.Utils = PSVUtils;
 
 /**
- * Short-Hand for PI*2
+ * @summary Short-Hand for PI*2
  * @type {float}
  * @readonly
  */
 PSVUtils.TwoPI = Math.PI * 2.0;
 
 /**
- * Short-Hand for PI/2
+ * @summary Short-Hand for PI/2
  * @type {float}
  * @readonly
  */
 PSVUtils.HalfPI = Math.PI / 2.0;
 
 /**
- * Namespace for SVG creation
+ * @summary Namespace for SVG creation
  * @type {string}
  * @readonly
  */
 PSVUtils.svgNS = 'http://www.w3.org/2000/svg';
 
 /**
- * Checks if some Three.js components are loaded
+ * @summary Checks if some three.js components are loaded
  * @param {...string} components
  * @returns {boolean}
  */
@@ -48,7 +49,7 @@ PSVUtils.checkTHREE = function(components) {
 };
 
 /**
- * Detects whether canvas is supported
+ * @summary Detects if canvas is supported
  * @returns {boolean}
  */
 PSVUtils.isCanvasSupported = function() {
@@ -57,7 +58,7 @@ PSVUtils.isCanvasSupported = function() {
 };
 
 /**
- * Tries to return a canvas webgl context
+ * @summary Tries to return a canvas webgl context
  * @returns {WebGLRenderingContext}
  */
 PSVUtils.getWebGLCtx = function() {
@@ -85,7 +86,7 @@ PSVUtils.getWebGLCtx = function() {
 };
 
 /**
- * Detects whether WebGL is supported
+ * @summary Detects if WebGL is supported
  * @returns {boolean}
  */
 PSVUtils.isWebGLSupported = function() {
@@ -93,7 +94,7 @@ PSVUtils.isWebGLSupported = function() {
 };
 
 /**
- * Gets max texture width in WebGL context
+ * @summary Gets max texture width in WebGL context
  * @returns {int}
  */
 PSVUtils.getMaxTextureWidth = function() {
@@ -104,7 +105,7 @@ PSVUtils.getMaxTextureWidth = function() {
 };
 
 /**
- * Toggles a CSS class
+ * @summary Toggles a CSS class
  * @param {HTMLElement|SVGElement} element
  * @param {string} className
  * @param {boolean} [active] - forced state
@@ -139,7 +140,7 @@ PSVUtils.toggleClass = function(element, className, active) {
 };
 
 /**
- * Adds one or several CSS classes to an element
+ * @summary Adds one or several CSS classes to an element
  * @param {HTMLElement} element
  * @param {string} className
  */
@@ -153,7 +154,7 @@ PSVUtils.addClasses = function(element, className) {
 };
 
 /**
- * Removes one or several CSS classes to an element
+ * @summary Removes one or several CSS classes to an element
  * @param {HTMLElement} element
  * @param {string} className
  */
@@ -162,12 +163,12 @@ PSVUtils.removeClasses = function(element, className) {
     return;
   }
   className.split(' ').forEach(function(name) {
-    element.classList.remove(name);
+    PSVUtils.toggleClass(element, name, false);
   });
 };
 
 /**
- * Searches if an element has a particular parent at any level including itself
+ * @summary Searches if an element has a particular parent at any level including itself
  * @param {HTMLElement} el
  * @param {HTMLElement} parent
  * @returns {boolean}
@@ -183,7 +184,7 @@ PSVUtils.hasParent = function(el, parent) {
 };
 
 /**
- * Gets the closest parent (can by itself)
+ * @summary Gets the closest parent (can by itself)
  * @param {HTMLElement} el (HTMLElement)
  * @param {string} selector
  * @returns {HTMLElement}
@@ -201,7 +202,7 @@ PSVUtils.getClosest = function(el, selector) {
 };
 
 /**
- * Gets the event name for mouse wheel
+ * @summary Gets the event name for mouse wheel
  * @returns {string}
  */
 PSVUtils.mouseWheelEvent = function() {
@@ -211,7 +212,7 @@ PSVUtils.mouseWheelEvent = function() {
 };
 
 /**
- * Gets the event name for fullscreen event
+ *@summary  Gets the event name for fullscreen
  * @returns {string}
  */
 PSVUtils.fullscreenEvent = function() {
@@ -228,7 +229,7 @@ PSVUtils.fullscreenEvent = function() {
 };
 
 /**
- * Ensures that a number is in a given interval
+ * @summary Ensures that a number is in a given interval
  * @param {number} x
  * @param {number} min
  * @param {number} max
@@ -239,7 +240,7 @@ PSVUtils.bound = function(x, min, max) {
 };
 
 /**
- * Checks if a value is an integer
+ * @summary Checks if a value is an integer
  * @function
  * @param {*} value
  * @returns {boolean}
@@ -249,7 +250,7 @@ PSVUtils.isInteger = Number.isInteger || function(value) {
   };
 
 /**
- * Computes the sum of an array
+ * @summary Computes the sum of an array
  * @param {number[]} array
  * @returns {number}
  */
@@ -260,7 +261,7 @@ PSVUtils.sum = function(array) {
 };
 
 /**
- * Returns the value of a given attribute in the panorama metadata
+ * @summary Returns the value of a given attribute in the panorama metadata
  * @param {string} data
  * @param {string} attr
  * @returns (string)
@@ -281,7 +282,7 @@ PSVUtils.getXMPValue = function(data, attr) {
 };
 
 /**
- * Detects whether fullscreen is enabled
+ * @summary Detects if fullscreen is enabled
  * @param {HTMLElement} elt
  * @returns {boolean}
  */
@@ -290,7 +291,7 @@ PSVUtils.isFullscreenEnabled = function(elt) {
 };
 
 /**
- * Enters fullscreen mode
+ * @summary Enters fullscreen mode
  * @param {HTMLElement} elt
  */
 PSVUtils.requestFullscreen = function(elt) {
@@ -298,14 +299,14 @@ PSVUtils.requestFullscreen = function(elt) {
 };
 
 /**
- * Exits fullscreen mode
+ * @summary Exits fullscreen mode
  */
 PSVUtils.exitFullscreen = function() {
   (document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen).call(document);
 };
 
 /**
- * Gets an element style
+ * @summary Gets an element style
  * @param {HTMLElement} elt
  * @param {string} prop
  * @returns {*}
@@ -315,7 +316,7 @@ PSVUtils.getStyle = function(elt, prop) {
 };
 
 /**
- * Compute the shortest offset between two longitudes
+ * @summary Compute the shortest offset between two longitudes
  * @param {float} from
  * @param {float} to
  * @returns {float}
@@ -334,8 +335,8 @@ PSVUtils.getShortestArc = function(from, to) {
 };
 
 /**
- * Translate CSS values like "top center" or "10% 50%" as top and left positions<br>
- * The implementation is as close as possible to the "background-position" specification
+ * @summary Translate CSS values like "top center" or "10% 50%" as top and left positions
+ * @description The implementation is as close as possible to the "background-position" specification
  * {@link https://developer.mozilla.org/en-US/docs/Web/CSS/background-position}
  * @param {string} value
  * @returns {{top: float, left: float}}
@@ -386,7 +387,7 @@ PSVUtils.parsePosition = function(value) {
 PSVUtils.parsePosition.positions = { 'top': '0%', 'bottom': '100%', 'left': '0%', 'right': '100%', 'center': '50%' };
 
 /**
- * Parses an speed
+ * @summary Parses an speed
  * @param {string} speed - The speed, in radians/degrees/revolutions per second/minute
  * @returns {float} radians per second
  * @throws {PSVError} when the speed cannot be parsed
@@ -438,7 +439,7 @@ PSVUtils.parseSpeed = function(speed) {
 };
 
 /**
- * Parses an angle value in radians or degrees and returns a normalized value in radians
+ * @summary Parses an angle value in radians or degrees and returns a normalized value in radians
  * @param {string|number} angle - eg: 3.14, 3.14rad, 180deg
  * @param {float|boolean} [reference=0] - base value for normalization, false to disable
  * @returns {float}
@@ -489,7 +490,7 @@ PSVUtils.parseAngle = function(angle, reference) {
 };
 
 /**
- * Removes all children of a scene and dispose all textures
+ * @summary Removes all children of a three.js scene and dispose all textures
  * @param {THREE.Scene} scene
  */
 PSVUtils.cleanTHREEScene = function(scene) {
@@ -536,7 +537,7 @@ PSVUtils.cleanTHREEScene = function(scene) {
  */
 
 /**
- * Utility for animations, interpolates each property with an easing and optional delay
+ * @summary Interpolates each property with an easing and optional delay
  * @param {Object} options
  * @param {Object[]} options.properties
  * @param {number} options.properties[].start
@@ -620,7 +621,7 @@ PSVUtils.animation = function(options) {
 };
 
 /**
- * Collection of easing functions
+ * @summary Collection of easing functions
  * {@link https://gist.github.com/frederickk/6165768}
  * @type {Object.<string, Function>}
  */
@@ -663,7 +664,7 @@ PSVUtils.animation.easings = {
 // @formatter:off
 
 /**
- * Returns a function, that, when invoked, will only be triggered at most once during a given window of time.
+ * @summary Returns a function, that, when invoked, will only be triggered at most once during a given window of time.
  * @copyright underscore.js - modified by Clément Prévost {@link http://stackoverflow.com/a/27078401}
  * @param {Function} func
  * @param {int} wait
@@ -702,13 +703,14 @@ PSVUtils.throttle = function(func, wait) {
 };
 
 /**
- *  Function to test if an object is a plain object, i.e. is constructed
- *  by the built-in Object constructor and inherits directly from Object.prototype
- *  or null. Some built-in objects pass the test, e.g. Math which is a plain object
- *  and some host or exotic objects may pass also.
- *  {@link http://stackoverflow.com/a/5878101/1207670}
- *  @param {*} obj
- *  @returns {boolean}
+ * @summary Test if an object is a plain object
+ * @description Test if an object is a plain object, i.e. is constructed
+ * by the built-in Object constructor and inherits directly from Object.prototype
+ * or null. Some built-in objects pass the test, e.g. Math which is a plain object
+ * and some host or exotic objects may pass also.
+ * {@link http://stackoverflow.com/a/5878101/1207670}
+ * @param {*} obj
+ * @returns {boolean}
  */
 PSVUtils.isPlainObject = function(obj) {
   // Basic check for Type object that's not null
@@ -729,8 +731,8 @@ PSVUtils.isPlainObject = function(obj) {
 };
 
 /**
- * Merges the enumerable attributes of two objects.<br>
- * Modified to replace arrays instead of merge and alter the target object.
+ * @summary Merges the enumerable attributes of two objects
+ * @description Replaces arrays and alters the target object.
  * @copyright Nicholas Fisher <nfisher110@gmail.com>
  * @param {Object} target
  * @param {Object} src
@@ -778,7 +780,7 @@ PSVUtils.deepmerge = function(target, src) {
 };
 
 /**
- * Clones an object
+ * @summary Clones an object
  * @param {Object} src
  * @returns {Object}
  */

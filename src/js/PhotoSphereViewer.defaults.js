@@ -1,5 +1,5 @@
 /**
- * Number of pixels bellow which a mouse move will be considered as a click
+ * @summary Number of pixels bellow which a mouse move will be considered as a click
  * @type {int}
  * @readonly
  * @private
@@ -7,7 +7,7 @@
 PhotoSphereViewer.MOVE_THRESHOLD = 4;
 
 /**
- * Time size of the mouse position history used to compute inertia
+ * @summary Time size of the mouse position history used to compute inertia
  * @type {int}
  * @readonly
  * @private
@@ -15,7 +15,7 @@ PhotoSphereViewer.MOVE_THRESHOLD = 4;
 PhotoSphereViewer.INERTIA_WINDOW = 300;
 
 /**
- * Radius of the THREE.SphereGeometry
+ * @summary Radius of the THREE.SphereGeometry
  * Half-length of the THREE.BoxGeometry
  * @type {int}
  * @readonly
@@ -24,7 +24,7 @@ PhotoSphereViewer.INERTIA_WINDOW = 300;
 PhotoSphereViewer.SPHERE_RADIUS = 100;
 
 /**
- * Number of vertice of the THREE.SphereGeometry
+ * @summary Number of vertice of the THREE.SphereGeometry
  * @type {int}
  * @readonly
  * @private
@@ -32,7 +32,7 @@ PhotoSphereViewer.SPHERE_RADIUS = 100;
 PhotoSphereViewer.SPHERE_VERTICES = 64;
 
 /**
- * Number of vertices of each side of the THREE.BoxGeometry
+ * @summary Number of vertices of each side of the THREE.BoxGeometry
  * @type {int}
  * @readonly
  * @private
@@ -40,7 +40,7 @@ PhotoSphereViewer.SPHERE_VERTICES = 64;
 PhotoSphereViewer.CUBE_VERTICES = 8;
 
 /**
- * Order of cube textures for arrays
+ * @summary Order of cube textures for arrays
  * @type {int[]}
  * @readonly
  * @private
@@ -48,7 +48,7 @@ PhotoSphereViewer.CUBE_VERTICES = 8;
 PhotoSphereViewer.CUBE_MAP = [0, 2, 4, 5, 3, 1];
 
 /**
- * Order of cube textures for maps
+ * @summary Order of cube textures for maps
  * @type {string[]}
  * @readonly
  * @private
@@ -56,7 +56,7 @@ PhotoSphereViewer.CUBE_MAP = [0, 2, 4, 5, 3, 1];
 PhotoSphereViewer.CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
 
 /**
- * Map between keyboard events `keyCode|which` and `key`
+ * @summary Map between keyboard events `keyCode|which` and `key`
  * @type {Object.<int, string>}
  * @readonly
  * @private
@@ -73,7 +73,7 @@ PhotoSphereViewer.KEYMAP = {
 };
 
 /**
- * System properties
+ * @summary System properties
  * @type {Object}
  * @readonly
  * @private
@@ -90,14 +90,14 @@ PhotoSphereViewer.SYSTEM = {
 };
 
 /**
- * SVG icons sources
+ * @summary SVG icons sources
  * @type {Object.<string, string>}
  * @readonly
  */
 PhotoSphereViewer.ICONS = {};
 
 /**
- * Default options, see {@link http://photo-sphere-viewer.js.org/#options}
+ * @summary Default options, see {@link http://photo-sphere-viewer.js.org/#options}
  * @type {Object}
  * @readonly
  */
@@ -165,7 +165,7 @@ PhotoSphereViewer.DEFAULTS = {
 };
 
 /**
- * doT.js templates
+ * @summary doT.js templates
  * @type {Object.<string, string>}
  * @readonly
  */

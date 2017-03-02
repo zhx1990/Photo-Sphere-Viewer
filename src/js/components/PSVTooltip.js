@@ -1,6 +1,6 @@
 /**
  * Tooltip class
- * @param {PSVHUD} hud
+ * @param {module:components.PSVHUD} hud
  * @constructor
  * @extends module:components.PSVComponent
  * @memberof module:components
@@ -36,7 +36,7 @@ PSVTooltip.leftMap = { 0: 'left', 0.5: 'center', 1: 'right' };
 PSVTooltip.topMap = { 0: 'top', 0.5: 'center', 1: 'bottom' };
 
 /**
- * Creates the tooltip
+ * @override
  */
 PSVTooltip.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -52,7 +52,7 @@ PSVTooltip.prototype.create = function() {
 };
 
 /**
- * Destroys the tooltip
+ * @override
  */
 PSVTooltip.prototype.destroy = function() {
   this.psv.off('render', this);
@@ -64,7 +64,7 @@ PSVTooltip.prototype.destroy = function() {
 };
 
 /**
- * Handles events
+ * @summary Handles events
  * @param {Event} e
  * @private
  */
@@ -77,7 +77,7 @@ PSVTooltip.prototype.handleEvent = function(e) {
 };
 
 /**
- * Checks if the tooltip is visible
+ * @summary Checks if the tooltip is visible
  * @returns {boolean}
  */
 PSVTooltip.prototype.isTooltipVisible = function() {
@@ -85,18 +85,23 @@ PSVTooltip.prototype.isTooltipVisible = function() {
 };
 
 /**
- * Shows the tooltip
+ * @summary Displays a tooltip on the viewer
  * @param {Object} config
- * @param {string} config.content
- * @param {int} config.top
- * @param {int} config.left
- * @param {string} [config.position='top center']
- * @param {string} [config.className]
- * @param {Object} [config.box]
+ * @param {string} config.content - HTML content of the tootlip
+ * @param {int} config.top - Position of the tip of the arrow of the tooltip, in pixels
+ * @param {int} config.left - Position of the tip of the arrow of the tooltip, in pixels
+ * @param {string} [config.position='top center'] - Tooltip position toward it's arrow tip.
+ *                                                  Accepted values are combinations of `top`, `center`, `bottom`
+ *                                                  and `left`, `center`, `right`
+ * @param {string} [config.className] - Additional CSS class added to the tooltip
+ * @param {Object} [config.box] - Used when displaying a tooltip on a marker
  * @param {int} [config.box.width=0]
  * @param {int} [config.box.height=0]
  * @fires module:components.PSVTooltip.show-tooltip
  * @throws {PSVError} when the configuration is incorrect
+ *
+ * @example
+ * viewer.showTooltip({ content: 'Hello world', top: 200, left: 450, position: 'center bottom'})
  */
 PSVTooltip.prototype.showTooltip = function(config) {
   if (this.prop.timeout) {
@@ -212,6 +217,7 @@ PSVTooltip.prototype.showTooltip = function(config) {
       /**
        * @event show-tooltip
        * @memberof module:components.PSVTooltip
+       * @summary Trigered when the tooltip is shown
        */
       self.psv.trigger('show-tooltip');
     }, this.config.delay);
@@ -219,7 +225,7 @@ PSVTooltip.prototype.showTooltip = function(config) {
 };
 
 /**
- * Hides the tooltip
+ * @summary Hides the tooltip
  * @fires module:components.PSVTooltip.hide-tooltip
  */
 PSVTooltip.prototype.hideTooltip = function() {
@@ -242,13 +248,14 @@ PSVTooltip.prototype.hideTooltip = function() {
     /**
      * @event hide-tooltip
      * @memberof module:components.PSVTooltip
+     * @summary Trigered when the tooltip is hidden
      */
     this.psv.trigger('hide-tooltip');
   }
 };
 
 /**
- * Computes the position of the tooltip and its arrow
+ * @summary Computes the position of the tooltip and its arrow
  * @param {Object} style
  * @param {Object} config
  * @private

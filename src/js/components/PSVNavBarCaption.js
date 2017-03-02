@@ -21,7 +21,7 @@ PSVNavBarCaption.className = 'psv-caption';
 PSVNavBarCaption.publicMethods = ['setCaption'];
 
 /**
- * Sets the bar caption
+ * @summary Sets the bar caption
  * @param {string} html
  */
 PSVNavBarCaption.prototype.setCaption = function(html) {

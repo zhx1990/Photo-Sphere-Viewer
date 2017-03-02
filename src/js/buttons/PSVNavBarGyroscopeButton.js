@@ -19,13 +19,11 @@ PSVNavBarGyroscopeButton.className = 'psv-button psv-button--hover-scale psv-gyr
 PSVNavBarGyroscopeButton.icon = 'compass.svg';
 
 /**
- * Creates the button
- * The buttons get visible once the gyroscope API is ready
+ * @override
+ * @description The button gets visible once the gyroscope API is ready
  */
 PSVNavBarGyroscopeButton.prototype.create = function() {
   PSVNavBarButton.prototype.create.call(this);
-
-  this.container.title = this.psv.config.lang.gyroscope;
 
   PhotoSphereViewer.SYSTEM.deviceOrientationSupported.promise.then(
     this._onAvailabilityChange.bind(this, true),
@@ -38,7 +36,7 @@ PSVNavBarGyroscopeButton.prototype.create = function() {
 };
 
 /**
- * Destroys the button
+ * @override
  */
 PSVNavBarGyroscopeButton.prototype.destroy = function() {
   this.psv.off('gyroscope-updated', this);
@@ -47,7 +45,7 @@ PSVNavBarGyroscopeButton.prototype.destroy = function() {
 };
 
 /**
- * Handle events
+ * @summary Handles events
  * @param {Event} e
  * @private
  */
@@ -60,15 +58,15 @@ PSVNavBarGyroscopeButton.prototype.handleEvent = function(e) {
 };
 
 /**
- * Toggle gyroscope on click
- * @private
+ * @override
+ * @description Toggles gyroscope control
  */
 PSVNavBarGyroscopeButton.prototype._onClick = function() {
   this.psv.toggleGyroscopeControl();
 };
 
 /**
- * Update button display when API is ready
+ * @summary Updates button display when API is ready
  * @param {boolean} available
  * @private
  * @throws {PSVError} when {@link THREE.DeviceOrientationControls} is not loaded

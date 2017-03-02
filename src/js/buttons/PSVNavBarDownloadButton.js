@@ -19,17 +19,8 @@ PSVNavBarDownloadButton.className = 'psv-button psv-button--hover-scale psv-down
 PSVNavBarDownloadButton.icon = 'download.svg';
 
 /**
- * Creates the button
- */
-PSVNavBarDownloadButton.prototype.create = function() {
-  PSVNavBarButton.prototype.create.call(this);
-
-  this.container.title = this.psv.config.lang.download;
-};
-
-/**
- * Asks the browser to download the panorama source file
- * @private
+ * @override
+ * @description Asks the browser to download the panorama source file
  */
 PSVNavBarDownloadButton.prototype._onClick = function() {
   var link = document.createElement('a');

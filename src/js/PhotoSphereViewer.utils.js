@@ -1,5 +1,5 @@
 /**
- * Init the global SYSTEM var with generic support information
+ * @summary Inits the global SYSTEM var with generic support information
  * @private
  */
 PhotoSphereViewer._loadSystem = function() {
@@ -22,8 +22,8 @@ PhotoSphereViewer._loadSystem = function() {
 };
 
 /**
- * Resolve or reject SYSTEM.deviceOrientationSupported<br>
- * We can only be sure device orientation is supported once received an event with coherent data
+ * @summary Resolve or reject SYSTEM.deviceOrientationSupported
+ * @description We can only be sure device orientation is supported once received an event with coherent data
  * @param {DeviceOrientationEvent} event
  * @private
  */
@@ -39,7 +39,7 @@ PhotoSphereViewer._deviceOrientationListener = function(event) {
 };
 
 /**
- * Sets the viewer size
+ * @summary Sets the viewer size
  * @param {PhotoSphereViewer.Size} size
  * @private
  */
@@ -53,7 +53,7 @@ PhotoSphereViewer.prototype._setViewerSize = function(size) {
 };
 
 /**
- * Converts pixel texture coordinates to spherical radians coordinates
+ * @summary Converts pixel texture coordinates to spherical radians coordinates
  * @param {PhotoSphereViewer.Point} point
  * @returns {PhotoSphereViewer.Position}
  */
@@ -72,7 +72,7 @@ PhotoSphereViewer.prototype.textureCoordsToSphericalCoords = function(point) {
 };
 
 /**
- * Converts spherical radians coordinates to pixel texture coordinates
+ * @summary Converts spherical radians coordinates to pixel texture coordinates
  * @param {PhotoSphereViewer.Position} position
  * @returns {PhotoSphereViewer.Point}
  */
@@ -91,7 +91,7 @@ PhotoSphereViewer.prototype.sphericalCoordsToTextureCoords = function(position) 
 };
 
 /**
- * Converts spherical radians coordinates to a THREE.Vector3
+ * @summary Converts spherical radians coordinates to a THREE.Vector3
  * @param {PhotoSphereViewer.Position} position
  * @returns {THREE.Vector3}
  */
@@ -104,7 +104,7 @@ PhotoSphereViewer.prototype.sphericalCoordsToVector3 = function(position) {
 };
 
 /**
- * Converts a THREE.Vector3 to spherical radians coordinates
+ * @summary Converts a THREE.Vector3 to spherical radians coordinates
  * @param {THREE.Vector3} vector
  * @returns {PhotoSphereViewer.Position}
  */
@@ -119,7 +119,7 @@ PhotoSphereViewer.prototype.vector3ToSphericalCoords = function(vector) {
 };
 
 /**
- * Converts position on the viewer to a THREE.Vector3
+ * @summary Converts position on the viewer to a THREE.Vector3
  * @param {PhotoSphereViewer.Point} viewerPoint
  * @returns {THREE.Vector3}
  */
@@ -142,7 +142,7 @@ PhotoSphereViewer.prototype.viewerCoordsToVector3 = function(viewerPoint) {
 };
 
 /**
- * Converts a THREE.Vector3 to position on the viewer
+ * @summary Converts a THREE.Vector3 to position on the viewer
  * @param {THREE.Vector3} vector
  * @returns {PhotoSphereViewer.Point}
  */
@@ -157,8 +157,9 @@ PhotoSphereViewer.prototype.vector3ToViewerCoords = function(vector) {
 };
 
 /**
- * Converts x/y to latitude/longitude if present and ensure boundaries
+ * @summary Converts x/y to latitude/longitude if present and ensure boundaries
  * @param {PhotoSphereViewer.ExtendedPosition} position - mutated
+ * @private
  */
 PhotoSphereViewer.prototype.cleanPosition = function(position) {
   if (position.hasOwnProperty('x') && position.hasOwnProperty('y')) {
@@ -170,9 +171,10 @@ PhotoSphereViewer.prototype.cleanPosition = function(position) {
 };
 
 /**
- * Apply "longitude_range" and "latitude_range"
+ * @summary Apply "longitude_range" and "latitude_range"
  * @param {PhotoSphereViewer.Position} position - mutated
  * @returns {string[]} list of sides that were reached
+ * @private
  */
 PhotoSphereViewer.prototype.applyRanges = function(position) {
   var range, offset, sidesReached = [];

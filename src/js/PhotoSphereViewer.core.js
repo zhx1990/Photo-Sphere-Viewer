@@ -1,5 +1,5 @@
 /**
- * Loads the XMP data with AJAX
+ * @summary Loads the XMP data with AJAX
  * @param {string} panorama
  * @returns {Promise.<PhotoSphereViewer.PanoData>}
  * @throws {PSVError} when the image cannot be loaded
@@ -79,7 +79,7 @@ PhotoSphereViewer.prototype._loadXMP = function(panorama) {
 };
 
 /**
- * Loads the panorama texture(s)
+ * @summary Loads the panorama texture(s)
  * @param {string|string[]} panorama
  * @returns {Promise.<THREE.Texture|THREE.Texture[]>}
  * @fires PhotoSphereViewer.panorama-load-progress
@@ -145,7 +145,7 @@ PhotoSphereViewer.prototype._loadTexture = function(panorama) {
 };
 
 /**
- * Loads the sphere texture
+ * @summary Loads the sphere texture
  * @param {string} panorama
  * @returns {Promise.<THREE.Texture>}
  * @fires PhotoSphereViewer.panorama-load-progress
@@ -178,6 +178,7 @@ PhotoSphereViewer.prototype._loadEquirectangularTexture = function(panorama) {
       /**
        * @event panorama-load-progress
        * @memberof PhotoSphereViewer
+       * @summary Triggered while a panorama image is loading
        * @param {string} panorama
        * @param {int} progress
        */
@@ -273,7 +274,7 @@ PhotoSphereViewer.prototype._loadEquirectangularTexture = function(panorama) {
 };
 
 /**
- * Load the six textures of the cube
+ * @summary Load the six textures of the cube
  * @param {string[]} panorama
  * @returns {Promise.<THREE.Texture[]>}
  * @fires PhotoSphereViewer.panorama-load-progress
@@ -376,7 +377,7 @@ PhotoSphereViewer.prototype._loadCubemapTexture = function(panorama) {
 };
 
 /**
- * Applies the texture to the scene, creates the scene if needed
+ * @summary Applies the texture to the scene, creates the scene if needed
  * @param {THREE.Texture|THREE.Texture[]} texture
  * @fires PhotoSphereViewer.panorama-loaded
  * @private
@@ -406,6 +407,7 @@ PhotoSphereViewer.prototype._setTexture = function(texture) {
   /**
    * @event panorama-loaded
    * @memberof PhotoSphereViewer
+   * @summary Triggered when a panorama image has been loaded
    */
   this.trigger('panorama-loaded');
 
@@ -413,7 +415,7 @@ PhotoSphereViewer.prototype._setTexture = function(texture) {
 };
 
 /**
- * Creates the 3D scene and GUI components
+ * @summary Creates the 3D scene and GUI components
  * @private
  */
 PhotoSphereViewer.prototype._createScene = function() {
@@ -481,7 +483,7 @@ PhotoSphereViewer.prototype._createScene = function() {
 };
 
 /**
- * Creates the sphere mesh
+ * @summary Creates the sphere mesh
  * @private
  */
 PhotoSphereViewer.prototype._createSphere = function() {
@@ -505,7 +507,7 @@ PhotoSphereViewer.prototype._createSphere = function() {
 };
 
 /**
- * Creates the cube mesh
+ * @summary Creates the cube mesh
  * @private
  */
 PhotoSphereViewer.prototype._createCubemap = function() {
@@ -538,7 +540,7 @@ PhotoSphereViewer.prototype._createCubemap = function() {
 };
 
 /**
- * Performs transition between the current and a new texture
+ * @summary Performs transition between the current and a new texture
  * @param {THREE.Texture} texture
  * @param {PhotoSphereViewer.Position} [position]
  * @returns {Promise}
@@ -653,7 +655,7 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
 };
 
 /**
- * Reverses autorotate direction with smooth transition
+ * @summary Reverses autorotate direction with smooth transition
  * @private
  */
 PhotoSphereViewer.prototype._reverseAutorotate = function() {
@@ -691,7 +693,7 @@ PhotoSphereViewer.prototype._reverseAutorotate = function() {
 };
 
 /**
- * Adds a panorama to the cache
+ * @summary Adds a panorama to the cache
  * @param {PhotoSphereViewer.CacheItem} cache
  * @fires PhotoSphereViewer.panorama-cached
  * @throws {PSVError} when the cache is disabled
@@ -716,7 +718,18 @@ PhotoSphereViewer.prototype._putPanoramaCache = function(cache) {
   /**
    * @event panorama-cached
    * @memberof PhotoSphereViewer
+   * @summary Triggered when a panorama is stored in the cache
    * @param {string} panorama
    */
   this.trigger('panorama-cached', cache.panorama);
+};
+
+/**
+ * @summary Stops all current animations
+ * @private
+ */
+PhotoSphereViewer.prototype._stopAll = function() {
+  this.stopAutorotate();
+  this.stopAnimation();
+  this.stopGyroscopeControl();
 };

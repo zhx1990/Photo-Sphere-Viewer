@@ -13,6 +13,7 @@ function PSVNavBarButton(navbar) {
   PSVComponent.call(this, navbar);
 
   /**
+   * @summary Unique identifier of the button
    * @member {string}
    * @readonly
    */
@@ -23,6 +24,7 @@ function PSVNavBarButton(navbar) {
   }
 
   /**
+   * @summary State of the button
    * @member {boolean}
    * @readonly
    */
@@ -33,31 +35,39 @@ PSVNavBarButton.prototype = Object.create(PSVComponent.prototype);
 PSVNavBarButton.prototype.constructor = PSVNavBarButton;
 
 /**
- * Unique identifier of the button
+ * @summary Unique identifier of the button
  * @member {string}
+ * @readonly
  */
 PSVNavBarButton.id = null;
 
 /**
- * SVG icon name injected in the button
+ * @summary SVG icon name injected in the button
  * @member {string}
+ * @readonly
  */
 PSVNavBarButton.icon = null;
 
 /**
- * SVG icon name injected in the button when it is active
+ * @summary SVG icon name injected in the button when it is active
  * @member {string}
+ * @readonly
  */
 PSVNavBarButton.iconActive = null;
 
 /**
- * Creates the button
+ * @summary Creates the button
+ * @protected
  */
 PSVNavBarButton.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
 
   if (this.constructor.icon) {
     this._setIcon(this.constructor.icon);
+  }
+
+  if (this.id && this.psv.config.lang[this.id]) {
+    this.container.title = this.psv.config.lang[this.id];
   }
 
   this.container.addEventListener('click', function() {
@@ -68,7 +78,15 @@ PSVNavBarButton.prototype.create = function() {
 };
 
 /**
- * Changes the active state of the button
+ * @summary Destroys the button
+ * @protected
+ */
+PSVNavBarButton.prototype.destroy = function() {
+  PSVComponent.prototype.destroy.call(this);
+};
+
+/**
+ * @summary Changes the active state of the button
  * @param {boolean} [active] - forced state
  */
 PSVNavBarButton.prototype.toggleActive = function(active) {
@@ -80,7 +98,7 @@ PSVNavBarButton.prototype.toggleActive = function(active) {
 };
 
 /**
- * Disables the button
+ * @summary Disables the button
  */
 PSVNavBarButton.prototype.disable = function() {
   this.container.classList.add('psv-button--disabled');
@@ -89,7 +107,7 @@ PSVNavBarButton.prototype.disable = function() {
 };
 
 /**
- * Enables the button
+ * @summary Enables the button
  */
 PSVNavBarButton.prototype.enable = function() {
   this.container.classList.remove('psv-button--disabled');
@@ -98,7 +116,7 @@ PSVNavBarButton.prototype.enable = function() {
 };
 
 /**
- * Set the button icon (from {@link PhotoSphereViewer.ICONS})
+ * @summary Set the button icon from {@link PhotoSphereViewer.ICONS}
  * @param {string} icon
  * @param {HTMLElement} [container] - default is the main button container
  * @private
@@ -118,7 +136,7 @@ PSVNavBarButton.prototype._setIcon = function(icon, container) {
 };
 
 /**
- * Action when the button is clicked
+ * @summary Action when the button is clicked
  * @private
  * @abstract
  */

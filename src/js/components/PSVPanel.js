@@ -9,10 +9,10 @@ function PSVPanel(psv) {
   PSVComponent.call(this, psv);
 
   /**
-   * Content container
+   * @summary Content container
    * @member {HTMLElement}
    * @readonly
-   * @protected
+   * @private
    */
   this.content = null;
 
@@ -37,7 +37,7 @@ PSVPanel.className = 'psv-panel';
 PSVPanel.publicMethods = ['showPanel', 'hidePanel'];
 
 /**
- * Creates the panel
+ * @override
  */
 PSVPanel.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -70,7 +70,7 @@ PSVPanel.prototype.create = function() {
 };
 
 /**
- * Destroys the panel
+ * @override
  */
 PSVPanel.prototype.destroy = function() {
   this.psv.container.removeEventListener('mousemove', this);
@@ -85,7 +85,7 @@ PSVPanel.prototype.destroy = function() {
 };
 
 /**
- * Handles events
+ * @summary Handles events
  * @param {Event} e
  * @private
  */
@@ -103,7 +103,7 @@ PSVPanel.prototype.handleEvent = function(e) {
 };
 
 /**
- * Shows the panel
+ * @summary Shows the panel
  * @param {string} content
  * @param {boolean} [noMargin=false]
  * @fires module:components.PSVPanel.open-panel
@@ -120,12 +120,13 @@ PSVPanel.prototype.showPanel = function(content, noMargin) {
   /**
    * @event open-panel
    * @memberof module:components.PSVPanel
+   * @summary Triggered when the panel is opened
    */
   this.psv.trigger('open-panel');
 };
 
 /**
- * Hides the panel
+ * @summary Hides the panel
  * @fires module:components.PSVPanel.close-panel
  */
 PSVPanel.prototype.hidePanel = function() {
@@ -136,12 +137,13 @@ PSVPanel.prototype.hidePanel = function() {
   /**
    * @event close-panel
    * @memberof module:components.PSVPanel
+   * @summary Trigered when the panel is closed
    */
   this.psv.trigger('close-panel');
 };
 
 /**
- * Handles mouse down events
+ * @summary Handles mouse down events
  * @param {MouseEvent} evt
  * @private
  */
@@ -151,7 +153,7 @@ PSVPanel.prototype._onMouseDown = function(evt) {
 };
 
 /**
- * Handles touch events
+ * @summary Handles touch events
  * @param {TouchEvent} evt
  * @private
  */
@@ -161,7 +163,7 @@ PSVPanel.prototype._onTouchStart = function(evt) {
 };
 
 /**
- * Handles mouse up events
+ * @summary Handles mouse up events
  * @param {MouseEvent} evt
  * @private
  */
@@ -174,7 +176,7 @@ PSVPanel.prototype._onMouseUp = function(evt) {
 };
 
 /**
- * Handles mouse move events
+ * @summary Handles mouse move events
  * @param {MouseEvent} evt
  * @private
  */
@@ -186,7 +188,7 @@ PSVPanel.prototype._onMouseMove = function(evt) {
 };
 
 /**
- * Handles touch move events
+ * @summary Handles touch move events
  * @param {TouchEvent} evt
  * @private
  */
@@ -198,7 +200,7 @@ PSVPanel.prototype._onTouchMove = function(evt) {
 };
 
 /**
- * Initializes the panel resize
+ * @summary Initializes the panel resize
  * @param {MouseEvent|Touch} evt
  * @private
  */
@@ -210,7 +212,7 @@ PSVPanel.prototype._startResize = function(evt) {
 };
 
 /**
- * Resizes the panel
+ * @summary Resizes the panel
  * @param {MouseEvent|Touch} evt
  * @private
  */

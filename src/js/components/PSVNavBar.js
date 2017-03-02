@@ -16,9 +16,9 @@ function PSVNavBar(psv) {
   this.config = this.psv.config.navbar;
 
   /**
+   * @summary List of buttons of the navbar
    * @member {Array.<module:components/buttons.PSVNavBarButton>}
    * @readonly
-   * @protected
    */
   this.items = [];
 
@@ -57,7 +57,7 @@ PSVNavBar.className = 'psv-navbar psv-navbar--open';
 PSVNavBar.publicMethods = ['showNavbar', 'hideNavbar', 'toggleNavbar', 'getNavbarButton'];
 
 /**
- * Creates the navbar
+ * @override
  * @throws {PSVError} when the configuration is incorrect
  */
 PSVNavBar.prototype.create = function() {
@@ -117,7 +117,7 @@ PSVNavBar.prototype.create = function() {
 };
 
 /**
- * Destroys the navbar
+ * @override
  */
 PSVNavBar.prototype.destroy = function() {
   this.items.forEach(function(item) {
@@ -131,7 +131,7 @@ PSVNavBar.prototype.destroy = function() {
 };
 
 /**
- * Returns a button by its identifier
+ * @summary Returns a button by its identifier
  * @param {string} id
  * @returns {module:components/buttons.PSVNavBarButton}
  */
@@ -153,21 +153,21 @@ PSVNavBar.prototype.getNavbarButton = function(id) {
 };
 
 /**
- * Shows the navbar
+ * @summary Shows the navbar
  */
 PSVNavBar.prototype.showNavbar = function() {
   this.toggleNavbar(true);
 };
 
 /**
- * Hides the navbar
+ * @summary Hides the navbar
  */
 PSVNavBar.prototype.hideNavbar = function() {
   this.toggleNavbar(false);
 };
 
 /**
- * Toggles the navbar
+ * @summary Toggles the navbar
  * @param {boolean} active
  */
 PSVNavBar.prototype.toggleNavbar = function(active) {

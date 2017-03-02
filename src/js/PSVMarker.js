@@ -90,7 +90,7 @@ function PSVMarker(properties, psv) {
       }
     },
     /**
-     * Quick access to self value of key `type`
+     * @summary Quick access to self value of key `type`
      * @memberof PSVMarker
      * @type {*}
      * @private
@@ -125,14 +125,14 @@ function PSVMarker(properties, psv) {
 }
 
 /**
- * Types of markers
+ * @summary Types of markers
  * @type {string[]}
  * @readonly
  */
 PSVMarker.types = ['image', 'html', 'polygon_px', 'polygon_rad', 'rect', 'circle', 'ellipse', 'path'];
 
 /**
- * Determines the type of a marker by the available properties
+ * @summary Determines the type of a marker by the available properties
  * @param {object} properties
  * @param {boolean} [allowNone=false]
  * @returns {string}
@@ -158,14 +158,14 @@ PSVMarker.getType = function(properties, allowNone) {
 };
 
 /**
- * Destroys the marker
+ * @summary Destroys the marker
  */
 PSVMarker.prototype.destroy = function() {
   delete this.$el.psvMarker;
 };
 
 /**
- * Checks if it is a normal marker (image or html)
+ * @summary Checks if it is a normal marker (image or html)
  * @returns {boolean}
  */
 PSVMarker.prototype.isNormal = function() {
@@ -173,7 +173,7 @@ PSVMarker.prototype.isNormal = function() {
 };
 
 /**
- * Checks if it is a polygon marker
+ * @summary Checks if it is a polygon marker
  * @returns {boolean}
  */
 PSVMarker.prototype.isPolygon = function() {
@@ -181,7 +181,7 @@ PSVMarker.prototype.isPolygon = function() {
 };
 
 /**
- * Checks if it is an SVG marker
+ * @summary Checks if it is an SVG marker
  * @returns {boolean}
  */
 PSVMarker.prototype.isSvg = function() {
@@ -189,7 +189,7 @@ PSVMarker.prototype.isSvg = function() {
 };
 
 /**
- * Updates the marker with new properties
+ * @summary Updates the marker with new properties
  * @param {object} [properties]
  * @throws {PSVError} when trying to change the marker's type
  */
@@ -244,7 +244,7 @@ PSVMarker.prototype.update = function(properties) {
 };
 
 /**
- * Updates a normal marker
+ * @summary Updates a normal marker
  * @private
  */
 PSVMarker.prototype._updateNormal = function() {
@@ -272,7 +272,7 @@ PSVMarker.prototype._updateNormal = function() {
 };
 
 /**
- * Updates an SVG marker
+ * @summary Updates an SVG marker
  * @private
  */
 PSVMarker.prototype._updateSvg = function() {
@@ -376,7 +376,7 @@ PSVMarker.prototype._updateSvg = function() {
 };
 
 /**
- * Updates a polygon marker
+ * @summary Updates a polygon marker
  * @private
  */
 PSVMarker.prototype._updatePolygon = function() {

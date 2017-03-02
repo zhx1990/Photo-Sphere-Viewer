@@ -12,21 +12,18 @@ function PSVComponent(parent) {
   /**
    * @member {PhotoSphereViewer}
    * @readonly
-   * @protected
    */
   this.psv = parent instanceof PhotoSphereViewer ? parent : parent.psv;
 
   /**
    * @member {PhotoSphereViewer|module:components.PSVComponent}
    * @readonly
-   * @protected
    */
   this.parent = parent;
 
   /**
    * @member {HTMLElement}
    * @readonly
-   * @protected
    */
   this.container = null;
 
@@ -39,21 +36,22 @@ function PSVComponent(parent) {
 }
 
 /**
- * CSS class added to the component's container
+ * @summary CSS class added to the component's container
  * @member {string}
  * @readonly
  */
 PSVComponent.className = null;
 
 /**
- * List of component's methods which are bound the the main viewer
+ * @summary List of component's methods which are bound the the main viewer
  * @member {string[]}
  * @readonly
  */
 PSVComponent.publicMethods = [];
 
 /**
- * Creates the component
+ * @summary Creates the component
+ * @protected
  */
 PSVComponent.prototype.create = function() {
   this.container = document.createElement('div');
@@ -66,7 +64,8 @@ PSVComponent.prototype.create = function() {
 };
 
 /**
- * Destroys the component
+ * @summary Destroys the component
+ * @protected
  */
 PSVComponent.prototype.destroy = function() {
   this.parent.container.removeChild(this.container);
@@ -83,14 +82,16 @@ PSVComponent.prototype.destroy = function() {
 };
 
 /**
- * Hides the component
+ * @summary Hides the component
+ * @protected
  */
 PSVComponent.prototype.hide = function() {
   this.container.style.display = 'none';
 };
 
 /**
- * Displays the component
+ * @summary Displays the component
+ * @protected
  */
 PSVComponent.prototype.show = function() {
   this.container.style.display = '';

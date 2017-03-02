@@ -1,23 +1,27 @@
 /**
  * @typedef {Object} PhotoSphereViewer.Point
+ * @summary Object defining a point
  * @property {int} x
  * @property {int} y
  */
 
 /**
  * @typedef {Object} PhotoSphereViewer.Size
+ * @summary Object defining a size
  * @property {int} width
  * @property {int} height
  */
 
 /**
  * @typedef {Object} PhotoSphereViewer.Position
+ * @summary Object defining a spherical position
  * @property {float} longitude
  * @property {float} latitude
  */
 
 /**
  * @typedef {Object} PhotoSphereViewer.ExtendedPosition
+ * @summary Object defining a spherical or texture position
  * @description A position that can be expressed either in spherical coordinates (radians or degrees) or in texture coordinates (pixels)
  * @property {float} longitude
  * @property {float} latitude
@@ -27,6 +31,7 @@
 
 /**
  * @typedef {Object} PhotoSphereViewer.CacheItem
+ * @summary An entry in the memory cache
  * @property {string} panorama
  * @property {THREE.Texture} image
  * @property {PhotoSphereViewer.PanoData} pano_data
@@ -34,6 +39,7 @@
 
 /**
  * @typedef {Object} PhotoSphereViewer.PanoData
+ * @summary Crop information of the panorama
  * @property {int} full_width
  * @property {int} full_height
  * @property {int} cropped_width
@@ -44,16 +50,16 @@
 
 /**
  * @typedef {Object} PhotoSphereViewer.ClickData
- * @property {int} client_x
- * @property {int} client_y
- * @property {int} viewer_x
- * @property {int} viewer_y
- * @property {float} longitude
- * @property {float} latitude
- * @property {int} texture_x
- * @property {int} texture_y
- * @property {HTMLElement} [target]
- * @property {PSVMarker} [marker]
+ * @summary Data of the `click` event
+ * @property {int} client_x - position in the browser window
+ * @property {int} client_y - position in the browser window
+ * @property {int} viewer_x - position in the viewer
+ * @property {int} viewer_y - position in the viewer
+ * @property {float} longitude - position in spherical coordinates
+ * @property {float} latitude - position in spherical coordinates
+ * @property {int} texture_x - position on the texture
+ * @property {int} texture_y - position on the texture
+ * @property {PSVMarker} [marker] - clicked marker
  */
 
 /**
@@ -75,7 +81,7 @@ function PhotoSphereViewer(options) {
   }
 
   /**
-   * Configuration object
+   * @summary Configuration object
    * @member {Object}
    * @readonly
    */
@@ -211,14 +217,14 @@ function PhotoSphereViewer(options) {
   }
 
   /**
-   * Top most parent
+   * @summary Top most parent
    * @member {HTMLElement}
    * @readonly
    */
   this.parent = (typeof options.container == 'string') ? document.getElementById(options.container) : options.container;
 
   /**
-   * Main container
+   * @summary Main container
    * @member {HTMLElement}
    * @readonly
    */
@@ -318,7 +324,7 @@ function PhotoSphereViewer(options) {
   this.doControls = null;
 
   /**
-   * Internal properties, must not be modified externally
+   * @summary Internal properties
    * @member {Object}
    * @readonly
    * @property {boolean} isCubemap - if the panorama is a cubemap
@@ -429,11 +435,8 @@ function PhotoSphereViewer(options) {
   this.loader.hide();
 
   // load navbar
-  if (this.config.navbar) {
-    this.container.classList.add('psv-container--has-navbar');
-    this.navbar = new PSVNavBar(this);
-    this.navbar.hide();
-  }
+  this.navbar = new PSVNavBar(this);
+  this.navbar.hide();
 
   // load hud
   this.hud = new PSVHUD(this);
@@ -456,6 +459,7 @@ function PhotoSphereViewer(options) {
   // enable GUI after first render
   this.once('render', function() {
     if (this.config.navbar) {
+      this.container.classList.add('psv-container--has-navbar');
       this.navbar.show();
     }
 
@@ -466,7 +470,7 @@ function PhotoSphereViewer(options) {
         this.hud.addMarker(marker, false);
       }, this);
 
-      this.hud.updatePositions();
+      this.hud.renderMarkers();
     }
 
     // Queue animation
@@ -477,13 +481,14 @@ function PhotoSphereViewer(options) {
     /**
      * @event ready
      * @memberof PhotoSphereViewer
+     * @summary Triggered when the panorama image has been loaded and the viewer is ready to perform the first render
      */
     this.trigger('ready');
   }.bind(this));
 }
 
 /**
- * Triggers an event on the viewer
+ * @summary Triggers an event on the viewer
  * @function trigger
  * @memberof PhotoSphereViewer
  * @instance
@@ -493,7 +498,7 @@ function PhotoSphereViewer(options) {
  */
 
 /**
- * Triggers an event on the viewer and returns the modified value
+ * @summary Triggers an event on the viewer and returns the modified value
  * @function change
  * @memberof PhotoSphereViewer
  * @instance
@@ -504,7 +509,7 @@ function PhotoSphereViewer(options) {
  */
 
 /**
- * Attaches an event listener on the viewer
+ * @summary Attaches an event listener on the viewer
  * @function on
  * @memberof PhotoSphereViewer
  * @instance
@@ -514,7 +519,7 @@ function PhotoSphereViewer(options) {
  */
 
 /**
- * Removes an event listener from the viewer
+ * @summary Removes an event listener from the viewer
  * @function off
  * @memberof PhotoSphereViewer
  * @instance
@@ -524,7 +529,7 @@ function PhotoSphereViewer(options) {
  */
 
 /**
- * Attaches an event listener called once on the viewer
+ * @summary Attaches an event listener called once on the viewer
  * @function once
  * @memberof PhotoSphereViewer
  * @instance

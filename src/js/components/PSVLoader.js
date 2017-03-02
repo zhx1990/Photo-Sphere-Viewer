@@ -9,7 +9,7 @@ function PSVLoader(psv) {
   PSVComponent.call(this, psv);
 
   /**
-   * Animation canvas
+   * @summary Animation canvas
    * @member {HTMLCanvasElement}
    * @readonly
    * @private
@@ -17,7 +17,7 @@ function PSVLoader(psv) {
   this.canvas = null;
 
   /**
-   * Inner container for vertical center
+   * @summary Inner container for vertical center
    * @member {HTMLElement}
    * @readonly
    * @private
@@ -33,7 +33,7 @@ PSVLoader.prototype.constructor = PSVLoader;
 PSVLoader.className = 'psv-loader-container';
 
 /**
- * Creates the loader
+ * @override
  */
 PSVLoader.prototype.create = function() {
   PSVComponent.prototype.create.call(this);
@@ -71,7 +71,7 @@ PSVLoader.prototype.create = function() {
 };
 
 /**
- * Destroys the loader
+ * @override
  */
 PSVLoader.prototype.destroy = function() {
   delete this.loader;
@@ -81,7 +81,7 @@ PSVLoader.prototype.destroy = function() {
 };
 
 /**
- * Sets the loader progression
+ * @summary Sets the loader progression
  * @param {int} value - from 0 to 100
  */
 PSVLoader.prototype.setProgress = function(value) {
