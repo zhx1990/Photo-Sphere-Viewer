@@ -528,31 +528,43 @@ PSVHUD.prototype._getPolygonDimensions = function(marker, positions) {
 };
 
 /**
- * @summary Handles mouse enter events, show the tooltip
+ * @summary Handles mouse enter events, show the tooltip for non polygon markers
  * @param {MouseEvent} e
+ * @fires module:components.PSVHUD.over-marker
  * @private
  */
 PSVHUD.prototype._onMouseEnter = function(e) {
   var marker;
-  if (e.target && (marker = e.target.psvMarker) && marker.tooltip && !marker.isPolygon()) {
+  if (e.target && (marker = e.target.psvMarker) && !marker.isPolygon()) {
     this.hoveringMarker = marker;
 
-    this.psv.tooltip.showTooltip({
-      content: marker.tooltip.content,
-      position: marker.tooltip.position,
-      left: marker.position2D.x,
-      top: marker.position2D.y,
-      box: {
-        width: marker.width,
-        height: marker.height
-      }
-    });
+    /**
+     * @event over-marker
+     * @memberof module:components.PSVHUD
+     * @summary Triggered when the user puts the cursor hover a marker
+     * @param {PSVMarker} marker
+     */
+    this.psv.trigger('over-marker', marker);
+
+    if (marker.tooltip) {
+      this.psv.tooltip.showTooltip({
+        content: marker.tooltip.content,
+        position: marker.tooltip.position,
+        left: marker.position2D.x,
+        top: marker.position2D.y,
+        box: {
+          width: marker.width,
+          height: marker.height
+        }
+      });
+    }
   }
 };
 
 /**
  * @summary Handles mouse leave events, hide the tooltip
  * @param {MouseEvent} e
+ * @fires module:components.PSVHUD.leave-marker
  * @private
  */
 PSVHUD.prototype._onMouseLeave = function(e) {
@@ -563,6 +575,14 @@ PSVHUD.prototype._onMouseLeave = function(e) {
       return;
     }
 
+    /**
+     * @event leave-marker
+     * @memberof module:components.PSVHUD
+     * @summary Triggered when the user puts the cursor away from a marker
+     * @param {PSVMarker} marker
+     */
+    this.psv.trigger('leave-marker', marker);
+
     this.hoveringMarker = null;
 
     this.psv.tooltip.hideTooltip();
@@ -572,31 +592,44 @@ PSVHUD.prototype._onMouseLeave = function(e) {
 /**
  * @summary Handles mouse move events, refresh the tooltip for polygon markers
  * @param {MouseEvent} e
+ * @fires module:components.PSVHUD.leave-marker
+ * @fires module:components.PSVHUD.over-marker
  * @private
  */
 PSVHUD.prototype._onMouseMove = function(e) {
   if (!this.psv.prop.moving) {
     var marker;
-    // do not hide if we enter the tooltip while hovering a polygon
-    if (e.target && (marker = e.target.psvMarker) && marker.tooltip && marker.isPolygon() ||
+
+    // do not hide if we enter the tooltip itself while hovering a polygon
+    if (e.target && (marker = e.target.psvMarker) && marker.isPolygon() ||
       e.target && PSVUtils.hasParent(e.target, this.psv.tooltip.container) && (marker = this.hoveringMarker)) {
 
-      this.hoveringMarker = marker;
+      if (!this.hoveringMarker) {
+        this.psv.trigger('over-marker', marker);
+
+        this.hoveringMarker = marker;
+      }
 
       var boundingRect = this.psv.container.getBoundingClientRect();
 
-      this.psv.tooltip.showTooltip({
-        content: marker.tooltip.content,
-        position: marker.tooltip.position,
-        top: e.clientY - boundingRect.top - this.psv.config.tooltip.arrow_size / 2,
-        left: e.clientX - boundingRect.left - this.psv.config.tooltip.arrow_size,
-        box: { // separate the tooltip from the cursor
-          width: this.psv.config.tooltip.arrow_size * 2,
-          height: this.psv.config.tooltip.arrow_size * 2
-        }
-      });
+      if (marker.tooltip) {
+        this.psv.tooltip.showTooltip({
+          content: marker.tooltip.content,
+          position: marker.tooltip.position,
+          top: e.clientY - boundingRect.top - this.psv.config.tooltip.arrow_size / 2,
+          left: e.clientX - boundingRect.left - this.psv.config.tooltip.arrow_size,
+          box: { // separate the tooltip from the cursor
+            width: this.psv.config.tooltip.arrow_size * 2,
+            height: this.psv.config.tooltip.arrow_size * 2
+          }
+        });
+      }
     }
     else if (this.hoveringMarker && this.hoveringMarker.isPolygon()) {
+      this.psv.trigger('leave-marker', marker);
+
+      this.hoveringMarker = null;
+
       this.psv.tooltip.hideTooltip();
     }
   }

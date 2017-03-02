@@ -234,21 +234,6 @@
       });
 
       a.push({
-        id: 'polygon',
-        content: 'This mountain is so great it has dots on it!',
-        polygon_px: [3184, 794, 3268, 841, 3367, 1194, 3327, 1307, 3065, 1221, 3097, 847],
-        svgStyle: {
-          fill: 'url(#points)', //'rgba(255,0,0,0.3)',
-          stroke: 'rgba(255, 0, 50, 0.8)',
-          'stroke-width': '2px'
-        },
-        tooltip: {
-          content: 'This is a mountain',
-          position: 'right bottom'
-        }
-      });
-
-      a.push({
         id: 'polygon-sky',
         svgStyle: {
           fill: 'rgba(0, 190, 255, 0.1)'
@@ -263,6 +248,21 @@
 
           return points;
         }())
+      });
+
+      a.push({
+        id: 'polygon',
+        content: 'This mountain is so great it has dots on it!',
+        polygon_px: [3184, 794, 3268, 841, 3367, 1194, 3327, 1307, 3065, 1221, 3097, 847],
+        svgStyle: {
+          fill: 'url(#points)', //'rgba(255,0,0,0.3)',
+          stroke: 'rgba(255, 0, 50, 0.8)',
+          'stroke-width': '2px'
+        },
+        tooltip: {
+          content: 'This is a mountain',
+          position: 'right bottom'
+        }
       });
 
       a.push({
@@ -348,6 +348,14 @@
     if (marker.data && marker.data.deletable) {
       PSV.removeMarker(marker);
     }
+  });
+
+  PSV.on('over-marker', function(marker) {
+    console.log('over', marker.id);
+  });
+
+  PSV.on('leave-marker', function(marker) {
+    console.log('leave', marker.id);
   });
 </script>
 
