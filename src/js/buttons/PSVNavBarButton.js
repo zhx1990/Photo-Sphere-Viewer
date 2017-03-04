@@ -70,10 +70,11 @@ PSVNavBarButton.prototype.create = function() {
     this.container.title = this.psv.config.lang[this.id];
   }
 
-  this.container.addEventListener('click', function() {
+  this.container.addEventListener('click', function(e) {
     if (this.enabled) {
       this._onClick();
     }
+    e.stopPropagation();
   }.bind(this));
 };
 

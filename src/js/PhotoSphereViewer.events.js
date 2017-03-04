@@ -294,6 +294,7 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
  * @summary Triggers an event with all coordinates when a simple click is performed
  * @param {MouseEvent|Touch} evt
  * @fires PhotoSphereViewer.click
+ * @fires PhotoSphereViewer.dblclick
  * @private
  */
 PhotoSphereViewer.prototype._click = function(evt) {
