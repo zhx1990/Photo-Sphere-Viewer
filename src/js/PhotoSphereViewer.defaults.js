@@ -7,6 +7,14 @@
 PhotoSphereViewer.MOVE_THRESHOLD = 4;
 
 /**
+ * @summary Delay in milliseconds between two clicks to consider a double click
+ * @type {int}
+ * @readonly
+ * @private
+ */
+PhotoSphereViewer.DBLCLICK_DELAY = 300;
+
+/**
  * @summary Time size of the mouse position history used to compute inertia
  * @type {int}
  * @readonly

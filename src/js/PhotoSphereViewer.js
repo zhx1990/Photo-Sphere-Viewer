@@ -350,6 +350,8 @@ function PhotoSphereViewer(options) {
    * @property {Promise} animation_promise - promise of the current animation (either go to position or image transition)
    * @property {Promise} loading_promise - promise of the setPanorama method
    * @property start_timeout - timeout id of the automatic rotation delay
+   * @property {PhotoSphereViewer.ClickData} dblclick_data - temporary storage of click data between two clicks
+   * @property dblclick_timeout - timeout id for double click
    * @property {PhotoSphereViewer.CacheItem[]} cache - cached panoramas
    * @property {Size} size - size of the container
    * @property {PhotoSphereViewer.PanoData} pano_data - panorama metadata
@@ -378,6 +380,8 @@ function PhotoSphereViewer(options) {
     animation_promise: null,
     loading_promise: null,
     start_timeout: null,
+    dblclick_data: null,
+    dblclick_timeout: null,
     cache: [],
     size: {
       width: 0,

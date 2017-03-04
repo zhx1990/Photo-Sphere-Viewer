@@ -84,6 +84,7 @@ PSVHUD.prototype.create = function() {
 
   // Viewer events
   this.psv.on('click', this);
+  this.psv.on('dblclick', this);
   this.psv.on('render', this);
   this.psv.on('open-panel', this);
   this.psv.on('close-panel', this);
@@ -100,6 +101,7 @@ PSVHUD.prototype.destroy = function() {
   this.container.removeEventListener('mousemove', this);
 
   this.psv.off('click', this);
+  this.psv.off('dblclick', this);
   this.psv.off('render', this);
   this.psv.off('open-panel', this);
   this.psv.off('close-panel', this);
@@ -120,7 +122,8 @@ PSVHUD.prototype.handleEvent = function(e) {
     case 'mouseenter':  this._onMouseEnter(e);        break;
     case 'mouseleave':  this._onMouseLeave(e);        break;
     case 'mousemove':   this._onMouseMove(e);         break;
-    case 'click':       this._onClick(e.args[0], e);  break;
+    case 'click':       this._onClick(e.args[0], e, false); break;
+    case 'dblclick':    this._onClick(e.args[0], e, true);  break;
     case 'render':      this.renderMarkers();         break;
     case 'open-panel':  this._onPanelOpened();        break;
     case 'close-panel': this._onPanelClosed();        break;
@@ -639,11 +642,12 @@ PSVHUD.prototype._onMouseMove = function(e) {
  * @summary Handles mouse click events, select the marker and open the panel if necessary
  * @param {Object} data
  * @param {Event} e
+ * @param {boolean} dblclick
  * @fires module:components.PSVHUD.select-marker
  * @fires module:components.PSVHUD.unselect-marker
  * @private
  */
-PSVHUD.prototype._onClick = function(data, e) {
+PSVHUD.prototype._onClick = function(data, e, dblclick) {
   var marker;
   if (data.target && (marker = PSVUtils.getClosest(data.target, '.psv-marker')) && marker.psvMarker) {
     this.currentMarker = marker.psvMarker;
@@ -654,8 +658,9 @@ PSVHUD.prototype._onClick = function(data, e) {
      * @summary Triggered when the user clicks on a marker. The marker can be retrieved from outside the event handler
      * with {@link module:components.PSVHUD.getCurrentMarker}
      * @param {PSVMarker} marker
+     * @param {boolean} dblclick - the simple click is always fired before the double click
      */
-    this.psv.trigger('select-marker', this.currentMarker);
+    this.psv.trigger('select-marker', this.currentMarker, dblclick);
 
     if (this.psv.config.click_event_on_marker) {
       // add the marker to event data

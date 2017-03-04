@@ -316,18 +316,42 @@ PhotoSphereViewer.prototype._click = function(evt) {
 
     // TODO: for cubemap, computes texture's index and coordinates
     if (!this.prop.isCubemap) {
-      var textureCoords = this.sphericalCoordsToTextureCoords(data.longitude, data.latitude);
+      var textureCoords = this.sphericalCoordsToTextureCoords({ longitude: data.longitude, latitude: data.latitude });
       data.texture_x = textureCoords.x;
       data.texture_y = textureCoords.y;
     }
 
-    /**
-     * @event click
-     * @memberof PhotoSphereViewer
-     * @summary Triggered when the user click on the viewer (everywhere excluding the navbar and the side panel)
-     * @param {PhotoSphereViewer.ClickData} data
-     */
-    this.trigger('click', data);
+    if (!this.prop.dblclick_timeout) {
+      /**
+       * @event click
+       * @memberof PhotoSphereViewer
+       * @summary Triggered when the user clicks on the viewer (everywhere excluding the navbar and the side panel)
+       * @param {PhotoSphereViewer.ClickData} data
+       */
+      this.trigger('click', data);
+
+      this.prop.dblclick_data = PSVUtils.clone(data);
+      this.prop.dblclick_timeout = setTimeout(function() {
+        this.prop.dblclick_timeout = null;
+        this.prop.dblclick_data = null;
+      }.bind(this), PhotoSphereViewer.DBLCLICK_DELAY);
+    }
+    else {
+      if (Math.abs(this.prop.dblclick_data.client_x - data.client_x) < PhotoSphereViewer.MOVE_THRESHOLD &&
+        Math.abs(this.prop.dblclick_data.client_y - data.client_y) < PhotoSphereViewer.MOVE_THRESHOLD) {
+        /**
+         * @event dblclick
+         * @memberof PhotoSphereViewer
+         * @summary Triggered when the user double clicks on the viewer. The simple `click` event is always fired before `dblclick`
+         * @param {PhotoSphereViewer.ClickData} data
+         */
+        this.trigger('dblclick', this.prop.dblclick_data);
+      }
+
+      clearTimeout(this.prop.dblclick_timeout);
+      this.prop.dblclick_timeout = null;
+      this.prop.dblclick_data = null;
+    }
   }
 };
 

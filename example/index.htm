@@ -326,9 +326,6 @@
   });
 
   PSV.on('click', function(e) {
-    if (e.marker && !e.marker.isPolygon()) {
-      return;
-    }
     PSV.addMarker({
       id: '#' + Math.random(),
       tooltip: 'Generated marker',
@@ -344,9 +341,17 @@
     });
   });
 
-  PSV.on('select-marker', function(marker) {
+  PSV.on('select-marker', function(marker, dblclick) {
     if (marker.data && marker.data.deletable) {
-      PSV.removeMarker(marker);
+      if (dblclick) {
+        PSV.removeMarker(marker);
+      }
+      else {
+        PSV.updateMarker({
+          id: marker.id,
+          image: 'pin2.png'
+        });
+      }
     }
   });
 
