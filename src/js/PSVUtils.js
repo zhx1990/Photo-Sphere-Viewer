@@ -546,12 +546,10 @@ PSVUtils.cleanTHREEScene = function(scene) {
  * @param {int} [options.delay=0]
  * @param {string} [options.easing='linear']
  * @param {AnimationOnTick} options.onTick - called on each frame
- * @param {Function} [options.onDone]
- * @param {Function} [options.onCancel]
  * @returns {Promise} Promise with an additional "cancel" method
  */
 PSVUtils.animation = function(options) {
-  var defer = D();
+  var defer = D(false); // alwaysAsync = false to allow immediate resolution of "cancel"
   var start = null;
 
   if (!options.easing || typeof options.easing == 'string') {
@@ -592,11 +590,9 @@ PSVUtils.animation = function(options) {
 
       options.onTick(current, 1.0);
 
-      if (options.onDone) {
-        options.onDone();
-      }
-
-      defer.resolve();
+      window.requestAnimationFrame(function() {
+        defer.resolve();
+      });
     }
   }
 
@@ -612,9 +608,6 @@ PSVUtils.animation = function(options) {
   // add a "cancel" to the promise
   var promise = defer.promise;
   promise.cancel = function() {
-    if (options.onCancel) {
-      options.onCancel();
-    }
     defer.reject();
   };
   return promise;

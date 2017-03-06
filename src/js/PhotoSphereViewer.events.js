@@ -279,15 +279,12 @@ PhotoSphereViewer.prototype._stopMoveInertia = function(evt) {
     duration: norm * PhotoSphereViewer.INERTIA_WINDOW / 100,
     easing: 'outCirc',
     onTick: function(properties) {
-      self._move(properties);
-    },
-    onCancel: function() {
-      self.prop.moving = false;
-    },
-    onDone: function() {
-      self.prop.moving = false;
+      self._move(properties, false);
     }
-  });
+  })
+    .ensure(function() {
+      self.prop.moving = false;
+    });
 };
 
 /**
@@ -359,9 +356,10 @@ PhotoSphereViewer.prototype._click = function(evt) {
 /**
  * @summary Performs movement
  * @param {MouseEvent|Touch} evt
+ * @param {boolean} [log=true]
  * @private
  */
-PhotoSphereViewer.prototype._move = function(evt) {
+PhotoSphereViewer.prototype._move = function(evt, log) {
   if (this.prop.moving) {
     var x = parseInt(evt.clientX);
     var y = parseInt(evt.clientY);
@@ -374,7 +372,9 @@ PhotoSphereViewer.prototype._move = function(evt) {
     this.prop.mouse_x = x;
     this.prop.mouse_y = y;
 
-    this._logMouseMove(evt);
+    if (log !== false) {
+      this._logMouseMove(evt);
+    }
   }
 };
 

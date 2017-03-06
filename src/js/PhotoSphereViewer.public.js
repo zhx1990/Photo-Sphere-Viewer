@@ -74,6 +74,7 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
   if (updateDirection !== false) {
     this.prop.direction = this.sphericalCoordsToVector3(this.prop);
 
+    this.camera.position.set(0, 0, 0);
     this.camera.lookAt(this.prop.direction);
   }
 

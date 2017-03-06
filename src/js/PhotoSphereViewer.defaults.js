@@ -161,8 +161,7 @@ PhotoSphereViewer.DEFAULTS = {
   click_event_on_marker: false,
   transition: {
     duration: 1500,
-    loader: true,
-    blur: false
+    loader: true
   },
   loading_img: null,
   loading_txt: 'Loading...',

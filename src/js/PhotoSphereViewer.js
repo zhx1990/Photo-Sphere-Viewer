@@ -103,18 +103,6 @@ function PhotoSphereViewer(options) {
     throw new PSVError('Missing Three.js components: CanvasRenderer, Projector. Get them from three.js-examples package.');
   }
 
-  if (this.config.transition && this.config.transition.blur) {
-    // transition blur only works with webgl
-    if (!PhotoSphereViewer.SYSTEM.isWebGLSupported || !this.config.webgl) {
-      this.config.transition.blur = false;
-      console.warn('PhotoSphereViewer: Using canvas rendering, blur transition disabled.');
-    }
-    // additional scripts for transition blur
-    else if (!PSVUtils.checkTHREE('EffectComposer', 'RenderPass', 'ShaderPass', 'MaskPass', 'CopyShader')) {
-      throw new PSVError('Missing Three.js components: EffectComposer, RenderPass, ShaderPass, MaskPass, CopyShader. Get them from three.js-examples package.');
-    }
-  }
-
   // longitude range must have two values
   if (this.config.longitude_range && this.config.longitude_range.length !== 2) {
     this.config.longitude_range = null;
@@ -273,20 +261,6 @@ function PhotoSphereViewer(options) {
    * @private
    */
   this.renderer = null;
-
-  /**
-   * @member {THREE.EffectComposer}
-   * @readonly
-   * @private
-   */
-  this.composer = null;
-
-  /**
-   * @member {Object.<string, THREE.Pass>}
-   * @readonly
-   * @private
-   */
-  this.passes = {};
 
   /**
    * @member {THREE.Scene}

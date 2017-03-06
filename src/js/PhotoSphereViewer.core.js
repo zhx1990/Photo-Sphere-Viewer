@@ -456,30 +456,6 @@ PhotoSphereViewer.prototype._createScene = function() {
   this.renderer.domElement.className = 'psv-canvas';
   this.container.appendChild(this.canvas_container);
   this.canvas_container.appendChild(this.renderer.domElement);
-
-  // Init shader renderer
-  if (this.config.transition && this.config.transition.blur) {
-    this.composer = new THREE.EffectComposer(this.renderer);
-
-    this.passes.render = new THREE.RenderPass(this.scene, this.camera);
-
-    this.passes.copy = new THREE.ShaderPass(THREE.CopyShader);
-    this.passes.copy.renderToScreen = true;
-
-    this.passes.blur = new THREE.ShaderPass(THREE.GodraysShader);
-    this.passes.blur.enabled = false;
-    this.passes.blur.renderToScreen = true;
-
-    // values for minimal luminosity change
-    this.passes.blur.uniforms.fDensity.value = 0.0;
-    this.passes.blur.uniforms.fWeight.value = 0.5;
-    this.passes.blur.uniforms.fDecay.value = 0.5;
-    this.passes.blur.uniforms.fExposure.value = 1.0;
-
-    this.composer.addPass(this.passes.render);
-    this.composer.addPass(this.passes.copy);
-    this.composer.addPass(this.passes.blur);
-  }
 };
 
 /**
@@ -545,19 +521,30 @@ PhotoSphereViewer.prototype._createCubemap = function() {
  * @param {PhotoSphereViewer.Position} [position]
  * @returns {Promise}
  * @private
+ * @throws {PSVError} if the panorama is a cubemap
  */
 PhotoSphereViewer.prototype._transition = function(texture, position) {
+  if (this.prop.isCubemap) {
+    throw new PSVError('Transition is not available with cubemap.');
+  }
+
   var self = this;
 
   // create a new sphere with the new texture
-  var geometry = new THREE.SphereGeometry(PhotoSphereViewer.SPHERE_RADIUS * 1.5, PhotoSphereViewer.SPHERE_VERTICES, PhotoSphereViewer.SPHERE_VERTICES, -PSVUtils.HalfPI);
+  var geometry = new THREE.SphereGeometry(
+    PhotoSphereViewer.SPHERE_RADIUS * 0.9,
+    PhotoSphereViewer.SPHERE_VERTICES,
+    PhotoSphereViewer.SPHERE_VERTICES,
+    -PSVUtils.HalfPI
+  );
 
-  var material = new THREE.MeshBasicMaterial();
-  material.side = THREE.DoubleSide;
-  material.overdraw = PhotoSphereViewer.SYSTEM.isWebGLSupported && this.config.webgl ? 0 : 0.5;
-  material.map = texture;
-  material.transparent = true;
-  material.opacity = 0;
+  var material = new THREE.MeshBasicMaterial({
+    side: THREE.DoubleSide,
+    overdraw: PhotoSphereViewer.SYSTEM.isWebGLSupported && this.config.webgl ? 0 : 1,
+    map: texture,
+    transparent: true,
+    opacity: 0
+  });
 
   var mesh = new THREE.Mesh(geometry, material);
   mesh.scale.x = -1;
@@ -576,57 +563,19 @@ PhotoSphereViewer.prototype._transition = function(texture, position) {
   this.scene.add(mesh);
   this.render();
 
-  // animation with blur/zoom ?
-  var original_zoom_lvl = this.prop.zoom_lvl;
-  if (this.config.transition.blur) {
-    this.passes.copy.enabled = false;
-    this.passes.blur.enabled = true;
-  }
-
-  var onTick = function(properties) {
-    material.opacity = properties.opacity;
-
-    if (self.config.transition.blur) {
-      self.passes.blur.uniforms.fDensity.value = properties.density;
-      self.zoom(properties.zoom, false);
-    }
-
-    self.render();
-  };
-
-  // 1st half animation
   return PSVUtils.animation({
     properties: {
-      density: { start: 0.0, end: 1.5 },
-      opacity: { start: 0.0, end: 0.5 },
-      zoom: { start: original_zoom_lvl, end: 100 }
+      opacity: { start: 0.0, end: 1.0 }
     },
-    duration: self.config.transition.duration / (self.config.transition.blur ? 4 / 3 : 2),
-    easing: self.config.transition.blur ? 'outCubic' : 'linear',
-    onTick: onTick
+    duration: self.config.transition.duration,
+    easing: 'outCubic',
+    onTick: function(properties) {
+      material.opacity = properties.opacity;
+
+      self.render();
+    }
   })
     .then(function() {
-      // 2nd half animation
-      return PSVUtils.animation({
-        properties: {
-          density: { start: 1.5, end: 0.0 },
-          opacity: { start: 0.5, end: 1.0 },
-          zoom: { start: 100, end: original_zoom_lvl }
-        },
-        duration: self.config.transition.duration / (self.config.transition.blur ? 4 : 2),
-        easing: self.config.transition.blur ? 'inCubic' : 'linear',
-        onTick: onTick
-      });
-    })
-    .then(function() {
-      // disable blur shader
-      if (self.config.transition.blur) {
-        self.passes.copy.enabled = true;
-        self.passes.blur.enabled = false;
-
-        self.zoom(original_zoom_lvl, false);
-      }
-
       // remove temp sphere and transfer the texture to the main sphere
       self.mesh.material.map.dispose();
       self.mesh.material.map = texture;

@@ -36,11 +36,6 @@
 <script src="../bower_components/doT/doT.js"></script>
 <script src="../bower_components/three.js-examples/examples/js/renderers/CanvasRenderer.js"></script>
 <script src="../bower_components/three.js-examples/examples/js/renderers/Projector.js"></script>
-<script src="../bower_components/three.js-examples/examples/js/postprocessing/EffectComposer.js"></script>
-<script src="../bower_components/three.js-examples/examples/js/postprocessing/RenderPass.js"></script>
-<script src="../bower_components/three.js-examples/examples/js/postprocessing/ShaderPass.js"></script>
-<script src="../bower_components/three.js-examples/examples/js/postprocessing/MaskPass.js"></script>
-<script src="../bower_components/three.js-examples/examples/js/shaders/CopyShader.js"></script>
 <script src="../bower_components/three.js-examples/examples/js/controls/DeviceOrientationControls.js"></script>
 <script src="../dist/photo-sphere-viewer.js"></script>
 
@@ -100,15 +95,15 @@
       url: 'Bryce-Canyon-National-Park-Mark-Doliner.jpg',
       desc: 'Bryce Canyon National Park <b>&copy; Mark Doliner</b>',
       target: {
-        longitude: 3.8484510006474992,
-        latitude: -0.24434609527920628
+        longitude: 3.848,
+        latitude: -0.244
       }
     }, {
       url: 'Bryce-Canyon-By-Jess-Beauchemin.jpg',
-      desc: 'Bryce Canyon National Park <b>&copy;Jess Beauchemin</b>',
+      desc: 'Bryce Canyon National Park <b>&copy; Jess Beauchemin</b>',
       target: {
-        longitude: 3.7153696451829257,
-        latitude: 0.57417649320975916
+        longitude: 3.715,
+        latitude: 0.574
       }
     }
   ];
@@ -126,12 +121,7 @@
     move_speed: 1.1,
     time_anim: false,
     gyroscope: true,
-    webgl: true,
-    transition: {
-      duration: 1000,
-      loader: true,
-      blur: true
-    },
+    //webgl: true,
     navbar: [
       'autorotate', 'zoom', 'download', 'markers',
       'spacer-1',
