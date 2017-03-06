@@ -412,7 +412,7 @@ PSVUtils.parseSpeed = function(speed) {
       case 'degrees per minute':
       case 'dps':
       case 'degrees per second':
-        speed = speed_value * Math.PI / 180;
+        speed = THREE.Math.degToRad(speed_value);
         break;
 
       // Radians per minute / second
@@ -460,7 +460,7 @@ PSVUtils.parseAngle = function(angle, reference) {
       switch (unit) {
         case 'deg':
         case 'degs':
-          angle = value / 180 * Math.PI;
+          angle = THREE.Math.degToRad(value);
           break;
         case 'rad':
         case 'rads':

@@ -181,7 +181,7 @@ PhotoSphereViewer.prototype.applyRanges = function(position) {
 
   if (this.config.longitude_range) {
     range = PSVUtils.clone(this.config.longitude_range);
-    offset = this.prop.hFov / 180 * Math.PI / 2;
+    offset = THREE.Math.degToRad(this.prop.hFov) / 2;
 
     range[0] = PSVUtils.parseAngle(range[0] + offset);
     range[1] = PSVUtils.parseAngle(range[1] - offset);
@@ -212,7 +212,7 @@ PhotoSphereViewer.prototype.applyRanges = function(position) {
 
   if (this.config.latitude_range) {
     range = PSVUtils.clone(this.config.latitude_range);
-    offset = this.prop.vFov / 180 * Math.PI / 2;
+    offset = THREE.Math.degToRad(this.prop.vFov) / 2;
 
     range[0] = PSVUtils.parseAngle(Math.min(range[0] + offset, range[1]), -Math.PI);
     range[1] = PSVUtils.parseAngle(Math.max(range[1] - offset, range[0]), -Math.PI);

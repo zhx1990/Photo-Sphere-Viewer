@@ -340,7 +340,7 @@ PSVHUD.prototype.hideMarkersList = function() {
  * @summary Updates the visibility and the position of all markers
  */
 PSVHUD.prototype.renderMarkers = function() {
-  var rotation = !this.psv.isGyroscopeEnabled() ? 0 : this.psv.camera.rotation.z / Math.PI * 180;
+  var rotation = !this.psv.isGyroscopeEnabled() ? 0 : THREE.Math.radToDeg(this.psv.camera.rotation.z);
 
   for (var id in this.markers) {
     var marker = this.markers[id];

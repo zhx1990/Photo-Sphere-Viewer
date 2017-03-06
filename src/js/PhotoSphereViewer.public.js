@@ -74,13 +74,11 @@ PhotoSphereViewer.prototype.render = function(updateDirection) {
   if (updateDirection !== false) {
     this.prop.direction = this.sphericalCoordsToVector3(this.prop);
 
-    if (this.config.fisheye) {
-      this.prop.direction.multiplyScalar(this.config.fisheye / 2);
-      this.camera.position.copy(this.prop.direction).negate();
-    }
-
     this.camera.lookAt(this.prop.direction);
-    // this.camera.rotation.z = 0;
+  }
+
+  if (this.config.fisheye) {
+    this.camera.position.copy(this.prop.direction).multiplyScalar(this.config.fisheye / 2).negate();
   }
 
   this.camera.aspect = this.prop.aspect;
@@ -320,7 +318,7 @@ PhotoSphereViewer.prototype.toggleAutorotate = function() {
  * @fires PhotoSphereViewer.gyroscope-updated
  */
 PhotoSphereViewer.prototype.startGyroscopeControl = function() {
-  if (!this.config.gyroscope) {
+  if (!this.doControls || !this.doControls.enabled || !this.doControls.deviceOrientation) {
     console.warn('PhotoSphereViewer: gyroscope disabled');
     return;
   }
@@ -481,7 +479,7 @@ PhotoSphereViewer.prototype.stopAnimation = function() {
 PhotoSphereViewer.prototype.zoom = function(level, render) {
   this.prop.zoom_lvl = PSVUtils.bound(Math.round(level), 0, 100);
   this.prop.vFov = this.config.max_fov + (this.prop.zoom_lvl / 100) * (this.config.min_fov - this.config.max_fov);
-  this.prop.hFov = 2 * Math.atan(Math.tan(this.prop.vFov * Math.PI / 180 / 2) * this.prop.aspect) * 180 / Math.PI;
+  this.prop.hFov = THREE.Math.radToDeg(2 * Math.atan(Math.tan(THREE.Math.degToRad(this.prop.vFov) / 2) * this.prop.aspect));
 
   if (render !== false && this.renderer) {
     this.render();

@@ -4,6 +4,7 @@ var assert = require('assert');
 
 // Load PSVUtils (not a node module) in current context
 global.PhotoSphereViewer = {};
+vm.runInThisContext(fs.readFileSync('bower_components/three.js/three.js'));
 vm.runInThisContext(fs.readFileSync('src/js/PSVError.js'));
 vm.runInThisContext(fs.readFileSync('src/js/PSVUtils.js'));
 
@@ -19,21 +20,21 @@ describe('PSVUtils::parseAngle', function() {
     };
 
     for (var pos in values) {
-      assert.equal(PSVUtils.parseAngle(pos), values[pos], pos);
+      assert.equal(PSVUtils.parseAngle(pos).toFixed(16), values[pos].toFixed(16), pos);
     }
   });
 
   it('should parse degrees angles', function() {
     var values = {
       '0deg': 0,
-      '30deg': 30 / 180 * Math.PI,
-      '-30deg': PSVUtils.TwoPI - 30 / 180 * Math.PI,
-      '85degs': 85 / 180 * Math.PI,
+      '30deg': 30 * Math.PI / 180,
+      '-30deg': PSVUtils.TwoPI - 30 * Math.PI / 180,
+      '85degs': 85 * Math.PI / 180,
       '360degs': 0
     };
 
     for (var pos in values) {
-      assert.equal(PSVUtils.parseAngle(pos), values[pos], pos);
+      assert.equal(PSVUtils.parseAngle(pos).toFixed(16), values[pos].toFixed(16), pos);
     }
   });
 
@@ -43,11 +44,11 @@ describe('PSVUtils::parseAngle', function() {
       '1440deg': 0,
       '8.15': 8.15 - PSVUtils.TwoPI,
       '-3.14': PSVUtils.TwoPI - 3.14,
-      '-360deg': 0,
+      '-360deg': 0
     };
 
     for (var pos in values) {
-      assert.equal(PSVUtils.parseAngle(pos), values[pos], pos);
+      assert.equal(PSVUtils.parseAngle(pos).toFixed(16), values[pos].toFixed(16), pos);
     }
   });
 
@@ -58,7 +59,7 @@ describe('PSVUtils::parseAngle', function() {
     };
 
     for (var pos in values) {
-      assert.equal(PSVUtils.parseAngle(pos, -Math.PI), values[pos], pos);
+      assert.equal(PSVUtils.parseAngle(pos, -Math.PI).toFixed(16), values[pos].toFixed(16), pos);
     }
   });
 
@@ -194,10 +195,10 @@ describe('PSVUtils::parsePosition', function() {
 describe('PSVUtils::parseSpeed', function() {
   it('should parse all units', function() {
     var values = {
-      '360dpm': 360 / 180 * Math.PI / 60,
-      '360degrees per minute': 360 / 180 * Math.PI / 60,
-      '10dps': 10 / 180 * Math.PI,
-      '10degrees per second': 10 / 180 * Math.PI,
+      '360dpm': 360 * Math.PI / 180 / 60,
+      '360degrees per minute': 360 * Math.PI / 180 / 60,
+      '10dps': 10 * Math.PI / 180,
+      '10degrees per second': 10 * Math.PI / 180,
       '2radians per minute': 2 / 60,
       '0.1radians per second': 0.1,
       '2rpm': 2 * 2 * Math.PI / 60,
@@ -207,7 +208,7 @@ describe('PSVUtils::parseSpeed', function() {
     };
 
     for (var speed in values) {
-      assert.equal(PSVUtils.parseSpeed(speed), values[speed], speed);
+      assert.equal(PSVUtils.parseSpeed(speed).toFixed(16), values[speed].toFixed(16), speed);
     }
   });
 
@@ -224,7 +225,7 @@ describe('PSVUtils::parseSpeed', function() {
     };
 
     for (var speed in values) {
-      assert.equal(PSVUtils.parseSpeed(speed), values[speed], speed);
+      assert.equal(PSVUtils.parseSpeed(speed).toFixed(16), values[speed].toFixed(16), speed);
     }
   });
 

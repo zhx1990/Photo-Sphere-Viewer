@@ -426,7 +426,7 @@ function PhotoSphereViewer(options) {
   this.zoom(tempZoom - 2 * (tempZoom - 50), false);
 
   // actual move speed depends on pixel-ratio
-  this.prop.move_speed = 1 / PhotoSphereViewer.SYSTEM.pixelRatio * Math.PI / 180 * this.config.move_speed;
+  this.prop.move_speed = THREE.Math.degToRad(this.config.move_speed / PhotoSphereViewer.SYSTEM.pixelRatio);
 
   // set default position
   this.rotate({
