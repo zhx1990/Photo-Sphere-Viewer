@@ -1,5 +1,7 @@
 # Photo Sphere Viewer
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/mistic100/Photo-Sphere-Viewer.svg)](https://greenkeeper.io/)
+
 [![Bower version](https://img.shields.io/bower/v/Photo-Sphere-Viewer.svg?style=flat-square)](http://photo-sphere-viewer.js.org)
 [![NPM version](https://img.shields.io/npm/v/photo-sphere-viewer.svg?style=flat-square)](https://www.npmjs.com/package/photo-sphere-viewer)
 [![Build Status](https://img.shields.io/travis/mistic100/Photo-Sphere-Viewer/master.svg?style=flat-square)](https://travis-ci.org/mistic100/Photo-Sphere-Viewer)
