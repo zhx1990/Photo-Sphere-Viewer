@@ -1,8 +1,11 @@
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
   require('jit-grunt')(grunt, {
-    scsslint: 'grunt-scss-lint'
+    scsslint: 'grunt-scss-lint',
+    usebanner: 'grunt-banner'
   });
+
+  require('simple-cli')('git')(grunt);
 
   grunt.util.linefeed = '\n';
 
@@ -22,7 +25,7 @@ module.exports = function(grunt) {
     pkg: grunt.file.readJSON('package.json'),
 
     banner: '/*!\n' +
-    ' * Photo Sphere Viewer <%= pkg.version %>\n' +
+    ' * Photo Sphere Viewer <%= grunt.option("tag") || pkg.version %>\n' +
     ' * Copyright (c) 2014-2015 Jérémy Heleine\n' +
     ' * Copyright (c) 2015-<%= grunt.template.today("yyyy") %> Damien "Mistic" Sorel\n' +
     ' * Licensed under MIT (http://opensource.org/licenses/MIT)\n' +
@@ -49,24 +52,11 @@ module.exports = function(grunt) {
         },
         src: files_in_order.concat(['src/icons/*.svg']),
         dest: 'dist/photo-sphere-viewer.js'
-      },
-      /**
-       * Add banner to generated CSS files
-       */
-      css: {
-        options: {
-          banner: '<%= banner %>\n\n'
-        },
-        files: [{
-          expand: true,
-          src: 'dist/*.css',
-          dest: ''
-        }]
       }
     },
 
     /**
-     * Add AMD wrapper and banner to dist JS file
+     * Add AMD wrapper
      */
     wrap: {
       dist: {
@@ -75,12 +65,21 @@ module.exports = function(grunt) {
         options: {
           separator: '',
           wrapper: function() {
-            var wrapper = grunt.file.read('src/js/.wrapper.js').replace(/\r\n/g, '\n').split(/@@js\n/);
-            wrapper[0] = grunt.template.process('<%= banner %>\n\n') + wrapper[0];
-            wrapper[1] = '\n' + wrapper[1];
-            return wrapper;
+            return grunt.file.read('src/js/.wrapper.js').replace(/\r\n/g, '\n').split(/@@js\n/);
           }
         }
+      }
+    },
+
+    /**
+     * Add banners
+     */
+    usebanner: {
+      options: {
+        banner: '<%= banner %>'
+      },
+      all: {
+        src: ['dist/*.{js,css}']
       }
     },
 
@@ -88,9 +87,6 @@ module.exports = function(grunt) {
      * Minify dist JS file
      */
     uglify: {
-      options: {
-        banner: '<%= banner %>\n\n'
-      },
       dist: {
         src: 'dist/photo-sphere-viewer.js',
         dest: 'dist/photo-sphere-viewer.min.js'
@@ -245,19 +241,54 @@ module.exports = function(grunt) {
       dev: {
         path: 'http://localhost:<%= connect.dev.options.port%>/example/index.htm'
       }
+    },
+
+    /**
+     * Release tasks
+     */
+    git: {
+      checkout: {
+        args: ['master']
+      },
+
+      merge: {
+        args: ['dev'],
+        options: {
+          'strategy-option': 'theirs',
+          'm': 'Release <%= grunt.option("tag") %>'
+        }
+      },
+
+      commit: {
+        options: {
+          'a': true,
+          'amend': true,
+          'no-edit': true
+        }
+      },
+
+      tag: {
+        args: ['<%= grunt.option("tag") %>']
+      }
     }
+  });
+
+  grunt.registerTask('updatePackage', 'Update version in package.json', function() {
+    var pkg = grunt.config('pkg');
+    pkg.version = grunt.option('tag');
+    grunt.file.write('package.json', JSON.stringify(pkg, null, 2) + '\n');
   });
 
   /**
    * Build the lib
    */
-  grunt.registerTask('default', [
-    'concat:js',
+  grunt.registerTask('build', [
+    'concat',
     'wrap',
     'uglify',
     'sass',
     'cssmin',
-    'concat:css'
+    'usebanner'
   ]);
 
   /**
@@ -288,4 +319,18 @@ module.exports = function(grunt) {
     'jsdoc',
     'copy:doc_script'
   ]);
+
+  /**
+   * Release
+   */
+  grunt.registerTask('release', [
+    'git:checkout',
+    'git:merge',
+    'updatePackage',
+    'build',
+    'git:commit',
+    'git:tag'
+  ]);
+
+  grunt.registerTask('default', ['build']);
 };
