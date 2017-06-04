@@ -16,6 +16,7 @@
   top: 0;
   left: 0;
   z-index: $psv-canvas-zindex;
+  transition: opacity linear 100ms;
 }
 
 .psv-canvas {

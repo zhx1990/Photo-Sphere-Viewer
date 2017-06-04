@@ -212,6 +212,9 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
 
   if (!transition || !this.config.transition || !this.scene) {
     this.loader.show();
+    if (this.canvas_container) {
+      this.canvas_container.style.opacity = 0;
+    }
 
     this.prop.loading_promise = this._loadTexture(this.config.panorama)
       .then(function(texture) {
@@ -223,6 +226,7 @@ PhotoSphereViewer.prototype.setPanorama = function(path, position, transition) {
       })
       .ensure(function() {
         self.loader.hide();
+        self.canvas_container.style.opacity = 1;
 
         self.prop.loading_promise = null;
       })
