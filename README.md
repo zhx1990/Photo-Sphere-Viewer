@@ -36,6 +36,10 @@ $ bower install Photo-Sphere-Viewer
 $ npm install photo-sphere-viewer
 ```
 
+#### Via CDN
+
+Photo Sphere Viewer is available on [jsDelivr](https://cdn.jsdelivr.net/npm/photo-sphere-viewer/dist/) and [unpkg](https://unpkg.com/photo-sphere-viewer/dist/)
+
 ## Build
 
 #### Prerequisites
