@@ -2,7 +2,8 @@
   cursor: default;
   width: #{$psv-zoom-buttons-width * 3 + $psv-zoom-range-width};
 
-  &-minus, &-plus {
+  &-minus,
+  &-plus {
     float: left;
     position: relative;
     cursor: pointer;
@@ -58,7 +59,8 @@
       display: none;
     }
 
-    &-minus, &-plus {
+    &-minus,
+    &-plus {
       width: $psv-buttons-height;
       height: $psv-buttons-height;
       padding: $psv-buttons-padding;

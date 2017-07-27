@@ -1,7 +1,7 @@
 module.exports = function(grunt) {
   require('time-grunt')(grunt);
   require('jit-grunt')(grunt, {
-    scsslint: 'grunt-scss-lint',
+    sasslint: 'grunt-sass-lint',
     usebanner: 'grunt-banner'
   });
 
@@ -98,8 +98,8 @@ module.exports = function(grunt) {
      */
     sass: {
       options: {
-        sourcemap: 'none',
-        style: 'expanded'
+        sourceMap: false,
+        outputStyle: 'expanded'
       },
       lib: {
         src: 'src/scss/photo-sphere-viewer.scss',
@@ -150,10 +150,9 @@ module.exports = function(grunt) {
     /**
      * SCSSLint test on src files
      */
-    scsslint: {
+    sasslint: {
       options: {
-        colorizeOutput: true,
-        config: '.scss-lint.yml'
+        configFile: '.sass-lint.yml'
       },
       lib: {
         src: ['src/scss/**/*.scss']
@@ -297,7 +296,7 @@ module.exports = function(grunt) {
   grunt.registerTask('test', [
     'jshint',
     'jscs',
-    'scsslint',
+    'sasslint',
     'mochaTest'
   ]);
 

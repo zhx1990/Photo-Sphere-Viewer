@@ -1,5 +1,6 @@
 // scss-lint:disable ColorVariable
-$psv-main-background: radial-gradient(#ffffff, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%, #efefef 66%, #dfdfdf 82%, #bfbfbf 100%) !default;
+$psv-main-background-stops: #fff 0%, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%, #efefef 66%, #dfdfdf 82%, #bfbfbf 100%;
+$psv-main-background: radial-gradient($psv-main-background-stops) !default;
 
 $psv-loader-color: rgba(61, 61, 61, .7) !default;
 $psv-loader-width: 150px !default;
@@ -38,7 +39,7 @@ $psv-tooltip-max-width: 200px !default;
 
 $psv-tooltip-text-color: rgb(255, 255, 255) !default;
 $psv-tooltip-font: 14px sans-serif !default;
-$psv-tooltip-text-shadow: 0 1px #000000 !default;
+$psv-tooltip-text-shadow: 0 1px #000 !default;
 
 $psv-tooltip-shadow-color: rgba(90, 90, 90, .7) !default;
 // the shadow is always at the opposite side of the arrow
@@ -53,12 +54,12 @@ $psv-panel-padding: 1em !default;
 // must be odd
 $psv-panel-resizer-width: 9px !default;
 $psv-panel-resizer-background: rgba(0, 0, 0, .9) !default;
-$psv-panel-resizer-grip-color: #ffffff !default;
+$psv-panel-resizer-grip-color: #fff !default;
 // must be odd
 $psv-panel-resizer-grip-height: 29px !default;
 $psv-panel-close-button-width: 24px !default;
 $psv-panel-close-button-background: $psv-panel-resizer-background !default;
-$psv-panel-close-button-color: #ffffff !default;
+$psv-panel-close-button-color: #fff !default;
 
 $psv-panel-font: 16px sans-serif !default;
 
@@ -69,7 +70,7 @@ $psv-markers-list-hover-translation: 10px !default;
 $psv-markers-list-odd-background: rgba(255, 255, 255, .1) !default;
 $psv-markers-list-even-background: transparent !default;
 
-$psv-markers-list-title-shadow: 2px 1px #000000 !default;
+$psv-markers-list-title-shadow: 2px 1px #000 !default;
 $psv-markers-list-title-font: 24px sans-serif !default;
 
 $psv-canvas-zindex: 0 !default;

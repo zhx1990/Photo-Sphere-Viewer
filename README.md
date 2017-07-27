@@ -44,10 +44,8 @@ Photo Sphere Viewer is available on [jsDelivr](https://cdn.jsdelivr.net/npm/phot
 
 #### Prerequisites
  * NodeJS + NPM: `apt-get install nodejs-legacy npm`
- * Ruby Dev: `apt-get install ruby-dev`
  * Grunt CLI: `npm install -g grunt-cli`
  * Bower: `npm install -g bower`
- * SASS: `gem install sass`
 
 #### Run
 

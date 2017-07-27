@@ -29,7 +29,8 @@ $psv-panel-resizer-grip-width: $psv-panel-resizer-width - 4px;
     height: $psv-panel-close-button-width;
     background: $psv-panel-close-button-background;
 
-    &::before, &::after {
+    &::before,
+    &::after {
       content: '';
       position: absolute;
       top: 50%;
@@ -50,7 +51,8 @@ $psv-panel-resizer-grip-width: $psv-panel-resizer-width - 4px;
     }
 
     &:hover {
-      &::before, &::after {
+      &::before,
+      &::after {
         left: 0;
         width: $psv-panel-close-button-width - 1px;
       }
@@ -113,7 +115,8 @@ $psv-panel-resizer-grip-width: $psv-panel-resizer-width - 4px;
     opacity: 1;
     transition-duration: .2s;
 
-    .psv-panel-close-button, .psv-panel-resizer {
+    .psv-panel-close-button,
+    .psv-panel-resizer {
       display: block;
     }
   }

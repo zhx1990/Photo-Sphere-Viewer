@@ -30,11 +30,13 @@
       margin-left: -$psv-markers-list-hover-translation;
     }
 
-    &:nth-child(odd), &:nth-child(odd)::before {
+    &:nth-child(odd),
+    &:nth-child(odd)::before {
       background: $psv-markers-list-odd-background;
     }
 
-    &:nth-child(even), &:nth-child(even)::before {
+    &:nth-child(even),
+    &:nth-child(even)::before {
       background: $psv-markers-list-even-background;
     }
 

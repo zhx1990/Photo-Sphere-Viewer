@@ -1,5 +1,5 @@
 .psv-navbar {
-  @include flexbox();
+  @include flexbox;
   position: absolute;
   z-index: $psv-navbar-zindex;
   bottom: -$psv-navbar-height;
@@ -13,8 +13,8 @@
     bottom: 0;
   }
 
-  // scss-lint:disable UnnecessaryParentReference
-  &, & * {
+  &,
+  & * {
     box-sizing: content-box;
   }
 }
