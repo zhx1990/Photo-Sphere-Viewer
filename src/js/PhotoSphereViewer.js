@@ -13,6 +13,13 @@
  */
 
 /**
+ * @typedef {Object} PhotoSphereViewer.CssSize
+ * @summary Object defining a size in CSS (px, % or auto)
+ * @property {string} [width]
+ * @property {string} [height]
+ */
+
+/**
  * @typedef {Object} PhotoSphereViewer.Position
  * @summary Object defining a spherical position
  * @property {float} longitude

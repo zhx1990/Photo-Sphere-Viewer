@@ -518,6 +518,21 @@ PhotoSphereViewer.prototype.zoomOut = function() {
 };
 
 /**
+ * @summary Resizes the viewer
+ * @param {PhotoSphereViewer.CssSize} size
+ */
+PhotoSphereViewer.prototype.resize = function(size) {
+  if (size.width) {
+    this.container.style.width = size.width;
+  }
+  if (size.height) {
+    this.container.style.height = size.height;
+  }
+
+  this._onResize();
+};
+
+/**
  * @summary Enters or exits the fullscreen mode
  */
 PhotoSphereViewer.prototype.toggleFullscreen = function() {

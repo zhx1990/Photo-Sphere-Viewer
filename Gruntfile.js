@@ -61,7 +61,7 @@ module.exports = function(grunt) {
     wrap: {
       dist: {
         src: 'dist/photo-sphere-viewer.js',
-        dest: '',
+        dest: 'dist/photo-sphere-viewer.js',
         options: {
           separator: '',
           wrapper: function() {
