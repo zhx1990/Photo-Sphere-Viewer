@@ -41,7 +41,7 @@ function PSVHUD(psv) {
   this.prop = {
     panelOpened: false,
     panelOpening: false,
-    markersButton: this.psv.navbar.getNavbarButton('markers')
+    markersButton: this.psv.navbar.getNavbarButton('markers', true)
   };
 
   this.create();

@@ -133,9 +133,10 @@ PSVNavBar.prototype.destroy = function() {
 /**
  * @summary Returns a button by its identifier
  * @param {string} id
+ * @param {boolean} [silent=false]
  * @returns {module:components/buttons.PSVNavBarButton}
  */
-PSVNavBar.prototype.getNavbarButton = function(id) {
+PSVNavBar.prototype.getNavbarButton = function(id, silent) {
   var button = null;
 
   this.items.some(function(item) {
@@ -145,7 +146,7 @@ PSVNavBar.prototype.getNavbarButton = function(id) {
     }
   });
 
-  if (!button) {
+  if (!button && !silent) {
     console.warn('PhotoSphereViewer: button "' + id + '" not found in the navbar.');
   }
 
