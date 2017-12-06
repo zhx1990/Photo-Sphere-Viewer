@@ -52,14 +52,14 @@ describe('PSVUtils::parseAngle', function() {
     }
   });
 
-  it('should normalize angles between -Pi and Pi', function() {
+  it('should normalize angles between -Pi/2 and Pi/2', function() {
     var values = {
-      '270deg': -Math.PI / 2,
-      '-4': 2 * Math.PI - 4
+      '45deg': Math.PI / 4,
+      '-4': Math.PI / 2
     };
 
     for (var pos in values) {
-      assert.equal(PSVUtils.parseAngle(pos, -Math.PI).toFixed(16), values[pos].toFixed(16), pos);
+      assert.equal(PSVUtils.parseAngle(pos, true).toFixed(16), values[pos].toFixed(16), pos);
     }
   });
 

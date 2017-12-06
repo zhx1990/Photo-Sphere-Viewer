@@ -167,7 +167,7 @@ PhotoSphereViewer.prototype.cleanPosition = function(position) {
   }
 
   position.longitude = PSVUtils.parseAngle(position.longitude);
-  position.latitude = PSVUtils.bound(PSVUtils.parseAngle(position.latitude, -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI);
+  position.latitude = PSVUtils.parseAngle(position.latitude, true);
 };
 
 /**
@@ -214,8 +214,8 @@ PhotoSphereViewer.prototype.applyRanges = function(position) {
     range = PSVUtils.clone(this.config.latitude_range);
     offset = THREE.Math.degToRad(this.prop.vFov) / 2;
 
-    range[0] = PSVUtils.parseAngle(Math.min(range[0] + offset, range[1]), -Math.PI);
-    range[1] = PSVUtils.parseAngle(Math.max(range[1] - offset, range[0]), -Math.PI);
+    range[0] = PSVUtils.parseAngle(Math.min(range[0] + offset, range[1]), true);
+    range[1] = PSVUtils.parseAngle(Math.max(range[1] - offset, range[0]), true);
 
     if (position.latitude < range[0]) {
       position.latitude = range[0];

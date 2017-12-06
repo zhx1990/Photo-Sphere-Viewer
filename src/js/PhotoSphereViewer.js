@@ -167,8 +167,10 @@ function PhotoSphereViewer(options) {
   this.config.default_long = PSVUtils.parseAngle(this.config.default_long);
 
   // parse default_lat, is between -PI/2 and PI/2
-  this.config.default_lat = PSVUtils.parseAngle(this.config.default_lat, -Math.PI);
-  this.config.default_lat = PSVUtils.bound(this.config.default_lat, -PSVUtils.HalfPI, PSVUtils.HalfPI);
+  this.config.default_lat = PSVUtils.parseAngle(this.config.default_lat, true);
+
+  // parse panorama_roll, is between -PI/2 and PI/2
+  this.config.panorama_roll = PSVUtils.parseAngle(this.config.panorama_roll, true);
 
   // default anim_lat is default_lat
   if (this.config.anim_lat === null) {
@@ -176,8 +178,7 @@ function PhotoSphereViewer(options) {
   }
   // parse anim_lat, is between -PI/2 and PI/2
   else {
-    this.config.anim_lat = PSVUtils.parseAngle(this.config.anim_lat, -Math.PI);
-    this.config.anim_lat = PSVUtils.bound(this.config.anim_lat, -PSVUtils.HalfPI, PSVUtils.HalfPI);
+    this.config.anim_lat = PSVUtils.parseAngle(this.config.anim_lat, true);
   }
 
   // parse longitude_range, between 0 and 2*PI
@@ -190,8 +191,7 @@ function PhotoSphereViewer(options) {
   // parse latitude_range, between -PI/2 and PI/2
   if (this.config.latitude_range) {
     this.config.latitude_range = this.config.latitude_range.map(function(angle) {
-      angle = PSVUtils.parseAngle(angle, -Math.PI);
-      return PSVUtils.bound(angle, -PSVUtils.HalfPI, PSVUtils.HalfPI);
+      return PSVUtils.parseAngle(angle, true);
     });
   }
 

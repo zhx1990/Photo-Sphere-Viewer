@@ -413,7 +413,7 @@ PSVMarker.prototype._updatePolygon = function() {
     this.polygon_rad = this.polygon_rad.map(function(coord) {
       return [
         PSVUtils.parseAngle(coord[0]),
-        PSVUtils.bound(PSVUtils.parseAngle(coord[1], -Math.PI), -PSVUtils.HalfPI, PSVUtils.HalfPI)
+        PSVUtils.parseAngle(coord[1], true)
       ];
     });
   }
