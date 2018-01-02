@@ -273,7 +273,7 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('updatePackage', 'Update version in package.json', function() {
-    var pkg = grunt.config('pkg');
+    var pkg = grunt.file.readJSON('package.json');
     pkg.version = grunt.option('tag');
     grunt.file.write('package.json', JSON.stringify(pkg, null, 2) + '\n');
   });
