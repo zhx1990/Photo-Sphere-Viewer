@@ -29,7 +29,8 @@ function PSVNavBarZoomButton(navbar) {
   this.prop = {
     mousedown: false,
     buttondown: false,
-    longPressInterval: null
+    longPressInterval: null,
+    longPressTimeout: null
   };
 
   this.create();
@@ -91,6 +92,8 @@ PSVNavBarZoomButton.prototype.create = function() {
  * @override
  */
 PSVNavBarZoomButton.prototype.destroy = function() {
+  this._stopZoomChange();
+
   this.psv.container.removeEventListener('mousemove', this);
   this.psv.container.removeEventListener('touchmove', this);
   this.psv.container.removeEventListener('mouseup', this);
@@ -172,7 +175,7 @@ PSVNavBarZoomButton.prototype._zoomIn = function() {
 
   this.prop.buttondown = true;
   this.psv.zoomIn();
-  window.setTimeout(this._startLongPressInterval.bind(this, 1), 200);
+  this.prop.longPressTimeout = window.setTimeout(this._startLongPressInterval.bind(this, 1), 200);
 };
 
 /**
@@ -187,7 +190,7 @@ PSVNavBarZoomButton.prototype._zoomOut = function() {
 
   this.prop.buttondown = true;
   this.psv.zoomOut();
-  window.setTimeout(this._startLongPressInterval.bind(this, -1), 200);
+  this.prop.longPressTimeout = window.setTimeout(this._startLongPressInterval.bind(this, -1), 200);
 };
 
 /**
@@ -213,6 +216,7 @@ PSVNavBarZoomButton.prototype._stopZoomChange = function() {
   }
 
   window.clearInterval(this.prop.longPressInterval);
+  window.clearTimeout(this.prop.longPressTimeout);
   this.prop.longPressInterval = null;
   this.prop.mousedown = false;
   this.prop.buttondown = false;
