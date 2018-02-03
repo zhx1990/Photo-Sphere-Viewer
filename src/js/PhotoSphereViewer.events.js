@@ -408,11 +408,10 @@ PhotoSphereViewer.prototype._onMouseWheel = function(evt) {
   evt.preventDefault();
   evt.stopPropagation();
 
-  var delta = evt.deltaY !== undefined ? -evt.deltaY : (evt.wheelDelta !== undefined ? evt.wheelDelta : -evt.detail);
+  var delta = PSVUtils.normalizeWheel(evt).spinY * 5;
 
   if (delta !== 0) {
-    var direction = parseInt(delta / Math.abs(delta));
-    this.zoom(this.prop.zoom_lvl + direction);
+    this.zoom(this.prop.zoom_lvl - delta * this.config.mousewheel_factor);
   }
 };
 

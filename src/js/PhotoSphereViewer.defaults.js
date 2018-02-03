@@ -155,6 +155,7 @@ PhotoSphereViewer.DEFAULTS = {
     gyroscope: 'Gyroscope'
   },
   mousewheel: true,
+  mousewheel_factor: 1,
   mousemove: true,
   keyboard: true,
   gyroscope: false,
