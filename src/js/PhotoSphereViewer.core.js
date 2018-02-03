@@ -478,7 +478,9 @@ PhotoSphereViewer.prototype._createSphere = function() {
 
   this.mesh = new THREE.Mesh(geometry, material);
   this.mesh.scale.x = -1;
-  this.mesh.rotation.z = this.config.panorama_roll;
+  this.mesh.rotation.x = this.config.sphere_correction.tilt;
+  this.mesh.rotation.y = this.config.sphere_correction.pan;
+  this.mesh.rotation.z = this.config.sphere_correction.roll;
 
   this.scene.add(this.mesh);
 };

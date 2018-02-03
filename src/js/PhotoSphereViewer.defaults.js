@@ -122,7 +122,11 @@ PhotoSphereViewer.DEFAULTS = {
   default_fov: null,
   default_long: 0,
   default_lat: 0,
-  panorama_roll: 0,
+  sphere_correction: {
+    pan: 0,
+    tilt: 0,
+    roll: 0
+  },
   longitude_range: null,
   latitude_range: null,
   move_speed: 1,

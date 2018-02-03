@@ -147,7 +147,12 @@ function PhotoSphereViewer(options) {
 
   if (this.config.cache_texture && (!PSVUtils.isInteger(this.config.cache_texture) || this.config.cache_texture < 0)) {
     this.config.cache_texture = PhotoSphereViewer.DEFAULTS.cache_texture;
-    console.warn('PhotoSphreViewer: invalid valud for cache_texture');
+    console.warn('PhotoSphereViewer: invalid value for cache_texture');
+  }
+
+  if ('panorama_roll' in this.config) {
+    this.config.sphere_correction.roll = this.config.panorama_roll;
+    console.warn('PhotoSphereViewer: panorama_roll is deprecated, use sphere_correction.roll instead');
   }
 
   // min_fov/max_fov between 1 and 179
@@ -169,8 +174,10 @@ function PhotoSphereViewer(options) {
   // parse default_lat, is between -PI/2 and PI/2
   this.config.default_lat = PSVUtils.parseAngle(this.config.default_lat, true);
 
-  // parse panorama_roll, is between -PI/2 and PI/2
-  this.config.panorama_roll = PSVUtils.parseAngle(this.config.panorama_roll, true);
+  // parse camera_correction, is between -PI/2 and PI/2
+  this.config.sphere_correction.pan = PSVUtils.parseAngle(this.config.sphere_correction.pan, true);
+  this.config.sphere_correction.tilt = PSVUtils.parseAngle(this.config.sphere_correction.tilt, true);
+  this.config.sphere_correction.roll = PSVUtils.parseAngle(this.config.sphere_correction.roll, true);
 
   // default anim_lat is default_lat
   if (this.config.anim_lat === null) {
