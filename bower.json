@@ -19,7 +19,7 @@
     "dist/photo-sphere-viewer.css"
   ],
   "dependencies": {
-    "three.js": ">= 0.70.0",
+    "three.js": ">= 0.85.0",
     "D.js": "~0.7.3",
     "uevent": "~1.0.0",
     "doT": ">=1.0.3"

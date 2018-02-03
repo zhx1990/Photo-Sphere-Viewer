@@ -99,7 +99,7 @@ module.exports = function(grunt) {
     sass: {
       options: {
         sourceMap: false,
-        outputStyle: 'expanded'
+        style: 'expanded'
       },
       lib: {
         src: 'src/scss/photo-sphere-viewer.scss',
