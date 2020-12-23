@@ -5,6 +5,7 @@ import * as THREE from 'three';
  * @typedef {Object} PSV.plugins.VisibleRangePlugin.Options
  * @property {double[]|string[]} [latitudeRange] - latitude range as two angles
  * @property {double[]|string[]} [longitudeRange] - longitude range as two angles
+ * @property {boolean} [usePanoData] - if true use panoData as visible range
  */
 
 /**
@@ -33,6 +34,10 @@ export default class VisibleRangePlugin extends AbstractPlugin {
     };
 
     if (options) {
+      if (options.usePanoData) {
+        options.latitudeRange = this.getPanoLatitudeRange();
+        options.longitudeRange = this.getPanoLongitudeRange();
+      }
       this.setLatitudeRange(options.latitudeRange);
       this.setLongitudeRange(options.longitudeRange);
     }
@@ -123,6 +128,38 @@ export default class VisibleRangePlugin extends AbstractPlugin {
 
     if (this.psv.prop.ready) {
       this.psv.rotate(this.psv.getPosition());
+    }
+  }
+
+  /**
+   * @summary Gets the latitude range defined by the viewer's panoData
+   * @returns {double[]|null}
+   * @private
+   */
+  getPanoLatitudeRange() {
+    const p = this.psv.prop.panoData;
+    if (p.croppedHeight === p.fullHeight && p.croppedY === 0) {
+      return null;
+    }
+    else {
+      const latitude = y => Math.PI * (y / p.fullHeight) - (Math.PI / 2);
+      return [latitude(p.croppedY), latitude(p.croppedY + p.croppedHeight)];
+    }
+  }
+
+  /**
+   * @summary Gets the longitude range defined by the viewer's panoData
+   * @returns {double[]|null}
+   * @private
+   */
+  getPanoLongitudeRange() {
+    const p = this.psv.prop.panoData;
+    if (p.croppedWidth === p.fullWidth && p.croppedX === 0) {
+      return null;
+    }
+    else {
+      const longitude = x => 2 * Math.PI * (x / p.fullWidth);
+      return [longitude(p.croppedX), longitude(p.croppedX + p.croppedWidth)];
     }
   }
 
