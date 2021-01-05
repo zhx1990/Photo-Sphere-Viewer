@@ -47,9 +47,17 @@
 
   const viewer = new PhotoSphereViewer.Viewer({
     container : 'photosphere',
-    panorama  : 'sphere.jpg',
+    panorama  : 'sphere_cropped.jpg',
     caption   : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
     loadingImg: 'assets/photosphere-logo.gif',
+    panoData  : {
+      fullWidth: 6000,
+      fullHeight: 3000,
+      croppedX: 700,
+      croppedY: 700,
+      croppedWidth: 4000,
+      croppedHeight: 1260,
+    },
     navbar    : [
       'autorotate',
       {
@@ -66,6 +74,13 @@
         onClick  : function () {
           visibleRange.setLongitudeRange(ranges.longitudeRange);
           visibleRange.setLatitudeRange(ranges.latitudeRange);
+        },
+      },
+      {
+        content  : 'Set range from panoData',
+        className: 'custom-button',
+        onClick  : function () {
+          visibleRange.setRangesFromPanoData();
         },
       },
       'caption',
