@@ -36,6 +36,7 @@ export const DEFAULTS = {
   mousewheelSpeed    : 1,
   mousemove          : true,
   captureCursor      : false,
+  mousewheelCtrlKey  : false,
   touchmoveTwoFingers: false,
   useXmpData         : true,
   panoData           : null,
@@ -57,7 +58,8 @@ export const DEFAULTS = {
     download  : 'Download',
     fullscreen: 'Fullscreen',
     menu      : 'Menu',
-    twoFingers: ['Use two fingers to navigate'],
+    twoFingers: 'Use two fingers to navigate',
+    ctrlZoom  : 'Use ctrl + scroll to zoom the image',
     loadError : 'The panorama can\'t be loaded',
   },
   keyboard           : {
@@ -120,6 +122,10 @@ export const CONFIG_PARSERS = {
     return bound(maxFov, 1, 179);
   },
   lang           : (lang) => {
+    if (Array.isArray(lang.twoFingers)) {
+      logWarn('lang.twoFingers must not be an array');
+      lang.twoFingers = lang.twoFingers[0];
+    }
     return {
       ...DEFAULTS.lang,
       ...lang,

@@ -35,6 +35,14 @@ export const LONGTOUCH_DELAY = 500;
 export const TWOFINGERSOVERLAY_DELAY = 100;
 
 /**
+ * @summary Duration in milliseconds of the "ctrl zoom" overlay
+ * @memberOf PSV.constants
+ * @type {number}
+ * @constant
+ */
+export const CTRLZOOM_TIMEOUT = 2000;
+
+/**
  * @summary Time size of the mouse position history used to compute inertia
  * @memberOf PSV.constants
  * @type {number}
@@ -306,6 +314,7 @@ export const CHANGE_EVENTS = {
 export const IDS = {
   MENU       : 'menu',
   TWO_FINGERS: 'twoFingers',
+  CTRL_ZOOM  : 'ctrlZoom',
   ERROR      : 'error',
 };
 

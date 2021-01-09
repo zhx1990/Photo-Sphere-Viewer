@@ -148,7 +148,8 @@ lang: {
     download  : 'Download',
     fullscreen: 'Fullscreen',
     menu      : 'Menu',
-    twoFingers: ['Use two fingers to navigate'],
+    twoFingers: 'Use two fingers to navigate',
+    ctrlZoom  : 'Use ctrl + scroll to zoom the image',
     loadError : 'The panorama can\'t be loaded',
 }
 ```
@@ -177,6 +178,12 @@ Enables zoom with the mouse wheel.
 - default: `true`
 
 Enables panorama rotation with the mouse cursor.
+
+#### `mousewheelCtrlKey`
+- type: `boolean`
+- default: `false`
+
+Requires to use the ctrl key to zoom the panorama. The allows to scroll the page without interfering with the viewer. If enabled, an overlay asking the user to use ctrl + scroll is displayed when ctrl key is not pressed.
 
 #### `captureCursor`
 - type: `boolean`

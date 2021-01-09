@@ -114,6 +114,7 @@ export function getClosest(el, selector) {
  */
 const KEYMAP = {
   13 : 'Enter',
+  17 : 'Control',
   27 : 'Escape',
   32 : ' ',
   33 : 'PageUp',
@@ -209,7 +210,7 @@ export function getStyle(elt, prop) {
  * @description From Facebook's Fixed Data Table
  * {@link https://github.com/facebookarchive/fixed-data-table/blob/master/src/vendor_upstream/dom/normalizeWheel.js}
  * @copyright Facebook
- * @param {MouseWheelEvent} event
+ * @param {WheelEvent} event
  * @returns {{spinX: number, spinY: number, pixelX: number, pixelY: number}}
  */
 export function normalizeWheel(event) {

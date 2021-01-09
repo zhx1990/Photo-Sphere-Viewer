@@ -1,6 +1,7 @@
 import { Animation } from '../Animation';
 import {
   ACTIONS,
+  CTRLZOOM_TIMEOUT,
   DBLCLICK_DELAY,
   EVENTS,
   IDS,
@@ -11,6 +12,7 @@ import {
 } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import gestureIcon from '../icons/gesture.svg';
+import mousewheelIcon from '../icons/mousewheel.svg';
 import { clone, distance, getClosest, getEventKey, isFullscreenEnabled, normalizeWheel, throttle } from '../utils';
 import { AbstractService } from './AbstractService';
 
@@ -38,24 +40,29 @@ export class EventsHandler extends AbstractService {
      * @property {number} mouseY - current y position of the cursor
      * @property {number[][]} mouseHistory - list of latest positions of the cursor, [time, x, y]
      * @property {number} pinchDist - distance between fingers when zooming
+     * @property {boolean} ctrlKeyDown - when the Ctrl key is pressed
      * @property {PSV.ClickData} dblclickData - temporary storage of click data between two clicks
      * @property {number} dblclickTimeout - timeout id for double click
+     * @property {number} twofingersTimeout - timeout id for "two fingers" overlay
+     * @property {number} ctrlZoomTimeout - timeout id for "ctrol zoom" overlay
      * @protected
      */
     this.state = {
-      keyboardEnabled : false,
-      moving          : false,
-      zooming         : false,
-      startMouseX     : 0,
-      startMouseY     : 0,
-      mouseX          : 0,
-      mouseY          : 0,
-      mouseHistory    : [],
-      pinchDist       : 0,
-      dblclickData    : null,
-      dblclickTimeout : null,
-      longtouchTimeout: null,
+      keyboardEnabled  : false,
+      moving           : false,
+      zooming          : false,
+      startMouseX      : 0,
+      startMouseY      : 0,
+      mouseX           : 0,
+      mouseY           : 0,
+      mouseHistory     : [],
+      pinchDist        : 0,
+      ctrlKeyDown      : false,
+      dblclickData     : null,
+      dblclickTimeout  : null,
+      longtouchTimeout : null,
       twofingersTimeout: null,
+      ctrlZoomTimeout  : null,
     };
 
     /**
@@ -73,6 +80,7 @@ export class EventsHandler extends AbstractService {
   init() {
     window.addEventListener('resize', this);
     window.addEventListener('keydown', this);
+    window.addEventListener('keyup', this);
     this.psv.container.addEventListener('mouseenter', this);
     this.psv.container.addEventListener('mousedown', this);
     this.psv.container.addEventListener('mouseleave', this);
@@ -94,6 +102,7 @@ export class EventsHandler extends AbstractService {
   destroy() {
     window.removeEventListener('resize', this);
     window.removeEventListener('keydown', this);
+    window.removeEventListener('keyup', this);
     this.psv.container.removeEventListener('mouseenter', this);
     this.psv.container.removeEventListener('mousedown', this);
     this.psv.container.removeEventListener('mouseleave', this);
@@ -111,6 +120,7 @@ export class EventsHandler extends AbstractService {
     clearTimeout(this.state.dblclickTimeout);
     clearTimeout(this.state.longtouchTimeout);
     clearTimeout(this.state.twofingersTimeout);
+    clearTimeout(this.state.ctrlZoomTimeout);
 
     delete this.state;
 
@@ -128,6 +138,7 @@ export class EventsHandler extends AbstractService {
       // @formatter:off
       case 'resize':   this.__onResize(); break;
       case 'keydown':  this.__onKeyDown(evt); break;
+      case 'keyup':    this.__onKeyUp(); break;
       case 'mouseup':  this.__onMouseUp(evt); break;
       case 'touchend': this.__onTouchEnd(evt); break;
       case SYSTEM.fullscreenEvent: this.__fullscreenToggled(); break;
@@ -174,6 +185,17 @@ export class EventsHandler extends AbstractService {
    * @private
    */
   __onKeyDown(evt) {
+    const key = getEventKey(evt);
+
+    if (this.config.mousewheelCtrlKey) {
+      this.state.ctrlKeyDown = key === 'Control';
+
+      if (this.state.ctrlKeyDown) {
+        clearTimeout(this.state.ctrlZoomTimeout);
+        this.psv.overlay.hide(IDS.CTRL_ZOOM);
+      }
+    }
+
     if (!this.state.keyboardEnabled) {
       return;
     }
@@ -182,11 +204,8 @@ export class EventsHandler extends AbstractService {
     let dLat = 0;
     let dZoom = 0;
 
-    const key = getEventKey(evt);
-    const action = this.config.keyboard[key];
-
     /* eslint-disable */
-    switch (action) {
+    switch (this.config.keyboard[key]) {
       // @formatter:off
       case ACTIONS.ROTATE_LAT_UP    : dLat = 0.01;   break;
       case ACTIONS.ROTATE_LAT_DOWN  : dLat = -0.01;  break;
@@ -208,6 +227,14 @@ export class EventsHandler extends AbstractService {
         latitude : this.prop.position.latitude + dLat * this.prop.moveSpeed * this.prop.vFov,
       });
     }
+  }
+
+  /**
+   * @summary Handles keyboard events
+   * @private
+   */
+  __onKeyUp() {
+    this.state.ctrlKeyDown = false;
   }
 
   /**
@@ -353,7 +380,7 @@ export class EventsHandler extends AbstractService {
             this.psv.overlay.show({
               id: IDS.TWO_FINGERS,
               image: gestureIcon,
-              text: this.config.lang.twoFingers[0],
+              text: this.config.lang.twoFingers,
             });
           }, TWOFINGERSOVERLAY_DELAY);
         }
@@ -396,11 +423,24 @@ export class EventsHandler extends AbstractService {
 
   /**
    * @summary Handles mouse wheel events
-   * @param {MouseWheelEvent} evt
+   * @param {WheelEvent} evt
    * @private
    */
   __onMouseWheel(evt) {
     if (!this.config.mousewheel) {
+      return;
+    }
+
+    if (this.config.mousewheelCtrlKey && !this.state.ctrlKeyDown) {
+      this.psv.overlay.show({
+        id: IDS.CTRL_ZOOM,
+        image: mousewheelIcon,
+        text: this.config.lang.ctrlZoom,
+      });
+
+      clearTimeout(this.state.ctrlZoomTimeout);
+      this.state.ctrlZoomTimeout = setTimeout(() => this.psv.overlay.hide(IDS.CTRL_ZOOM), CTRLZOOM_TIMEOUT);
+
       return;
     }
 
