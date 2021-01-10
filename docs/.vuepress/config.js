@@ -22,6 +22,7 @@ module.exports = {
     nav         : [
       { text: 'Guide', link: '/guide/' },
       { text: 'Plugins', link: '/plugins/' },
+      { text: 'Demos', link: '/demos/' },
       { text: 'API', link: 'https://photo-sphere-viewer.js.org/api/' },
       { text: 'Changelog', link: '/changelog' },
     ],
@@ -66,6 +67,17 @@ module.exports = {
             'plugin-settings',
             'plugin-stereo',
             'plugin-visible-range',
+          ],
+        },
+      ],
+      '/demos/': [
+        {
+          title: 'Demos',
+          sidebarDepth: 3,
+          collapsable : false,
+          children    : [
+            '',
+            'intro',
           ],
         },
       ],
