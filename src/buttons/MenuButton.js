@@ -1,7 +1,6 @@
-import { BUTTON_DATA, EVENTS, IDS } from '../data/constants';
+import { EVENTS, IDS } from '../data/constants';
 import menuIcon from '../icons/menu.svg';
-import menuTemplate from '../templates/menu';
-import { getClosest } from '../utils';
+import { dasherize, getClosest } from '../utils';
 import { AbstractButton } from './AbstractButton';
 
 /**
@@ -13,6 +12,34 @@ export class MenuButton extends AbstractButton {
 
   static id = 'menu';
   static icon = menuIcon;
+
+  /**
+   * @summary Property name added to buttons list
+   * @type {string}
+   * @constant
+   */
+  static BUTTON_DATA = 'psvButton';
+
+  /**
+   * @summary Menu template
+   * @param {AbstractButton[]} buttons
+   * @param {PSV.Viewer} psv
+   * @param {string} dataKey
+   * @returns {string}
+   */
+  static MENU_TEMPLATE = (buttons, psv, dataKey) => `
+<div class="psv-panel-menu psv-panel-menu--stripped">
+  <h1 class="psv-panel-menu-title">${menuIcon} ${psv.config.lang.menu}</h1>
+  <ul class="psv-panel-menu-list">
+    ${buttons.map(button => `
+    <li data-${dataKey}="${button.prop.id}" class="psv-panel-menu-item">
+      <span class="psv-panel-menu-item-icon">${button.container.innerHTML}</span>
+      <span class="psv-panel-menu-item-label">${button.container.title}</span>
+    </li>
+    `).join('')}
+  </ul>
+</div>
+`;
 
   /**
    * @param {PSV.components.Navbar} navbar
@@ -87,11 +114,11 @@ export class MenuButton extends AbstractButton {
   __showMenu() {
     this.psv.panel.show({
       id          : IDS.MENU,
-      content     : menuTemplate(this.parent.collapsed, this.psv),
+      content     : MenuButton.MENU_TEMPLATE(this.parent.collapsed, this.psv, dasherize(MenuButton.BUTTON_DATA)),
       noMargin    : true,
       clickHandler: (e) => {
         const li = e.target ? getClosest(e.target, 'li') : undefined;
-        const buttonId = li ? li.dataset[BUTTON_DATA] : undefined;
+        const buttonId = li ? li.dataset[MenuButton.BUTTON_DATA] : undefined;
 
         if (buttonId) {
           this.parent.getButton(buttonId).onClick();

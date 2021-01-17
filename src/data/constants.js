@@ -91,14 +91,6 @@ export const CUBE_MAP = [0, 2, 4, 5, 3, 1];
 export const CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
 
 /**
- * @summary Property name added to buttons list
- * @memberOf PSV.constants
- * @type {string}
- * @constant
- */
-export const BUTTON_DATA = 'psvButton';
-
-/**
  * @summary Property name added to viewer element
  * @memberOf PSV.constants
  * @type {string}

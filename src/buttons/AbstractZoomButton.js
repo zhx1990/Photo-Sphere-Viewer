@@ -14,7 +14,7 @@ export class AbstractZoomButton extends AbstractButton {
    * @param {number} value
    */
   constructor(navbar, value) {
-    super(navbar, 'psv-button--hover-scale psv-zoom-button', true);
+    super(navbar, 'psv-button--hover-scale psv-zoom-button');
 
     /**
      * @override

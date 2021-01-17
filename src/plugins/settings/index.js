@@ -77,14 +77,17 @@ export default class SettingsPlugin extends AbstractPlugin {
    * @returns {string}
    */
   static SETTINGS_TEMPLATE = (settings, title, dataKey) => `
-<h1 class="psv-settings-title">${icon} ${title}</h1>
-<ul class="psv-settings-list">
-  ${settings.map(s => `
-    <li class="psv-settings-item" data-${dataKey}="${s.id}">
-      ${SettingsPlugin.SETTINGS_TEMPLATE_[s.type](s)}
-    </li>
-  `).join('')}
-</ul>`;
+<div class="psv-panel-menu">
+  <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
+  <ul class="psv-panel-menu-list">
+    ${settings.map(s => `
+      <li class="psv-panel-menu-item" data-${dataKey}="${s.id}">
+        ${SettingsPlugin.SETTINGS_TEMPLATE_[s.type](s)}
+      </li>
+    `).join('')}
+  </ul>
+</div>
+`;
 
   /**
    * @summary Setting item template, by type
@@ -109,19 +112,21 @@ export default class SettingsPlugin extends AbstractPlugin {
    * @returns {string}
    */
   static SETTING_OPTIONS_TEMPLATE = (setting, title, dataKey) => `
-<h1 class="psv-settings-title">${icon} ${title}</h1>
-<ul class="psv-settings-list">
-  <li class="psv-settings-item psv-settings-item--header" data-${dataKey}="__back">
-    <span class="psv-settings-item-icon">${chevron}</span>
-    <span class="psv-settings-item-label">${setting.label}</span>
-  </li>
-  ${setting.options().map(s => `
-    <li class="psv-settings-item" data-${dataKey}="${s.id}">
-      <span class="psv-settings-item-icon">${s.active ? check : ''}</span>
-      <span class="psv-settings-item-value">${s.label}</span>
+<div class="psv-panel-menu">
+  <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
+  <ul class="psv-panel-menu-list">
+    <li class="psv-panel-menu-item psv-settings-item--header" data-${dataKey}="__back">
+      <span class="psv-settings-item-icon">${chevron}</span>
+      <span class="psv-settings-item-label">${setting.label}</span>
     </li>
-  `).join('')}
-</ul>`;
+    ${setting.options().map(s => `
+      <li class="psv-panel-menu-item" data-${dataKey}="${s.id}">
+        <span class="psv-settings-item-icon">${s.active ? check : ''}</span>
+        <span class="psv-settings-item-value">${s.label}</span>
+      </li>
+    `).join('')}
+  </ul>
+`;
 
   /**
    * @param {PSV.Viewer} psv

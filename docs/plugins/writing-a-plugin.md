@@ -181,6 +181,10 @@ import customIcon from './icons/custom.svg';
 static icon = customIcon;
 ```
 
+::: tip Icon color
+To be correctly displayed in the navbar, the icon must use `fill="currentColor"` and/or `stroke="currentColor"`.
+:::
+
 ## Viewer settings
 
 A plugin can expose one or more settings to the viewer by using the [Settings plugin](./plugin-settings.md).

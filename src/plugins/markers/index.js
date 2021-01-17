@@ -90,13 +90,13 @@ export default class MarkersPlugin extends AbstractPlugin {
    * @returns {string}
    */
   static MARKERS_LIST_TEMPLATE = (markers, title, dataKey) => `
-<div class="psv-markers-list-container">
-  <h1 class="psv-markers-list-title">${icon} ${title}</h1>
-  <ul class="psv-markers-list">
+<div class="psv-panel-menu psv-panel-menu--stripped">
+  <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
+  <ul class="psv-panel-menu-list">
     ${markers.map(marker => `
-    <li data-${dataKey}="${marker.config.id}" class="psv-markers-list-item ${marker.config.className || ''}">
-      ${marker.type === 'image' ? `<img class="psv-markers-list-image" src="${marker.config.image}"/>` : ''}
-      <p class="psv-markers-list-name">${marker.getListContent()}</p>
+    <li data-${dataKey}="${marker.config.id}" class="psv-panel-menu-item">
+      ${marker.type === 'image' ? `<span class="psv-panel-menu-item-icon" ><img src="${marker.config.image}"/></span>` : ''}
+      <span class="psv-panel-menu-item-label">${marker.getListContent()}</span>
     </li>
     `).join('')}
   </ul>
