@@ -65,7 +65,7 @@ export default class ResolutionPlugin extends AbstractPlugin {
       id     : ResolutionPlugin.id,
       type   : 'options',
       label  : this.psv.config.lang.resolution,
-      current: () => (this.prop.resolution ? this.resolutionsById[this.prop.resolution].label : ''),
+      current: () => this.prop.resolution,
       options: () => this.__getSettingsOptions(),
       apply  : resolution => this.setResolution(resolution),
     });
@@ -179,10 +179,8 @@ export default class ResolutionPlugin extends AbstractPlugin {
   __getSettingsOptions() {
     return this.resolutions
       .map(resolution => ({
-        type  : 'button',
-        id    : resolution.id,
-        active: resolution.id === this.prop.resolution,
-        label : resolution.label,
+        id   : resolution.id,
+        label: resolution.label,
       }));
   }
 

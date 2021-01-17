@@ -25,7 +25,7 @@ registerButton(SettingsButton);
  * @typedef {PSV.plugins.SettingsPlugin.Setting} PSV.plugins.SettingsPlugin.OptionsSetting
  * @summary Description of a 'options' setting
  * @property {'options'} type - type of the setting
- * @property {function} current - function which returns the current value (human readable)
+ * @property {function} current - function which returns the current option id
  * @property {function} options - function which the possible options as an array of {@link PSV.plugins.SettingsPlugin.Option}
  * @property {function} apply - function called with the id of the selected option
  */
@@ -43,7 +43,6 @@ registerButton(SettingsButton);
  * @summary Option of an 'option' setting
  * @property {string} id - identifier of the option
  * @property {string} label - label of the option
- * @property {boolean} active - state of the option
  */
 
 /**
@@ -74,15 +73,16 @@ export default class SettingsPlugin extends AbstractPlugin {
    * @param {PSV.plugins.SettingsPlugin.Setting[]} settings
    * @param {string} title
    * @param {string} dataKey
+   * @param {function} optionsCurrent
    * @returns {string}
    */
-  static SETTINGS_TEMPLATE = (settings, title, dataKey) => `
+  static SETTINGS_TEMPLATE = (settings, title, dataKey, optionsCurrent) => `
 <div class="psv-panel-menu">
   <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
   <ul class="psv-panel-menu-list">
     ${settings.map(s => `
       <li class="psv-panel-menu-item" data-${dataKey}="${s.id}">
-        ${SettingsPlugin.SETTINGS_TEMPLATE_[s.type](s)}
+        ${SettingsPlugin.SETTINGS_TEMPLATE_[s.type](s, optionsCurrent)}
       </li>
     `).join('')}
   </ul>
@@ -93,9 +93,9 @@ export default class SettingsPlugin extends AbstractPlugin {
    * @summary Setting item template, by type
    */
   static SETTINGS_TEMPLATE_ = {
-    options: setting => `
+    options: (setting, optionsCurrent) => `
       <span class="psv-settings-item-label">${setting.label}</span> 
-      <span class="psv-settings-item-value">${setting.current()}</span> 
+      <span class="psv-settings-item-value">${optionsCurrent(setting)}</span> 
       <span class="psv-settings-item-icon">${chevron}</span>
     `,
     toggle : setting => `
@@ -109,9 +109,10 @@ export default class SettingsPlugin extends AbstractPlugin {
    * @param {PSV.plugins.SettingsPlugin.OptionsSetting} setting
    * @param {string} title
    * @param {string} dataKey
+   * @param {function} optionActive
    * @returns {string}
    */
-  static SETTING_OPTIONS_TEMPLATE = (setting, title, dataKey) => `
+  static SETTING_OPTIONS_TEMPLATE = (setting, title, dataKey, optionActive) => `
 <div class="psv-panel-menu">
   <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
   <ul class="psv-panel-menu-list">
@@ -121,7 +122,7 @@ export default class SettingsPlugin extends AbstractPlugin {
     </li>
     ${setting.options().map(s => `
       <li class="psv-panel-menu-item" data-${dataKey}="${s.id}">
-        <span class="psv-settings-item-icon">${s.active ? check : ''}</span>
+        <span class="psv-settings-item-icon">${optionActive(s) ? check : ''}</span>
         <span class="psv-settings-item-value">${s.label}</span>
       </li>
     `).join('')}
@@ -221,7 +222,12 @@ export default class SettingsPlugin extends AbstractPlugin {
       content     : SettingsPlugin.SETTINGS_TEMPLATE(
         this.settings,
         this.psv.config.lang[SettingsButton.id],
-        utils.dasherize(SettingsPlugin.SETTING_DATA)
+        utils.dasherize(SettingsPlugin.SETTING_DATA),
+        (setting) => { // retrocompatibility with "current" returning a label
+          const current = setting.current();
+          const option = setting.options().find(opt => opt.id === current);
+          return option?.label || current;
+        }
       ),
       noMargin    : true,
       clickHandler: (e) => {
@@ -254,12 +260,17 @@ export default class SettingsPlugin extends AbstractPlugin {
    * @private
    */
   __showOptions(setting) {
+    const current = setting.current();
+
     this.psv.panel.show({
       id          : SettingsPlugin.ID_PANEL,
       content     : SettingsPlugin.SETTING_OPTIONS_TEMPLATE(
         setting,
         this.psv.config.lang[SettingsButton.id],
-        utils.dasherize(SettingsPlugin.SETTING_DATA)
+        utils.dasherize(SettingsPlugin.SETTING_DATA),
+        (option) => { // retrocompatibility with options having an "active" flag
+          return 'active' in option ? option.active : option.id === current;
+        }
       ),
       noMargin    : true,
       clickHandler: (e) => {

@@ -56,12 +56,12 @@ settings.addSetting({
   id     : 'custom-options-setting',
   label  : 'Options setting',
   type   : 'options',
-  current: () => currentOption, // prefer a human readable label
   options: () => ([
-    { id: 'option-a', label: 'Option A', active: currentOption === 'option-a' },
-    { id: 'option-b', label: 'Option B', active: currentOption === 'option-b' },
+    { id: 'option-a', label: 'Option A' },
+    { id: 'option-b', label: 'Option B' },
   ]),
-  apply : (option) => currentOption = option,
+  current: () => currentOption,
+  apply  : (option) => currentOption = option,
 });
 ```
 
