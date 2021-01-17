@@ -22,6 +22,12 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ## Configuration
 
+#### `touchmove`
+- type: `boolean`
+- default: `true`
+
+Allows to pan horizontally the camera when the gyroscope is enabled (requires global `mousemove=true`).
+
 #### `absolutePosition`
 - type: `boolean`
 - default: `false`

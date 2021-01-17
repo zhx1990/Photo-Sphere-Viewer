@@ -177,7 +177,7 @@ Enables zoom with the mouse wheel.
 - type: `boolean`
 - default: `true`
 
-Enables panorama rotation with the mouse cursor.
+Enables panorama rotation with the mouse cursor or with a finger swipe on touch screens.
 
 #### `mousewheelCtrlKey`
 - type: `boolean`

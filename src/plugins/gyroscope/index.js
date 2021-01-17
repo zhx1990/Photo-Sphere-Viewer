@@ -10,6 +10,7 @@ import { GyroscopeButton } from './GyroscopeButton';
 
 /**
  * @typedef {Object} PSV.plugins.GyroscopePlugin.Options
+ * @property {boolean} [touchmove=true] - allows to pan horizontally when the gyroscope is enabled (requires global `mousemove=true`)
  * @property {boolean} [absolutePosition=false] - when true the view will ignore the current direction when enabling gyroscope control
  */
 
@@ -66,6 +67,7 @@ export default class GyroscopePlugin extends AbstractPlugin {
      * @private
      */
     this.config = {
+      touchmove       : true,
       absolutePosition: false,
       ...options,
     };
@@ -253,7 +255,9 @@ export default class GyroscopePlugin extends AbstractPlugin {
     if (this.isEnabled()) {
       e.preventDefault();
 
-      this.prop.alphaOffset -= e.args[0].longitude - this.psv.prop.position.longitude;
+      if (this.config.touchmove) {
+        this.prop.alphaOffset -= e.args[0].longitude - this.psv.prop.position.longitude;
+      }
     }
   }
 

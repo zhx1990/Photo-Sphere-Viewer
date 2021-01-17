@@ -95,7 +95,10 @@
       'caption', 'gyroscope', 'stereo', 'fullscreen',
     ],
     plugins            : [
-      PhotoSphereViewer.GyroscopePlugin,
+      [PhotoSphereViewer.GyroscopePlugin, {
+        touchmove       : true,
+        absolutePosition: false,
+      }],
       PhotoSphereViewer.StereoPlugin,
     ]
   });
