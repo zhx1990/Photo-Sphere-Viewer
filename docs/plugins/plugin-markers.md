@@ -52,7 +52,94 @@ markersPlugin.on('select-marker', (e, marker) => {
 
 The following example contains all types of markers. Click anywhere on the panorama to add a red marker, right-click to change it's color and double-click to remove it.
 
-<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/kdpqLey2/embedded/result,js/dark" allowfullscreen="allowfullscreen" allowpaymentrequest frameborder="0"></iframe>
+<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/kdpqLey2/embedded/result,js,html/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
+
+## Markers definition
+
+One of these options is required.
+
+#### `image`
+- type : `string`
+
+Path to the image representing the marker. Requires `width` and `height` to be defined.
+
+#### `html`
+- type : `string`
+
+HTML content of the marker. It is recommended to define `width` and `height`.
+
+#### `rect`
+- type : `integer[2] | {width: integer, height: integer}`
+
+Size of the rectangle.
+
+```js
+rect: [10, 5]
+
+rect: {width: 10, height: 5}
+```
+
+#### `circle`
+- type: `integer`
+
+Radius of the circle.
+
+#### `ellipse`
+- type : `integer[2] | {cx: integer, cy: integer}`
+
+Radiuses of the ellipse.
+
+```js
+ellipse: [10, 5]
+
+ellipse: {cx: 10, cy: 5}
+```
+
+#### `path`
+- type : `string`
+
+Definition of the path (0,0 will be placed at the defined x/y or longitude/latitude).
+
+```js
+path: 'M 0 0 L 60 60 L 60 0 L 0 60 L 0 0'
+```
+
+#### `polygonRad`
+- type : `double[2][]`
+
+Same as above but coordinates are in longitude and latitude.
+
+```js
+polygonRad: [[0.2, 0.4], [0.9, 1.1], [1.5, 0.7]]
+```
+
+#### `polygonPx`
+- type : `integer[2][]`
+
+Array of points defining the polygon in pixel coordinates on the panorama image.
+
+```js
+polygonPx: [[100, 200], [150, 300], [300, 200]]
+```
+
+::: warning
+Texture coordinates are not applicable to cubemaps.
+:::
+
+#### `polylineRad`
+- type : `double[2][]`
+
+Same as `polygonRad` but generates a polyline.
+
+#### `polylinePx`
+- type : `integer[2][]`
+
+Same as `polygonPx` but generates a polyline.
+
+::: warning
+Texture coordinates are not applicable to cubemaps.
+:::
 
 
 ## Markers options
@@ -157,93 +244,6 @@ HTML content that will be displayed on the side panel when the marker is clicked
 - type : `any`
 
 Any custom data you want to attach to the marker.
-
-
-## Markers definition
-
-One of these options is required.
-
-#### `image`
-- type : `string`
-
-Path to the image representing the marker. Requires `width` and `height` to be defined.
-
-#### `html`
-- type : `string`
-
-HTML content of the marker. It is recommended to define `width` and `height`.
-
-#### `rect`
-- type : `integer[2] | {width: integer, height: integer}`
-
-Size of the rectangle.
-
-```js
-rect: [10, 5]
-
-rect: {width: 10, height: 5}
-```
-
-#### `circle`
-- type: `integer`
-
-Radius of the circle.
-
-#### `ellipse`
-- type : `integer[2] | {cx: integer, cy: integer}`
-
-Radiuses of the ellipse.
-
-```js
-ellipse: [10, 5]
-
-ellipse: {cx: 10, cy: 5}
-```
-
-#### `path`
-- type : `string`
-
-Definition of the path (0,0 will be placed at the defined x/y or longitude/latitude).
-
-```js
-path: 'M 0 0 L 60 60 L 60 0 L 0 60 L 0 0'
-```
-
-#### `polygonRad`
-- type : `double[2][]`
-
-Same as above but coordinates are in longitude and latitude.
-
-```js
-polygonRad: [[0.2, 0.4], [0.9, 1.1], [1.5, 0.7]]
-```
-
-#### `polygonPx`
-- type : `integer[2][]`
-
-Array of points defining the polygon in pixel coordinates on the panorama image.
-
-```js
-polygonPx: [[100, 200], [150, 300], [300, 200]]
-```
-
-::: warning
-Texture coordinates are not applicable to cubemaps.
-:::
-
-#### `polylineRad`
-- type : `double[2][]`
-
-Same as `polygonRad` but generates a polyline.
-
-#### `polylinePx`
-- type : `integer[2][]`
-
-Same as `polygonPx` but generates a polyline.
-
-::: warning
-Texture coordinates are not applicable to cubemaps.
-:::
 
 
 ## Configuration
