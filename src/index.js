@@ -7,6 +7,7 @@ import './data/constants'; // for jsdoc
 import { SYSTEM } from './data/system';
 import { AbstractPlugin } from './plugins/AbstractPlugin';
 import { PSVError } from './PSVError';
+import './styles/index.scss';
 import * as utils from './utils';
 import { Viewer } from './Viewer';
 

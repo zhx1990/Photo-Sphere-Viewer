@@ -16,7 +16,6 @@ import { EventsHandler } from './services/EventsHandler';
 import { Renderer } from './services/Renderer';
 import { TextureLoader } from './services/TextureLoader';
 import { TooltipRenderer } from './services/TooltipRenderer';
-import './styles/viewer.scss';
 import {
   bound,
   each,

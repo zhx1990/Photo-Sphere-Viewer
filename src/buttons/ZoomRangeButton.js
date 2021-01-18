@@ -3,8 +3,6 @@ import { SYSTEM } from '../data/system';
 import { getStyle } from '../utils';
 import { AbstractButton } from './AbstractButton';
 
-import '../styles/buttons/zoom-range.scss';
-
 /**
  * @summary Navigation bar zoom button class
  * @extends PSV.buttons.AbstractButton

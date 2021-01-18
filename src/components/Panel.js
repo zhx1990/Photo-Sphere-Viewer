@@ -1,8 +1,6 @@
 import { EVENTS } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { PSVError } from '../PSVError';
-
-import '../styles/panel.scss';
 import { toggleClass } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 

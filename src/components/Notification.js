@@ -1,8 +1,6 @@
 import { EVENTS } from '../data/constants';
 import { AbstractComponent } from './AbstractComponent';
 
-import '../styles/notification.scss';
-
 /**
  * @summary Notification class
  * @extends PSV.components.AbstractComponent

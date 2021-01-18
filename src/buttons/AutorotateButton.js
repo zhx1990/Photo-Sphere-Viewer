@@ -3,8 +3,6 @@ import playActive from '../icons/play-active.svg';
 import play from '../icons/play.svg';
 import { AbstractButton } from './AbstractButton';
 
-import '../styles/buttons/autorotate.scss';
-
 /**
  * @summary Navigation bar autorotate button class
  * @extends PSV.buttons.AbstractButton

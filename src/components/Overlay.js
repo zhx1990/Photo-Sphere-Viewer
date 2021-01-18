@@ -2,8 +2,6 @@ import { EVENTS } from '../data/constants';
 import { AbstractComponent } from './AbstractComponent';
 import { PSVError } from '../PSVError';
 
-import '../styles/overlay.scss';
-
 /**
  * @summary Overlay class
  * @extends PSV.components.AbstractComponent

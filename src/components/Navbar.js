@@ -8,7 +8,6 @@ import { ZoomOutButton } from '../buttons/ZoomOutButton';
 import { ZoomRangeButton } from '../buttons/ZoomRangeButton';
 import { DEFAULTS } from '../data/config';
 import { PSVError } from '../PSVError';
-import '../styles/navbar.scss';
 import { clone, logWarn } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 import { NavbarCaption } from './NavbarCaption';

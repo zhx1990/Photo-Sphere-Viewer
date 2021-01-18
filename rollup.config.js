@@ -1,9 +1,9 @@
 import alias from '@rollup/plugin-alias';
+import babel from '@rollup/plugin-babel';
 import inject from '@rollup/plugin-inject';
 import replace from '@rollup/plugin-replace';
 import fs from 'fs';
 import path from 'path';
-import babel from 'rollup-plugin-babel';
 import localResolve from 'rollup-plugin-local-resolve';
 import postcss from 'rollup-plugin-postcss'
 import { string } from 'rollup-plugin-string';
@@ -35,6 +35,7 @@ const baseConfig = {
   output  : {
     format   : 'umd',
     sourcemap: true,
+    interop  : false,
     banner   : banner,
     globals  : {
       'three' : 'THREE',
@@ -50,7 +51,8 @@ const baseConfig = {
   plugins : () => [
     localResolve(),
     babel({
-      exclude: 'node_modules/**',
+      exclude     : 'node_modules/**',
+      babelHelpers: 'bundled',
     }),
     postcss({
       extract  : true,

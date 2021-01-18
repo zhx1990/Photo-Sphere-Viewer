@@ -3,8 +3,6 @@ import { PSVError } from '../PSVError';
 import { addClasses, parsePosition } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 
-import '../styles/tooltip.scss';
-
 const LEFT_MAP = { 0: 'left', 0.5: 'center', 1: 'right' };
 const TOP_MAP = { 0: 'top', 0.5: 'center', 1: 'bottom' };
 const STATE = { NONE: 0, SHOWING: 1, HIDING: 2, READY: 3 };

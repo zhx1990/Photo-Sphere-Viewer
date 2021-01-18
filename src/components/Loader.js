@@ -2,8 +2,6 @@ import { SYSTEM } from '../data/system';
 import { getStyle } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 
-import '../styles/loader.scss';
-
 /**
  * @summary Loader class
  * @extends PSV.components.AbstractComponent
