@@ -98,6 +98,10 @@ export const CONFIG_PARSERS = {
     }
     return container;
   },
+  defaultLong: (defaultLong) => {
+    // defaultLat is between 0 and PI
+    return parseAngle(defaultLong);
+  },
   defaultLat     : (defaultLat) => {
     // defaultLat is between -PI/2 and PI/2
     return parseAngle(defaultLat, true);
