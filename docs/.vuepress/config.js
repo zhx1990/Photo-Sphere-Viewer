@@ -22,6 +22,7 @@ module.exports = {
     nav         : [
       { text: 'Guide', link: '/guide/' },
       { text: 'Plugins', link: '/plugins/' },
+      { text: 'Playground', link: '/playground' },
       { text: 'Demos', link: '/demos/' },
       { text: 'API', link: 'https://photo-sphere-viewer.js.org/api/' },
       { text: 'Changelog', link: '/changelog' },

@@ -6,6 +6,10 @@
 Photo Sphere Viewer 4 is not compatible with previous versions. If you are using version 3 , please follow the [migration guide](./migration-v3.md). You can also read the [version 3 documentation](https://photo-sphere-viewer-3.netlify.com).
 :::
 
+::: tip Playground
+Test Photo Sphere Viewer with you own panorama in the [Playground](../playground.md)
+:::
+
 ## Install Photo Sphere Viewer
 
 #### With npm or yarn
