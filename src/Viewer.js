@@ -516,7 +516,7 @@ export class Viewer extends EventEmitter {
         this.loader.show();
       }
 
-      this.prop.loadingPromise = this.textureLoader.loadTexture(this.config.panorama)
+      this.prop.loadingPromise = this.textureLoader.loadTexture(this.config.panorama, options.panoData)
         .then((textureData) => {
           this.loader.hide();
 
