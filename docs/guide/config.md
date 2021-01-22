@@ -261,6 +261,12 @@ panoData: (image) => ({
 })
 ```
 
+#### `canvasBackground`
+- type: `string`
+- default: `#000`
+
+Background of the canvas, which will be visible when using cropped panoramas.
+
 #### `moveInertia`
 - type: `boolean`
 - default: `true`

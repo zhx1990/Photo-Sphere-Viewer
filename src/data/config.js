@@ -40,6 +40,7 @@ export const DEFAULTS = {
   touchmoveTwoFingers: false,
   useXmpData         : true,
   panoData           : null,
+  canvasBackground   : '#000',
   withCredentials    : false,
   navbar             : [
     'autorotate',
@@ -98,7 +99,7 @@ export const CONFIG_PARSERS = {
     }
     return container;
   },
-  defaultLong: (defaultLong) => {
+  defaultLong    : (defaultLong) => {
     // defaultLat is between 0 and PI
     return parseAngle(defaultLong);
   },

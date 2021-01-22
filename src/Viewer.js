@@ -578,6 +578,10 @@ export class Viewer extends EventEmitter {
           this.trigger(EVENTS.ZOOM_UPDATED, this.getZoomLevel());
           break;
 
+        case 'canvasBackground':
+          this.renderer.canvasContainer.style.background = this.config.canvasBackground;
+          break;
+
         default:
           break;
       }

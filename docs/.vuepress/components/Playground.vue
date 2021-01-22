@@ -39,6 +39,10 @@
     }
   }
 
+  .playground-container .el-tabs__content {
+    overflow: visible;
+  }
+
   .playground-container .md-title {
     margin: 2em 0 0 0;
   }
@@ -201,6 +205,14 @@
               Move inertia
             </md-checkbox>
           </div>
+          <div class="md-layout-item md-size-33">
+            <md-field>
+              <label>Canvas background</label>
+              <v-swatches shapes="circles" v-model="options.canvasBackground" :disabled="!imageData">
+                <md-input slot="trigger" :value="options.canvasBackground" :disabled="!imageData" readonly/>
+              </v-swatches>
+            </md-field>
+          </div>
         </div>
       </Tab>
 
@@ -227,6 +239,14 @@
       file     : null,
       imageData: null,
       options  : omit(cloneDeep(DEFAULTS), ['panorama', 'panoData', 'container', 'plugins', 'navbar', 'loadingImg']),
+      panoData : {
+        fullWidth    : null,
+        fullHeight   : null,
+        croppedWidth : null,
+        croppedHeight: null,
+        croppedX     : null,
+        croppedY     : null,
+      },
       navbar   : [
         { code: 'autorotate', label: DEFAULTS.lang.autorotate, enabled: true },
         { code: 'zoom', label: DEFAULTS.lang.zoom, enabled: true },
@@ -301,6 +321,7 @@
 
             image.onload = () => {
               this.imageData = image.src;
+              this.computePanoData(image.width, image.height);
               this.loadPsv();
               this.options.caption = null;
             };
@@ -316,8 +337,23 @@
         }
       },
 
+      computePanoData(width, height) {
+        const fullWidth = Math.max(width, height * 2);
+        const fullHeight = Math.round(fullWidth / 2);
+        const croppedX = Math.round((fullWidth - width) / 2);
+        const croppedY = Math.round((fullHeight - height) / 2);
+
+        this.panoData.fullWidth = fullWidth;
+        this.panoData.fullHeight = fullHeight;
+        this.panoData.croppedWidth = width;
+        this.panoData.croppedHeight = height;
+        this.panoData.croppedX = croppedX;
+        this.panoData.croppedY = croppedY;
+      },
+
       loadDefaultFile() {
         this.imageData = 'https://photo-sphere-viewer.js.org/assets/sphere.jpg';
+        this.computePanoData(6000, 3000);
         this.file = null;
         this.loadPsv();
         this.options.caption = 'Parc national du Mercantour <b>&copy; Damien Sorel</b>';
@@ -327,7 +363,7 @@
         if (this.imageData) {
           this.psv.overlay.hide();
 
-          this.psv.setPanorama(this.imageData);
+          this.psv.setPanorama(this.imageData, { panoData: this.panoData });
         }
         else {
           this.psv.overlay.show({

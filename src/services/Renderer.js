@@ -62,10 +62,11 @@ export class Renderer extends AbstractService {
     /**
      * @member {HTMLElement}
      * @readonly
-     * @protected
+     * @package
      */
     this.canvasContainer = document.createElement('div');
     this.canvasContainer.className = 'psv-canvas-container';
+    this.canvasContainer.style.background = this.psv.config.canvasBackground;
     this.canvasContainer.style.cursor = this.psv.config.mousemove ? 'move' : 'default';
     this.psv.container.appendChild(this.canvasContainer);
 
@@ -223,7 +224,7 @@ export class Renderer extends AbstractService {
   __createScene() {
     this.raycaster = new THREE.Raycaster();
 
-    this.renderer = new THREE.WebGLRenderer();
+    this.renderer = new THREE.WebGLRenderer({ alpha: true });
     this.renderer.setSize(this.prop.size.width, this.prop.size.height);
     this.renderer.setPixelRatio(SYSTEM.pixelRatio);
 
