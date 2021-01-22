@@ -52,7 +52,7 @@ export class Viewer extends EventEmitter {
       throw new PSVError('WebGL is not supported.');
     }
 
-    if (SYSTEM.maxCanvasWidth === 0 || SYSTEM.maxTextureWidth === 0) {
+    if (SYSTEM.maxTextureWidth === 0) {
       throw new PSVError('Unable to detect system capabilities');
     }
 

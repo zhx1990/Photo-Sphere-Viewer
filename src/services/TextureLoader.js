@@ -273,14 +273,16 @@ export class TextureLoader extends AbstractService {
     ) {
       const resizedPanoData = { ...panoData };
 
-      const ratio = SYSTEM.maxCanvasWidth / panoData.fullWidth;
+      const ratio = SYSTEM.getMaxCanvasWidth() / panoData.fullWidth;
 
-      resizedPanoData.fullWidth *= ratio;
-      resizedPanoData.fullHeight *= ratio;
-      resizedPanoData.croppedWidth *= ratio;
-      resizedPanoData.croppedHeight *= ratio;
-      resizedPanoData.croppedX *= ratio;
-      resizedPanoData.croppedY *= ratio;
+      if (ratio < 1) {
+        resizedPanoData.fullWidth *= ratio;
+        resizedPanoData.fullHeight *= ratio;
+        resizedPanoData.croppedWidth *= ratio;
+        resizedPanoData.croppedHeight *= ratio;
+        resizedPanoData.croppedX *= ratio;
+        resizedPanoData.croppedY *= ratio;
+      }
 
       const buffer = document.createElement('canvas');
       buffer.width = resizedPanoData.fullWidth;
@@ -351,7 +353,7 @@ export class TextureLoader extends AbstractService {
     // resize image
     if (img.width > SYSTEM.maxTextureWidth) {
       const buffer = document.createElement('canvas');
-      const ratio = SYSTEM.maxCanvasWidth / img.width;
+      const ratio = SYSTEM.getMaxCanvasWidth() / img.width;
 
       buffer.width = img.width * ratio;
       buffer.height = img.height * ratio;

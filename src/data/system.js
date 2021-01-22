@@ -1,3 +1,5 @@
+import { PSVError } from '../PSVError';
+
 /**
  * @summary General information about the system
  * @constant
@@ -6,10 +8,10 @@
  * @property {Function} load - Loads the system if not already loaded
  * @property {number} pixelRatio
  * @property {boolean} isWebGLSupported
- * @property {number} maxTextureWidth
  * @property {number} maxCanvasWidth
  * @property {string} mouseWheelEvent
  * @property {string} fullscreenEvent
+ * @property {Function} getMaxCanvasWidth - Returns the max width of a canvas allowed by the browser
  * @property {Promise<boolean>} isTouchEnabled
  */
 export const SYSTEM = {
@@ -18,7 +20,6 @@ export const SYSTEM = {
   isWebGLSupported: false,
   isTouchEnabled  : null,
   maxTextureWidth : 0,
-  maxCanvasWidth  : 0,
   mouseWheelEvent : null,
   fullscreenEvent : null,
 };
@@ -35,10 +36,17 @@ SYSTEM.load = () => {
     SYSTEM.isWebGLSupported = ctx != null;
     SYSTEM.isTouchEnabled = isTouchEnabled();
     SYSTEM.maxTextureWidth = getMaxTextureWidth(ctx);
-    SYSTEM.maxCanvasWidth = getMaxCanvasWidth(SYSTEM.maxTextureWidth);
     SYSTEM.mouseWheelEvent = getMouseWheelEvent();
     SYSTEM.fullscreenEvent = getFullscreenEvent();
   }
+};
+
+let maxCanvasWidth = null;
+SYSTEM.getMaxCanvasWidth = () => {
+  if (maxCanvasWidth === null) {
+    maxCanvasWidth = getMaxCanvasWidth(SYSTEM.maxTextureWidth);
+  }
+  return maxCanvasWidth;
 };
 
 /**
@@ -140,7 +148,7 @@ function getMaxCanvasWidth(maxWidth) {
     canvas.height /= 2;
   }
 
-  return 0;
+  throw new PSVError('Unable to detect system capabilities');
 }
 
 /**
