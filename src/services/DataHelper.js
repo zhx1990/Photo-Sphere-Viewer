@@ -199,7 +199,7 @@ export class DataHelper extends AbstractService {
   }
 
   /**
-   * @summary Ensure a SphereCorrection object is valide
+   * @summary Ensure a SphereCorrection object is valid
    * @param {PSV.SphereCorrection} sphereCorrection
    * @returns {PSV.SphereCorrection}
    */

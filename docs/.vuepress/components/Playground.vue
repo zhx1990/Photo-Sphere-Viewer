@@ -209,7 +209,7 @@
             <md-field>
               <label>Canvas background</label>
               <v-swatches shapes="circles" v-model="options.canvasBackground" :disabled="!imageData">
-                <md-input slot="trigger" :value="options.canvasBackground" :disabled="!imageData" readonly/>
+                <md-input slot="trigger" :value="options.canvasBackground" :disabled="!imageData"/>
               </v-swatches>
             </md-field>
           </div>
@@ -238,7 +238,10 @@
       psv      : null,
       file     : null,
       imageData: null,
-      options  : omit(cloneDeep(DEFAULTS), ['panorama', 'panoData', 'container', 'plugins', 'navbar', 'loadingImg']),
+      options  : {
+        ...omit(cloneDeep(DEFAULTS), ['panorama', 'panoData', 'container', 'plugins', 'navbar', 'loadingImg']),
+        sphereCorrection: { pan: 0, tilt: 0, roll: 0 }
+      },
       panoData : {
         fullWidth    : null,
         fullHeight   : null,

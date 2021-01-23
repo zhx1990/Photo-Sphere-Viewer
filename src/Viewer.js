@@ -432,6 +432,7 @@ export class Viewer extends EventEmitter {
       this.textureLoader.abortLoading();
     }
 
+    // apply default parameters on first load
     if (!this.prop.ready) {
       if (!('longitude' in options) && !this.prop.isCubemap) {
         options.longitude = this.config.defaultLong;
@@ -498,10 +499,8 @@ export class Viewer extends EventEmitter {
       this.prop.loadingPromise = this.textureLoader.loadTexture(this.config.panorama, options.panoData)
         .then((textureData) => {
           this.renderer.setTexture(textureData);
+          this.renderer.setSphereCorrection(textureData.panoData, options.sphereCorrection);
 
-          if (options.sphereCorrection) {
-            this.renderer.setSphereCorrection(options.sphereCorrection);
-          }
           if (zoomProvided) {
             this.zoom(options.zoom);
           }
@@ -560,7 +559,7 @@ export class Viewer extends EventEmitter {
           break;
 
         case 'sphereCorrection':
-          this.renderer.setSphereCorrection(value);
+          this.renderer.setSphereCorrection(this.prop.panoData, value);
           break;
 
         case 'navbar':

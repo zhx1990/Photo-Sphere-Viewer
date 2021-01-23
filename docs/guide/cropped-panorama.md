@@ -22,6 +22,11 @@ In both case the data contains six important values:
 
 The `Full panorama width` / `Full panorama height` ratio must always be 2:1. `Cropped area width` and `Cropped area height` are the actual size of your image. `Cropped area left` and `Cropped area right` are used to define the cropped area position.
 
+The data can also contains angular values:
+  - Pose Heading
+  - Pose Pitch
+  - Pose Roll
+
 ![XMP_pano_pixels](/assets/XMP_pano_pixels.png)
 
 More information on [Google documentation](https://developers.google.com/streetview/spherical-metadata).
@@ -47,6 +52,9 @@ The XMP payload is as follow:
       <GPano:CroppedAreaImageHeightPixels>2000</GPano:CroppedAreaImageHeightPixels>
       <GPano:CroppedAreaLeftPixels>1000</GPano:CroppedAreaLeftPixels>
       <GPano:CroppedAreaTopPixels>500</GPano:CroppedAreaTopPixels>
+      <GPano:PoseHeadingDegrees>270</GPano:PoseHeadingDegrees>
+      <GPano:PosePitchDegrees>0</GPano:PosePitchDegrees>
+      <GPano:PoseRollDegrees>0</GPano:PoseRollDegrees>
     </rdf:Description>
   </rdf:RDF>
 </x:xmpmeta>
@@ -61,7 +69,7 @@ exiftool -tagsfromfile data.xmp -all:all panorama.jpg
 
 ### Manually
 
-You can also directly pass the six values to Photo Sphere Viewer with the `panoData` parameter.
+You can also directly pass the values to Photo Sphere Viewer with the `panoData` parameter.
 
 ```js
 var viewer = new PhotoSphereViewer.Viewer({
@@ -73,7 +81,10 @@ var viewer = new PhotoSphereViewer.Viewer({
       croppedWidth: 4000,
       croppedHeight: 2000,
       croppedX: 1000,
-      croppedY: 500
+      croppedY: 500,
+      poseHeading: 270, // 0 to 360
+      posePitch: 0, // -90 to 90
+      poseRoll: 0, // -180 to 180
   }
 });
 ```

@@ -206,6 +206,8 @@ Requires two fingers to rotate the panorama. This allows standard touch-scroll n
 
 Sphere rotation angles, in radians.
 
+**Note** : This parameter is ignored if the XMP data and/or `panoData` contains heading/pitch/roll data.
+
 ![pan-tilt-toll](/assets//pan-tilt-roll.png)
 
 #### `moveSpeed`
@@ -235,7 +237,8 @@ Read real image size from XMP data, must be kept `true` if the panorama has been
 #### `panoData`
 - type: `object | function<Image, object>`
 
-Manually define cropping config (if `useXmpData` is `false` or no XMP tag is found).
+Overrides XMP data found in the panorama file (or simply defines it if `useXmpData=false`).
+All parameters are optional.
 
 ```js
 panoData: {
@@ -244,7 +247,10 @@ panoData: {
   croppedWidth: 4000,
   croppedHeight: 2000,
   croppedX: 1000,
-  croppedY: 500
+  croppedY: 500,
+  poseHeading: 270, // 0 to 360
+  posePitch: 0, // -90 to 90
+  poseRoll: 0, // -180 to 180
 }
 ```
 
@@ -260,6 +266,8 @@ panoData: (image) => ({
   croppedY     : image.width / 2 - image.height,
 })
 ```
+
+**Note** : if any of _poseHeading_, _posePitch_ or _poseRoll_ parameters are found, the `sphereCorrection` option is ignored.
 
 #### `canvasBackground`
 - type: `string`

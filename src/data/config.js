@@ -21,11 +21,7 @@ export const DEFAULTS = {
   defaultZoomLvl     : 50,
   defaultLong        : 0,
   defaultLat         : 0,
-  sphereCorrection   : {
-    pan : 0,
-    tilt: 0,
-    roll: 0,
-  },
+  sphereCorrection   : null,
   moveSpeed          : 1,
   zoomButtonIncrement: 2,
   autorotateDelay    : null,

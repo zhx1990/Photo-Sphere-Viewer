@@ -124,7 +124,10 @@ export {
  * @property {number} croppedWidth
  * @property {number} croppedHeight
  * @property {number} croppedX
- * @property {number} croppedX
+ * @property {number} croppedY
+ * @property {number} poseHeading
+ * @property {number} posePitch
+ * @property {number} poseRoll
  */
 
 /**

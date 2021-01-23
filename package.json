@@ -76,6 +76,7 @@
     "stylelint-config-standard": "^20.0.0",
     "stylelint-scss": "^3.13.0",
     "vue-material": "^1.0.0-beta-11",
+    "vue-slider-component": "^3.2.11",
     "vue-swatches": "^2.1.0",
     "vuepress": "^1.4.0",
     "vuepress-plugin-element-tabs": "^0.2.8"

@@ -22,8 +22,7 @@
       <div class="md-layout-item">
         <md-field>
           <label>Cropped Y</label>
-          <md-input name="croppedY" v-model="panoData.croppedY" type="number" min="0" :disabled="loading"
-                    v-on:change="setValue"/>
+          <md-input name="croppedY" v-model="panoData.croppedY" type="number" min="0" :disabled="loading"/>
         </md-field>
       </div>
     </div>
@@ -45,13 +44,32 @@
       <div class="md-layout-item">
         <md-field>
           <label>Cropped X</label>
-          <md-input name="croppedX" v-model="panoData.croppedX" type="number" min="0" :disabled="loading"
-                    v-on:change="setValue"/>
+          <md-input name="croppedX" v-model="panoData.croppedX" type="number" min="0" :disabled="loading"/>
         </md-field>
       </div>
     </div>
 
-    <md-button class="md-raised md-primary" :disabled="loading" v-on:click="apply">Apply</md-button>
+    <div class="md-layout md-gutter">
+      <div class="md-layout-item">
+        <label class="md-caption">Pose Heading</label>
+        <vue-slider v-model="panoData.poseHeading" min="0" max="360" :marks="[0,90,180,270,360]" :drag-on-click="true"
+                    :disabled="oading"/>
+      </div>
+      <div class="md-layout-item">
+        <label class="md-caption">Pose Pitch</label>
+        <vue-slider v-model="panoData.posePitch" min="-90" max="90" :marks="[-90,0,90]" :drag-on-click="true"
+                    :disabled="loading"/>
+      </div>
+      <div class="md-layout-item">
+        <label class="md-caption">Pose Roll</label>
+        <vue-slider v-model="panoData.poseRoll" min="-180" max="180" :marks="[-180,-90,0,90,180]" :drag-on-click="true"
+                    :disabled="loading"/>
+      </div>
+    </div>
+
+    <div style="margin-top: 30px">
+      <md-button class="md-raised md-dense md-primary" :disabled="loading" v-on:click="apply">Apply</md-button>
+    </div>
 
     <Tabs v-show="!loading" type="border-card">
       <Tab label="Preview">
@@ -84,6 +102,9 @@
         croppedHeight: null,
         croppedX     : null,
         croppedY     : null,
+        poseHeading  : null,
+        posePitch    : null,
+        poseRoll     : null,
       }
     }),
     beforeDestroy() {
@@ -114,7 +135,8 @@
           };
 
           reader.readAsDataURL(files[0]);
-        } else {
+        }
+        else {
           this.imageData = null;
         }
       },
@@ -122,7 +144,8 @@
       setValue(e) {
         if (e.target.name === 'fullWidth') {
           this.panoData.fullHeight = Math.round(this.panoData.fullWidth / 2);
-        } else if (e.target.name === 'fullHeight') {
+        }
+        else if (e.target.name === 'fullHeight') {
           this.panoData.fullWidth = this.panoData.fullHeight * 2;
         }
       },
@@ -145,6 +168,9 @@
         this.panoData.croppedHeight = height;
         this.panoData.croppedX = croppedX;
         this.panoData.croppedY = croppedY;
+        this.panoData.poseHeading = 0;
+        this.panoData.posePitch = 0;
+        this.panoData.poseRoll = 0;
       },
 
       updateOutput() {
@@ -159,6 +185,9 @@
       <GPano:CroppedAreaImageHeightPixels>${this.panoData.croppedHeight}</GPano:CroppedAreaImageHeightPixels>
       <GPano:CroppedAreaLeftPixels>${this.panoData.croppedX}</GPano:CroppedAreaLeftPixels>
       <GPano:CroppedAreaTopPixels>${this.panoData.croppedY}</GPano:CroppedAreaTopPixels>
+      <GPano:PoseHeadingDegrees>${this.panoData.poseHeading}</GPano:PoseHeadingDegrees>
+      <GPano:PosePitchDegrees>${this.panoData.posePitch}</GPano:PosePitchDegrees>
+      <GPano:PoseRollDegrees>${this.panoData.poseRoll}</GPano:PoseRollDegrees>
     </rdf:Description>
   </rdf:RDF>
 </x:xmpmeta>
@@ -173,7 +202,7 @@
         this.psv = new Viewer({
           panorama  : this.imageData,
           container : 'viewer',
-          loadingImg: '/assets/photosphere-logo.gif',
+          loadingImg: 'https://photo-sphere-viewer.js.org/assets/photosphere-logo.gif',
           panoData  : this.panoData,
           navbar    : ['zoom', 'fullscreen'],
           size      : {

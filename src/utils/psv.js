@@ -16,19 +16,21 @@ export function logWarn(message) {
  * @memberOf PSV.utils
  * @param {string} data
  * @param {string} attr
- * @returns (string)
+ * @returns (number)
  */
 export function getXMPValue(data, attr) {
   // XMP data are stored in children
   let result = data.match('<GPano:' + attr + '>(.*)</GPano:' + attr + '>');
   if (result !== null) {
-    return result[1];
+    const val = parseInt(result[1], 10);
+    return isNaN(val) ? null : val;
   }
 
   // XMP data are stored in attributes
   result = data.match('GPano:' + attr + '="(.*?)"');
   if (result !== null) {
-    return result[1];
+    const val = parseInt(result[1], 10);
+    return isNaN(val) ? null : val;
   }
 
   return null;

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { CUBE_HASHMAP, CUBE_MAP } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { PSVError } from '../PSVError';
-import { getXMPValue, logWarn, sum } from '../utils';
+import { firstNonNull, getXMPValue, logWarn, sum } from '../utils';
 import { AbstractService } from './AbstractService';
 
 /**
@@ -179,7 +179,6 @@ export class TextureLoader extends AbstractService {
    * @private
    */
   __loadEquirectangularTexture(panorama, newPanoData) {
-    /* eslint no-shadow: ["error", {allow: ["newPanoData"]}] */
     if (this.prop.isCubemap === true) {
       throw new PSVError('The viewer was initialized with an cubemap, cannot switch to equirectangular panorama.');
     }
@@ -187,25 +186,28 @@ export class TextureLoader extends AbstractService {
     this.prop.isCubemap = false;
 
     return (
-      newPanoData || !this.config.useXmpData
+      !this.config.useXmpData
         ? this.__loadImage(panorama, p => this.psv.loader.setProgress(p))
-          .then(img => ({ img, newPanoData }))
+          .then(img => ({ img: img, xmpPanoData: null }))
         : this.__loadXMP(panorama, p => this.psv.loader.setProgress(p))
-          .then(newPanoData => this.__loadImage(panorama).then(img => ({ img, newPanoData })))
+          .then(xmpPanoData => this.__loadImage(panorama).then(img => ({ img, xmpPanoData })))
     )
-      .then(({ img, newPanoData }) => {
+      .then(({ img, xmpPanoData }) => {
         if (typeof newPanoData === 'function') {
           // eslint-disable-next-line no-param-reassign
           newPanoData = newPanoData(img);
         }
 
-        const panoData = newPanoData || {
-          fullWidth    : img.width,
-          fullHeight   : img.height,
-          croppedWidth : img.width,
-          croppedHeight: img.height,
-          croppedX     : 0,
-          croppedY     : 0,
+        const panoData = {
+          fullWidth    : firstNonNull(newPanoData?.fullWidth, xmpPanoData?.fullWidth, img.width),
+          fullHeight   : firstNonNull(newPanoData?.fullHeight, xmpPanoData?.fullHeight, img.height),
+          croppedWidth : firstNonNull(newPanoData?.croppedWidth, xmpPanoData?.croppedWidth, img.width),
+          croppedHeight: firstNonNull(newPanoData?.croppedHeight, xmpPanoData?.croppedHeight, img.height),
+          croppedX     : firstNonNull(newPanoData?.croppedX, xmpPanoData?.croppedX, 0),
+          croppedY     : firstNonNull(newPanoData?.croppedY, xmpPanoData?.croppedY, 0),
+          poseHeading  : firstNonNull(newPanoData?.poseHeading, xmpPanoData?.poseHeading),
+          posePitch    : firstNonNull(newPanoData?.posePitch, xmpPanoData?.posePitch),
+          poseRoll     : firstNonNull(newPanoData?.poseRoll, xmpPanoData?.poseRoll),
         };
 
         if (panoData.croppedWidth !== img.width || panoData.croppedHeight !== img.height) {
@@ -234,25 +236,22 @@ export class TextureLoader extends AbstractService {
         const a = binary.indexOf('<x:xmpmeta');
         const b = binary.indexOf('</x:xmpmeta>');
         const data = binary.substring(a, b);
-        let panoData = null;
 
         if (a !== -1 && b !== -1 && data.indexOf('GPano:') !== -1) {
-          panoData = {
-            fullWidth    : parseInt(getXMPValue(data, 'FullPanoWidthPixels'), 10),
-            fullHeight   : parseInt(getXMPValue(data, 'FullPanoHeightPixels'), 10),
-            croppedWidth : parseInt(getXMPValue(data, 'CroppedAreaImageWidthPixels'), 10),
-            croppedHeight: parseInt(getXMPValue(data, 'CroppedAreaImageHeightPixels'), 10),
-            croppedX     : parseInt(getXMPValue(data, 'CroppedAreaLeftPixels'), 10),
-            croppedY     : parseInt(getXMPValue(data, 'CroppedAreaTopPixels'), 10),
+          return {
+            fullWidth    : getXMPValue(data, 'FullPanoWidthPixels'),
+            fullHeight   : getXMPValue(data, 'FullPanoHeightPixels'),
+            croppedWidth : getXMPValue(data, 'CroppedAreaImageWidthPixels'),
+            croppedHeight: getXMPValue(data, 'CroppedAreaImageHeightPixels'),
+            croppedX     : getXMPValue(data, 'CroppedAreaLeftPixels'),
+            croppedY     : getXMPValue(data, 'CroppedAreaTopPixels'),
+            poseHeading  : getXMPValue(data, 'PoseHeadingDegrees'),
+            posePitch    : getXMPValue(data, 'PosePitchDegrees'),
+            poseRoll     : getXMPValue(data, 'PoseRollDegrees'),
           };
-
-          if (!panoData.fullWidth || !panoData.fullHeight || !panoData.croppedWidth || !panoData.croppedHeight) {
-            logWarn('invalid XMP data');
-            panoData = null;
-          }
         }
 
-        return panoData;
+        return null;
       });
   }
 

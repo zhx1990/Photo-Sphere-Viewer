@@ -276,9 +276,12 @@ describe('utils:psv:getXMPValue', () => {
       getXMPValue(data, 'CroppedAreaImageWidthPixels'),
       getXMPValue(data, 'CroppedAreaImageHeightPixels'),
       getXMPValue(data, 'CroppedAreaLeftPixels'),
-      getXMPValue(data, 'CroppedAreaTopPixels')
+      getXMPValue(data, 'CroppedAreaTopPixels'),
+      getXMPValue(data, 'PoseHeadingDegrees'),
+      getXMPValue(data, 'PosePitchDegrees'),
+      getXMPValue(data, 'PoseRollDegrees'),
     ], [
-      '5376', '2688', '5376', '2688', '0', '0'
+      5376, 2688, 5376, 2688, 0, 0, 270, 0, 0
     ])
   });
 
@@ -302,9 +305,12 @@ describe('utils:psv:getXMPValue', () => {
       getXMPValue(data, 'CroppedAreaImageWidthPixels'),
       getXMPValue(data, 'CroppedAreaImageHeightPixels'),
       getXMPValue(data, 'CroppedAreaLeftPixels'),
-      getXMPValue(data, 'CroppedAreaTopPixels')
+      getXMPValue(data, 'CroppedAreaTopPixels'),
+      getXMPValue(data, 'PoseHeadingDegrees'),
+      getXMPValue(data, 'PosePitchDegrees'),
+      getXMPValue(data, 'PoseRollDegrees'),
     ], [
-      '5376', '2688', '5376', '2688', '0', '0'
+      5376, 2688, 5376, 2688, 0, 0, 270, 0, 0
     ])
   });
 

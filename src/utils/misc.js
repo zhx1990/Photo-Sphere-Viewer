@@ -182,3 +182,28 @@ export function each(object, callback) {
 export function intersect(array1, array2) {
   return array1.filter(value => array2.indexOf(value) !== -1);
 }
+
+/**
+ * @summary Returns if a valu is null or undefined
+ * @param {*} val
+ * @return {boolean}
+ */
+export function isNil(val) {
+  return val === null || val === undefined;
+}
+
+/**
+ * @summary Returns the first non null non undefined parameter
+ * @memberOf PSV.utils
+ * @param {*} values
+ * @return {*}
+ */
+export function firstNonNull(...values) {
+  for (const val of values) {
+    if (!isNil(val)) {
+      return val;
+    }
+  }
+
+  return undefined;
+}

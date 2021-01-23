@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Animation } from '../Animation';
 import { CUBE_VERTICES, EVENTS, SPHERE_RADIUS, SPHERE_VERTICES } from '../data/constants';
 import { SYSTEM } from '../data/system';
-import { logWarn } from '../utils';
+import { isNil, logWarn } from '../utils';
 import { AbstractService } from './AbstractService';
 
 /**
@@ -203,18 +203,38 @@ export class Renderer extends AbstractService {
 
   /**
    * @summary Apply a SphereCorrection to a Mesh
-   * @param {PSV.SphereCorrection} sphereCorrection
+   * @param {PSV.PanoData} [panoData]
+   * @param {PSV.SphereCorrection} [sphereCorrection]
    * @param {external:THREE.Mesh} [mesh=this.mesh]
    * @package
    */
-  setSphereCorrection(sphereCorrection, mesh = this.mesh) {
-    const cleanCorrection = this.psv.dataHelper.cleanSphereCorrection(sphereCorrection);
+  setSphereCorrection(panoData, sphereCorrection, mesh = this.mesh) {
+    if (!isNil(panoData?.poseHeading) || !isNil(panoData?.posePitch) || !isNil(panoData?.poseRoll)) {
+      // By Google documentation the angles are applied on the camera in order : heading, pitch, roll
+      // here we apply the reverse transformation on the sphere
+      mesh.rotation.set(
+        -THREE.Math.degToRad(panoData?.posePitch || 0),
+        -THREE.Math.degToRad(panoData?.poseHeading || 0),
+        -THREE.Math.degToRad(panoData?.poseRoll || 0),
+        'ZXY'
+      );
 
-    mesh.rotation.set(
-      cleanCorrection.tilt,
-      cleanCorrection.pan,
-      cleanCorrection.roll
-    );
+      if (sphereCorrection) {
+        logWarn('sphereCorrection was ignored because panoData already contains pose angles.');
+      }
+    }
+    else if (sphereCorrection) {
+      const cleanCorrection = this.psv.dataHelper.cleanSphereCorrection(sphereCorrection);
+
+      mesh.rotation.set(
+        cleanCorrection.tilt,
+        cleanCorrection.pan,
+        cleanCorrection.roll
+      );
+    }
+    else {
+      mesh.rotation.set(0, 0, 0);
+    }
   }
 
   /**
@@ -299,7 +319,7 @@ export class Renderer extends AbstractService {
    * @package
    */
   transition(textureData, options) {
-    const { texture } = textureData;
+    const { texture, panoData } = textureData;
 
     let positionProvided = this.psv.dataHelper.isExtendedPosition(options);
     const zoomProvided = 'zoom' in options;
@@ -327,9 +347,7 @@ export class Renderer extends AbstractService {
       mesh.material.transparent = true;
       mesh.material.opacity = 0;
 
-      if (options.sphereCorrection) {
-        this.setSphereCorrection(options.sphereCorrection, mesh);
-      }
+      this.setSphereCorrection(panoData, options.sphereCorrection, mesh);
     }
 
     // rotate the new sphere to make the target position face the camera
@@ -387,11 +405,8 @@ export class Renderer extends AbstractService {
         mesh.geometry.dispose();
         mesh.geometry = null;
 
-        if (options.sphereCorrection) {
-          this.setSphereCorrection(options.sphereCorrection);
-        }
-        else {
-          this.setSphereCorrection({});
+        if (!this.prop.isCubemap) {
+          this.setSphereCorrection(panoData, options.sphereCorrection);
         }
 
         // actually rotate the camera
