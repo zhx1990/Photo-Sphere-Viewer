@@ -13,8 +13,8 @@ export function greatArcIntermediaryPoint(p1, p2, f) {
   const [λ1, φ1] = p1;
   const [λ2, φ2] = p2;
 
-  const r = utils.greatArcDistance(p1, p2) * CONSTANTS.SPHERE_RADIUS;
-  const a = Math.sin((1 - f) * r) / Math.sin(r / CONSTANTS.SPHERE_RADIUS);
+  const r = utils.greatArcDistance(p1, p2);
+  const a = Math.sin((1 - f) * r) / Math.sin(r);
   const b = Math.sin(f * r) / Math.sin(r);
   const x = a * Math.cos(φ1) * Math.cos(λ1) + b * Math.cos(φ2) * Math.cos(λ2);
   const y = a * Math.cos(φ1) * Math.sin(λ1) + b * Math.cos(φ2) * Math.sin(λ2);
@@ -34,8 +34,23 @@ export function greatArcIntermediaryPoint(p1, p2, f) {
  * @private
  */
 export function getPolygonCenter(polygon) {
-  const sum = polygon.reduce((intermediary, point) => [intermediary[0] + point[0], intermediary[1] + point[1]]);
-  return [sum[0] / polygon.length, sum[1] / polygon.length];
+  // apply offsets to avoid crossing the origin
+  const workPoints = [polygon[0]];
+
+  let k = 0;
+  for (let i = 1; i < polygon.length; i++) {
+    const d = polygon[i - 1][0] - polygon[i][0];
+    if (d > Math.PI) { // crossed the origin left to right
+      k += 1;
+    }
+    else if (d < -Math.PI) { // crossed the origin right to left
+      k -= 1;
+    }
+    workPoints.push([polygon[i][0] + k * 2 * Math.PI, polygon[i][1]]);
+  }
+
+  const sum = workPoints.reduce((intermediary, point) => [intermediary[0] + point[0], intermediary[1] + point[1]]);
+  return [utils.parseAngle(sum[0] / polygon.length), sum[1] / polygon.length];
 }
 
 /**
@@ -59,14 +74,14 @@ export function getPolylineCenter(polyline) {
   // iterate until length / 2
   let consumed = 0;
 
-  for (let i = 0; i < polyline.length - 1; i++) {
+  for (let j = 0; j < polyline.length - 1; j++) {
     // once the segment containing the middle point is found, computes the intermediary point
-    if (consumed + lengths[i] > length / 2) {
-      const r = (length / 2 - consumed) / lengths[i];
-      return greatArcIntermediaryPoint(polyline[i], polyline[i + 1], r);
+    if (consumed + lengths[j] > length / 2) {
+      const r = (length / 2 - consumed) / lengths[j];
+      return greatArcIntermediaryPoint(polyline[j], polyline[j + 1], r);
     }
 
-    consumed += lengths[i];
+    consumed += lengths[j];
   }
 
   // this never happens

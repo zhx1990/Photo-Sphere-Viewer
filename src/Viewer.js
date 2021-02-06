@@ -22,6 +22,7 @@ import {
   exitFullscreen,
   getAngle,
   getShortestArc,
+  isExtendedPosition,
   isFullscreenEnabled,
   requestFullscreen,
   throttle,
@@ -458,7 +459,7 @@ export class Viewer extends EventEmitter {
       options.showLoader = true;
     }
 
-    const positionProvided = this.dataHelper.isExtendedPosition(options);
+    const positionProvided = isExtendedPosition(options);
     const zoomProvided = 'zoom' in options;
 
     if (positionProvided || zoomProvided) {
@@ -712,7 +713,7 @@ export class Viewer extends EventEmitter {
   animate(options) {
     this.__stopAll();
 
-    const positionProvided = this.dataHelper.isExtendedPosition(options);
+    const positionProvided = isExtendedPosition(options);
     const zoomProvided = 'zoom' in options;
 
     const animProperties = {};

@@ -12,6 +12,18 @@ export function logWarn(message) {
 }
 
 /**
+ * @summary Checks if an object is a {PSV.ExtendedPosition}, ie has x/y or longitude/latitude
+ * @memberOf PSV.utils
+ * @param {object} object
+ * @returns {boolean}
+ */
+export function isExtendedPosition(object) {
+  return [['x', 'y'], ['longitude', 'latitude']].some(([key1, key2]) => {
+    return object[key1] !== undefined && object[key2] !== undefined;
+  });
+}
+
+/**
  * @summary Returns the value of a given attribute in the panorama metadata
  * @memberOf PSV.utils
  * @param {string} data

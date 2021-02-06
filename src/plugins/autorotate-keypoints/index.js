@@ -112,7 +112,7 @@ export default class AutorotateKeypointsPlugin extends AbstractPlugin {
           // eslint-disable-next-line no-param-reassign
           pt = { markerId: pt };
         }
-        else if (this.psv.dataHelper.isExtendedPosition(pt)) {
+        else if (utils.isExtendedPosition(pt)) {
           // eslint-disable-next-line no-param-reassign
           pt = { position: pt };
         }

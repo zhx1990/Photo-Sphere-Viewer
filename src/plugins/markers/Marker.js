@@ -44,16 +44,6 @@ export class Marker {
       throw new PSVError('missing marker id');
     }
 
-    if (properties.image && (!properties.width || !properties.height)) {
-      throw new PSVError('missing marker width/height');
-    }
-
-    if (properties.image || properties.html) {
-      if ((!('x' in properties) || !('y' in properties)) && (!('latitude' in properties) || !('longitude' in properties))) {
-        throw new PSVError('missing marker position, latitude/longitude or x/y');
-      }
-    }
-
     /**
      * @member {PSV.Viewer}
      * @readonly
@@ -330,7 +320,7 @@ export class Marker {
   /**
    * @summary Updates the marker with new properties
    * @param {PSV.plugins.MarkersPlugin.Properties} properties
-   * @throws {PSV.PSVError} when trying to change the marker's type
+   * @throws {PSV.PSVError} when the configuration is incorrect
    */
   update(properties) {
     const newType = Marker.getType(properties, true);
@@ -390,6 +380,14 @@ export class Marker {
    * @private
    */
   __updateNormal() {
+    if (!utils.isExtendedPosition(this.config)) {
+      throw new PSVError('missing marker position, latitude/longitude or x/y');
+    }
+
+    if (this.config.image && (!this.config.width || !this.config.height)) {
+      throw new PSVError('missing marker width/height');
+    }
+
     if (this.config.width && this.config.height) {
       this.props.dynamicSize = false;
       this.props.width = this.config.width;
@@ -425,6 +423,10 @@ export class Marker {
    * @private
    */
   __updateSvg() {
+    if (!utils.isExtendedPosition(this.config)) {
+      throw new PSVError('missing marker position, latitude/longitude or x/y');
+    }
+
     this.props.dynamicSize = true;
 
     // set content

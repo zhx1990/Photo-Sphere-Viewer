@@ -171,17 +171,6 @@ export class DataHelper extends AbstractService {
   }
 
   /**
-   * @summary Checks if an object is a {PSV.ExtendedPosition}, ie has x/y or longitude/latitude
-   * @param {object} object
-   * @returns {boolean}
-   */
-  isExtendedPosition(object) {
-    return [['x', 'y'], ['longitude', 'latitude']].some(([key1, key2]) => {
-      return key1 in object && key2 in object;
-    });
-  }
-
-  /**
    * @summary Converts x/y to latitude/longitude if present and ensure boundaries
    * @param {PSV.ExtendedPosition} position
    * @returns {PSV.Position}

@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Animation } from '../Animation';
 import { CUBE_VERTICES, EVENTS, SPHERE_RADIUS, SPHERE_VERTICES } from '../data/constants';
 import { SYSTEM } from '../data/system';
-import { isNil, logWarn } from '../utils';
+import { isExtendedPosition, isNil, logWarn } from '../utils';
 import { AbstractService } from './AbstractService';
 
 /**
@@ -321,7 +321,7 @@ export class Renderer extends AbstractService {
   transition(textureData, options) {
     const { texture, panoData } = textureData;
 
-    let positionProvided = this.psv.dataHelper.isExtendedPosition(options);
+    let positionProvided = isExtendedPosition(options);
     const zoomProvided = 'zoom' in options;
 
     let mesh;
