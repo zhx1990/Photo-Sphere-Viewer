@@ -52,17 +52,17 @@
     <div class="md-layout md-gutter">
       <div class="md-layout-item">
         <label class="md-caption">Pose Heading</label>
-        <vue-slider v-model="panoData.poseHeading" min="0" max="360" :marks="[0,90,180,270,360]" :drag-on-click="true"
+        <vue-slider v-model="panoData.poseHeading" :min="0" :max="360" :marks="[0,90,180,270,360]" :drag-on-click="true"
                     :disabled="oading"/>
       </div>
       <div class="md-layout-item">
         <label class="md-caption">Pose Pitch</label>
-        <vue-slider v-model="panoData.posePitch" min="-90" max="90" :marks="[-90,0,90]" :drag-on-click="true"
+        <vue-slider v-model="panoData.posePitch" :min="-90" :max="90" :marks="[-90,0,90]" :drag-on-click="true"
                     :disabled="loading"/>
       </div>
       <div class="md-layout-item">
         <label class="md-caption">Pose Roll</label>
-        <vue-slider v-model="panoData.poseRoll" min="-180" max="180" :marks="[-180,-90,0,90,180]" :drag-on-click="true"
+        <vue-slider v-model="panoData.poseRoll" :min="-180" :max="180" :marks="[-180,-90,0,90,180]" :drag-on-click="true"
                     :disabled="loading"/>
       </div>
     </div>

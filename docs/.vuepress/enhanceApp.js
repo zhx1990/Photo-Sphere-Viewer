@@ -1,9 +1,10 @@
 import { MdButton, MdCheckbox, MdField } from 'vue-material/dist/components';
 import VSwatches from 'vue-swatches';
-import VueSlider from 'vue-slider-component'
+import VueSlider from 'vue-slider-component/dist-css/vue-slider-component.umd.min';
 
 import 'vue-material/dist/theme/default.css'
 import 'vue-material/dist/vue-material.min.css'
+import 'vue-slider-component/dist-css/vue-slider-component.css';
 import 'vue-slider-component/theme/antd.css'
 import 'vue-swatches/dist/vue-swatches.css';
 
