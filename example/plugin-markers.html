@@ -100,6 +100,10 @@
     <pattern id="points" x="10" y="10" width="15" height="15" patternUnits="userSpaceOnUse">
       <circle cx="10" cy="10" r="0.8" style="stroke: none; fill: red"/>
     </pattern>
+    <pattern id="image" x="256" y="256" width="512" height="512" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="512" height="512" fill="#8DC73F"/>
+      <image href="test-cubemap/2.png" x="128" y="128" width="256" height="256"/>
+    </pattern>
   </defs>
 </svg>
 
@@ -183,16 +187,10 @@
           });
 
           a.push({
-            id        : 'polygon',
-            content   : 'This mountain is so great it has dots on it!',
+            id        : 'polygon-1',
             polygonPx: [
               [2941, 1413],
               [3042, 1402],
-              [3222, 1419],
-              [3433, 1463],
-              [3480, 1505],
-              [3438, 1538],
-              [3241, 1543],
               [3041, 1555],
               [2854, 1559],
               [2739, 1516],
@@ -200,12 +198,35 @@
               [2941, 1413],
             ],
             svgStyle  : {
-              fill       : 'url(#points)', //'rgba(255,0,0,0.3)',
+              fill       : 'rgba(255,0,0,0.2)',
               stroke     : 'rgba(255, 0, 50, 0.8)',
               strokeWidth: '2px',
             },
             tooltip   : {
-              content : 'This is a mountain',
+              content : 'Simple polygon',
+              position: 'right bottom',
+            },
+          });
+
+          a.push({
+            id        : 'polygon-2',
+            polygonPx: [
+              [3042, 1402],
+              [3222, 1419],
+              [3433, 1463],
+              [3480, 1505],
+              [3438, 1538],
+              [3241, 1543],
+              [3041, 1555],
+            ],
+            svgStyle  : {
+              fill       : 'url(#image)',
+              fillOpacity: '0.5',
+              stroke     : 'rgba(255, 0, 50, 0.8)',
+              strokeWidth: '2px',
+            },
+            tooltip   : {
+              content : 'Polygon with image background',
               position: 'right bottom',
             },
           });
@@ -219,7 +240,7 @@
               strokeLinejoin: 'round',
               strokeWidth   : '20px',
             },
-            tooltip   : 'This is a track',
+            tooltip   : 'Polyline',
           });
 
           a.push({

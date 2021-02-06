@@ -59,87 +59,42 @@ The following example contains all types of markers. Click anywhere on the panor
 
 One of these options is required.
 
-#### `image`
-- type : `string`
+| Name | Type | Description |
+|---|---|---|
+| `image` | `string` | Path to the image representing the marker. Requires `width` and `height` to be defined. |
+| `html` | `string` | HTML content of the marker. It is recommended to define `width` and `height`. |
+| `rect` | `integer[2] |`<br>`{width:int,height:int}` | Size of the rectangle. |
+| `circle` | `integer` | Radius of the circle. |
+| `ellipse` | `integer[2] |`<br>`{cx:int,cy:int}` | Radiuses of the ellipse. |
+| `path` | `string` | Definition of the path (0,0 will be placed at the defined x/y or longitude/latitude). |
+| `polygonPx` | `integer[2][]` |Array of points defining the polygon in pixel coordinates on the panorama image. |
+| `polygonRad` | `double[2][]` | Same as above but coordinates are in longitude and latitude. |
+| `polylinePx` | `integer[2][]` | Same as `polygonPx` but generates a polyline. |
+| `polylineRad` | `double[2][]` | Same as `polygonRad` but generates a polyline. |
 
-Path to the image representing the marker. Requires `width` and `height` to be defined.
-
-#### `html`
-- type : `string`
-
-HTML content of the marker. It is recommended to define `width` and `height`.
-
-#### `rect`
-- type : `integer[2] | {width: integer, height: integer}`
-
-Size of the rectangle.
-
-```js
-rect: [10, 5]
-
-rect: {width: 10, height: 5}
-```
-
-#### `circle`
-- type: `integer`
-
-Radius of the circle.
-
-#### `ellipse`
-- type : `integer[2] | {cx: integer, cy: integer}`
-
-Radiuses of the ellipse.
+#### Examples :
 
 ```js
-ellipse: [10, 5]
-
-ellipse: {cx: 10, cy: 5}
-```
-
-#### `path`
-- type : `string`
-
-Definition of the path (0,0 will be placed at the defined x/y or longitude/latitude).
-
-```js
-path: 'M 0 0 L 60 60 L 60 0 L 0 60 L 0 0'
-```
-
-#### `polygonRad`
-- type : `double[2][]`
-
-Same as above but coordinates are in longitude and latitude.
-
-```js
-polygonRad: [[0.2, 0.4], [0.9, 1.1], [1.5, 0.7]]
-```
-
-#### `polygonPx`
-- type : `integer[2][]`
-
-Array of points defining the polygon in pixel coordinates on the panorama image.
-
-```js
-polygonPx: [[100, 200], [150, 300], [300, 200]]
+{
+  image: 'pin-red.png',
+  html: 'Click here',
+  rect: [10, 5],
+  rect: {width: 10, height: 5},
+  circle: 10,
+  ellipse: [10, 5],
+  ellipse: {cx: 10, cy: 5},
+  path: 'M 0 0 L 60 60 L 60 0 L 0 60 L 0 0',
+  polygonPx: [[100, 200], [150, 300], [300, 200]],
+  polygonRad: [[0.2, 0.4], [0.9, 1.1], [1.5, 0.7]],
+  polylinePx: [[100, 200], [150, 300]],
+  polylineRad: [[0.2, 0.4], [0.9, 1.1]],
+}
 ```
 
 ::: warning
 Texture coordinates are not applicable to cubemaps.
 :::
 
-#### `polylineRad`
-- type : `double[2][]`
-
-Same as `polygonRad` but generates a polyline.
-
-#### `polylinePx`
-- type : `integer[2][]`
-
-Same as `polygonPx` but generates a polyline.
-
-::: warning
-Texture coordinates are not applicable to cubemaps.
-:::
 
 
 ## Markers options
@@ -155,11 +110,7 @@ Unique identifier of the marker.
 Position of the marker in **texture coordinates** (pixels) or **spherical coordinates** (radians).
 _(This option is ignored for polygons and polylines)_
 
-::: warning
-Texture coordinates are not applicable to cubemaps.
-:::
-
-#### `width` & `height`
+#### `width` & `height` (required for images, recommended for html)
 - type : `integer`
 
 Size of the marker.
@@ -170,6 +121,7 @@ _(This option is ignored for polygons and polylines)_
 
 Scale factor multiplied by the zoom level. Provide an array of two values for min and max.
 By default the scale is constant.
+_(This option is ignored for polygons and polylines)_
 
 ```js
 scale: 1 // the marker is scalling with the zoom level (from 0 to 100%)
@@ -206,6 +158,25 @@ svgStyle: {
   strokeWidth: '2px'
 }
 ```
+
+::: tip Image and pattern background
+You can define complex SVG backgrounds such as images by using a pattern definition.
+
+First declare the pattern somewhere in your page :
+
+```html
+<svg id="patterns">
+  <defs>
+    <!-- define pattern origin on its center -->
+    <pattern id="image" x="256" y="256" width="512" height="512" patternUnits="userSpaceOnUse">
+      <image href="my-image.jpg" x="0" y="0" width="512" height="512"/>
+    </pattern>
+  </defs>
+</svg>
+```
+
+And use it in your marker : `fill: 'url(#image)'`.
+:::
 
 #### `anchor`
 - type : `string`

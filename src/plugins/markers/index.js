@@ -578,11 +578,13 @@ export default class MarkersPlugin extends AbstractPlugin {
         isVisible = positions.length > (marker.isPolygon() ? 2 : 1);
 
         if (isVisible) {
-          marker.props.position2D = this.__getMarkerPosition(marker);
+          const position = this.__getMarkerPosition(marker);
+          marker.props.position2D = position;
 
-          const points = positions.map(pos => pos.x + ',' + pos.y).join(' ');
+          const points = positions.map(pos => (pos.x - position.x) + ',' + (pos.y - position.y)).join(' ');
 
           marker.$el.setAttributeNS(null, 'points', points);
+          marker.$el.setAttributeNS(null, 'transform', `translate(${position.x} ${position.y})`);
         }
       }
       else if (isVisible) {
