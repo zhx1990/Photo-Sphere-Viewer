@@ -152,7 +152,7 @@ export const EVENTS = {
   /**
    * @event close-panel
    * @memberof PSV
-   * @summary Trigered when the panel is closed
+   * @summary Triggered when the panel is closed
    * @param {string} [id]
    */
   CLOSE_PANEL       : 'close-panel',
@@ -180,20 +180,20 @@ export const EVENTS = {
   /**
    * @event hide-notification
    * @memberof PSV
-   * @summary Trigered when the notification is hidden
+   * @summary Triggered when the notification is hidden
    */
   HIDE_NOTIFICATION : 'hide-notification',
   /**
    * @event hide-overlay
    * @memberof PSV
-   * @summary Trigered when the overlay is hidden
+   * @summary Triggered when the overlay is hidden
    * @param {string} [id]
    */
   HIDE_OVERLAY      : 'hide-overlay',
   /**
    * @event hide-tooltip
    * @memberof PSV
-   * @summary Trigered when the tooltip is hidden
+   * @summary Triggered when the tooltip is hidden
    * @param {*} Data associated to this tooltip
    */
   HIDE_TOOLTIP      : 'hide-tooltip',
@@ -232,20 +232,20 @@ export const EVENTS = {
   /**
    * @event show-notification
    * @memberof PSV
-   * @summary Trigered when the notification is shown
+   * @summary Triggered when the notification is shown
    */
   SHOW_NOTIFICATION : 'show-notification',
   /**
    * @event show-overlay
    * @memberof PSV
-   * @summary Trigered when the overlay is shown
+   * @summary Triggered when the overlay is shown
    * @param {string} [id]
    */
   SHOW_OVERLAY      : 'show-overlay',
   /**
    * @event show-tooltip
    * @memberof PSV
-   * @summary Trigered when the tooltip is shown
+   * @summary Triggered when the tooltip is shown
    * @param {*} Data associated to this tooltip
    * @param {PSV.components.Tooltip} Instance of the tooltip
    */

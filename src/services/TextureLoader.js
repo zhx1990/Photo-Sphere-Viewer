@@ -76,6 +76,7 @@ export class TextureLoader extends AbstractService {
 
   /**
    * @summary Cancels current HTTP requests
+   * @package
    */
   abortLoading() {
     [...this.requests].forEach(r => r.abort());
@@ -375,7 +376,7 @@ export class TextureLoader extends AbstractService {
 
   /**
    * @summary Preload a panorama file without displaying it
-   * @param {string} panorama
+   * @param {string|string[]|PSV.Cubemap} panorama
    * @returns {Promise}
    */
   preloadPanorama(panorama) {

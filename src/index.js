@@ -93,6 +93,20 @@ export {
  */
 
 /**
+ * @typedef {Object} PSV.PanoData
+ * @summary Crop information of the panorama
+ * @property {number} fullWidth
+ * @property {number} fullHeight
+ * @property {number} croppedWidth
+ * @property {number} croppedHeight
+ * @property {number} croppedX
+ * @property {number} croppedY
+ * @property {number} poseHeading
+ * @property {number} posePitch
+ * @property {number} poseRoll
+ */
+
+/**
  * @callback PanoDataProvider
  * @summary Function to compute panorama data once the image is loaded
  * @memberOf PSV
@@ -114,20 +128,6 @@ export {
  * @summary Result of the {@link PSV.TextureLoader#loadTexture} method
  * @property {external:THREE.Texture|external:THREE.Texture[]} texture
  * @property {PSV.PanoData} [panoData]
- */
-
-/**
- * @typedef {Object} PSV.PanoData
- * @summary Crop information of the panorama
- * @property {number} fullWidth
- * @property {number} fullHeight
- * @property {number} croppedWidth
- * @property {number} croppedHeight
- * @property {number} croppedX
- * @property {number} croppedY
- * @property {number} poseHeading
- * @property {number} posePitch
- * @property {number} poseRoll
  */
 
 /**

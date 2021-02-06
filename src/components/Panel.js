@@ -127,7 +127,7 @@ export class Panel extends AbstractComponent {
 
   /**
    * @summary Shows the panel
-   * @param {Object} config
+   * @param {string|Object} config
    * @param {string} [config.id]
    * @param {string} config.content
    * @param {boolean} [config.noMargin=false]

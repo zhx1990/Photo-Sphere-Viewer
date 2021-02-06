@@ -1,5 +1,5 @@
 import { SYSTEM } from '../data/system';
-import { getStyle } from '../utils';
+import { bound, getStyle } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 
 /**
@@ -110,7 +110,7 @@ export class Loader extends AbstractComponent {
     context.arc(
       this.canvas.width / 2, this.canvas.height / 2,
       this.canvas.width / 2 - this.prop.tickness / 2,
-      -Math.PI / 2, value / 100 * 2 * Math.PI - Math.PI / 2
+      -Math.PI / 2, bound(value, 0, 100) / 100 * 2 * Math.PI - Math.PI / 2
     );
     context.stroke();
   }

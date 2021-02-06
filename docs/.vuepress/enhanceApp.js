@@ -5,7 +5,7 @@ import VueSlider from 'vue-slider-component/dist-css/vue-slider-component.umd.mi
 import 'vue-material/dist/theme/default.css'
 import 'vue-material/dist/vue-material.min.css'
 import 'vue-slider-component/dist-css/vue-slider-component.css';
-import 'vue-slider-component/theme/antd.css'
+import 'vue-slider-component/theme/material.css'
 import 'vue-swatches/dist/vue-swatches.css';
 
 export default ({ Vue, router }) => {
