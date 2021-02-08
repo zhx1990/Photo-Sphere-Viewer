@@ -7,7 +7,9 @@
 
 ## Example
 
-TODO
+This example displays a overlay at startup.
+
+<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/wxh27zt5/embedded/result,js/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 
 ## Methods
@@ -40,6 +42,10 @@ SVG image/icon displayed above the text.
 ### `hide([id])`
 
 Hide the overlay, without condition if `id` is not provided, or only if the last `show` was called with the same `id`.
+
+### `isVisible([id]): boolean`
+
+Check if the overlay is visible.
 
 
 ## Events

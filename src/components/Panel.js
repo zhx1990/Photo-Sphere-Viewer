@@ -129,11 +129,11 @@ export class Panel extends AbstractComponent {
   /**
    * @summary Shows the panel
    * @param {string|Object} config
-   * @param {string} [config.id] unique identifier to use with "hide" and to store the user desired width
-   * @param {string} config.content
-   * @param {boolean} [config.noMargin=false] removes default margins
-   * @param {string} [config.width] initial width, if not specified the default width will be used
-   * @param {Function} [config.clickHandler] called when the user clicks inside the panel
+   * @param {string} [config.id] - unique identifier to use with "hide" and to store the user desired width
+   * @param {string} config.content - HTML content of the panel
+   * @param {boolean} [config.noMargin=false] - remove the default margins
+   * @param {string} [config.width] - initial width, if not specified the default width will be used
+   * @param {Function} [config.clickHandler] - called when the user clicks inside the panel
    * @fires PSV.open-panel
    */
   show(config) {

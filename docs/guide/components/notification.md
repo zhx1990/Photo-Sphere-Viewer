@@ -7,7 +7,9 @@
 
 ## Example
 
-TODO
+This example consistently displays new notifications.
+
+<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/m8nxryc4/embedded/result,js/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 
 ## Methods
@@ -29,6 +31,10 @@ Auto-hide delay in milliseconds.
 ### `hide()`
 
 Hide the notification.
+
+### `isVisible(): boolean`
+
+Check if the notification is visible.
 
 
 ## Events

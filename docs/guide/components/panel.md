@@ -7,7 +7,9 @@
 
 ## Example
 
-TODO
+This example adds a custom button to toggle a panel.
+
+<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/9170wgfk/embedded/result,js/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 
 ## Methods
@@ -46,6 +48,10 @@ Function called when the user clicks inside the panel.
 ### `hide([id])`
 
 Hide the panel, without condition if `id` is not provided, or only if the last `show` was called with the same `id`.
+
+### `isVisible([id]): boolean`
+
+Check if the panel is opened.
 
 
 ## Events

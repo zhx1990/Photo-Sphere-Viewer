@@ -95,19 +95,12 @@ export class Overlay extends AbstractComponent {
   /**
    * @summary Displays an overlay on the viewer
    * @param {Object|string} config
-   * @param {string} [config.id]
-   * @param {string} config.image
-   * @param {string} config.text
-   * @param {string} [config.subtext]
-   * @param {boolean} [config.dissmisable=true]
+   * @param {string} [config.id] - unique identifier to use with "hide"
+   * @param {string} config.image - SVG image/icon displayed above the text
+   * @param {string} config.text - main message
+   * @param {string} [config.subtext] - secondary message
+   * @param {boolean} [config.dissmisable=true] - if the user can hide the overlay by clicking
    * @fires PSV.show-overlay
-   *
-   * @example
-   * viewer.showOverlay({
-   *   image: '<svg></svg>',
-   *   text: '....',
-   *   subtext: '....'
-   * })
    */
   show(config) {
     if (typeof config === 'string') {

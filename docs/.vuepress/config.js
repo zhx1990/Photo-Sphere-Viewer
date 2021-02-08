@@ -51,6 +51,7 @@ module.exports = {
                 'components/panel',
                 'components/notification',
                 'components/overlay',
+                'components/tooltip',
               ],
             },
           ],
