@@ -63,6 +63,7 @@ One of these options is required.
 |---|---|---|
 | `image` | `string` | Path to the image representing the marker. Requires `width` and `height` to be defined. |
 | `html` | `string` | HTML content of the marker. It is recommended to define `width` and `height`. |
+| `square` | `integer` | Size of the square. |
 | `rect` | `integer[2] |`<br>`{width:int,height:int}` | Size of the rectangle. |
 | `circle` | `integer` | Radius of the circle. |
 | `ellipse` | `integer[2] |`<br>`{cx:int,cy:int}` | Radiuses of the ellipse. |
@@ -78,6 +79,7 @@ One of these options is required.
 {
   image: 'pin-red.png',
   html: 'Click here',
+  square: 10,
   rect: [10, 5],
   rect: {width: 10, height: 5},
   circle: 10,

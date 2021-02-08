@@ -366,11 +366,11 @@ export default class MarkersPlugin extends AbstractPlugin {
 
   /**
    * @summary Removes a marker from the viewer
-   * @param {*} markerOrId
+   * @param {string} markerId
    * @param {boolean} [render=true] - renders the marker immediately
    */
-  removeMarker(markerOrId, render = true) {
-    const marker = this.getMarker(markerOrId);
+  removeMarker(markerId, render = true) {
+    const marker = this.getMarker(markerId);
 
     if (marker.isNormal()) {
       this.container.removeChild(marker.$el);
@@ -479,18 +479,6 @@ export default class MarkersPlugin extends AbstractPlugin {
   }
 
   /**
-   * @summary Toggles the visibility of markers list
-   */
-  toggleMarkersList() {
-    if (this.psv.panel.prop.contentId === MarkersPlugin.ID_PANEL_MARKERS_LIST) {
-      this.hideMarkersList();
-    }
-    else {
-      this.showMarkersList();
-    }
-  }
-
-  /**
    * @summary Opens the panel with the content of the marker
    * @param {string} markerId
    */
@@ -505,6 +493,18 @@ export default class MarkersPlugin extends AbstractPlugin {
     }
     else {
       this.psv.panel.hide(MarkersPlugin.ID_PANEL_MARKER);
+    }
+  }
+
+  /**
+   * @summary Toggles the visibility of markers list
+   */
+  toggleMarkersList() {
+    if (this.psv.panel.prop.contentId === MarkersPlugin.ID_PANEL_MARKERS_LIST) {
+      this.hideMarkersList();
+    }
+    else {
+      this.showMarkersList();
     }
   }
 
