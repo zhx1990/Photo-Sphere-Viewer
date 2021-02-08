@@ -30,11 +30,11 @@ viewer.once('ready', () => {
 
 This section describes the most useful methods available, remember to check the <ApiLink page="PSV.Viewer.html"/> for a full list.
 
-#### `destroy()`
+### `destroy()`
 
 Removes the viewer from the page and frees memory used by three.js.
 
-#### `animate(options): Animation`
+### `animate(options): Animation`
 
 Rotates and zooms the view with a smooth animation. You can change the position (`longitude`, `latitude` or `x`, `y`) and the zoom level (`zoom`). The `speed` option is either a duration in milliseconds or string containing the speed in revolutions per minute (`2rpm`) or degrees per second (`10dps`). It returns a `PSV.Animation` which is a standard Promise with an additional `cancel` method.
 
@@ -48,15 +48,15 @@ viewer.animate({
   .then(() => /* animation complete */);
 ```
 
-#### `getPosition(): Position`
+### `getPosition(): Position`
 
 Returns the current position of the view.
 
-#### `getZoomLevel(): number`
+### `getZoomLevel(): number`
 
 Returns the current zoom level between 0 and 100.
 
-#### `rotate(position)`
+### `rotate(position)`
 
 Immediately rotates the view without animation.
 
@@ -68,7 +68,7 @@ viewer.rotate({
 });
 ```
 
-#### `setOption(option, value)` | `setOptions(options)`
+### `setOption(option, value)` | `setOptions(options)`
 
 Updates one or more options of the viewer. Some options cannot be changed : `panorama`, `panoData`, `container` and `plugins`.
 
@@ -76,7 +76,7 @@ Updates one or more options of the viewer. Some options cannot be changed : `pan
 viewer.setOption('fisheye', true);
 ```
 
-#### `setPanorama(panorama, options): Promise`
+### `setPanorama(panorama, options): Promise`
 
 Changes the panorama image with an optional transition animation (enabled by default). You can also set the new `sphereCorrection` and `panoData` if needed.
 
@@ -85,6 +85,6 @@ viewer.setPanorama('image.jpg')
   .then(() => /* update complete */);
 ```
 
-#### `zoom(level)` | `zoomIn()` | `zoomOut()`
+### `zoom(level)` | `zoomIn()` | `zoomOut()`
 
 Changes the zoom level without animation.

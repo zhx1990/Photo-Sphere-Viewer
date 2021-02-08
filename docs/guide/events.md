@@ -12,7 +12,7 @@ Event listeners take an `Event` object as first parameter, this object is genera
 
 This section describes the most useful events available, remember to check the <ApiLink page="PSV.html#.event:autorotate"/> for a full list.
 
-#### `click(data)` | `dblclick(data)`
+### `click(data)` | `dblclick(data)`
 
 Triggered when the user clicks on the viewer (everywhere excluding the navbar and the side panel), it contains many information about where the user clicked including a [marker](../plugins/plugin-markers.md) if the `clickEventOnMarker` option is enabled.
 
@@ -24,7 +24,7 @@ viewer.on('click', (e, data) => {
 
 The simple `click` event is always fired before  a `dblclick`.
 
-#### `position-updated(position)`
+### `position-updated(position)`
 
 Triggered when the view longitude and/or latitude changes.
 
@@ -34,10 +34,10 @@ viewer.on('position-updated', (e, position) => {
 });
 ```
 
-#### `ready`
+### `ready`
 
 Triggered when the panorama image has been loaded and the viewer is ready to perform the first render.
 
-#### `zoom-updated(level)`
+### `zoom-updated(level)`
 
 Triggered when the zoom level changes.
