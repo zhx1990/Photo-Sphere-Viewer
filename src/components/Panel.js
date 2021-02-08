@@ -41,6 +41,7 @@ export class Panel extends AbstractComponent {
       mouseY      : 0,
       mousedown   : false,
       clickHandler: null,
+      width       : {},
     };
 
     const resizer = document.createElement('div');
@@ -128,10 +129,11 @@ export class Panel extends AbstractComponent {
   /**
    * @summary Shows the panel
    * @param {string|Object} config
-   * @param {string} [config.id]
+   * @param {string} [config.id] unique identifier to use with "hide" and to store the user desired width
    * @param {string} config.content
-   * @param {boolean} [config.noMargin=false]
-   * @param {Function} [config.clickHandler]
+   * @param {boolean} [config.noMargin=false] removes default margins
+   * @param {string} [config.width] initial width, if not specified the default width will be used
+   * @param {Function} [config.clickHandler] called when the user clicks inside the panel
    * @fires PSV.open-panel
    */
   show(config) {
@@ -145,6 +147,16 @@ export class Panel extends AbstractComponent {
     if (this.prop.clickHandler) {
       this.content.removeEventListener('click', this.prop.clickHandler);
       this.prop.clickHandler = null;
+    }
+
+    if (config.id && this.prop.width[config.id]) {
+      this.container.style.width = this.prop.width[config.id];
+    }
+    else if (config.width) {
+      this.container.style.width = config.width;
+    }
+    else {
+      this.container.style.width = null;
     }
 
     this.content.innerHTML = config.content;
@@ -261,8 +273,13 @@ export class Panel extends AbstractComponent {
   __resize(evt) {
     const x = evt.clientX;
     const y = evt.clientY;
+    const width = Math.max(PANEL_MIN_WIDTH, this.container.offsetWidth - (x - this.prop.mouseX)) + 'px';
 
-    this.container.style.width = Math.max(PANEL_MIN_WIDTH, this.container.offsetWidth - (x - this.prop.mouseX)) + 'px';
+    if (this.prop.contentId) {
+      this.prop.width[this.prop.contentId] = width;
+    }
+
+    this.container.style.width = width;
 
     this.prop.mouseX = x;
     this.prop.mouseY = y;

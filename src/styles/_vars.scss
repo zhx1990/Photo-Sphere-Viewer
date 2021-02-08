@@ -82,7 +82,7 @@ $psv-panel-menu-even-background: transparent !default;
 
 
 //*** NOTIFICATION ***
-$psv-notification-bottom: (from: 0, to: $psv-navbar-height * 2) !default;
+$psv-notification-bottom: (from: - $psv-navbar-height, to: $psv-navbar-height * 2) !default;
 $psv-notification-animate-delay: 200ms !default;
 $psv-notification-background-color: $psv-tooltip-background-color !default;
 $psv-notification-radius: $psv-tooltip-radius !default;
