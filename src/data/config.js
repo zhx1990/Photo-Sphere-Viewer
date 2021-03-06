@@ -22,6 +22,7 @@ export const DEFAULTS = {
   defaultLong        : 0,
   defaultLat         : 0,
   sphereCorrection   : null,
+  sphereCorrectionReorder: false,
   moveSpeed          : 1,
   zoomButtonIncrement: 2,
   autorotateDelay    : null,

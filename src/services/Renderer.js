@@ -53,6 +53,13 @@ export class Renderer extends AbstractService {
     this.mesh = null;
 
     /**
+     * @member {external:THREE.Group}
+     * @readonly
+     * @private
+     */
+    this.meshContainer = null;
+
+    /**
      * @member {external:THREE.Raycaster}
      * @readonly
      * @protected
@@ -105,6 +112,7 @@ export class Renderer extends AbstractService {
     delete this.scene;
     delete this.camera;
     delete this.mesh;
+    delete this.meshContainer;
     delete this.raycaster;
 
     super.destroy();
@@ -202,13 +210,12 @@ export class Renderer extends AbstractService {
   }
 
   /**
-   * @summary Apply a SphereCorrection to a Mesh
+   * @summary Apply a panorama data pose to a Mesh
    * @param {PSV.PanoData} [panoData]
-   * @param {PSV.SphereCorrection} [sphereCorrection]
    * @param {external:THREE.Mesh} [mesh=this.mesh]
    * @package
    */
-  setSphereCorrection(panoData, sphereCorrection, mesh = this.mesh) {
+  setPanoramaPose(panoData, mesh = this.mesh) {
     if (!isNil(panoData?.poseHeading) || !isNil(panoData?.posePitch) || !isNil(panoData?.poseRoll)) {
       // By Google documentation the angles are applied on the camera in order : heading, pitch, roll
       // here we apply the reverse transformation on the sphere
@@ -218,18 +225,35 @@ export class Renderer extends AbstractService {
         -THREE.Math.degToRad(panoData?.poseRoll || 0),
         'ZXY'
       );
-
-      if (sphereCorrection) {
-        logWarn('sphereCorrection was ignored because panoData already contains pose angles.');
-      }
     }
-    else if (sphereCorrection) {
+    else {
+      mesh.rotation.set(0, 0, 0);
+    }
+  }
+
+  /**
+   * @summary Apply a SphereCorrection to a Mesh
+   * @param {PSV.SphereCorrection} [sphereCorrection]
+   * @param {external:THREE.Mesh} [mesh=this.meshContainer]
+   * @package
+   */
+  setSphereCorrection(sphereCorrection, mesh = this.meshContainer) {
+    if (sphereCorrection) {
       const cleanCorrection = this.psv.dataHelper.cleanSphereCorrection(sphereCorrection);
+
+      if (!this.config.sphereCorrectionReorder) {
+        const nonZeros = (cleanCorrection.tilt !== 0) + (cleanCorrection.pan !== 0) + (cleanCorrection.roll !== 0);
+        if (nonZeros > 1) {
+          logWarn(`"sphereCorrection" computation will change in a future version. 
+            Please set "sphereCorrectionReorder: true" and modify your correction accordingly.`);
+        }
+      }
 
       mesh.rotation.set(
         cleanCorrection.tilt,
         cleanCorrection.pan,
-        cleanCorrection.roll
+        cleanCorrection.roll,
+        this.config.sphereCorrectionReorder ? 'ZXY' : 'XYZ'
       );
     }
     else {
@@ -261,7 +285,9 @@ export class Renderer extends AbstractService {
       this.mesh = this.__createSphere();
     }
 
-    this.scene.add(this.mesh);
+    this.meshContainer = new THREE.Group();
+    this.meshContainer.add(this.mesh);
+    this.scene.add(this.meshContainer);
 
     // create canvas container
     this.renderer.domElement.className = 'psv-canvas';
@@ -324,6 +350,7 @@ export class Renderer extends AbstractService {
     let positionProvided = isExtendedPosition(options);
     const zoomProvided = 'zoom' in options;
 
+    const group = new THREE.Group();
     let mesh;
 
     if (this.prop.isCubemap) {
@@ -347,7 +374,8 @@ export class Renderer extends AbstractService {
       mesh.material.transparent = true;
       mesh.material.opacity = 0;
 
-      this.setSphereCorrection(panoData, options.sphereCorrection, mesh);
+      this.setPanoramaPose(panoData, mesh);
+      this.setSphereCorrection(options.sphereCorrection, group);
     }
 
     // rotate the new sphere to make the target position face the camera
@@ -356,11 +384,11 @@ export class Renderer extends AbstractService {
 
       // Longitude rotation along the vertical axis
       const verticalAxis = new THREE.Vector3(0, 1, 0);
-      mesh.rotateOnWorldAxis(verticalAxis, cleanPosition.longitude - this.prop.position.longitude);
+      group.rotateOnWorldAxis(verticalAxis, cleanPosition.longitude - this.prop.position.longitude);
 
       // Latitude rotation along the camera horizontal axis
       const horizontalAxis = new THREE.Vector3(0, 1, 0).cross(this.camera.getWorldDirection(new THREE.Vector3())).normalize();
-      mesh.rotateOnWorldAxis(horizontalAxis, cleanPosition.latitude - this.prop.position.latitude);
+      group.rotateOnWorldAxis(horizontalAxis, cleanPosition.latitude - this.prop.position.latitude);
 
       // TODO: find a better way to handle ranges
       if (this.config.latitudeRange || this.config.longitudeRange) {
@@ -370,7 +398,8 @@ export class Renderer extends AbstractService {
       }
     }
 
-    this.scene.add(mesh);
+    group.add(mesh);
+    this.scene.add(group);
     this.psv.needsUpdate();
 
     return new Animation({
@@ -400,13 +429,14 @@ export class Renderer extends AbstractService {
       .then(() => {
         // remove temp sphere and transfer the texture to the main sphere
         this.setTexture(textureData);
-        this.scene.remove(mesh);
+        this.scene.remove(group);
 
         mesh.geometry.dispose();
         mesh.geometry = null;
 
         if (!this.prop.isCubemap) {
-          this.setSphereCorrection(panoData, options.sphereCorrection);
+          this.setPanoramaPose(panoData);
+          this.setSphereCorrection(options.sphereCorrection);
         }
 
         // actually rotate the camera

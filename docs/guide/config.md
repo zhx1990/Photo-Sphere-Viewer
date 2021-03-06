@@ -206,9 +206,13 @@ Requires two fingers to rotate the panorama. This allows standard touch-scroll n
 
 Sphere rotation angles, in radians.
 
-**Note** : This parameter is ignored if the XMP data and/or `panoData` contains heading/pitch/roll data.
+**Note** : if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
 
 ![pan-tilt-toll](/assets//pan-tilt-roll.png)
+
+::: warning Future change in computation
+In a future version the order in which the angles are applied will change. It is highly recommended to set `sphereCorrectionReorder: true` to any new viewer to enable the new behaviour.
+:::
 
 #### `moveSpeed`
 - type: `double`

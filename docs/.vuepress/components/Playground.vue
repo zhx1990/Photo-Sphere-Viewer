@@ -157,24 +157,21 @@
       </Tab>
 
       <Tab label="Advanced options">
-        <div class="md-layout md-gutter">
+        <div class="md-layout md-gutter" style="margin-bottom: 30px">
           <div class="md-layout-item md-size-33">
-            <md-field>
-              <label>Correction, pan</label>
-              <md-input v-model="options.sphereCorrection.pan" :disabled="!imageData"/>
-            </md-field>
+            <label class="md-caption">Correction, pan</label>
+            <vue-slider v-model="sphereCorrection.pan" :min="-180" :max="180" :marks="[-180,-90,0,90,180]"
+                        :drag-on-click="true" :disabled="!imageData"/>
           </div>
           <div class="md-layout-item md-size-33">
-            <md-field>
-              <label>Correction, tilt</label>
-              <md-input v-model="options.sphereCorrection.tilt" :disabled="!imageData"/>
-            </md-field>
+            <label class="md-caption">Correction, tilt</label>
+            <vue-slider v-model="sphereCorrection.tilt" :min="-90" :max="90" :marks="[-90,0,90]"
+                        :drag-on-click="true" :disabled="!imageData"/>
           </div>
           <div class="md-layout-item md-size-33">
-            <md-field>
-              <label>Correction, roll</label>
-              <md-input v-model="options.sphereCorrection.roll" :disabled="!imageData"/>
-            </md-field>
+            <label class="md-caption">Correction, roll</label>
+            <vue-slider v-model="sphereCorrection.roll"  :min="-180" :max="180" :marks="[-180,-90,0,90,180]"
+                        :drag-on-click="true" :disabled="!imageData"/>
           </div>
         </div>
 
@@ -235,14 +232,14 @@
 
   export default {
     data: () => ({
-      psv      : null,
-      file     : null,
-      imageData: null,
-      options  : {
+      psv             : null,
+      file            : null,
+      imageData       : null,
+      sphereCorrection: { pan: 0, tilt: 0, roll: 0 },
+      options         : {
         ...omit(cloneDeep(DEFAULTS), ['panorama', 'panoData', 'container', 'plugins', 'navbar', 'loadingImg']),
-        sphereCorrection: { pan: 0, tilt: 0, roll: 0 }
       },
-      panoData : {
+      panoData        : {
         fullWidth    : null,
         fullHeight   : null,
         croppedWidth : null,
@@ -250,7 +247,7 @@
         croppedX     : null,
         croppedY     : null,
       },
-      navbar   : [
+      navbar          : [
         { code: 'autorotate', label: DEFAULTS.lang.autorotate, enabled: true },
         { code: 'zoom', label: DEFAULTS.lang.zoom, enabled: true },
         { code: 'download', label: DEFAULTS.lang.download, enabled: true },
@@ -294,19 +291,30 @@
       this.psv = new Viewer({
         container : 'viewer',
         loadingImg: 'https://photo-sphere-viewer.js.org/assets/photosphere-logo.gif',
+        sphereCorrectionReorder: true,
       });
 
       this.loadPsv();
     },
 
     watch: {
-      options: {
+      options         : {
         deep: true,
         handler() {
           this.applyOptions();
         },
       },
-      navbar : {
+      sphereCorrection: {
+        deep: true,
+        handler() {
+          this.psv.setOption('sphereCorrection', {
+            pan : this.sphereCorrection.pan / 180 * Math.PI,
+            tilt: this.sphereCorrection.tilt / 180 * Math.PI,
+            roll: this.sphereCorrection.roll / 180 * Math.PI,
+          });
+        },
+      },
+      navbar          : {
         deep: true,
         handler() {
           this.psv.setOption('navbar', this.getNavbar());
@@ -355,7 +363,7 @@
       },
 
       loadDefaultFile() {
-        this.imageData = 'https://photo-sphere-viewer.js.org/assets/sphere.jpg';
+        this.imageData = 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg';
         this.computePanoData(6000, 3000);
         this.file = null;
         this.loadPsv();

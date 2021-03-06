@@ -500,7 +500,8 @@ export class Viewer extends EventEmitter {
       this.prop.loadingPromise = this.textureLoader.loadTexture(this.config.panorama, options.panoData)
         .then((textureData) => {
           this.renderer.setTexture(textureData);
-          this.renderer.setSphereCorrection(textureData.panoData, options.sphereCorrection);
+          this.renderer.setPanoramaPose(textureData.panoData);
+          this.renderer.setSphereCorrection(options.sphereCorrection);
 
           if (zoomProvided) {
             this.zoom(options.zoom);
@@ -560,7 +561,7 @@ export class Viewer extends EventEmitter {
           break;
 
         case 'sphereCorrection':
-          this.renderer.setSphereCorrection(this.prop.panoData, value);
+          this.renderer.setSphereCorrection(value);
           break;
 
         case 'navbar':
