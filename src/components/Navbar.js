@@ -3,6 +3,10 @@ import { CustomButton } from '../buttons/CustomButton';
 import { DownloadButton } from '../buttons/DownloadButton';
 import { FullscreenButton } from '../buttons/FullscreenButton';
 import { MenuButton } from '../buttons/MenuButton';
+import { MoveDownButton } from '../buttons/MoveDownButton';
+import { MoveLeftButton } from '../buttons/MoveLeftButton';
+import { MoveRightButton } from '../buttons/MoveRightButton';
+import { MoveUpButton } from '../buttons/MoveUpButton';
 import { ZoomInButton } from '../buttons/ZoomInButton';
 import { ZoomOutButton } from '../buttons/ZoomOutButton';
 import { ZoomRangeButton } from '../buttons/ZoomRangeButton';
@@ -39,6 +43,10 @@ export function registerButton(button) {
   ZoomOutButton,
   DownloadButton,
   FullscreenButton,
+  MoveRightButton,
+  MoveLeftButton,
+  MoveUpButton,
+  MoveDownButton,
 ].forEach(registerButton);
 
 /**
@@ -92,6 +100,12 @@ export class Navbar extends AbstractComponent {
         new ZoomOutButton(this);
         new ZoomRangeButton(this);
         new ZoomInButton(this);
+      }
+      else if (button === 'move') {
+        new MoveLeftButton(this);
+        new MoveRightButton(this);
+        new MoveUpButton(this);
+        new MoveDownButton(this);
       }
       else {
         throw new PSVError('Unknown button ' + button);

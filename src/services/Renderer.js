@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Animation } from '../Animation';
 import { CUBE_VERTICES, EVENTS, SPHERE_RADIUS, SPHERE_VERTICES } from '../data/constants';
 import { SYSTEM } from '../data/system';
-import { isExtendedPosition, isNil, logWarn } from '../utils';
+import { each, isExtendedPosition, isNil, logWarn } from '../utils';
 import { AbstractService } from './AbstractService';
 
 /**
@@ -65,6 +65,12 @@ export class Renderer extends AbstractService {
      * @protected
      */
     this.raycaster = null;
+
+    /**
+     * @member {number}
+     * @private
+     */
+    this.timestamp = null;
 
     /**
      * @member {HTMLElement}
@@ -139,7 +145,11 @@ export class Renderer extends AbstractService {
    * @package
    */
   __renderLoop(timestamp) {
-    this.psv.trigger(EVENTS.BEFORE_RENDER, timestamp);
+    const elapsed = this.timestamp !== null ? timestamp - this.timestamp : 0;
+    this.timestamp = timestamp;
+
+    this.psv.trigger(EVENTS.BEFORE_RENDER, timestamp, elapsed);
+    each(this.psv.dynamics, d => d.update(elapsed));
 
     if (this.prop.needsUpdate) {
       this.render();
@@ -156,7 +166,7 @@ export class Renderer extends AbstractService {
    * @fires PSV.render
    */
   render() {
-    this.prop.direction = this.psv.dataHelper.sphericalCoordsToVector3(this.prop.position);
+    this.psv.dataHelper.sphericalCoordsToVector3(this.psv.getPosition(), this.prop.direction);
     this.camera.position.set(0, 0, 0);
     this.camera.lookAt(this.prop.direction);
 
@@ -381,21 +391,15 @@ export class Renderer extends AbstractService {
     // rotate the new sphere to make the target position face the camera
     if (positionProvided) {
       const cleanPosition = this.psv.dataHelper.cleanPosition(options);
+      const currentPosition = this.psv.getPosition();
 
       // Longitude rotation along the vertical axis
       const verticalAxis = new THREE.Vector3(0, 1, 0);
-      group.rotateOnWorldAxis(verticalAxis, cleanPosition.longitude - this.prop.position.longitude);
+      group.rotateOnWorldAxis(verticalAxis, cleanPosition.longitude - currentPosition.longitude);
 
       // Latitude rotation along the camera horizontal axis
       const horizontalAxis = new THREE.Vector3(0, 1, 0).cross(this.camera.getWorldDirection(new THREE.Vector3())).normalize();
-      group.rotateOnWorldAxis(horizontalAxis, cleanPosition.latitude - this.prop.position.latitude);
-
-      // TODO: find a better way to handle ranges
-      if (this.config.latitudeRange || this.config.longitudeRange) {
-        this.config.longitudeRange = null;
-        this.config.latitudeRange = null;
-        logWarn('trying to perform transition with longitudeRange and/or latitudeRange, ranges cleared');
-      }
+      group.rotateOnWorldAxis(horizontalAxis, cleanPosition.latitude - currentPosition.latitude);
     }
 
     group.add(mesh);
@@ -405,7 +409,7 @@ export class Renderer extends AbstractService {
     return new Animation({
       properties: {
         opacity: { start: 0.0, end: 1.0 },
-        zoom   : zoomProvided ? { start: this.prop.zoomLvl, end: options.zoom } : undefined,
+        zoom   : zoomProvided ? { start: this.psv.getZoomLevel(), end: options.zoom } : undefined,
       },
       duration  : options.transition,
       easing    : 'outCubic',

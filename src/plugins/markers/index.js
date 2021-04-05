@@ -694,7 +694,7 @@ export default class MarkersPlugin extends AbstractPlugin {
    */
   __getMarkerPosition(marker, scale = 1) {
     if (marker.isPoly()) {
-      return this.psv.dataHelper.vector3ToViewerCoords(this.psv.dataHelper.sphericalCoordsToVector3(marker.props.position));
+      return this.psv.dataHelper.sphericalCoordsToViewerCoords(marker.props.position);
     }
     else {
       const position = this.psv.dataHelper.vector3ToViewerCoords(marker.props.positions3D[0]);

@@ -26,12 +26,10 @@ function snakeCaseToCamelCase(options) {
  * @private
  */
 const RENAMED_OPTIONS = {
-  animSpeed       : 'autorotateSpeed',
-  animLat         : 'autorotateLat',
-  usexmpdata      : 'useXmpData',
-  mousemoveHover  : 'captureCursor',
-  zoomSpeed       : 'zoomButtonIncrement',
-  mousewheelFactor: 'mousewheelSpeed',
+  animSpeed     : 'autorotateSpeed',
+  animLat       : 'autorotateLat',
+  usexmpdata    : 'useXmpData',
+  mousemoveHover: 'captureCursor',
 };
 
 /**
@@ -119,6 +117,8 @@ export default class ViewerCompat extends Viewer {
     if (VisibleRangePlugin) {
       options.plugins.push([VisibleRangePlugin, { longitudeRange, latitudeRange }]);
     }
+
+    delete options.mousewheelFactor;
 
     super(options);
 

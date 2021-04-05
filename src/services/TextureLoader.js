@@ -195,7 +195,6 @@ export class TextureLoader extends AbstractService {
     )
       .then(({ img, xmpPanoData }) => {
         if (typeof newPanoData === 'function') {
-          // eslint-disable-next-line no-param-reassign
           newPanoData = newPanoData(img);
         }
 

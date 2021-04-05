@@ -104,7 +104,7 @@ export class Overlay extends AbstractComponent {
    */
   show(config) {
     if (typeof config === 'string') {
-      config = { text: config }; // eslint-disable-line no-param-reassign
+      config = { text: config };
     }
 
     this.prop.contentId = config.id;

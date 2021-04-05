@@ -78,10 +78,12 @@ export default class AutorotateKeypointsPlugin extends AbstractPlugin {
     }
 
     this.psv.on(CONSTANTS.EVENTS.AUTOROTATE, this);
+    this.psv.on(CONSTANTS.EVENTS.BEFORE_RENDER, this);
   }
 
   destroy() {
     this.psv.off(CONSTANTS.EVENTS.AUTOROTATE, this);
+    this.psv.off(CONSTANTS.EVENTS.BEFORE_RENDER, this);
 
     delete this.keypoints;
     delete this.state;
@@ -92,6 +94,9 @@ export default class AutorotateKeypointsPlugin extends AbstractPlugin {
   handleEvent(e) {
     if (e.type === CONSTANTS.EVENTS.AUTOROTATE) {
       this.__configure();
+    }
+    else if (e.type === CONSTANTS.EVENTS.BEFORE_RENDER) {
+      this.__beforeRender(e.args[0]);
     }
   }
 
@@ -109,11 +114,9 @@ export default class AutorotateKeypointsPlugin extends AbstractPlugin {
     if (this.keypoints) {
       this.keypoints.forEach((pt, i) => {
         if (typeof pt === 'string') {
-          // eslint-disable-next-line no-param-reassign
           pt = { markerId: pt };
         }
         else if (utils.isExtendedPosition(pt)) {
-          // eslint-disable-next-line no-param-reassign
           pt = { position: pt };
         }
         if (pt.markerId) {
@@ -151,6 +154,9 @@ export default class AutorotateKeypointsPlugin extends AbstractPlugin {
       return;
     }
 
+    // cancel core rotation
+    this.psv.dynamics.position.stop();
+
     this.state = {
       idx           : -1,
       curve         : [],
@@ -164,17 +170,23 @@ export default class AutorotateKeypointsPlugin extends AbstractPlugin {
     };
 
     if (this.config.startFromClosest) {
+      const currentPosition = serializePt(this.psv.getPosition());
       const index = this.__findMinIndex(this.keypoints, (keypoint) => {
-        return utils.greatArcDistance(keypoint.position, serializePt(this.psv.prop.position));
+        return utils.greatArcDistance(keypoint.position, currentPosition);
       });
 
       this.keypoints.push(...this.keypoints.splice(0, index));
     }
+  }
 
-    const autorotateCb = (e, timestamp) => {
+  /**
+   * @private
+   */
+  __beforeRender(timestamp) {
+    if (this.psv.isAutorotateEnabled()) {
       // initialisation
       if (!this.state.startTime) {
-        this.state.endPt = serializePt(this.psv.prop.position);
+        this.state.endPt = serializePt(this.psv.getPosition());
         this.__nextStep();
 
         this.state.startTime = timestamp;
@@ -182,11 +194,7 @@ export default class AutorotateKeypointsPlugin extends AbstractPlugin {
       }
 
       this.__nextFrame(timestamp);
-    };
-
-    this.psv.off(CONSTANTS.EVENTS.BEFORE_RENDER, this.psv.prop.autorotateCb);
-    this.psv.prop.autorotateCb = autorotateCb;
-    this.psv.on(CONSTANTS.EVENTS.BEFORE_RENDER, this.psv.prop.autorotateCb);
+    }
   }
 
   /**
@@ -249,9 +257,10 @@ export default class AutorotateKeypointsPlugin extends AbstractPlugin {
     // one point before and two points before current
     const workPoints = [];
     if (this.state.idx === -1) {
+      const currentPosition = serializePt(this.psv.getPosition());
       workPoints.push(
-        serializePt(this.psv.prop.position),
-        serializePt(this.psv.prop.position),
+        currentPosition,
+        currentPosition,
         this.keypoints[0].position,
         this.keypoints[1].position
       );

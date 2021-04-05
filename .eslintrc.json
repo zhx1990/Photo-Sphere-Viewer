@@ -14,6 +14,7 @@
     "no-bitwise": "off",
     "no-else-return": "off",
     "no-multiple-empty-lines": "off",
+    "no-param-reassign": "off",
     "no-plusplus": "off",
     "no-restricted-properties": "off",
     "no-underscore-dangle": "off",
@@ -53,12 +54,6 @@
         "classes": "always",
         "blocks": "never",
         "switches": "never"
-      }
-    ],
-    "no-param-reassign": [
-      "error",
-      {
-        "props": false
       }
     ],
     "no-console": [

@@ -74,3 +74,7 @@
 .psv-container:not(.psv--is-touch) .psv-button--hover-scale:not(.psv-button--disabled):hover .psv-button-svg {
   transform: scale($psv-buttons-hover-scale);
 }
+
+.psv-move-button + .psv-move-button {
+  padding-left: 0;
+}

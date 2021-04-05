@@ -59,7 +59,7 @@ export class ZoomRangeButton extends AbstractButton {
     this.psv.on(EVENTS.ZOOM_UPDATED, this);
 
     if (this.psv.prop.ready) {
-      this.__moveZoomValue(this.psv.prop.zoomLvl);
+      this.__moveZoomValue(this.psv.getZoomLevel());
     }
     else {
       this.psv.once(EVENTS.READY, this);
@@ -103,7 +103,7 @@ export class ZoomRangeButton extends AbstractButton {
       case 'mouseup':      this.__stopZoomChange(e);          break;
       case 'touchend':     this.__stopZoomChange(e);          break;
       case EVENTS.ZOOM_UPDATED: this.__moveZoomValue(e.args[0]); break;
-      case EVENTS.READY:        this.__moveZoomValue(this.psv.prop.zoomLvl); break;
+      case EVENTS.READY:        this.__moveZoomValue(this.psv.getZoomLevel()); break;
       // @formatter:on
     }
     /* eslint-enable */

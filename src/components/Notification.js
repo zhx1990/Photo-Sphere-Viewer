@@ -65,7 +65,7 @@ export class Notification extends AbstractComponent {
     }
 
     if (typeof config === 'string') {
-      config = { content: config }; // eslint-disable-line no-param-reassign
+      config = { content: config };
     }
 
     this.content.innerHTML = config.content;

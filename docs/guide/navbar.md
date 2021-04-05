@@ -6,19 +6,25 @@
 
 The `navbar` option is an array which can contain the following elements:
 
-  - `autorotate` : toggles the automatic rotation
-  - `zoomOut` : zooms in
-  - `zoomRange` : zoom slider
-  - `zoomIn` :  zooms out
-  - `zoom`: `zoomOut` + `zoomRange` + `zoomIn`
-  - `download` : download the source image
-  - `caption` : the caption
-  - `fullscreen` : toggles fullscreen view
-  - ~~`markers` : toggles the markers~~ now part of a [plugin](../plugins/plugin-markers.md)
-  - ~~`markersList` : shows the markers list~~ now part of a [plugin](../plugins/plugin-markers.md)
-  - ~~`gyroscope` : toggles the gyroscope~~ now part of a [plugin](../plugins/plugin-gyroscope.md)
-  - ~~`stereo` : toggles stereo view (VR)~~ now part of a [plugin](../plugins/plugin-stereo.md)
+  - `autorotate`
+  - `zoomOut`
+  - `zoomRange`
+  - `zoomIn`
+  - `zoom` = `zoomOut` + `zoomRange` + `zoomIn`
+  - `moveLeft`
+  - `moveRight`
+  - `moveTop`
+  - `moveDown`
+  - `move` = `moveLeft` + `moveRight` + `moveTop` + `moveDown`
+  - `download`
+  - `caption`
+  - `fullscreen`
+  - ~~`markers`~~ now part of a [plugin](../plugins/plugin-markers.md)
+  - ~~`markersList`~~ now part of a [plugin](../plugins/plugin-markers.md)
+  - ~~`gyroscope`~~ now part of a [plugin](../plugins/plugin-gyroscope.md)
+  - ~~`stereo`~~ now part of a [plugin](../plugins/plugin-stereo.md)
 
+Other buttons can be made available by plugins.
 
 ## Custom buttons
 

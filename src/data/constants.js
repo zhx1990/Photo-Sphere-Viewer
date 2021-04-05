@@ -133,6 +133,7 @@ export const EVENTS = {
    * @memberof PSV
    * @summary Triggered before a render, used to modify the view
    * @param {number} timestamp - time provided by requestAnimationFrame
+   * @param {number} elapsed - time elapsed from the previous frame
    */
   BEFORE_RENDER     : 'before-render',
   /**

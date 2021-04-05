@@ -1,24 +1,39 @@
 import { SYSTEM } from '../data/system';
+import arrow from '../icons/arrow.svg';
 import { PressHandler } from '../utils/PressHandler';
 import { AbstractButton } from './AbstractButton';
 
+export function getOrientedArrow(direction) {
+  let angle = 0;
+  switch (direction) {
+    // @formatter:off
+    case 'up': angle = 90; break;
+    case 'right': angle = 180; break;
+    case 'down': angle = -90; break;
+    default: angle = 0; break;
+    // @formatter:on
+  }
+
+  return arrow.replace('rotate(0', `rotate(${angle}`);
+}
+
 /**
- * @summary Navigation bar zoom button class
+ * @summary Navigation bar move button class
  * @extends PSV.buttons.AbstractButton
  * @memberof PSV.buttons
  */
-export class AbstractZoomButton extends AbstractButton {
+export class AbstractMoveButton extends AbstractButton {
 
   /**
    * @param {PSV.components.Navbar} navbar
    * @param {number} value
    */
   constructor(navbar, value) {
-    super(navbar, 'psv-button--hover-scale psv-zoom-button');
+    super(navbar, 'psv-button--hover-scale psv-move-button');
 
     /**
      * @override
-     * @property {boolean} value
+     * @property {{longitude?: boolean, latitude?: boolean}} value
      * @property {PressHandler} handler
      */
     this.prop = {
@@ -83,7 +98,8 @@ export class AbstractZoomButton extends AbstractButton {
       return;
     }
 
-    this.psv.dynamics.zoom.roll(this.prop.value);
+    this.psv.__stopAll();
+    this.psv.dynamics.position.roll(this.prop.value);
     this.prop.handler.down();
   }
 
@@ -95,7 +111,7 @@ export class AbstractZoomButton extends AbstractButton {
       return;
     }
 
-    this.prop.handler.up(() => this.psv.dynamics.zoom.stop());
+    this.prop.handler.up(() => this.psv.dynamics.position.stop());
   }
 
 }

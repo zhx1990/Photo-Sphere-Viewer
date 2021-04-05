@@ -6,7 +6,7 @@ import { Navbar } from './components/Navbar';
 import { Notification } from './components/Notification';
 import { Overlay } from './components/Overlay';
 import { Panel } from './components/Panel';
-import { CONFIG_PARSERS, DEFAULTS, getConfig, READONLY_OPTIONS } from './data/config';
+import { CONFIG_PARSERS, DEFAULTS, DEPRECATED_OPTIONS, getConfig, READONLY_OPTIONS } from './data/config';
 import { CHANGE_EVENTS, EVENTS, IDS, VIEWER_DATA } from './data/constants';
 import { SYSTEM } from './data/system';
 import errorIcon from './icons/error.svg';
@@ -17,17 +17,19 @@ import { Renderer } from './services/Renderer';
 import { TextureLoader } from './services/TextureLoader';
 import { TooltipRenderer } from './services/TooltipRenderer';
 import {
-  bound,
   each,
   exitFullscreen,
   getAngle,
   getShortestArc,
   isExtendedPosition,
   isFullscreenEnabled,
+  logWarn,
   requestFullscreen,
   throttle,
   toggleClass
 } from './utils';
+import { Dynamic } from './utils/Dynamic';
+import { MultiDynamic } from './utils/MultiDynamic';
 
 THREE.Cache.enabled = true;
 
@@ -64,14 +66,11 @@ export class Viewer extends EventEmitter {
      * @property {boolean} ready - when all components are loaded
      * @property {boolean} needsUpdate - if the view needs to be renderer
      * @property {boolean} isCubemap - if the panorama is a cubemap
-     * @property {PSV.Position} position - current direction of the camera
      * @property {external:THREE.Vector3} direction - direction of the camera
-     * @property {number} zoomLvl - current zoom level
      * @property {number} vFov - vertical FOV
      * @property {number} hFov - horizontal FOV
      * @property {number} aspect - viewer aspect ratio
-     * @property {number} moveSpeed - move speed (computed with pixel ratio and configuration moveSpeed)
-     * @property {Function} autorotateCb - update callback of the automatic rotation
+     * @property {boolean} autorotateEnabled - automatic rotation is enabled
      * @property {PSV.Animation} animationPromise - promise of the current animation (either go to position or image transition)
      * @property {Promise} loadingPromise - promise of the setPanorama method
      * @property startTimeout - timeout id of the automatic rotation delay
@@ -79,30 +78,24 @@ export class Viewer extends EventEmitter {
      * @property {PSV.PanoData} panoData - panorama metadata
      */
     this.prop = {
-      ready           : false,
-      uiRefresh       : false,
-      needsUpdate     : false,
-      fullscreen      : false,
-      isCubemap       : undefined,
-      position        : {
-        longitude: 0,
-        latitude : 0,
-      },
-      direction       : null,
-      zoomLvl         : null,
-      vFov            : null,
-      hFov            : null,
-      aspect          : null,
-      moveSpeed       : 0.1,
-      autorotateCb    : null,
-      animationPromise: null,
-      loadingPromise  : null,
-      startTimeout    : null,
-      size            : {
+      ready            : false,
+      uiRefresh        : false,
+      needsUpdate      : false,
+      fullscreen       : false,
+      isCubemap        : undefined,
+      direction        : new THREE.Vector3(),
+      vFov             : null,
+      hFov             : null,
+      aspect           : null,
+      autorotateEnabled: false,
+      animationPromise : null,
+      loadingPromise   : null,
+      startTimeout     : null,
+      size             : {
         width : 0,
         height: 0,
       },
-      panoData        : {
+      panoData         : {
         fullWidth    : 0,
         fullHeight   : 0,
         croppedWidth : 0,
@@ -216,15 +209,36 @@ export class Viewer extends EventEmitter {
      */
     this.overlay = new Overlay(this);
 
+    /**
+     * @member {Record<string, PSV.Dynamic>}
+     * @package
+     */
+    this.dynamics = {
+      zoom: new Dynamic((value) => {
+        this.prop.vFov = this.dataHelper.zoomLevelToFov(value);
+        this.prop.hFov = this.dataHelper.vFovToHFov(this.prop.vFov);
+
+        this.needsUpdate();
+        this.trigger(EVENTS.ZOOM_UPDATED, value);
+      }, 0, 100),
+
+      position: new MultiDynamic({
+        longitude: new Dynamic(null),
+        latitude : new Dynamic(null, -Math.PI / 2, Math.PI / 2),
+      }, (position) => {
+        this.needsUpdate();
+        this.trigger(EVENTS.POSITION_UPDATED, position);
+      }),
+    };
+
+    this.__updateSpeeds();
+
     this.eventsHandler.init();
 
     this.__resizeRefresh = throttle(() => this.refreshUi('resize'), 500);
 
     // apply container size
     this.resize(this.config.size);
-
-    // actual move speed depends on pixel-ratio
-    this.prop.moveSpeed = THREE.Math.degToRad(this.config.moveSpeed / SYSTEM.pixelRatio);
 
     // init plugins
     this.config.plugins.forEach(([plugin, opts]) => {
@@ -345,10 +359,7 @@ export class Viewer extends EventEmitter {
    * @returns {PSV.Position}
    */
   getPosition() {
-    return {
-      longitude: this.prop.position.longitude,
-      latitude : this.prop.position.latitude,
-    };
+    return this.dynamics.position.current;
   }
 
   /**
@@ -356,7 +367,7 @@ export class Viewer extends EventEmitter {
    * @returns {number}
    */
   getZoomLevel() {
-    return this.prop.zoomLvl;
+    return this.dynamics.zoom.current;
   }
 
   /**
@@ -375,7 +386,7 @@ export class Viewer extends EventEmitter {
    * @returns {boolean}
    */
   isAutorotateEnabled() {
-    return !!this.prop.autorotateCb;
+    return this.prop.autorotateEnabled;
   }
 
   /**
@@ -536,6 +547,11 @@ export class Viewer extends EventEmitter {
    */
   setOptions(options) {
     each(options, (value, key) => {
+      if (DEPRECATED_OPTIONS[key]) {
+        logWarn(DEPRECATED_OPTIONS[key]);
+        return;
+      }
+
       if (!Object.prototype.hasOwnProperty.call(DEFAULTS, key)) {
         throw new PSVError(`Unknown option ${key}`);
       }
@@ -570,12 +586,13 @@ export class Viewer extends EventEmitter {
           break;
 
         case 'moveSpeed':
-          this.prop.moveSpeed = THREE.Math.degToRad(value / SYSTEM.pixelRatio);
+        case 'zoomSpeed':
+          this.__updateSpeeds();
           break;
 
         case 'minFov':
         case 'maxFov':
-          this.prop.zoomLvl = this.dataHelper.fovToZoomLevel(this.prop.vFov);
+          this.dynamics.zoom.setValue(this.dataHelper.fovToZoomLevel(this.prop.vFov));
           this.trigger(EVENTS.ZOOM_UPDATED, this.getZoomLevel());
           break;
 
@@ -611,22 +628,15 @@ export class Viewer extends EventEmitter {
   startAutorotate() {
     this.__stopAll();
 
-    this.prop.autorotateCb = (() => {
-      let last;
-      let elapsed;
+    this.dynamics.position.roll({
+      longitude: this.config.autorotateSpeed < 0,
+    }, Math.abs(this.config.autorotateSpeed / this.config.moveSpeed));
 
-      return (e, timestamp) => {
-        elapsed = last === undefined ? 0 : timestamp - last;
-        last = timestamp;
+    this.dynamics.position.goto({
+      latitude: this.config.autorotateLat,
+    }, Math.abs(this.config.autorotateSpeed / this.config.moveSpeed));
 
-        this.rotate({
-          longitude: this.prop.position.longitude + this.config.autorotateSpeed * elapsed / 1000,
-          latitude : this.prop.position.latitude - (this.prop.position.latitude - this.config.autorotateLat) / 200,
-        });
-      };
-    })();
-
-    this.on(EVENTS.BEFORE_RENDER, this.prop.autorotateCb);
+    this.prop.autorotateEnabled = true;
 
     this.trigger(EVENTS.AUTOROTATE, true);
   }
@@ -642,8 +652,9 @@ export class Viewer extends EventEmitter {
     }
 
     if (this.isAutorotateEnabled()) {
-      this.off(EVENTS.BEFORE_RENDER, this.prop.autorotateCb);
-      this.prop.autorotateCb = null;
+      this.dynamics.position.stop();
+
+      this.prop.autorotateEnabled = false;
 
       this.trigger(EVENTS.AUTOROTATE, false);
     }
@@ -695,15 +706,7 @@ export class Viewer extends EventEmitter {
     }
 
     const cleanPosition = this.change(CHANGE_EVENTS.GET_ROTATE_POSITION, this.dataHelper.cleanPosition(position));
-
-    if (this.prop.position.longitude !== cleanPosition.longitude || this.prop.position.latitude !== cleanPosition.latitude) {
-      this.prop.position.longitude = cleanPosition.longitude;
-      this.prop.position.latitude = cleanPosition.latitude;
-
-      this.needsUpdate();
-
-      this.trigger(EVENTS.POSITION_UPDATED, this.getPosition());
-    }
+    this.dynamics.position.setValue(cleanPosition);
   }
 
   /**
@@ -723,21 +726,22 @@ export class Viewer extends EventEmitter {
     // clean/filter position and compute duration
     if (positionProvided) {
       const cleanPosition = this.change(CHANGE_EVENTS.GET_ANIMATE_POSITION, this.dataHelper.cleanPosition(options));
+      const currentPosition = this.getPosition();
 
       // longitude offset for shortest arc
-      const tOffset = getShortestArc(this.prop.position.longitude, cleanPosition.longitude);
+      const tOffset = getShortestArc(currentPosition.longitude, cleanPosition.longitude);
 
-      animProperties.longitude = { start: this.prop.position.longitude, end: this.prop.position.longitude + tOffset };
-      animProperties.latitude = { start: this.prop.position.latitude, end: cleanPosition.latitude };
+      animProperties.longitude = { start: currentPosition.longitude, end: currentPosition.longitude + tOffset };
+      animProperties.latitude = { start: currentPosition.latitude, end: cleanPosition.latitude };
 
-      duration = this.dataHelper.speedToDuration(options.speed, getAngle(this.prop.position, cleanPosition));
+      duration = this.dataHelper.speedToDuration(options.speed, getAngle(currentPosition, cleanPosition));
     }
 
     // clean/filter zoom and compute duration
     if (zoomProvided) {
-      const dZoom = Math.abs(options.zoom - this.prop.zoomLvl);
+      const dZoom = Math.abs(options.zoom - this.getZoomLevel());
 
-      animProperties.zoom = { start: this.prop.zoomLvl, end: options.zoom };
+      animProperties.zoom = { start: this.getZoomLevel(), end: options.zoom };
 
       if (!duration) {
         // if animating zoom only and a speed is given, use an arbitrary PI/4 to compute the duration
@@ -798,31 +802,23 @@ export class Viewer extends EventEmitter {
    * @fires PSV.zoom-updated
    */
   zoom(level) {
-    const newZoomLvl = bound(level, 0, 100);
-
-    if (this.prop.zoomLvl !== newZoomLvl) {
-      this.prop.zoomLvl = newZoomLvl;
-      this.prop.vFov = this.dataHelper.zoomLevelToFov(this.prop.zoomLvl);
-      this.prop.hFov = this.dataHelper.vFovToHFov(this.prop.vFov);
-
-      this.needsUpdate();
-      this.trigger(EVENTS.ZOOM_UPDATED, this.getZoomLevel());
-      this.rotate(this.prop.position);
-    }
+    this.dynamics.zoom.setValue(level);
   }
 
   /**
-   * @summary Increases the zoom level by 1
+   * @summary Increases the zoom level
+   * @param {number} [step=1]
    */
-  zoomIn() {
-    this.zoom(this.prop.zoomLvl + this.config.zoomButtonIncrement);
+  zoomIn(step = 1) {
+    this.dynamics.zoom.step(step);
   }
 
   /**
-   * @summary Decreases the zoom level by 1
+   * @summary Decreases the zoom level
+   * @param {number} [step=1]
    */
-  zoomOut() {
-    this.zoom(this.prop.zoomLvl - this.config.zoomButtonIncrement);
+  zoomOut(step = 1) {
+    this.dynamics.zoom.step(-step);
   }
 
   /**
@@ -903,13 +899,22 @@ export class Viewer extends EventEmitter {
 
   /**
    * @summary Stops all current animations
-   * @private
+   * @package
    */
   __stopAll() {
     this.stopAutorotate();
     this.stopAnimation();
 
     this.trigger(EVENTS.STOP_ALL);
+  }
+
+  /**
+   * @summary Recomputes dynamics speeds
+   * @private
+   */
+  __updateSpeeds() {
+    this.dynamics.zoom.setSpeed(this.config.zoomSpeed * 50);
+    this.dynamics.position.setSpeed(THREE.Math.degToRad(this.config.moveSpeed * 50));
   }
 
 }

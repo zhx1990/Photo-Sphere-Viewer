@@ -1,4 +1,4 @@
-import { Animation } from '../Animation';
+import * as THREE from 'three';
 import {
   ACTIONS,
   CTRLZOOM_TIMEOUT,
@@ -7,14 +7,16 @@ import {
   IDS,
   INERTIA_WINDOW,
   LONGTOUCH_DELAY,
-  TWOFINGERSOVERLAY_DELAY,
-  MOVE_THRESHOLD
+  MOVE_THRESHOLD,
+  TWOFINGERSOVERLAY_DELAY
 } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import gestureIcon from '../icons/gesture.svg';
 import mousewheelIcon from '../icons/mousewheel.svg';
 import { clone, distance, getClosest, getEventKey, isFullscreenEnabled, normalizeWheel, throttle } from '../utils';
+import { PressHandler } from '../utils/PressHandler';
 import { AbstractService } from './AbstractService';
+import { Animation } from '../Animation';
 
 /**
  * @summary Events handler
@@ -40,6 +42,7 @@ export class EventsHandler extends AbstractService {
      * @property {number} mouseY - current y position of the cursor
      * @property {number[][]} mouseHistory - list of latest positions of the cursor, [time, x, y]
      * @property {number} pinchDist - distance between fingers when zooming
+     * @property {PressHandler} keyHandler
      * @property {boolean} ctrlKeyDown - when the Ctrl key is pressed
      * @property {PSV.ClickData} dblclickData - temporary storage of click data between two clicks
      * @property {number} dblclickTimeout - timeout id for double click
@@ -57,6 +60,7 @@ export class EventsHandler extends AbstractService {
       mouseY           : 0,
       mouseHistory     : [],
       pinchDist        : 0,
+      keyHandler       : new PressHandler(),
       ctrlKeyDown      : false,
       dblclickData     : null,
       dblclickTimeout  : null,
@@ -200,32 +204,24 @@ export class EventsHandler extends AbstractService {
       return;
     }
 
-    let dLong = 0;
-    let dLat = 0;
-    let dZoom = 0;
-
-    /* eslint-disable */
-    switch (this.config.keyboard[key]) {
-      // @formatter:off
-      case ACTIONS.ROTATE_LAT_UP    : dLat = 0.01;   break;
-      case ACTIONS.ROTATE_LAT_DOWN  : dLat = -0.01;  break;
-      case ACTIONS.ROTATE_LONG_RIGHT: dLong = 0.01;  break;
-      case ACTIONS.ROTATE_LONG_LEFT : dLong = -0.01; break;
-      case ACTIONS.ZOOM_IN          : dZoom = 1;     break;
-      case ACTIONS.ZOOM_OUT         : dZoom = -1;    break;
-      case ACTIONS.TOGGLE_AUTOROTATE: this.psv.toggleAutorotate(); break;
-      // @formatter:on
+    if (this.config.keyboard[key] === ACTIONS.TOGGLE_AUTOROTATE) {
+      this.psv.toggleAutorotate();
     }
-    /* eslint-enable */
+    else if (this.config.keyboard[key] && !this.state.keyHandler.time) {
+      /* eslint-disable */
+      switch (this.config.keyboard[key]) {
+        // @formatter:off
+        case ACTIONS.ROTATE_LAT_UP: this.psv.dynamics.position.roll({latitude: false}); break;
+        case ACTIONS.ROTATE_LAT_DOWN: this.psv.dynamics.position.roll({latitude: true});  break;
+        case ACTIONS.ROTATE_LONG_RIGHT: this.psv.dynamics.position.roll({longitude: false}); break;
+        case ACTIONS.ROTATE_LONG_LEFT: this.psv.dynamics.position.roll({longitude: true}); break;
+        case ACTIONS.ZOOM_IN: this.psv.dynamics.zoom.roll(false); break;
+        case ACTIONS.ZOOM_OUT: this.psv.dynamics.zoom.roll(true); break;
+        // @formatter:on
+      }
+      /* eslint-enable */
 
-    if (dZoom !== 0) {
-      this.psv.zoom(this.prop.zoomLvl + dZoom * this.config.zoomButtonIncrement);
-    }
-    else if (dLat !== 0 || dLong !== 0) {
-      this.psv.rotate({
-        longitude: this.prop.position.longitude + dLong * this.prop.moveSpeed * this.prop.hFov,
-        latitude : this.prop.position.latitude + dLat * this.prop.moveSpeed * this.prop.vFov,
-      });
+      this.state.keyHandler.down();
     }
   }
 
@@ -235,6 +231,15 @@ export class EventsHandler extends AbstractService {
    */
   __onKeyUp() {
     this.state.ctrlKeyDown = false;
+
+    if (!this.state.keyboardEnabled) {
+      return;
+    }
+
+    this.state.keyHandler.up(() => {
+      this.psv.dynamics.position.stop();
+      this.psv.dynamics.zoom.stop();
+    });
   }
 
   /**
@@ -378,9 +383,9 @@ export class EventsHandler extends AbstractService {
         if (!this.prop.twofingersTimeout) {
           this.prop.twofingersTimeout = setTimeout(() => {
             this.psv.overlay.show({
-              id: IDS.TWO_FINGERS,
+              id   : IDS.TWO_FINGERS,
               image: gestureIcon,
-              text: this.config.lang.twoFingers,
+              text : this.config.lang.twoFingers,
             });
           }, TWOFINGERSOVERLAY_DELAY);
         }
@@ -433,9 +438,9 @@ export class EventsHandler extends AbstractService {
 
     if (this.config.mousewheelCtrlKey && !this.state.ctrlKeyDown) {
       this.psv.overlay.show({
-        id: IDS.CTRL_ZOOM,
+        id   : IDS.CTRL_ZOOM,
         image: mousewheelIcon,
-        text: this.config.lang.ctrlZoom,
+        text : this.config.lang.ctrlZoom,
       });
 
       clearTimeout(this.state.ctrlZoomTimeout);
@@ -447,10 +452,9 @@ export class EventsHandler extends AbstractService {
     evt.preventDefault();
     evt.stopPropagation();
 
-    const delta = normalizeWheel(evt).spinY * 5;
-
+    const delta = normalizeWheel(evt).spinY * 5 * this.config.zoomSpeed;
     if (delta !== 0) {
-      this.psv.zoom(this.prop.zoomLvl - delta * this.config.mousewheelSpeed);
+      this.psv.dynamics.zoom.step(-delta, 5);
     }
   }
 
@@ -659,13 +663,14 @@ export class EventsHandler extends AbstractService {
       const y = evt.clientY;
 
       const rotation = {
-        longitude: (x - this.state.mouseX) / this.prop.size.width * this.prop.moveSpeed * this.prop.hFov * SYSTEM.pixelRatio,
-        latitude : (y - this.state.mouseY) / this.prop.size.height * this.prop.moveSpeed * this.prop.vFov * SYSTEM.pixelRatio,
+        longitude: (x - this.state.mouseX) / this.prop.size.width * this.config.moveSpeed * THREE.Math.degToRad(this.prop.hFov),
+        latitude : (y - this.state.mouseY) / this.prop.size.height * this.config.moveSpeed * THREE.Math.degToRad(this.prop.vFov),
       };
 
+      const currentPosition = this.psv.getPosition();
       this.psv.rotate({
-        longitude: this.prop.position.longitude - rotation.longitude,
-        latitude : this.prop.position.latitude + rotation.latitude,
+        longitude: currentPosition.longitude - rotation.longitude,
+        latitude : currentPosition.latitude + rotation.latitude,
       });
 
       this.state.mouseX = x;
@@ -685,10 +690,10 @@ export class EventsHandler extends AbstractService {
   __moveAbsolute(evt) {
     if (this.state.moving) {
       const containerRect = this.psv.container.getBoundingClientRect();
-      this.psv.rotate({
+      this.psv.dynamics.position.goto({
         longitude: ((evt.clientX - containerRect.left) / containerRect.width - 0.5) * Math.PI * 2,
         latitude : -((evt.clientY - containerRect.top) / containerRect.height - 0.5) * Math.PI,
-      });
+      }, 10);
     }
   }
 
@@ -703,9 +708,9 @@ export class EventsHandler extends AbstractService {
       const p2 = { x: evt.touches[1].clientX, y: evt.touches[1].clientY };
 
       const p = distance(p1, p2);
-      const delta = 80 * (p - this.state.pinchDist) / this.prop.size.width;
+      const delta = 80 * (p - this.state.pinchDist) / this.prop.size.width * this.config.zoomSpeed;
 
-      this.psv.zoom(this.prop.zoomLvl + delta);
+      this.psv.zoom(this.psv.getZoomLevel() + delta);
 
       this.__move({
         clientX: (p1.x + p2.x) / 2,

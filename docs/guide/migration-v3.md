@@ -59,8 +59,6 @@ Be sure to rename your configuration properties, the old naming is not supported
 - `time_anim` → `autorotateDelay`
 - `default_fov`→ `defaultZoomLvl`
 - `mousemove_hover` → `captureCursor`
-- `zoom_speed` → `zoomButtonIncrement`
-- `mousewheel_factor` → `mousewheelSpeed`
 
 ### Deleted options
 
@@ -68,6 +66,7 @@ Be sure to rename your configuration properties, the old naming is not supported
 - `tooltip` → the properties of the tooltip are now extracted from the stylesheet
 - `webgl` → WebGL is now always enabled since three.js deprecated the CanvasRenderer
 - `panorama_roll` → use `sphereCorrection` with the `roll` property
+- `mousewheel_factor`
 
 
 ## Methods
