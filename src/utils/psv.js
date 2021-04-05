@@ -225,3 +225,17 @@ export function parseAngle(angle, zeroCenter = false, halfCircle = zeroCenter) {
 
   return zeroCenter ? bound(parsed - Math.PI, -Math.PI / (halfCircle ? 2 : 1), Math.PI / (halfCircle ? 2 : 1)) : parsed;
 }
+
+/**
+ * @summary Creates a THREE texture from an image
+ * @memberOf PSV.utils
+ * @param {HTMLImageElement | HTMLCanvasElement} img
+ * @return {external:THREE.Texture}
+ */
+export function createTexture(img) {
+  const texture = new THREE.Texture(img);
+  texture.needsUpdate = true;
+  texture.minFilter = THREE.LinearFilter;
+  texture.generateMipmaps = false;
+  return texture;
+}

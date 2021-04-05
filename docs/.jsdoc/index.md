@@ -9,11 +9,13 @@
 - [Viewer](PSV.Viewer.html)
 - [Events](PSV.html#.event:autorotate)
 - [Plugins](PSV.plugins.html)
+- [Adapters](PSV.adapters.html)
 
 ---
 
 ## Exported members
 
+- [AbstractAdapter](PSV.adapters.AbstractAdapter.html) - Base class for render adapters
 - [AbstractButton](PSV.buttons.AbstractButton.html) - Base class for plugins buttons
 - [AbstractPlugin](PSV.plugins.AbstractPlugin.html) - Base class for plugins
 - [Animation](PSV.Animation.html) - Animations manager

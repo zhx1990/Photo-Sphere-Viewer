@@ -6,11 +6,6 @@ import { StereoButton } from './StereoButton';
 
 
 /**
- * @typedef {Object} external:THREE.StereoEffect
- * @summary {@link https://github.com/mrdoob/three.js/blob/dev/examples/jsm/effects/StereoEffect.js}
- */
-
-/**
  * @external NoSleep
  * @description {@link https://github.com/richtr/NoSleep.js}
  */

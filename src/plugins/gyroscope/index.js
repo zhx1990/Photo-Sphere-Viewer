@@ -3,10 +3,6 @@ import * as THREE from 'three';
 import { DeviceOrientationControls } from 'three/examples/jsm/controls/DeviceOrientationControls';
 import { GyroscopeButton } from './GyroscopeButton';
 
-/**
- * @typedef {Object} external:THREE.DeviceOrientationControls
- * @summary {@link https://github.com/mrdoob/three.js/blob/dev/examples/jsm/controls/DeviceOrientationControls.js}
- */
 
 /**
  * @typedef {Object} PSV.plugins.GyroscopePlugin.Options

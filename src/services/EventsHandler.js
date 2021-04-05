@@ -622,11 +622,14 @@ export class EventsHandler extends AbstractService {
       data.longitude = sphericalCoords.longitude;
       data.latitude = sphericalCoords.latitude;
 
-      // TODO: for cubemap, computes texture's index and coordinates
-      if (!this.prop.isCubemap) {
+      try {
         const textureCoords = this.psv.dataHelper.sphericalCoordsToTextureCoords(data);
         data.textureX = textureCoords.x;
         data.textureY = textureCoords.y;
+      }
+      catch (e) {
+        data.textureX = NaN;
+        data.textureY = NaN;
       }
 
       if (!this.state.dblclickTimeout) {

@@ -40,9 +40,17 @@ module.exports = {
             'events',
             'navbar',
             'markers',
-            'cubemap',
             'cropped-panorama',
             'migration-v3',
+            {
+              title: 'Adapters',
+              path: '/guide/adapters/',
+              collapsable : false,
+              children: [
+                'adapters/cubemap',
+                'adapters/tiles',
+              ],
+            },
             {
               title: 'Reusable components',
               path: '/guide/components/',

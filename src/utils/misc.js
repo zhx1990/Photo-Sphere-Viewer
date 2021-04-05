@@ -185,6 +185,7 @@ export function intersect(array1, array2) {
 
 /**
  * @summary Returns if a valu is null or undefined
+ * @memberOf PSV.utils
  * @param {*} val
  * @return {boolean}
  */

@@ -7,7 +7,7 @@ import { Notification } from './components/Notification';
 import { Overlay } from './components/Overlay';
 import { Panel } from './components/Panel';
 import { CONFIG_PARSERS, DEFAULTS, DEPRECATED_OPTIONS, getConfig, READONLY_OPTIONS } from './data/config';
-import { CHANGE_EVENTS, EVENTS, IDS, VIEWER_DATA } from './data/constants';
+import { CHANGE_EVENTS, EVENTS, IDS, SPHERE_RADIUS, VIEWER_DATA } from './data/constants';
 import { SYSTEM } from './data/system';
 import errorIcon from './icons/error.svg';
 import { PSVError } from './PSVError';
@@ -65,7 +65,6 @@ export class Viewer extends EventEmitter {
      * @protected
      * @property {boolean} ready - when all components are loaded
      * @property {boolean} needsUpdate - if the view needs to be renderer
-     * @property {boolean} isCubemap - if the panorama is a cubemap
      * @property {external:THREE.Vector3} direction - direction of the camera
      * @property {number} vFov - vertical FOV
      * @property {number} hFov - horizontal FOV
@@ -82,8 +81,7 @@ export class Viewer extends EventEmitter {
       uiRefresh        : false,
       needsUpdate      : false,
       fullscreen       : false,
-      isCubemap        : undefined,
-      direction        : new THREE.Vector3(),
+      direction        : new THREE.Vector3(0, 0, SPHERE_RADIUS),
       vFov             : null,
       hFov             : null,
       aspect           : null,
@@ -128,6 +126,14 @@ export class Viewer extends EventEmitter {
     this.container = document.createElement('div');
     this.container.classList.add('psv-container');
     this.parent.appendChild(this.container);
+
+    /**
+     * @summary Render adapter
+     * @type {PSV.adapters.AbstractAdapter}
+     * @readonly
+     * @package
+     */
+    this.adapter = new this.config.adapter[0](this, this.config.adapter[1]); // eslint-disable-line new-cap
 
     /**
      * @summary All child components
@@ -226,6 +232,7 @@ export class Viewer extends EventEmitter {
         longitude: new Dynamic(null),
         latitude : new Dynamic(null, -Math.PI / 2, Math.PI / 2),
       }, (position) => {
+        this.dataHelper.sphericalCoordsToVector3(position, this.prop.direction);
         this.needsUpdate();
         this.trigger(EVENTS.POSITION_UPDATED, position);
       }),
@@ -290,6 +297,7 @@ export class Viewer extends EventEmitter {
     this.renderer.destroy();
     this.textureLoader.destroy();
     this.dataHelper.destroy();
+    this.adapter.destroy();
 
     this.children.slice().forEach(child => child.destroy());
     this.children.length = 0;
@@ -424,6 +432,8 @@ export class Viewer extends EventEmitter {
       this.prop.aspect = this.prop.size.width / this.prop.size.height;
       this.prop.hFov = this.dataHelper.vFovToHFov(this.prop.vFov);
 
+      this.renderer.updateCameraMatrix();
+
       this.needsUpdate();
       this.trigger(EVENTS.SIZE_UPDATED, this.getSize());
       this.__resizeRefresh();
@@ -435,7 +445,7 @@ export class Viewer extends EventEmitter {
    * @description Loads a new panorama file, optionally changing the camera position/zoom and activating the transition animation.<br>
    * If the "options" parameter is not defined, the camera will not move and the ongoing animation will continue.<br>
    * If another loading is already in progress it will be aborted.
-   * @param {string|string[]|PSV.Cubemap} path - URL of the new panorama file
+   * @param {*} path - URL of the new panorama file
    * @param {PSV.PanoramaOptions} [options]
    * @returns {Promise}
    */
@@ -446,10 +456,10 @@ export class Viewer extends EventEmitter {
 
     // apply default parameters on first load
     if (!this.prop.ready) {
-      if (!('longitude' in options) && !this.prop.isCubemap) {
+      if (!('longitude' in options)) {
         options.longitude = this.config.defaultLong;
       }
-      if (!('latitude' in options) && !this.prop.isCubemap) {
+      if (!('latitude' in options)) {
         options.latitude = this.config.defaultLat;
       }
       if (!('zoom' in options)) {
@@ -503,12 +513,12 @@ export class Viewer extends EventEmitter {
       }
     };
 
-    if (!options.transition || !this.prop.ready) {
+    if (!options.transition || !this.prop.ready || !this.adapter.constructor.supportsTransition) {
       if (options.showLoader || !this.prop.ready) {
         this.loader.show();
       }
 
-      this.prop.loadingPromise = this.textureLoader.loadTexture(this.config.panorama, options.panoData)
+      this.prop.loadingPromise = this.adapter.loadTexture(this.config.panorama, options.panoData)
         .then((textureData) => {
           this.renderer.setTexture(textureData);
           this.renderer.setPanoramaPose(textureData.panoData);
@@ -528,7 +538,7 @@ export class Viewer extends EventEmitter {
         this.loader.show();
       }
 
-      this.prop.loadingPromise = this.textureLoader.loadTexture(this.config.panorama, options.panoData)
+      this.prop.loadingPromise = this.adapter.loadTexture(this.config.panorama, options.panoData)
         .then((textureData) => {
           this.loader.hide();
 

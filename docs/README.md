@@ -20,8 +20,8 @@ features:
 footer: Licensed under MIT License, documentation under CC BY 3.0
 ---
 
-::: tip New playground
-Test Photo Sphere Viewer with you own panorama in the [Playground](playground.md)
+::: tip New tiles support
+Improve the loading time of big panorams with the the [Tiles adapter](guide/adapters/tiles.md).
 :::
 
 <iframe style="width: 100%; height: 600px;" src="//jsfiddle.net/mistic100/5r684etx/embedded/result,js/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>

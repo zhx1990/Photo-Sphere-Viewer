@@ -6,7 +6,7 @@ Plugins are used to add new functionalities to Photo Sphere Viewer. They can acc
 
 Official plugins (listed on the left menu) are available in the the main `photo-sphere-viewer` package inside the `dist/plugins` directory. Some plugins also have an additional CSS file.
 
-**Example for the Markers plugins:**
+**Example for the Markers plugin:**
 
 :::: tabs
 
