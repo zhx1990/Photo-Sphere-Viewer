@@ -33,7 +33,7 @@ export class AbstractMoveButton extends AbstractButton {
 
     /**
      * @override
-     * @property {{longitude?: boolean, latitude?: boolean}} value
+     * @property {{longitude: boolean, latitude: boolean}} value
      * @property {PressHandler} handler
      */
     this.prop = {

@@ -12,13 +12,13 @@ export class Dynamic {
   static POSITION = 2;
 
   /**
-   * @param {Function<number>} fn Callback function
+   * @param {Function} fn Callback function
    * @param {number} [min] Minimum position
    * @param {number} [max] Maximum position
    */
   constructor(fn, min = -Infinity, max = Infinity) {
     /**
-     * @type {Function<number>}
+     * @type {Function}
      * @private
      * @readonly
      */

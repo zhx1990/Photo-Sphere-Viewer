@@ -4,36 +4,6 @@
 
 > Photo Sphere Viewer 4 is a complete rewrite of the internals of the library using ES6 modules and a modular plugin system. The library is still compatible with less modern browsers and any build systems (or no build system at all) but many methods and options have been moved and renamed.
 
-## Compatibility wrapper
-
-For a quick migration from Photo Sphere Viewer 3 you can use the `CompatViewer` class instead of ` PhotoSphereViewer`.
-
-```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.css"/>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/markers.min.css"/>
-
-<script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/viewer-compat.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/markers.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/gyroscope.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/stereo.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/visible-range.min.js"></script>
-
-<script>
-var viewer = new PhotoSphereViewer.CompatViewer({
-  // old options
-});
-</script>
-```
-
-::: warning
-Please note this wrapper is not fully tested and only addresses renamed options and moved methods.
-
-It does not cover the signature changes of event methods (`on` and `once`).
-:::
-
 
 ## Plugins
 

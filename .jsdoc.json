@@ -1,7 +1,4 @@
 {
-  "source": {
-    "excludePattern": "PhotoSphereViewerCompat\\.js"
-  },
   "opts": {
     "recurse": true,
     "private": false,

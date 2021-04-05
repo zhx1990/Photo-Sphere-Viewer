@@ -8,7 +8,7 @@ import { each } from './index';
 export class MultiDynamic {
 
   /**
-   * @type {Record<string, number>}
+   * @type {Object<string, number>}
    * @readonly
    */
   get current() {
@@ -21,11 +21,11 @@ export class MultiDynamic {
 
   /**
    * @param {Record<string, PSV.Dynamic>} dynamics
-   * @param {Function<Record<string, number>>} fn Callback function
+   * @param {Function} fn Callback function
    */
   constructor(dynamics, fn) {
     /**
-     * @type {Function<Record<string, number>>}
+     * @type {Function}
      * @private
      * @readonly
      */
