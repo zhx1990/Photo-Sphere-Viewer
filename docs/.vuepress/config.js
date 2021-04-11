@@ -86,6 +86,7 @@ module.exports = {
             'plugin-resolution',
             'plugin-settings',
             'plugin-stereo',
+            'plugin-virtual-tour',
             'plugin-visible-range',
           ],
         },

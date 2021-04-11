@@ -619,26 +619,19 @@ export class MarkersPlugin extends AbstractPlugin {
         }
 
         const scale = marker.getScale(this.psv.getZoomLevel());
-        const position = this.__getMarkerPosition(marker, scale);
+        const position = this.__getMarkerPosition(marker);
         isVisible = this.__isMarkerVisible(marker, position);
 
         if (isVisible) {
           marker.props.position2D = position;
 
+          let transform;
           if (marker.isSvg()) {
-            let transform = `translate(${position.x}, ${position.y})`;
-            if (scale !== 1) {
-              transform += ` scale(${scale}, ${scale})`;
-            }
-
+            transform = `translate(${position.x}, ${position.y}) scale(${scale}, ${scale})`;
             marker.$el.setAttributeNS(null, 'transform', transform);
           }
           else {
-            let transform = `translate3D(${position.x}px, ${position.y}px, 0px)`;
-            if (scale !== 1) {
-              transform += ` scale(${scale}, ${scale})`;
-            }
-
+            transform = `translate3D(${position.x}px, ${position.y}px, 0px) scale(${scale}, ${scale})`;
             marker.$el.style.transform = transform;
           }
         }
@@ -714,19 +707,18 @@ export class MarkersPlugin extends AbstractPlugin {
   /**
    * @summary Computes viewer coordinates of a marker
    * @param {PSV.plugins.MarkersPlugin.Marker} marker
-   * @param {number} [scale=1]
    * @returns {PSV.Point}
    * @private
    */
-  __getMarkerPosition(marker, scale = 1) {
+  __getMarkerPosition(marker) {
     if (marker.isPoly()) {
       return this.psv.dataHelper.sphericalCoordsToViewerCoords(marker.props.position);
     }
     else {
       const position = this.psv.dataHelper.vector3ToViewerCoords(marker.props.positions3D[0]);
 
-      position.x -= marker.props.width * marker.props.anchor.x * scale;
-      position.y -= marker.props.height * marker.props.anchor.y * scale;
+      position.x -= marker.props.width * marker.props.anchor.x;
+      position.y -= marker.props.height * marker.props.anchor.y;
 
       return position;
     }

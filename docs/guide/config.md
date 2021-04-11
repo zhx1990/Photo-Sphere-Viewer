@@ -248,7 +248,7 @@ panoData: (image) => ({
 })
 ```
 
-**Note** : if any of _poseHeading_, _posePitch_ or _poseRoll_ parameters are found, the `sphereCorrection` option is ignored.
+**Note** : if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
 
 #### `requestHeaders`
 - type: `object | function<string, object>`

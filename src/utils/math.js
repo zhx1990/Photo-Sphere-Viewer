@@ -84,6 +84,7 @@ export function getAngle(position1, position2) {
 
 /**
  * @summary Returns the distance between two points on a sphere of radius one
+ * {@link http://www.movable-type.co.uk/scripts/latlong.html}
  * @memberOf PSV.utils
  * @param {number[]} p1
  * @param {number[]} p2

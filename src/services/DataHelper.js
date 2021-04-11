@@ -81,6 +81,8 @@ export class DataHelper extends AbstractService {
     const relativeX = (point.x + panoData.croppedX) / panoData.fullWidth * Math.PI * 2;
     const relativeY = (point.y + panoData.croppedY) / panoData.fullHeight * Math.PI;
 
+    // TODO apply the inverse transformation from sphereCorrection/panoData[pose]
+
     return {
       longitude: relativeX >= Math.PI ? relativeX - Math.PI : relativeX + Math.PI,
       latitude : Math.PI / 2 - relativeY,
@@ -144,19 +146,30 @@ export class DataHelper extends AbstractService {
    * @returns {external:THREE.Vector3}
    */
   viewerCoordsToVector3(viewerPoint) {
+    const sphereIntersect = this.getIntersection(viewerPoint, 'psvSphere');
+
+    if (sphereIntersect) {
+      return sphereIntersect.point;
+    }
+    else {
+      return null;
+    }
+  }
+
+  /**
+   * @summary Returns the first intersection with the cursor and having specific data
+   * @param {PSV.Point} viewerPoint
+   * @param {string} objectDataName
+   * @return {external:THREE.Intersection}
+   */
+  getIntersection(viewerPoint, objectDataName) {
     vector2.x = 2 * viewerPoint.x / this.prop.size.width - 1;
     vector2.y = -2 * viewerPoint.y / this.prop.size.height + 1;
 
     this.psv.renderer.raycaster.setFromCamera(vector2, this.psv.renderer.camera);
 
     const intersects = this.psv.renderer.raycaster.intersectObjects(this.psv.renderer.scene.children, true);
-
-    if (intersects.length === 1) {
-      return intersects[0].point;
-    }
-    else {
-      return null;
-    }
+    return intersects.find(i => i.object.userData?.[objectDataName]);
   }
 
   /**
@@ -189,7 +202,7 @@ export class DataHelper extends AbstractService {
    * @returns {PSV.Position}
    */
   cleanPosition(position) {
-    if ('x' in position && 'y' in position) {
+    if (position.x !== undefined && position.y !== undefined) {
       return this.textureCoordsToSphericalCoords(position);
     }
     else {

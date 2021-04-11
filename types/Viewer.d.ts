@@ -30,7 +30,7 @@ import { TooltipRenderer } from './services/TooltipRenderer';
  */
 export type ViewerOptions = {
   container: HTMLElement | string;
-  panorama?: string;
+  panorama?: any;
   adapter?: AdapterConstructor<any> | [AdapterConstructor<any>, any];
   caption?: string;
   loadingImg?: string;

@@ -274,6 +274,7 @@ export class Renderer extends AbstractService {
     this.scene.add(this.camera);
 
     this.mesh = this.psv.adapter.createMesh();
+    this.mesh.userData = { psvSphere: true };
 
     this.meshContainer = new THREE.Group();
     this.meshContainer.add(this.mesh);
