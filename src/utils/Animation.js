@@ -1,17 +1,18 @@
-import { EASINGS } from './data/constants';
-import { each, logWarn } from './utils';
+import { EASINGS } from '../data/constants';
+import { each } from './misc';
+import { logWarn } from './psv';
 
 /**
  * @callback OnTick
  * @summary Function called for each animation frame with computed properties
- * @memberOf PSV.Animation
+ * @memberOf PSV.utils.Animation
  * @param {Object.<string, number>} properties - current values
  * @param {float} progress - 0 to 1
  */
 
 /**
  * @summary Interpolation helper for animations
- * @memberOf PSV
+ * @memberOf PSV.utils
  * @description
  * Implements the Promise API with an additional "cancel" method.
  * The promise is resolved with `true` when the animation is completed and `false` if the animation is cancelled.
@@ -38,7 +39,7 @@ export class Animation {
    * @param {number} options.duration
    * @param {number} [options.delay=0]
    * @param {string} [options.easing='linear']
-   * @param {PSV.Animation.OnTick} options.onTick - called on each frame
+   * @param {PSV.utils.Animation.OnTick} options.onTick - called on each frame
    */
   constructor(options) {
     this.__callbacks = [];
@@ -120,7 +121,7 @@ export class Animation {
    * @summary Promise chaining
    * @param {Function} [onFulfilled] - Called when the animation is complete (true) or cancelled (false)
    * @param {Function} [onRejected] - deprecated
-   * @returns {PSV.Promise}
+   * @returns {Promise}
    */
   then(onFulfilled = null, onRejected = null) {
     if (onRejected) {

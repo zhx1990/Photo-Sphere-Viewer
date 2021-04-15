@@ -57,7 +57,7 @@ export abstract class AbstractAdapter<T> {
   setTextureOpacity(mesh: Mesh, opacity: number);
 
   /**
-   * @abstract
+   * @summary Cleanup a loaded texture, used on load abort
    */
   disposeTexture(textureData: TextureData);
 

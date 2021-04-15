@@ -64,7 +64,7 @@
     opacity: $psv-buttons-disabled-opacity;
   }
 
-  .psv-button-svg {
+  &-svg {
     width: 100%;
     transform: scale(1);
     transition: transform $psv-buttons-hover-scale-delay ease;

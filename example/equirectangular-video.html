@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhotoSphereViewer - equirectangular video demo</title>
+
+  <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
+  <link rel="stylesheet" href="../dist/plugins/settings.css">
+  <link rel="stylesheet" href="../dist/plugins/video.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="photosphere"></div>
+
+<script src="../node_modules/three/build/three.js"></script>
+<script src="../node_modules/uevent/browser.js"></script>
+<script src="../dist/photo-sphere-viewer.js"></script>
+<script src="../dist/adapters/equirectangular-video.js"></script>
+<script src="../dist/plugins/settings.js"></script>
+<script src="../dist/plugins/resolution.js"></script>
+<script src="../dist/plugins/video.js"></script>
+
+<script>
+  const base = 'https://photo-sphere-viewer-data.netlify.app/assets/equirectangular-video/';
+
+  const viewer = new PhotoSphereViewer.Viewer({
+    container : 'photosphere',
+    adapter   : [PhotoSphereViewer.EquirectangularVideoAdapter, {
+      autoplay: false,
+      muted   : true,
+    }],
+    panorama  : { source: base + 'Ayutthaya_FHD.mp4' },
+    caption   : 'Ayutthaya <b>&copy; meetle</b>',
+    plugins   : [
+      [PhotoSphereViewer.VideoPlugin, {
+        progressbar: true,
+        bigbutton  : true,
+      }],
+      PhotoSphereViewer.SettingsPlugin,
+      [PhotoSphereViewer.ResolutionPlugin, {
+        resolutions: [
+          {
+            id      : 'UHD',
+            label   : 'Ultra high',
+            panorama: { source: base + 'Ayutthaya_UHD.mp4' },
+          },
+          {
+            id      : 'FHD',
+            label   : 'High',
+            panorama: { source: base + 'Ayutthaya_FHD.mp4' },
+          },
+          {
+            id      : 'HD',
+            label   : 'Standard',
+            panorama: { source: base + 'Ayutthaya_HD.mp4' },
+          },
+          {
+            id      : 'SD',
+            label   : 'Low',
+            panorama: { source: base + 'Ayutthaya_SD.mp4' },
+          },
+        ]
+      }]
+    ],
+    loadingImg: 'assets/photosphere-logo.gif',
+    navbar    : 'video zoom move caption settings fullscreen',
+  });
+</script>
+</body>
+</html>

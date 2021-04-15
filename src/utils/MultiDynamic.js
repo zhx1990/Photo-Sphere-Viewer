@@ -1,9 +1,8 @@
 import { each } from './index';
 
 /**
- * @summary Wrapper for multiple {@link PSV.Dynamic} evolving together
- * @memberOf PSV
- * @package
+ * @summary Wrapper for multiple {@link PSV.utils.Dynamic} evolving together
+ * @memberOf PSV.utils
  */
 export class MultiDynamic {
 
@@ -20,7 +19,7 @@ export class MultiDynamic {
   }
 
   /**
-   * @param {Record<string, PSV.Dynamic>} dynamics
+   * @param {Record<string, PSV.utils.Dynamic>} dynamics
    * @param {Function} [fn] Callback function
    */
   constructor(dynamics, fn) {
@@ -32,7 +31,7 @@ export class MultiDynamic {
     this.fn = fn;
 
     /**
-     * @type {Record<string, PSV.Dynamic>}
+     * @type {Record<string, PSV.utils.Dynamic>}
      * @private
      * @readonly
      */

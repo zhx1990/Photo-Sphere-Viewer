@@ -189,7 +189,7 @@ Allows to rotate the panorama sphere. Angles are in radians.
 
 **Note** : if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
 
-![pan-tilt-toll](/assets//pan-tilt-roll.png)
+![pan-tilt-toll](/assets/pan-tilt-roll.png)
 
 #### `moveSpeed`
 - type: `double`
@@ -243,6 +243,10 @@ panoData: (image) => ({
 ```
 
 **Note** : if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
+
+::: warning
+Only the default `equirectangular` adapter supports `panoData`, for other adapters you can only use [`sphereCorrection`](#spherecorrection) if the tilt/roll/pan needs to be corrected.
+:::
 
 #### `requestHeaders`
 - type: `object | function<string, object>`

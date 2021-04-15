@@ -174,7 +174,6 @@ export class SettingsPlugin extends AbstractPlugin {
       id          : ID_PANEL,
       content     : SETTINGS_TEMPLATE(
         this.settings,
-        this.psv.config.lang[SettingsButton.id],
         utils.dasherize(SETTING_DATA),
         (setting) => { // retrocompatibility with "current" returning a label
           const current = setting.current();
@@ -221,7 +220,6 @@ export class SettingsPlugin extends AbstractPlugin {
       id          : ID_PANEL,
       content     : SETTING_OPTIONS_TEMPLATE(
         setting,
-        this.psv.config.lang[SettingsButton.id],
         utils.dasherize(SETTING_DATA),
         (option) => { // retrocompatibility with options having an "active" flag
           return 'active' in option ? option.active : option.id === current;

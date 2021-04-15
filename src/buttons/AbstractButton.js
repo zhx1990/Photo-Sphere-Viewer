@@ -24,6 +24,14 @@ export class AbstractButton extends AbstractComponent {
   static id = null;
 
   /**
+   * @summary Identifier to declare a group of buttons
+   * @member {string}
+   * @readonly
+   * @static
+   */
+  static groupId = null;
+
+  /**
    * @summary SVG icon name injected in the button
    * @member {string}
    * @readonly

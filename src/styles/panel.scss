@@ -144,7 +144,12 @@
 }
 
 .psv-panel-menu {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+
   &-title {
+    flex: none;
     display: flex;
     align-items: center;
     font: $psv-panel-title-font;
@@ -158,10 +163,11 @@
   }
 
   &-list {
+    flex: 1;
     list-style: none;
     margin: 0;
     padding: 0;
-    overflow: hidden;
+    overflow-x: hidden;
   }
 
   &-item {

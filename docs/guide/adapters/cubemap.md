@@ -20,10 +20,6 @@ new PhotoSphereViewer.Viewer({
 });
 ```
 
-::: warning
-This adapter does not use `panoData` option. You can use `sphereCorrection` if the tilt/roll/pan needs to be corrected.
-:::
-
 
 ## Example
 

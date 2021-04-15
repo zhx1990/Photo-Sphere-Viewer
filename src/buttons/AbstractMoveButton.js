@@ -26,6 +26,8 @@ export function getOrientedArrow(direction) {
  */
 export class AbstractMoveButton extends AbstractButton {
 
+  static groupId = 'move';
+
   /**
    * @param {PSV.components.Navbar} navbar
    * @param {number} value

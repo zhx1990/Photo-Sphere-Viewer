@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Animation } from '../Animation';
+import { Animation } from '../utils/Animation';
 import { EVENTS, MESH_USER_DATA, SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { each, isExtendedPosition } from '../utils';
@@ -242,7 +242,7 @@ export class Renderer extends AbstractService {
 
     this.psv.needsUpdate();
 
-    this.psv.trigger(EVENTS.PANORAMA_LOADED);
+    this.psv.trigger(EVENTS.PANORAMA_LOADED, textureData);
   }
 
   /**

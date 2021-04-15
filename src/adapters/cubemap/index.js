@@ -28,6 +28,7 @@ export const CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
 /**
  * @summary Adapter for cubemaps
  * @memberof PSV.adapters
+ * @extends PSV.adapters.AbstractAdapter
  */
 export class CubemapAdapter extends AbstractAdapter {
 

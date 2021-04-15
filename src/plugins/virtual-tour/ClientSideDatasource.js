@@ -4,7 +4,7 @@ import { checkLink, checkNode } from './utils';
 
 /**
  * @memberOf PSV.plugins.VirtualTourPlugin
- * @package
+ * @private
  */
 export class ClientSideDatasource extends AbstractDatasource {
 

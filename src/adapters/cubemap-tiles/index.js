@@ -1,9 +1,9 @@
 import * as THREE from 'three';
 import { CONSTANTS, PSVError, utils } from '../..';
 import { CUBE_HASHMAP, CubemapAdapter } from '../cubemap';
-import { Queue } from '../tiles-shared/Queue';
-import { Task } from '../tiles-shared/Task';
-import { buildErrorMaterial, createBaseTexture } from '../tiles-shared/utils';
+import { Queue } from '../shared/Queue';
+import { Task } from '../shared/Task';
+import { buildErrorMaterial, createBaseTexture } from '../shared/tiles-utils';
 
 if (!CubemapAdapter) {
   throw new PSVError('CubemapAdapter is missing, please load cubemap.js before cubemap-tiles.js');
@@ -67,6 +67,7 @@ const vertexPosition = new THREE.Vector3();
 /**
  * @summary Adapter for tiled cubemaps
  * @memberof PSV.adapters
+ * @extends PSV.adapters.AbstractAdapter
  */
 export class CubemapTilesAdapter extends CubemapAdapter {
 

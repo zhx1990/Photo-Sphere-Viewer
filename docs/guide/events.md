@@ -10,7 +10,7 @@ Event listeners take an `Event` object as first parameter, this object is genera
 
 ## Main events
 
-This section describes the most useful events available, remember to check the <ApiLink page="PSV.html#.event:autorotate"/> for a full list.
+This section describes the most useful events available.
 
 ### `click(data)` | `dblclick(data)`
 

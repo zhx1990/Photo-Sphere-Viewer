@@ -53,3 +53,12 @@ $psv-settings-badge-text-color: white !default;
   color: $psv-settings-badge-text-color;
   font: $psv-settings-badge-font;
 }
+
+.psv-settings-menu {
+  justify-content: flex-end;
+
+  .psv-panel-menu-list {
+    flex: none;
+    margin-bottom: $psv-panel-menu-item-height;
+  }
+}

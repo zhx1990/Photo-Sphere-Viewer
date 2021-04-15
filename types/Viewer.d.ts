@@ -1,7 +1,7 @@
 import { Vector3 } from 'three';
 import { Event, EventEmitter } from 'uevent';
 import { AdapterConstructor } from './adapters/AbstractAdapter';
-import { Animation } from './Animation';
+import { Animation } from './utils/Animation';
 import { Loader } from './components/Loader';
 import { Navbar } from './components/Navbar';
 import { Notification } from './components/Notification';
@@ -18,7 +18,8 @@ import {
   PanoDataProvider,
   PanoramaOptions,
   Position,
-  Size
+  Size,
+  TextureData
 } from './models';
 import { AbstractPlugin, PluginConstructor } from './plugins/AbstractPlugin';
 import { DataHelper } from './services/DataHelper';
@@ -349,6 +350,10 @@ export class Viewer extends EventEmitter {
    */
   on(e: 'hide-tooltip', cb: (e: Event, data: any) => void): this;
   /**
+   * @summary Triggered when a key is pressed, can be cancelled
+   */
+  on(e: 'key-press', cb: (e: Event, key: string) => void): this;
+  /**
    * @summary Triggered when the loader value changes
    */
   on(e: 'load-progress', cb: (e: Event, value: number) => void): this;
@@ -359,7 +364,7 @@ export class Viewer extends EventEmitter {
   /**
    * @summary Triggered when a panorama image has been loaded
    */
-  on(e: 'panorama-loaded', cb: (e: Event) => void): this;
+  on(e: 'panorama-loaded', cb: (e: Event, textureData: TextureData) => void): this;
   /**
    * @summary Triggered when the view longitude and/or latitude changes
    */

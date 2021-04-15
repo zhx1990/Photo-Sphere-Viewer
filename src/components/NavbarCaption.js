@@ -75,15 +75,8 @@ export class NavbarCaption extends AbstractComponent {
     this.content.innerHTML = this.prop.caption;
 
     if (html) {
-      this.show(false);
-
-      this.content.style.display = '';
       this.prop.contentWidth = this.content.offsetWidth;
-
-      this.refreshUi();
-    }
-    else {
-      this.hide();
+      this.refreshUi('caption change');
     }
   }
 

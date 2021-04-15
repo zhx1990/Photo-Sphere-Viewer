@@ -2,8 +2,8 @@ import { bound } from './math';
 import { each } from './misc';
 
 /**
- * @summary Implementation of {@link PSV.Dynamic} for any number of variables, unused
- * @memberOf PSV
+ * @summary Implementation of {@link PSV.utils.Dynamic} for any number of variables, unused
+ * @memberOf PSV.utils
  * @private
  */
 export class DynamicXD {

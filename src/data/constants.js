@@ -183,6 +183,13 @@ export const EVENTS = {
    */
   HIDE_TOOLTIP      : 'hide-tooltip',
   /**
+   * @event key-press
+   * @memberof PSV
+   * @summary Triggered when a key is pressed, can be cancelled
+   * @param {string} key
+   */
+  KEY_PRESS         : 'key-press',
+  /**
    * @event load-progress
    * @memberof PSV
    * @summary Triggered when the loader value changes
@@ -200,6 +207,7 @@ export const EVENTS = {
    * @event panorama-loaded
    * @memberof PSV
    * @summary Triggered when a panorama image has been loaded
+   * @param {PSV.TextureData} textureData
    */
   PANORAMA_LOADED   : 'panorama-loaded',
   /**

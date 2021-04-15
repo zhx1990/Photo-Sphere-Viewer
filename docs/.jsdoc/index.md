@@ -16,13 +16,12 @@
 ## Exported members
 
 - [AbstractAdapter](PSV.adapters.AbstractAdapter.html) - Base class for render adapters
-- [AbstractButton](PSV.buttons.AbstractButton.html) - Base class for plugins buttons
+- [AbstractButton](PSV.buttons.AbstractButton.html) - Base class for buttons
 - [AbstractPlugin](PSV.plugins.AbstractPlugin.html) - Base class for plugins
-- [Animation](PSV.Animation.html) - Animations manager
 - [CONSTANTS](PSV.constants.html) - All internal constants
 - [DEFAULTS](PSV.html#.DEFAULTS) - Default configuration
 - [PSVError](PSV.PSVError.html) - Generic error
-- [registerButton](PSV.html#.registerButton) - Helper for registering plugins buttons
+- [registerButton](PSV.html#.registerButton) - Helper for registering buttons
 - [SYSTEM](PSV.html#.SYSTEM) - System informations
-- [Viewer](PSV.Viewer.html) - Base class
 - [utils](PSV.utils.html) - Various utilities
+- [Viewer](PSV.Viewer.html) - Base class

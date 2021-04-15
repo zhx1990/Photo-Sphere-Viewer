@@ -1,4 +1,4 @@
-# Cubemap tiles <Badge text="NEW"/>
+# Cubemap tiles
 
 > Reduce the initial loading time and used bandwidth by slicing big cubemap panoramas into many small tiles.
 
@@ -11,11 +11,11 @@ new PhotoSphereViewer.Viewer({
     faceSize: 6000,
     nbTiles: 8,
     baseUrl: {
-      left  : 'left_low.jpg',  
-      front : 'front_low.jpg', 
-      right : 'right_low.jpg', 
-      back  : 'back_low.jpg',  
-      top   : 'top_low.jpg',   
+      left  : 'left_low.jpg',
+      front : 'front_low.jpg',
+      right : 'right_low.jpg',
+      back  : 'back_low.jpg',
+      top   : 'top_low.jpg',
       bottom: 'bottom_low.jpg',
     },
     tileUrl: (face, col, row) => {
@@ -24,10 +24,6 @@ new PhotoSphereViewer.Viewer({
   },
 });
 ```
-
-::: warning
-This adapter does not use `panoData` option. You can use `sphereCorrection` if the tilt/roll/pan needs to be corrected.
-:::
 
 
 ## Example

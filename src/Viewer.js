@@ -1,6 +1,5 @@
 import * as THREE from 'three';
 import { EventEmitter } from 'uevent';
-import { Animation } from './Animation';
 import { Loader } from './components/Loader';
 import { Navbar } from './components/Navbar';
 import { Notification } from './components/Notification';
@@ -18,6 +17,8 @@ import { Renderer } from './services/Renderer';
 import { TextureLoader } from './services/TextureLoader';
 import { TooltipRenderer } from './services/TooltipRenderer';
 import {
+  Animation,
+  Dynamic,
   each,
   exitFullscreen,
   getAbortError,
@@ -27,13 +28,12 @@ import {
   isExtendedPosition,
   isFullscreenEnabled,
   logWarn,
+  MultiDynamic,
   pluginInterop,
   requestFullscreen,
   throttle,
   toggleClass
 } from './utils';
-import { Dynamic } from './utils/Dynamic';
-import { MultiDynamic } from './utils/MultiDynamic';
 
 THREE.Cache.enabled = true;
 
@@ -223,7 +223,7 @@ export class Viewer extends EventEmitter {
     this.overlay = new Overlay(this);
 
     /**
-     * @member {Record<string, PSV.Dynamic>}
+     * @member {Record<string, PSV.utils.Dynamic>}
      * @package
      */
     this.dynamics = {

@@ -11,6 +11,8 @@ import { AbstractButton } from './AbstractButton';
  */
 export class AbstractZoomButton extends AbstractButton {
 
+  static groupId = 'zoom';
+
   /**
    * @param {PSV.components.Navbar} navbar
    * @param {number} value

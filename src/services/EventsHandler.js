@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { Animation } from '../Animation';
+import { Animation } from '../utils/Animation';
 import {
   ACTIONS,
   CTRLZOOM_TIMEOUT,
@@ -213,6 +213,11 @@ export class EventsHandler extends AbstractService {
         clearTimeout(this.state.ctrlZoomTimeout);
         this.psv.overlay.hide(IDS.CTRL_ZOOM);
       }
+    }
+
+    const e = this.psv.trigger(EVENTS.KEY_PRESS, key);
+    if (e.isDefaultPrevented()) {
+      return;
     }
 
     if (!this.state.keyboardEnabled) {

@@ -1,8 +1,7 @@
 /**
  * @summary Helper for pressable things (buttons, keyboard)
  * @description When the pressed thing goes up and was not pressed long enough, wait a bit more before execution
- * @package
- * @package
+ * @private
  */
 export class PressHandler {
 

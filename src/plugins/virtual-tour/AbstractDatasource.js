@@ -2,7 +2,7 @@ import { PSVError } from 'photo-sphere-viewer';
 
 /**
  * @memberOf PSV.plugins.VirtualTourPlugin
- * @package
+ * @private
  */
 export class AbstractDatasource {
 

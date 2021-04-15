@@ -2,8 +2,7 @@ import { bound } from './index';
 
 /**
  * @summary Represents a variable that can dynamically change with time (using requestAnimationFrame)
- * @memberOf PSV
- * @package
+ * @memberOf PSV.utils
  */
 export class Dynamic {
 

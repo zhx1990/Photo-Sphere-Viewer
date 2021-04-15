@@ -1,6 +1,5 @@
 import check from './check.svg';
 import chevron from './chevron.svg';
-import icon from './settings.svg';
 import switchOff from './switch-off.svg';
 import switchOn from './switch-on.svg';
 
@@ -58,16 +57,14 @@ export const SETTINGS_TEMPLATE_ = {
 /**
  * @summary Settings list template
  * @param {PSV.plugins.SettingsPlugin.Setting[]} settings
- * @param {string} title
  * @param {string} dataKey
  * @param {function} optionsCurrent
  * @returns {string}
  * @constant
  * @private
  */
-export const SETTINGS_TEMPLATE = (settings, title, dataKey, optionsCurrent) => `
-<div class="psv-panel-menu">
-  <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
+export const SETTINGS_TEMPLATE = (settings, dataKey, optionsCurrent) => `
+<div class="psv-panel-menu psv-settings-menu">
   <ul class="psv-panel-menu-list">
     ${settings.map(s => `
       <li class="psv-panel-menu-item" data-${dataKey}="${s.id}">
@@ -81,16 +78,14 @@ export const SETTINGS_TEMPLATE = (settings, title, dataKey, optionsCurrent) => `
 /**
  * @summary Settings options template
  * @param {PSV.plugins.SettingsPlugin.OptionsSetting} setting
- * @param {string} title
  * @param {string} dataKey
  * @param {function} optionActive
  * @returns {string}
  * @constant
  * @private
  */
-export const SETTING_OPTIONS_TEMPLATE = (setting, title, dataKey, optionActive) => `
-<div class="psv-panel-menu">
-  <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
+export const SETTING_OPTIONS_TEMPLATE = (setting, dataKey, optionActive) => `
+<div class="psv-panel-menu psv-settings-menu">
   <ul class="psv-panel-menu-list">
     <li class="psv-panel-menu-item psv-settings-item--header" data-${dataKey}="__back">
       <span class="psv-settings-item-icon">${chevron}</span>

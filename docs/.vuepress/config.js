@@ -48,8 +48,10 @@ module.exports = {
               children   : [
                 'adapters/equirectangular',
                 'adapters/equirectangular-tiles',
+                ['adapters/equirectangular-video', 'Equirectangular videos (NEW)'],
                 'adapters/cubemap',
-                ['adapters/cubemap-tiles', 'Cubemap tiles (NEW)'],
+                'adapters/cubemap-tiles',
+                ['adapters/cubemap-video', 'Cubemap videos (NEW)'],
               ],
             },
             {
@@ -88,6 +90,7 @@ module.exports = {
             'plugin-resolution',
             'plugin-settings',
             'plugin-stereo',
+            ['plugin-video', 'Video (NEW)'],
             'plugin-virtual-tour',
             'plugin-visible-range',
           ],

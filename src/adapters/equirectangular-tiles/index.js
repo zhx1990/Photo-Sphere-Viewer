@@ -1,8 +1,8 @@
 import * as THREE from 'three';
 import { CONSTANTS, EquirectangularAdapter, PSVError, utils } from '../..';
-import { Queue } from '../tiles-shared/Queue';
-import { Task } from '../tiles-shared/Task';
-import { buildErrorMaterial, createBaseTexture } from '../tiles-shared/utils';
+import { Queue } from '../shared/Queue';
+import { Task } from '../shared/Task';
+import { buildErrorMaterial, createBaseTexture } from '../shared/tiles-utils';
 
 
 /**
@@ -87,6 +87,7 @@ const vertexPosition = new THREE.Vector3();
 /**
  * @summary Adapter for tiled panoramas
  * @memberof PSV.adapters
+ * @extends PSV.adapters.AbstractAdapter
  */
 export class EquirectangularTilesAdapter extends EquirectangularAdapter {
 
@@ -259,6 +260,9 @@ export class EquirectangularTilesAdapter extends EquirectangularAdapter {
       croppedHeight: panorama.width / 2,
       croppedX     : 0,
       croppedY     : 0,
+      poseHeading  : 0,
+      posePitch    : 0,
+      poseRoll     : 0,
     };
 
     if (panorama.baseUrl) {
@@ -278,7 +282,12 @@ export class EquirectangularTilesAdapter extends EquirectangularAdapter {
    * @override
    */
   createMesh(scale = 1) {
-    const geometry = new THREE.SphereGeometry(CONSTANTS.SPHERE_RADIUS * scale, this.SPHERE_SEGMENTS, this.SPHERE_HORIZONTAL_SEGMENTS, -Math.PI / 2)
+    const geometry = new THREE.SphereGeometry(
+      CONSTANTS.SPHERE_RADIUS * scale,
+      this.SPHERE_SEGMENTS,
+      this.SPHERE_HORIZONTAL_SEGMENTS,
+      -Math.PI / 2
+    )
       .scale(-1, 1, 1)
       .toNonIndexed();
 

@@ -26,7 +26,7 @@ Some [plugins](../plugins/) add new buttons to the navbar and will be automatica
 
 ## Custom buttons
 
-You can also add as many custom buttons you want. A Custom buttons is an object with the following options.
+You can also add as many custom buttons you want. A custom button is an object with the following options:
 
 #### `content` (required)
 - type : `string`
@@ -83,7 +83,7 @@ new PhotoSphereViewer.Viewer({
     'zoom',
     {
       id: 'my-button',
-      content: 'Custom',
+      content: '<svg...>',
       title: 'Hello world',
       className: 'custom-button',
       onClick: () => {

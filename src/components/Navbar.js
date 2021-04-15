@@ -24,6 +24,13 @@ import { NavbarCaption } from './NavbarCaption';
 const AVAILABLE_BUTTONS = {};
 
 /**
+ * @summary List of available buttons
+ * @type {Object<string, Array<Class<PSV.buttons.AbstractButton>>>}
+ * @private
+ */
+const AVAILABLE_GROUPS = {};
+
+/**
  * @summary Register a new button available for all viewers
  * @param {Class<PSV.buttons.AbstractButton>} button
  * @param {'start' | 'end' | '[id]:left' | '[id]:right'} [defaultPosition]
@@ -36,6 +43,11 @@ export function registerButton(button, defaultPosition) {
   }
 
   AVAILABLE_BUTTONS[button.id] = button;
+
+  if (button.groupId) {
+    AVAILABLE_GROUPS[button.groupId] = AVAILABLE_GROUPS[button.groupId] || [];
+    AVAILABLE_GROUPS[button.groupId].push(button);
+  }
 
   if (typeof defaultPosition === 'string') {
     switch (defaultPosition) {
@@ -54,13 +66,13 @@ export function registerButton(button, defaultPosition) {
 
 [
   AutorotateButton,
-  ZoomInButton,
-  ZoomRangeButton,
   ZoomOutButton,
+  ZoomRangeButton,
+  ZoomInButton,
   DownloadButton,
   FullscreenButton,
-  MoveRightButton,
   MoveLeftButton,
+  MoveRightButton,
   MoveUpButton,
   MoveDownButton,
 ].forEach(registerButton);
@@ -110,19 +122,11 @@ export class Navbar extends AbstractComponent {
       else if (AVAILABLE_BUTTONS[button]) {
         new AVAILABLE_BUTTONS[button](this);
       }
-      else if (button === 'caption') {
+      else if (AVAILABLE_GROUPS[button]) {
+        AVAILABLE_GROUPS[button].forEach(buttonCtor => new buttonCtor(this)); // eslint-disable-line new-cap
+      }
+      else if (button === NavbarCaption.id) {
         new NavbarCaption(this, this.psv.config.caption);
-      }
-      else if (button === 'zoom') {
-        new ZoomOutButton(this);
-        new ZoomRangeButton(this);
-        new ZoomInButton(this);
-      }
-      else if (button === 'move') {
-        new MoveLeftButton(this);
-        new MoveRightButton(this);
-        new MoveUpButton(this);
-        new MoveDownButton(this);
       }
       else {
         throw new PSVError('Unknown button ' + button);
