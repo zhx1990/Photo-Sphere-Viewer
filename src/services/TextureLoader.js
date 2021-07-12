@@ -31,6 +31,9 @@ export class TextureLoader extends AbstractService {
     if (this.config.withCredentials) {
       this.loader.setWithCredentials(true);
     }
+    if (this.config.requestHeaders && typeof this.config.requestHeaders === 'object') {
+      this.loader.setRequestHeader(this.config.requestHeaders);
+    }
   }
 
   /**
@@ -68,6 +71,10 @@ export class TextureLoader extends AbstractService {
    * @returns {Promise<Blob>}
    */
   loadFile(url, onProgress) {
+    if (this.config.requestHeaders && typeof this.config.requestHeaders === 'function') {
+      this.loader.setRequestHeader(this.config.requestHeaders(url));
+    }
+
     return new Promise((resolve, reject) => {
       let progress = 0;
       onProgress && onProgress(progress);

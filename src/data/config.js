@@ -38,6 +38,7 @@ export const DEFAULTS = {
   touchmoveTwoFingers: false,
   useXmpData         : true,
   panoData           : null,
+  requestHeaders     : null,
   canvasBackground   : '#000',
   withCredentials    : false,
   navbar             : [

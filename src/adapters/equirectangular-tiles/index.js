@@ -117,6 +117,9 @@ export default class EquirectangularTilesAdapter extends AbstractAdapter {
     if (this.psv.config.withCredentials) {
       this.loader.setWithCredentials(true);
     }
+    if (this.psv.config.requestHeaders && typeof this.psv.config.requestHeaders === 'object') {
+      this.loader.setRequestHeader(this.psv.config.requestHeaders);
+    }
 
     this.psv.on(CONSTANTS.EVENTS.POSITION_UPDATED, this);
     this.psv.on(CONSTANTS.EVENTS.ZOOM_UPDATED, this);
@@ -393,6 +396,10 @@ export default class EquirectangularTilesAdapter extends AbstractAdapter {
   __loadTile(tile, task) {
     const panorama = this.psv.config.panorama;
     const url = panorama.tileUrl(tile.col, tile.row);
+
+    if (this.psv.config.requestHeaders && typeof this.psv.config.requestHeaders === 'function') {
+      this.loader.setRequestHeader(this.psv.config.requestHeaders(url));
+    }
 
     return new Promise((resolve, reject) => this.loader.load(url, resolve, undefined, reject))
       .then((image) => {
