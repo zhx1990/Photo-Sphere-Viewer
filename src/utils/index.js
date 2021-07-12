@@ -2,7 +2,7 @@
  * @namespace PSV.utils
  */
 
-export * from './browser.js';
-export * from './math.js';
-export * from './misc.js';
-export * from './psv.js';
+export * from './browser';
+export * from './math';
+export * from './misc';
+export * from './psv';
