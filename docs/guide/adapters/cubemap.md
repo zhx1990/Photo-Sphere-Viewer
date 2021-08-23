@@ -30,7 +30,7 @@ This adapter does not use `panoData` option. You can use `sphereCorrection` if t
 <iframe style="width: 100%; height: 600px;" src="//jsfiddle.net/mistic100/1jL5yc2r/embedded/result,js/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 
-## Configuration
+## Panorama options
 
 When using this adapter the `panorama` option and the `setPanorama()` method accept an array or an object of six URLs.
 

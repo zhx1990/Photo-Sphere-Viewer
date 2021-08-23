@@ -97,6 +97,6 @@
     "start:doc": "vuepress dev docs",
     "start:remote": "ngrok http 8080",
     "dev:serve": "live-server --watch=dist,example --open=example",
-    "dev:watch": "npm run compile:rollup -- --watch"
+    "dev:watch": "npm run compile:prepare && npm run compile:rollup -- --watch"
   }
 }

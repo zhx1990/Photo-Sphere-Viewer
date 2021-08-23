@@ -31,6 +31,21 @@ This adapter does not use `panoData` option. You can use `sphereCorrection` if t
 
 ## Configuration
 
+#### `baseBlur`
+- type: `boolean`
+- default: `true`
+
+Applies a 1px blur to the base image (option `baseUrl`).
+
+#### `showErrorTile`
+- type: `boolean`
+- default: `true`
+
+Shows a warning sign on tiles that cannot be loaded.
+
+
+## Panorama options
+
 When using this adapter the `panorama` option and the `setPanorama()` method accept an object to configure the tiles.
 
 #### `width` (required)

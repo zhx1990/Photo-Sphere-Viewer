@@ -41,7 +41,11 @@
       desc    : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
       minFov  : 30,
       base    : `${base}sphere-small.jpg`,
-      position: { longitude: 0, latitude: 0, zoom: 50, },
+      position: {
+        longitude: 0,
+        latitude : 0,
+        zoom     : 50,
+      },
       config  : {
         width  : 6656,
         cols   : 16,
@@ -59,7 +63,11 @@
       desc    : 'Simon\'s Town <b>&copy;  Greg Zall (HDRI Haven)</b>',
       minFov  : 10,
       base    : `${base}sphere-tiles-24k/base.jpg`,
-      position: { longitude: '52deg', latitude: 0, zoom: 70 },
+      position: {
+        longitude: '52deg',
+        latitude : 0,
+        zoom     : 70
+      },
       config  : {
         width  : 24576,
         cols   : 64,
@@ -76,8 +84,9 @@
     container : 'photosphere',
     adapter   : [PhotoSphereViewer.EquirectangularTilesAdapter, {
       showErrorTile: true,
+      baseBlur     : true,
     }],
-    plugins: [
+    plugins   : [
       PhotoSphereViewer.GyroscopePlugin,
     ],
     loadingImg: 'assets/photosphere-logo.gif',
@@ -103,32 +112,11 @@
 
   loadPanorama(panos[0]);
 
-  // wash out the base image
-  // for demonstration purpose only
   function loadPanorama(pano) {
-    const loader = new THREE.ImageLoader();
-
-    viewer.loader.show();
-
-    return new Promise((resolve, reject) => loader.load(pano.base, resolve, undefined, reject))
-      .then(image => {
-        const canvas = document.createElement('canvas');
-        canvas.width = image.width;
-        canvas.height = image.height;
-
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(image, 0, 0);
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.3)';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        return canvas.toDataURL('image/png');
-      })
-      .then(baseUrl => {
-        return viewer.setPanorama({
-          ...pano.config,
-          baseUrl: baseUrl,
-        }, pano.position);
-      })
+    return viewer.setPanorama({
+      ...pano.config,
+      baseUrl: pano.base,
+    }, pano.position)
       .then(() => {
         viewer.navbar.setCaption(pano.desc);
         viewer.setOption('minFov', pano.minFov);

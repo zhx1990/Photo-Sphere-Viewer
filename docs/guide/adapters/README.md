@@ -25,11 +25,27 @@ Official adapters (listed on the left menu) are available in the the main `photo
 
 <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/adapters/cubemap.min.js"></script>
 ```
+
+```js
+new PhotoSphereViewer.Viewer({
+  adapter: [PhotoSphereViewer.CubemapAdapter, {
+    // optional adapter config
+  }],
+  panorama: // specific to the adapter,
+});
+```
 :::
 
 ::: tab ES import
 ```js
 import CubemapAdapter from 'photo-sphere-viewer/dist/adapters/cubemap';
+
+new Viewer({
+  adapter: [CubemapAdapter, {
+    // optional adapter config
+  }],
+  panorama: // specific to the adapter,
+});
 ```
 :::
 

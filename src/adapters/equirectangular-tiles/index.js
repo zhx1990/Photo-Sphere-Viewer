@@ -1,4 +1,4 @@
-import { AbstractAdapter, CONSTANTS, PSVError, utils } from 'photo-sphere-viewer';
+import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from 'photo-sphere-viewer';
 import * as THREE from 'three';
 import { Queue } from './Queue';
 import { Task } from './Task';
@@ -25,6 +25,7 @@ import { Task } from './Task';
 /**
  * @typedef {Object} PSV.adapters.EquirectangularTilesAdapter.Options
  * @property {boolean} [showErrorTile=true] - shows a warning sign on tiles that cannot be loaded
+ * @property {boolean} [baseBlur=true] - applies a blur to the low resolution panorama
  */
 
 /**
@@ -71,6 +72,7 @@ export default class EquirectangularTilesAdapter extends AbstractAdapter {
      */
     this.config = {
       showErrorTile: true,
+      baseBlur     : true,
       ...options,
     };
 
@@ -214,7 +216,7 @@ export default class EquirectangularTilesAdapter extends AbstractAdapter {
       return this.psv.textureLoader.loadImage(panorama.baseUrl, p => this.psv.loader.setProgress(p))
         .then((img) => {
           return {
-            texture : utils.createTexture(img),
+            texture : this.__createBaseTexture(img),
             panoData: panoData,
           };
         });
@@ -514,6 +516,36 @@ export default class EquirectangularTilesAdapter extends AbstractAdapter {
     }
 
     return this.prop.errorMaterial;
+  }
+
+  /**
+   * @summary Create the texture for the base image
+   * @param {HTMLImageElement} img
+   * @return {external:THREE.Texture}
+   * @private
+   */
+  __createBaseTexture(img) {
+    if (img.width !== img.height * 2) {
+      utils.logWarn('Invalid base image, the width should be twice the height');
+    }
+
+    if (this.config.baseBlur || img.width > SYSTEM.maxTextureWidth) {
+      const ratio = Math.min(1, SYSTEM.getMaxCanvasWidth() / img.width);
+
+      const buffer = document.createElement('canvas');
+      buffer.width = img.width * ratio;
+      buffer.height = buffer.width / 2;
+
+      const ctx = buffer.getContext('2d');
+      if (this.config.baseBlur) {
+        ctx.filter = 'blur(1px)';
+      }
+      ctx.drawImage(img, 0, 0, buffer.width, buffer.height);
+
+      return utils.createTexture(buffer);
+    }
+
+    return utils.createTexture(img);
   }
 
 }
