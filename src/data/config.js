@@ -56,6 +56,7 @@ export const DEFAULTS = {
     zoom      : 'Zoom',
     zoomOut   : 'Zoom out',
     zoomIn    : 'Zoom in',
+    move      : 'Move',
     download  : 'Download',
     fullscreen: 'Fullscreen',
     menu      : 'Menu',

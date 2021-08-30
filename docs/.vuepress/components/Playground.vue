@@ -244,6 +244,7 @@
       navbar          : [
         { code: 'autorotate', label: DEFAULTS.lang.autorotate, enabled: true },
         { code: 'zoom', label: DEFAULTS.lang.zoom, enabled: true },
+        { code: 'move', label: DEFAULTS.lang.move, enabled: true },
         { code: 'download', label: DEFAULTS.lang.download, enabled: true },
         { code: 'caption', label: 'Caption', enabled: true },
         { code: 'fullscreen', label: DEFAULTS.lang.fullscreen, enabled: true },

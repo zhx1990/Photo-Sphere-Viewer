@@ -31,6 +31,8 @@ export class AbstractMoveButton extends AbstractButton {
   constructor(navbar, value) {
     super(navbar, 'psv-button--hover-scale psv-move-button');
 
+    this.container.title = this.psv.config.lang.move;
+
     /**
      * @override
      * @property {{longitude: boolean, latitude: boolean}} value
