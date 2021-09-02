@@ -42,27 +42,23 @@ You can also [download the latest release](https://github.com/mistic100/Photo-Sp
 
 Include all JS & CSS files in your page manually or with your favorite bundler and init the viewer.
 
-The `panorama` must be an [equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection) of your photo. Other modes are supported through [adapters](./adapters/).
-
 :::: tabs
 
 ::: tab Direct import
 ```html
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.css"/>
+<head>
+  <!-- for optimal display on high DPI devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.css"/>
+</head>
 
 <script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/uevent@2/browser.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.min.js"></script>
 
-<div id="viewer"></div>
-
-<style>
-  /* the viewer container must have a defined size */
-  #viewer {
-    width: 100vw;
-    height: 50vh;
-  }
-</style>
+<!-- the viewer container must have a defined size -->
+<div id="viewer" style="width: 100vw; height: 100vh;"></div>
 
 <script>
   var viewer = new PhotoSphereViewer.Viewer({
@@ -77,15 +73,13 @@ The `panorama` must be an [equirectangular projection](https://en.wikipedia.org/
 Import `photo-sphere-viewer/dist/photo-sphere-viewer.css` with the prefered way depending on your tooling.
 
 ```html
-<div id="viewer"></div>
+<head>
+  <!-- for optimal display on high DPI devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
 
-<style>
-  /* the viewer container must have a defined size */
-  #viewer {
-    width: 100vw;
-    height: 50vh;
-  }
-</style>
+<!-- the viewer container must have a defined size -->
+<div id="viewer" style="width: 100vw; height: 100vh;"></div>
 ```
 
 ```js
@@ -100,7 +94,7 @@ const viewer = new Viewer({
 
 ::::
 
----
+The `panorama` must be an [equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection) of your photo. Other modes are supported through [adapters](./adapters/).
 
 ::: tip Cropped panoramas
 If your image is not covering a full 360°×180° sphere, it will be deformed. You can fix it by providing [cropping data](./cropped-panorama.md).
