@@ -30,13 +30,9 @@ viewer.once('ready', () => {
 
 This section describes the most useful methods available, remember to check the <ApiLink page="PSV.Viewer.html"/> for a full list.
 
-### `destroy()`
-
-Removes the viewer from the page and frees memory used by three.js.
-
 ### `animate(options): Animation`
 
-Rotates and zooms the view with a smooth animation. You can change the position (`longitude`, `latitude` or `x`, `y`) and the zoom level (`zoom`). The `speed` option is either a duration in milliseconds or string containing the speed in revolutions per minute (`2rpm`) or degrees per second (`10dps`). It returns a `PSV.Animation` which is a standard Promise with an additional `cancel` method.
+Rotate and zoom the view with a smooth animation. You can change the position (`longitude`, `latitude` or `x`, `y`) and the zoom level (`zoom`). The `speed` option is either a duration in milliseconds or string containing the speed in revolutions per minute (`2rpm`) or degrees per second (`10dps`). It returns a `PSV.Animation` which is a standard Promise with an additional `cancel` method.
 
 ```js
 viewer.animate({
@@ -48,17 +44,21 @@ viewer.animate({
   .then(() => /* animation complete */);
 ```
 
+### `destroy()`
+
+Remove the viewer from the page and frees memory used by three.js.
+
 ### `getPosition(): Position`
 
-Returns the current position of the view.
+Return the current position of the view.
 
 ### `getZoomLevel(): number`
 
-Returns the current zoom level between 0 and 100.
+Return the current zoom level between 0 and 100.
 
 ### `rotate(position)`
 
-Immediately rotates the view without animation.
+Immediately rotate the view without animation.
 
 ```js
 // you can also use longitude and latitude
@@ -68,17 +68,28 @@ viewer.rotate({
 });
 ```
 
-### `setOption(option, value)` | `setOptions(options)`
+### `setOption(option, value)`
 
-Updates one or more options of the viewer. Some options cannot be changed : `panorama`, `panoData`, `container` and `plugins`.
+Update an option of the viewer. Some options cannot be changed : `panorama`, `panoData`, `container`, `adapter` and `plugins`.
 
 ```js
 viewer.setOption('fisheye', true);
 ```
 
+### `setOptions(options)`
+
+Update multiple options at once.
+
+```js
+viewer.setOptions({
+  fisheye: true,
+  autorotateSpeed: '-1rpm',
+});
+```
+
 ### `setPanorama(panorama, options): Promise`
 
-Changes the panorama image with an optional transition animation (enabled by default). You can also set the new `sphereCorrection` and `panoData` if needed.
+Change the panorama image with an optional transition animation (enabled by default). You can also set the new `sphereCorrection` and `panoData` if needed.
 
 ```js
 viewer.setPanorama('image.jpg')
@@ -87,4 +98,4 @@ viewer.setPanorama('image.jpg')
 
 ### `zoom(level)` | `zoomIn()` | `zoomOut()`
 
-Changes the zoom level without animation.
+Change the zoom level without animation.

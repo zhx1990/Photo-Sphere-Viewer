@@ -18,33 +18,15 @@ This example adds a persistent tooltip following the cursor.
 
 ### `create(config)`
 
-Create a tooltip. The configuration is described bellow.
+Create a tooltip.
 
-##### `content` (required)
-- type: `string`
-
-HTML content of the tooltip.
-
-#### `top` | `left` (required)
-- type: `integer`
-
-Pixel coordinate of the tooltip relative to the top-left corner of the viewer.
-
-##### `position`
-- type: `string`
-- default: `top center`
-
-Tooltip position toward it's arrow tip. Accepted values are combinations of `top`, `center`, `bottom` and `left`, `center`, `right`.
-
-##### `className`
-- type: `string`
-
-Additional CSS class added to the tooltip.
-
-##### `data`
-- type: `any`
-
-Userdata associated to the tooltip (useful for events).
+| | | |
+|---|---|---|
+| `content` (required) | `string` |HTML content of the tooltip. |
+| `top` & `left` (required) | `number` | Pixel coordinates of the tooltip relative to the top-left corner of the viewer. |
+| `position` (default `top center`) | `string` | Tooltip position toward it's arrow tip. Accepted values are combinations of `top`, `center`, `bottom` and `left`, `center`, `right`. |
+| `className` | `string` | Additional CSS class added to the tooltip. |
+| `data` | `any` | User data associated to the tooltip (useful for events). |
 
 ### `tooltip.move(config)`
 

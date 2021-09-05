@@ -16,34 +16,15 @@ This example adds a custom button to toggle a panel.
 
 ### `show(config)`
 
-Open the side panel. The configuration is described bellow.
+Open the side panel.
 
-##### `id`
-- type: `string`
-
-Unique identifier of the panel, this will be used to `hide` the panel only if the content has not been replaced by something else. It will be used to store the width defined by the user when using the resize handle.
-
-##### `content` (required)
-- type: `string`
-
-HTML content of the panel.
-
-##### `noMargin`
-- type: `boolean`
-- default: `false`
-
-Remove the default margins inside the panel.
-
-##### `width`
-- type: `string`
-- default: `400px` (from CSS)
-
-Initial width if the panel (example: `100%`, `600px`).
-
-##### `clickHandler`
-- type: `function`
-
-Function called when the user clicks inside the panel.
+| | | |
+|---|---|---|
+| `id` | `string` | Unique identifier of the panel, this will be used to `hide` the panel only if the content has not been replaced by something else. It will be used to store the width defined by the user when using the resize handle. |
+| `content` (required) | `string` | HTML content of the panel. |
+| `noMargin` (default&nbsp;`false`) | `boolean` | Remove the default margins inside the panel. |
+| `width` (default&nbsp;`400px`) | `string` | Initial width if the panel (example: `100%`, `600px`). |
+| `clickHandler` | `function` | Function called when the user clicks inside the panel. |
 
 ### `hide([id])`
 

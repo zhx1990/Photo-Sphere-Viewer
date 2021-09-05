@@ -73,7 +73,7 @@ One of these options is required.
 | `polylinePx` | `integer[2][]` | Same as `polygonPx` but generates a polyline. |
 | `polylineRad` | `double[2][]` | Same as `polygonRad` but generates a polyline. |
 
-#### Examples :
+**Examples :**
 
 ```js
 {

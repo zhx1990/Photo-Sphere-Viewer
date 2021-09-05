@@ -16,28 +16,14 @@ This example displays a overlay at startup.
 
 ### `show(config)`
 
-Show the overlay. The configuration is described bellow.
+Show the overlay.
 
-##### `id`
-- type: `string`
-
-Unique identifier of the overlay, this will be used to `hide` the overlay only if the content has not been replaced by something else.
-
-##### `text` (required)
-- type: `string`
-
-Main message of the overlay.
-
-##### `subtext`
-- type: `string`
-
-Secondary message of the overlay.
-
-##### `image`
-- type: `string`
-
-SVG image/icon displayed above the text.
-
+| | | |
+|---|---|---|
+| `id` | `string` | Unique identifier of the overlay, this will be used to `hide` the overlay only if the content has not been replaced by something else. |
+| `text` (required) | `string` | Main message of the overlay. |
+| `subtext` | `string` | Secondary message of the overlay. |
+| `image` | `string` |SVG image/icon displayed above the text. |
 
 ### `hide([id])`
 

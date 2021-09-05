@@ -16,17 +16,12 @@ This example consistently displays new notifications.
 
 ### `show(config)`
 
-Show the notification. The configuration is described bellow.
+Show the notification.
 
-##### `content` (required)
-- type: `string`
-
-HTML content of the notification.
-
-##### `timeout`
-- type: `number`
-
-Auto-hide delay in milliseconds.
+| | | |
+|---|---|---|
+| `content` (required) | `string` | HTML content of the notification. |
+| `timeout` | `number` | Auto-hide delay in milliseconds. |
 
 ### `hide()`
 

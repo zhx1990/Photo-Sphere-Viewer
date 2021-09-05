@@ -18,7 +18,7 @@ Triggered when the user clicks on the viewer (everywhere excluding the navbar an
 
 ```js
 viewer.on('click', (e, data) => {
-  console.log(`${data.rightclick ? 'right clicked' : 'clicked'} at longitude: ${data.longitude} latitude: ${data.latitude}`);
+  console.log(`${data.rightclick?'right ':''}clicked at longitude: ${data.longitude} latitude: ${data.latitude}`);
 });
 ```
 
@@ -38,6 +38,18 @@ viewer.on('position-updated', (e, position) => {
 
 Triggered when the panorama image has been loaded and the viewer is ready to perform the first render.
 
+```js
+viewer.once('ready', () => {
+  console.log(`viewer is ready`);
+});
+```
+
 ### `zoom-updated(level)`
 
 Triggered when the zoom level changes.
+
+```js
+viewer.on('zoom-updated', (e, level) => {
+  console.log(`new zoom level is ${level}`);
+});
+```
