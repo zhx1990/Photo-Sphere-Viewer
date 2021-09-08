@@ -87,3 +87,22 @@ export const EASINGS: {
   outCirc: (t: number) => number,
   inOutCirc: (t: number) => number,
 };
+
+/**
+ * @summary Subset of key codes
+ */
+export const KEY_CODES: {
+  Enter     : 'Enter',
+  Control   : 'Control',
+  Escape    : 'Escape',
+  Space     : ' ',
+  PageUp    : 'PageUp',
+  PageDown  : 'PageDown',
+  ArrowLeft : 'ArrowLeft',
+  ArrowUp   : 'ArrowUp',
+  ArrowRight: 'ArrowRight',
+  ArrowDown : 'ArrowDown',
+  Delete    : 'Delete',
+  Plus      : '+',
+  Minus     : '-',
+};

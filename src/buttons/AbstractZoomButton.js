@@ -1,4 +1,6 @@
+import { KEY_CODES } from '../data/constants';
 import { SYSTEM } from '../data/system';
+import { getEventKey } from '../utils';
 import { PressHandler } from '../utils/PressHandler';
 import { AbstractButton } from './AbstractButton';
 
@@ -28,6 +30,8 @@ export class AbstractZoomButton extends AbstractButton {
     };
 
     this.container.addEventListener('mousedown', this);
+    this.container.addEventListener('keydown', this);
+    this.container.addEventListener('keyup', this);
     this.psv.container.addEventListener('mouseup', this);
     this.psv.container.addEventListener('touchend', this);
   }
@@ -56,6 +60,8 @@ export class AbstractZoomButton extends AbstractButton {
       case 'mousedown': this.__onMouseDown(); break;
       case 'mouseup':   this.__onMouseUp(); break;
       case 'touchend':  this.__onMouseUp(); break;
+      case 'keydown':   getEventKey(e) === KEY_CODES.Enter && this.__onMouseDown(); break;
+      case 'keyup':     getEventKey(e) === KEY_CODES.Enter && this.__onMouseUp(); break;
       // @formatter:on
     }
     /* eslint-enable */

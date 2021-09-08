@@ -14,16 +14,12 @@
       overflow: hidden;
       margin: 0;
       padding: 0;
+      font-family: sans-serif;
     }
 
     #photosphere {
       width: 100%;
       height: 100%;
-    }
-
-    .custom-button {
-      font-family: sans-serif;
-      width: auto;
     }
   </style>
 </head>
@@ -59,7 +55,6 @@
     loadingImg: 'assets/photosphere-logo.gif',
     navbar    : [
       {
-        className: 'custom-button',
         content  : 'Loader',
         onClick  : () => {
           PSV.loader.show();
@@ -67,7 +62,6 @@
         },
       },
       {
-        className: 'custom-button',
         content  : 'Notification',
         onClick  : () => {
           const messages = ['This is a custom notification', 'This is another notification', 'Yet another notification?'];
@@ -78,7 +72,6 @@
         },
       },
       {
-        className: 'custom-button',
         content  : 'Overlay',
         onClick  : () => {
           PSV.overlay.show({
@@ -90,7 +83,6 @@
         },
       },
       {
-        className: 'custom-button',
         content  : 'Panel',
         onClick  : () => {
           PSV.panel.show({
@@ -101,7 +93,6 @@
         },
       },
       {
-        className: 'custom-button',
         content  : 'Tooltip',
         onClick  : () => {
           const position = ['top center', 'top left', 'top right', 'bottom center', 'bottom left', 'bottom right', 'center left', 'center right'][Math.floor(Math.random() * 8)];

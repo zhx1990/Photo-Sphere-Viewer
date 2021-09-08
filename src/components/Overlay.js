@@ -1,4 +1,5 @@
-import { EVENTS } from '../data/constants';
+import { EVENTS, KEY_CODES } from '../data/constants';
+import { getEventKey } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 import { PSVError } from '../PSVError';
 
@@ -56,12 +57,9 @@ export class Overlay extends AbstractComponent {
     this.subtext.className = 'psv-overlay-subtext';
     this.container.appendChild(this.subtext);
 
-    this.container.addEventListener('mouseup', (e) => {
-      e.stopPropagation();
-      if (this.prop.dissmisable) {
-        this.hide();
-      }
-    }, true);
+    this.container.addEventListener('mouseup', this);
+
+    document.addEventListener('keydown', this);
 
     super.hide();
   }
@@ -70,11 +68,29 @@ export class Overlay extends AbstractComponent {
    * @override
    */
   destroy() {
+    document.removeEventListener('keydown', this);
+
     delete this.image;
     delete this.text;
     delete this.subtext;
 
     super.destroy();
+  }
+
+  /**
+   * @summary Handles events
+   * @param {Event} e
+   * @private
+   */
+  handleEvent(e) {
+    /* eslint-disable */
+    switch (e.type) {
+      // @formatter:off
+      case 'mouseup':  this.prop.dissmisable && this.hide(); break;
+      case 'keydown':  getEventKey(e) === KEY_CODES.Escape && this.prop.dissmisable && this.hide(); break;
+      // @formatter:on
+    }
+    /* eslint-enable */
   }
 
   /**

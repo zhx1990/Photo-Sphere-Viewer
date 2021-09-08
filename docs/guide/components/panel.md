@@ -24,7 +24,11 @@ Open the side panel.
 | `content` (required) | `string` | HTML content of the panel. |
 | `noMargin` (default&nbsp;`false`) | `boolean` | Remove the default margins inside the panel. |
 | `width` (default&nbsp;`400px`) | `string` | Initial width if the panel (example: `100%`, `600px`). |
-| `clickHandler` | `function` | Function called when the user clicks inside the panel. |
+| `clickHandler` | `function` | Function called when the user clicks inside the panel or presses the Enter key while an element focused. |
+
+::: tip Content focus
+After openning, the first focusable element (`a`, `button` or anything with `tabindex`) will be focused, allowing the user to navigate with the Tab key and activate the `clickHandler` with the `Enter` key.
+:::
 
 ### `hide([id])`
 

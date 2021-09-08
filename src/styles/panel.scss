@@ -191,6 +191,11 @@
         height: 100%;
       }
     }
+
+    &:focus-visible {
+      outline: 1px dotted currentColor;
+      outline-offset: -1px;
+    }
   }
 
   &--stripped &-item {

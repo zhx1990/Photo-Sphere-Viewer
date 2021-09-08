@@ -16,7 +16,7 @@ export class ZoomRangeButton extends AbstractButton {
    * @param {PSV.components.Navbar} navbar
    */
   constructor(navbar) {
-    super(navbar, 'psv-zoom-range');
+    super(navbar, 'psv-zoom-range', false, false);
 
     /**
      * @override

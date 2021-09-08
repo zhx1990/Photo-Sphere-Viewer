@@ -32,7 +32,7 @@ export class MenuButton extends AbstractButton {
   <h1 class="psv-panel-menu-title">${menuIcon} ${psv.config.lang.menu}</h1>
   <ul class="psv-panel-menu-list">
     ${buttons.map(button => `
-    <li data-${dataKey}="${button.prop.id}" class="psv-panel-menu-item">
+    <li data-${dataKey}="${button.prop.id}" class="psv-panel-menu-item" tabindex="0">
       <span class="psv-panel-menu-item-icon">${button.container.innerHTML}</span>
       <span class="psv-panel-menu-item-label">${button.container.title}</span>
     </li>

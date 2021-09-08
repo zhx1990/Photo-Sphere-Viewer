@@ -1,7 +1,7 @@
-import { EVENTS } from '../data/constants';
+import { EVENTS, KEY_CODES } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { PSVError } from '../PSVError';
-import { toggleClass } from '../utils';
+import { getEventKey, toggleClass } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 
 /**
@@ -32,6 +32,7 @@ export class Panel extends AbstractComponent {
      * @property {number} mouseY
      * @property {boolean} mousedown
      * @property {function} clickHandler
+     * @property {function} keyHandler
      */
     this.prop = {
       ...this.prop,
@@ -41,6 +42,7 @@ export class Panel extends AbstractComponent {
       mouseY      : 0,
       mousedown   : false,
       clickHandler: null,
+      keyHandler  : null,
       width       : {},
     };
 
@@ -62,7 +64,7 @@ export class Panel extends AbstractComponent {
     this.content.className = 'psv-panel-content';
     this.container.appendChild(this.content);
 
-    // Stop wheel event bubling from panel
+    // Stop wheel event bubbling from panel
     this.container.addEventListener(SYSTEM.mouseWheelEvent, e => e.stopPropagation());
 
     closeBtn.addEventListener('click', () => this.hide());
@@ -74,6 +76,8 @@ export class Panel extends AbstractComponent {
     this.psv.container.addEventListener('touchend', this);
     this.psv.container.addEventListener('mousemove', this);
     this.psv.container.addEventListener('touchmove', this);
+
+    document.addEventListener('keydown', this);
   }
 
   /**
@@ -84,6 +88,8 @@ export class Panel extends AbstractComponent {
     this.psv.container.removeEventListener('touchmove', this);
     this.psv.container.removeEventListener('mouseup', this);
     this.psv.container.removeEventListener('touchend', this);
+
+    document.removeEventListener('keydown', this);
 
     delete this.prop;
     delete this.content;
@@ -106,6 +112,7 @@ export class Panel extends AbstractComponent {
       case 'touchmove':  this.__onTouchMove(e);  break;
       case 'mouseup':    this.__onMouseUp(e);    break;
       case 'touchend':   this.__onMouseUp(e);    break;
+      case 'keydown':    getEventKey(e) === KEY_CODES.Escape && this.hide(); break;
       // @formatter:on
     }
     /* eslint-enable */
@@ -133,7 +140,7 @@ export class Panel extends AbstractComponent {
    * @param {string} config.content - HTML content of the panel
    * @param {boolean} [config.noMargin=false] - remove the default margins
    * @param {string} [config.width] - initial width, if not specified the default width will be used
-   * @param {Function} [config.clickHandler] - called when the user clicks inside the panel
+   * @param {Function} [config.clickHandler] - called when the user clicks inside the panel or presses the Enter key while an element focused
    * @fires PSV.open-panel
    */
   show(config) {
@@ -146,7 +153,9 @@ export class Panel extends AbstractComponent {
 
     if (this.prop.clickHandler) {
       this.content.removeEventListener('click', this.prop.clickHandler);
+      this.content.removeEventListener('keydown', this.prop.keyHandler);
       this.prop.clickHandler = null;
+      this.prop.keyHandler = null;
     }
 
     if (config.id && this.prop.width[config.id]) {
@@ -167,7 +176,18 @@ export class Panel extends AbstractComponent {
 
     if (config.clickHandler) {
       this.prop.clickHandler = config.clickHandler;
-      this.content.addEventListener('click', config.clickHandler);
+      this.prop.keyHandler = (e) => {
+        if (getEventKey(e) === KEY_CODES.Enter) {
+          config.clickHandler(e);
+        }
+      };
+      this.content.addEventListener('click', this.prop.clickHandler);
+      this.content.addEventListener('keydown', this.prop.keyHandler);
+
+      // focus the first element if possible, after animation ends
+      setTimeout(() => {
+        this.content.querySelector('a,button,[tabindex]')?.focus();
+      }, 300);
     }
 
     this.psv.trigger(EVENTS.OPEN_PANEL, config.id);

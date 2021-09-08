@@ -1,6 +1,7 @@
 import { AbstractComponent } from '../components/AbstractComponent';
+import { KEY_CODES } from '../data/constants';
 import { PSVError } from '../PSVError';
-import { isPlainObject, toggleClass } from '../utils';
+import { getEventKey, isPlainObject, toggleClass } from '../utils';
 
 /**
  * @namespace PSV.buttons
@@ -42,8 +43,9 @@ export class AbstractButton extends AbstractComponent {
    * @param {PSV.components.Navbar} navbar
    * @param {string} [className] - Additional CSS classes
    * @param {boolean} [collapsable=false] - `true` if the button can be moved to menu when the navbar is too small
+   * @param {boolean} [tabbable=true] - `true` if the button is accessible with Tab key
    */
-  constructor(navbar, className = '', collapsable = false) {
+  constructor(navbar, className = '', collapsable = false, tabbable = true) {
     super(navbar, 'psv-button ' + className);
 
     /**
@@ -74,11 +76,22 @@ export class AbstractButton extends AbstractComponent {
       this.container.title = this.psv.config.lang[this.prop.id];
     }
 
+    if (tabbable) {
+      this.container.tabIndex = 0;
+    }
+
     this.container.addEventListener('click', (e) => {
       if (this.prop.enabled) {
         this.onClick();
       }
       e.stopPropagation();
+    });
+
+    this.container.addEventListener('keydown', (e) => {
+      if (getEventKey(e) === KEY_CODES.Enter && this.prop.enabled) {
+        this.onClick();
+        e.stopPropagation();
+      }
     });
   }
 

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { Animation } from '../Animation';
 import {
   ACTIONS,
   CTRLZOOM_TIMEOUT,
@@ -6,6 +7,7 @@ import {
   EVENTS,
   IDS,
   INERTIA_WINDOW,
+  KEY_CODES,
   LONGTOUCH_DELAY,
   MOVE_THRESHOLD,
   TWOFINGERSOVERLAY_DELAY
@@ -16,7 +18,6 @@ import mousewheelIcon from '../icons/mousewheel.svg';
 import { clone, distance, getClosest, getEventKey, isFullscreenEnabled, normalizeWheel, throttle } from '../utils';
 import { PressHandler } from '../utils/PressHandler';
 import { AbstractService } from './AbstractService';
-import { Animation } from '../Animation';
 
 /**
  * @summary Events handler
@@ -192,7 +193,7 @@ export class EventsHandler extends AbstractService {
     const key = getEventKey(evt);
 
     if (this.config.mousewheelCtrlKey) {
-      this.state.ctrlKeyDown = key === 'Control';
+      this.state.ctrlKeyDown = key === KEY_CODES.Control;
 
       if (this.state.ctrlKeyDown) {
         clearTimeout(this.state.ctrlZoomTimeout);

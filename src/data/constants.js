@@ -321,3 +321,25 @@ export const EASINGS = {
 };
 // @formatter:on
 /* eslint-enable */
+
+/**
+ * @summary Subset of key codes
+ * @memberOf PSV.constants
+ * @type {Object<string, string>}
+ * @constant
+ */
+export const KEY_CODES = {
+  Enter     : 'Enter',
+  Control   : 'Control',
+  Escape    : 'Escape',
+  Space     : ' ',
+  PageUp    : 'PageUp',
+  PageDown  : 'PageDown',
+  ArrowLeft : 'ArrowLeft',
+  ArrowUp   : 'ArrowUp',
+  ArrowRight: 'ArrowRight',
+  ArrowDown : 'ArrowDown',
+  Delete    : 'Delete',
+  Plus      : '+',
+  Minus     : '-',
+};

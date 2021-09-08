@@ -149,7 +149,7 @@ export class MarkersPlugin extends AbstractPlugin {
   <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
   <ul class="psv-panel-menu-list">
     ${markers.map(marker => `
-    <li data-${dataKey}="${marker.config.id}" class="psv-panel-menu-item">
+    <li data-${dataKey}="${marker.config.id}" class="psv-panel-menu-item" tabindex="0">
       ${marker.type === 'image' ? `<span class="psv-panel-menu-item-icon" ><img src="${marker.config.image}"/></span>` : ''}
       <span class="psv-panel-menu-item-label">${marker.getListContent()}</span>
     </li>

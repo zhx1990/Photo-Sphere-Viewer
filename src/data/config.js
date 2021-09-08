@@ -3,7 +3,7 @@ import { EquirectangularAdapter } from '../adapters/equirectangular';
 import { AbstractPlugin } from '../plugins/AbstractPlugin';
 import { PSVError } from '../PSVError';
 import { bound, clone, deepmerge, each, logWarn, parseAngle, parseSpeed, pluginInterop } from '../utils';
-import { ACTIONS } from './constants';
+import { ACTIONS, KEY_CODES } from './constants';
 
 /**
  * @summary Default options
@@ -65,15 +65,15 @@ export const DEFAULTS = {
     loadError : 'The panorama can\'t be loaded',
   },
   keyboard           : {
-    'ArrowUp'   : ACTIONS.ROTATE_LAT_UP,
-    'ArrowDown' : ACTIONS.ROTATE_LAT_DOWN,
-    'ArrowRight': ACTIONS.ROTATE_LONG_RIGHT,
-    'ArrowLeft' : ACTIONS.ROTATE_LONG_LEFT,
-    'PageUp'    : ACTIONS.ZOOM_IN,
-    'PageDown'  : ACTIONS.ZOOM_OUT,
-    '+'         : ACTIONS.ZOOM_IN,
-    '-'         : ACTIONS.ZOOM_OUT,
-    ' '         : ACTIONS.TOGGLE_AUTOROTATE,
+    [KEY_CODES.ArrowUp]   : ACTIONS.ROTATE_LAT_UP,
+    [KEY_CODES.ArrowDown] : ACTIONS.ROTATE_LAT_DOWN,
+    [KEY_CODES.ArrowRight]: ACTIONS.ROTATE_LONG_RIGHT,
+    [KEY_CODES.ArrowLeft] : ACTIONS.ROTATE_LONG_LEFT,
+    [KEY_CODES.PageUp]    : ACTIONS.ZOOM_IN,
+    [KEY_CODES.PageDown]  : ACTIONS.ZOOM_OUT,
+    [KEY_CODES.Plus]      : ACTIONS.ZOOM_IN,
+    [KEY_CODES.Minus]     : ACTIONS.ZOOM_OUT,
+    [KEY_CODES.Space]     : ACTIONS.TOGGLE_AUTOROTATE,
   },
   plugins            : [],
 };

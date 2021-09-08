@@ -41,7 +41,7 @@ export class CustomButton extends AbstractButton {
       this.container.innerHTML = this.config.content;
     }
 
-    this.width = this.container.offsetWidth;
+    this.prop.width = this.container.offsetWidth;
 
     if (this.config.enabled === false) {
       this.disable();
