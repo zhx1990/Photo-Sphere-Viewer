@@ -197,10 +197,6 @@ Sphere rotation angles, in radians.
 
 ![pan-tilt-toll](/assets//pan-tilt-roll.png)
 
-::: warning Future change in computation
-In a future version the order in which the angles are applied will change. It is highly recommended to set `sphereCorrectionReorder: true` to any new viewer to enable the new behaviour.
-:::
-
 #### `moveSpeed`
 - type: `double`
 - default `1`

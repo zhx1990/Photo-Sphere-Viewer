@@ -26,7 +26,6 @@ export const DEFAULTS = {
   defaultLong        : 0,
   defaultLat         : 0,
   sphereCorrection   : null,
-  sphereCorrectionReorder: false,
   moveSpeed          : 1,
   zoomSpeed          : 1,
   autorotateDelay    : null,
@@ -95,8 +94,9 @@ export const READONLY_OPTIONS = {
  * @private
  */
 export const DEPRECATED_OPTIONS = {
-  zoomButtonIncrement: 'zoomButtonIncrement is deprecated, use zoomSpeed',
-  mousewheelSpeed    : 'mousewheelSpeed is deprecated, use zoomSpeed',
+  zoomButtonIncrement    : 'zoomButtonIncrement is deprecated, use zoomSpeed',
+  mousewheelSpeed        : 'mousewheelSpeed is deprecated, use zoomSpeed',
+  sphereCorrectionReorder: 'sphereCorrectionReorder is deprecated',
 };
 
 /**

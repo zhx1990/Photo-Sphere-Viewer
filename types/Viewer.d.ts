@@ -43,7 +43,6 @@ export type ViewerOptions = {
   defaultLong?: number;
   defaultLat?: number;
   sphereCorrection?: { pan?: number, tilt?: number, roll?: number },
-  sphereCorrectionReorder?: boolean;
   moveSpeed?: number;
   zoomSpeed?: number;
   autorotateDelay?: null,

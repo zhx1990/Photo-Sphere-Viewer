@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Animation } from '../Animation';
 import { EVENTS, SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
-import { each, isExtendedPosition, isNil, logWarn } from '../utils';
+import { each, isExtendedPosition, isNil } from '../utils';
 import { AbstractService } from './AbstractService';
 
 /**
@@ -244,19 +244,11 @@ export class Renderer extends AbstractService {
     if (sphereCorrection) {
       const cleanCorrection = this.psv.dataHelper.cleanSphereCorrection(sphereCorrection);
 
-      if (!this.config.sphereCorrectionReorder) {
-        const nonZeros = (cleanCorrection.tilt !== 0) + (cleanCorrection.pan !== 0) + (cleanCorrection.roll !== 0);
-        if (nonZeros > 1) {
-          logWarn(`"sphereCorrection" computation will change in a future version. 
-            Please set "sphereCorrectionReorder: true" and modify your correction accordingly.`);
-        }
-      }
-
       mesh.rotation.set(
         cleanCorrection.tilt,
         cleanCorrection.pan,
         cleanCorrection.roll,
-        this.config.sphereCorrectionReorder ? 'ZXY' : 'XYZ'
+        'ZXY'
       );
     }
     else {

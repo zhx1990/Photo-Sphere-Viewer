@@ -286,7 +286,6 @@
       this.psv = new Viewer({
         container : 'viewer',
         loadingImg: 'https://photo-sphere-viewer.js.org/assets/photosphere-logo.gif',
-        sphereCorrectionReorder: true,
       });
 
       this.loadPsv();
