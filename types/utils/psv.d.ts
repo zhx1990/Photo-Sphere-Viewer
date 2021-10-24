@@ -24,6 +24,14 @@ export function getXMPValue(data: string, attr: string): number | null;
 export function parsePosition(value: string | Point): Point;
 
 /**
+ * @summary Parse a CSS-like position into an array of position keywords among top, bottom, left, right and center
+ * @param {string | string[]} value
+ * @param {string} defaultValue
+ * @param {boolean} [allowCenter=true]
+ */
+export function cleanPosition(value: string | string[], defaultValue: string, allowCenter?): string[];
+
+/**
  * @summary Parses an speed
  * @param speed - The speed, in radians/degrees/revolutions per second/minute
  * @returns radians per second

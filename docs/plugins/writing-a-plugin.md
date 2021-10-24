@@ -12,7 +12,7 @@ The recommended way to create your own plugin is as an ES6 class extending `Abst
 - It **must** implement the `destroy` method which is used to cleanup the plugin when the viewer is unloaded. 
 - The constructor **can** take an `options` object as second parameter.
 
-In you plugin you have access to `this.psv` which is the instance of the viewer, check the <ApiLink page="PSV.Viewer.html"/> for more information.
+In the plugin you have access to `this.psv` which is the instance of the viewer, check the <ApiLink page="PSV.Viewer.html"/> for more information.
 
 Your plugin is also an [`EventEmitter`](https://github.com/mistic100/uEvent) with `on`, `off` and `trigger` methods.
 
@@ -115,8 +115,10 @@ Photo Sphere Viewer buttons **must** extend `AbstractButton`, check the <ApiLink
 - It **must** implement the `onClick` method to perform an action.
 - It **should** have a `static icon` property containing a SVG.
 - It **can** implement the `isSupported` method to inform the viewer if the action is possible depending on the environement.
-- It **can** provide a CSS class name as second parameter of `super`.
-- It **can** provide a boolean as third parameter of `super`, this boolean indicated the button can be collapsed in the menu on small screens.
+- It **can** provide additional parameters to `super` :
+  - 2nd: a CSS class name applied to the button
+  - 3rd: a boolean indicating the button can be collapsed in the menu on small screens
+  - 4th: a boolean indicating the button can be activated with the keyboard
 
 ```js
 import { AbstractButton } from 'photo-sphere-viewer';
@@ -203,8 +205,10 @@ export default class PhotoSphereViewerCustomPlugin extends AbstractPlugin {
     /**
      * @type {PSV.plugins.SettingsPlugin}
      */
-    this.settings = SettingsPlugin ? psv.getPlugin(SettingsPlugin) : null;
+    this.settings = psv.getPlugin(SettingsPlugin);
 
+    // the user may choose to not import the Settings plugin
+    // you may choose to make it a requirement by throwing an error...
     if (this.settings) {
       this.settings.addSetting({
         id    : 'custom-setting',

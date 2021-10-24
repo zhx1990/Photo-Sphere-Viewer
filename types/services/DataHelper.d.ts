@@ -39,7 +39,7 @@ export class DataHelper {
   /**
    * @summary Converts spherical radians coordinates to a THREE.Vector3
    */
-  sphericalCoordsToVector3(position: Position): Vector3;
+  sphericalCoordsToVector3(position: Position, vector: Vector3): Vector3;
 
   /**
    * @summary Converts a THREE.Vector3 to spherical radians coordinates

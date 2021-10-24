@@ -1,4 +1,4 @@
-# VirtualTourPlugin
+# VirtualTourPlugin <Badge text="NEW"/>
 
 <ApiButton page="PSV.plugins.VirtualTourPlugin.html"/>
 
@@ -264,12 +264,17 @@ Default value is:
 
 Vertical offset in radians applied to the markers to compensate for the viewer position above ground.
 
-
 #### `arrowPosition` (3d mode only)
 - type: `'top' | 'bottom'`
 - default: `'bottom'`
 
 Vertical position of the arrows.
+
+#### `linksOnCompass`
+- type: `boolean`
+- default: `true` if markers mode
+
+If the [Compass plugin](plugin-compass.md) is enabled, displays the links on the compass.
 
 
 ## Methods

@@ -1,4 +1,4 @@
-import { AbstractPlugin, Viewer, PSVError } from '../..';
+import { AbstractPlugin, Viewer } from '../..';
 import { Event } from 'uevent';
 
 /**

@@ -102,6 +102,13 @@ export class MarkersPlugin extends AbstractPlugin {
      */
     HIDE_MARKERS       : 'hide-markers',
     /**
+     * @event set-marker
+     * @memberof PSV.plugins.MarkersPlugin
+     * @summary Triggered when the list of markers changes
+     * @param {PSV.plugins.MarkersPlugin.Marker[]} markers
+     */
+    SET_MARKERS        : 'set-markers',
+    /**
      * @event show-markers
      * @memberof PSV.plugins.MarkersPlugin
      * @summary Triggered when the markers are shown
@@ -327,11 +334,19 @@ export class MarkersPlugin extends AbstractPlugin {
   }
 
   /**
-   * @summary Return the total number of markers
+   * @summary Returns the total number of markers
    * @returns {number}
    */
   getNbMarkers() {
     return Object.keys(this.markers).length;
+  }
+
+  /**
+   * @summary Returns all the markers
+   * @return {PSV.plugins.MarkersPlugin.Marker[]}
+   */
+  getMarkers() {
+    return Object.values(this.markers);
   }
 
   /**
@@ -360,6 +375,8 @@ export class MarkersPlugin extends AbstractPlugin {
     if (render) {
       this.renderMarkers();
       this.__refreshUi();
+
+      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
     }
 
     return marker;
@@ -404,6 +421,8 @@ export class MarkersPlugin extends AbstractPlugin {
     if (render) {
       this.renderMarkers();
       this.__refreshUi();
+
+      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
     }
 
     return marker;
@@ -439,6 +458,8 @@ export class MarkersPlugin extends AbstractPlugin {
 
     if (render) {
       this.__refreshUi();
+
+      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
     }
   }
 
@@ -455,6 +476,8 @@ export class MarkersPlugin extends AbstractPlugin {
     if (render) {
       this.renderMarkers();
       this.__refreshUi();
+
+      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
     }
   }
 
@@ -468,6 +491,8 @@ export class MarkersPlugin extends AbstractPlugin {
     if (render) {
       this.renderMarkers();
       this.__refreshUi();
+
+      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
     }
   }
 

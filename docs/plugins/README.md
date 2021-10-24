@@ -24,7 +24,7 @@ Official plugins (listed on the left menu) are available in the the main `photo-
 Import `photo-sphere-viewer/dist/plugins/markers.css` with the prefered way depending on your tooling.
 
 ```js
-import { MarkersPlugins } from 'photo-sphere-viewer/dist/plugins/markers';
+import { MarkersPlugin } from 'photo-sphere-viewer/dist/plugins/markers';
 ```
 :::
 
@@ -39,8 +39,8 @@ All plugins consists of a JavaScript class which must be provided to the `plugin
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
   plugins: [
-    SimplePlugin,
-    [PluginWithOptions, {
+    PhotoSphereViewer.GyroscopePlugin,
+    [PhotoSphereViewer.MarkersPlugin, {
       option1: 'foo',
       option2: 'bar',
     }],
@@ -51,9 +51,9 @@ const viewer = new PhotoSphereViewer.Viewer({
 After initializayion the plugin instance can be obtained with the `getPlugin` method, allowing to call methods on the plugin and subscribe to events.
 
 ```js
-const plugin = new viewer.getPlugin(PluginWithOptions);
+const markersPlugin = new viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
 
-plugin.on('something', () => {
+markersPlugin.on('select-marker', () => {
   /* ... */
 });
 ```

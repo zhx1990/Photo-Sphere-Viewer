@@ -1,10 +1,8 @@
 import { EVENTS } from '../data/constants';
 import { PSVError } from '../PSVError';
-import { addClasses, parsePosition } from '../utils';
+import { addClasses, cleanPosition } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 
-const LEFT_MAP = { 0: 'left', 0.5: 'center', 1: 'right' };
-const TOP_MAP = { 0: 'top', 0.5: 'center', 1: 'bottom' };
 const STATE = { NONE: 0, SHOWING: 1, HIDING: 2, READY: 3 };
 
 /**
@@ -171,28 +169,9 @@ export class Tooltip extends AbstractComponent {
     const t = this.container;
     const a = this.arrow;
 
-    if (!config.position) {
-      config.position = ['top', 'center'];
-    }
-
-    // parse position
-    if (typeof config.position === 'string') {
-      const tempPos = parsePosition(config.position);
-
-      if (!(tempPos.x in LEFT_MAP) || !(tempPos.y in TOP_MAP)) {
-        throw new PSVError(`Unable to parse tooltip position "${config.position}"`);
-      }
-
-      config.position = [TOP_MAP[tempPos.y], LEFT_MAP[tempPos.x]];
-    }
-
-    if (config.position[0] === 'center' && config.position[1] === 'center') {
-      throw new PSVError('Unable to parse tooltip position "center center"');
-    }
-
     // compute size
     const style = {
-      posClass : config.position.slice(),
+      posClass : cleanPosition(config.position, 'top center', false),
       width    : this.prop.width,
       height   : this.prop.height,
       top      : 0,

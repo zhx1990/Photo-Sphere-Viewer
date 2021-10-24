@@ -79,6 +79,7 @@ import { bearing, distance, setMeshColor } from './utils';
  * @property {PSV.plugins.VirtualTourPlugin.ArrowStyle} [arrowStyle] - global arrow style
  * @property {number} [markerLatOffset=-0.1] - (GPS & Markers mode) latitude offset applied to link markers, to compensate for viewer height
  * @property {'top'|'bottom'} [arrowPosition='bottom'] - (3D mode) arrows vertical position
+ * @property {boolean} [linksOnCompass] - if the Compass plugin is enabled, displays the links on the compass
  */
 
 
@@ -237,6 +238,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
       preload        : false,
       markerLatOffset: -0.1,
       arrowPosition  : 'bottom',
+      linksOnCompass : options?.renderMode === MODE_MARKERS,
       ...options,
       markerStyle    : {
         ...VirtualTourPlugin.DEFAULT_MARKER,
@@ -254,6 +256,12 @@ export class VirtualTourPlugin extends AbstractPlugin {
      * @private
      */
     this.markers = this.psv.getPlugin('markers');
+
+    /**
+     * @type {PSV.plugins.CompassPlugin}
+     * @private
+     */
+    this.compass = this.psv.getPlugin('compass');
 
     if (!this.is3D() && !this.markers) {
       throw new PSVError('Tour plugin requires the Markers plugin in markers mode');
@@ -443,6 +451,10 @@ export class VirtualTourPlugin extends AbstractPlugin {
           this.markers.clearMarkers();
         }
 
+        if (this.config.linksOnCompass && this.compass) {
+          this.compass.setHotspots(null);
+        }
+
         return Promise.all([
           this.psv.setPanorama(node.panorama, {
             panoData        : node.panoData,
@@ -496,8 +508,11 @@ export class VirtualTourPlugin extends AbstractPlugin {
    * @private
    */
   __renderLinks(node) {
+    const positions = [];
+
     node.links.forEach((link) => {
       const position = this.__getLinkPosition(node, link);
+      positions.push(position);
 
       if (this.is3D()) {
         const arrow = ARROW_GEOM.clone();
@@ -509,7 +524,8 @@ export class VirtualTourPlugin extends AbstractPlugin {
 
         setMeshColor(mesh, link.arrowStyle?.color || this.config.arrowStyle.color);
 
-        mesh.userData = { [VirtualTourPlugin.LINK_DATA]: link };
+        mesh.userData = { [VirtualTourPlugin.LINK_DATA]: link, longitude: position.longitude };
+        mesh.rotation.order = 'YXZ';
         mesh.rotateY(-position.longitude);
         this.psv.dataHelper
           .sphericalCoordsToVector3({ longitude: position.longitude, latitude: 0 }, mesh.position)
@@ -534,8 +550,15 @@ export class VirtualTourPlugin extends AbstractPlugin {
       }
     });
 
-    if (!this.is3D()) {
+    if (this.is3D()) {
+      this.__positionArrows();
+    }
+    else {
       this.markers.renderMarkers();
+    }
+
+    if (this.config.linksOnCompass && this.compass) {
+      this.compass.setHotspots(positions);
     }
   }
 
@@ -626,11 +649,32 @@ export class VirtualTourPlugin extends AbstractPlugin {
    * @private
    */
   __positionArrows() {
+    const isBottom = this.config.arrowPosition === 'bottom';
+
     this.arrowsGroup.position.copy(this.psv.prop.direction).multiplyScalar(0.5);
     const s = this.config.arrowStyle.scale;
     const f = s[1] + (s[0] - s[1]) * CONSTANTS.EASINGS.linear(this.psv.getZoomLevel() / 100);
-    this.arrowsGroup.position.y += this.config.arrowPosition === 'bottom' ? -1.5 : 1.5;
+    this.arrowsGroup.position.y += isBottom ? -1.5 : 1.5;
     this.arrowsGroup.scale.set(f, f, f);
+
+    // slightly rotates each arrow to make the center ones standing out
+    const position = this.psv.getPosition();
+    if (isBottom ? (position.latitude < Math.PI / 8) : (position.latitude > -Math.PI / 8)) {
+      this.arrowsGroup.children
+        .filter(o => o.type === 'Mesh')
+        .forEach((arrow) => {
+          const d = Math.abs(utils.getShortestArc(arrow.userData.longitude, position.longitude));
+          const x = CONSTANTS.EASINGS.inOutSine(Math.max(0, Math.PI / 4 - d) / (Math.PI / 4)) / 3; // magic !
+          arrow.rotation.x = isBottom ? -x : x;
+        });
+    }
+    else {
+      this.arrowsGroup.children
+        .filter(o => o.type === 'Mesh')
+        .forEach((arrow) => {
+          arrow.rotation.x = 0;
+        });
+    }
   }
 
   /**

@@ -128,6 +128,46 @@ export function parsePosition(value) {
 }
 
 /**
+ * @readonly
+ * @private
+ */
+const LEFT_MAP = { 0: 'left', 0.5: 'center', 1: 'right' };
+/**
+ * @readonly
+ * @private
+ */
+const TOP_MAP = { 0: 'top', 0.5: 'center', 1: 'bottom' };
+
+/**
+ * @summary Parse a CSS-like position into an array of position keywords among top, bottom, left, right and center
+ * @param {string | string[]} value
+ * @param {string} defaultValue
+ * @param {boolean} [allowCenter=true]
+ * @return {string[]}
+ */
+export function cleanPosition(value, defaultValue, allowCenter = true) {
+  if (!value) {
+    return defaultValue.split(' ');
+  }
+
+  if (typeof value === 'string') {
+    const tempPos = parsePosition(value);
+
+    if (!(tempPos.x in LEFT_MAP) || !(tempPos.y in TOP_MAP)) {
+      throw new PSVError(`Unable to parse position "${value}"`);
+    }
+
+    value = [TOP_MAP[tempPos.y], LEFT_MAP[tempPos.x]];
+  }
+
+  if (!allowCenter && value[0] === 'center' && value[1] === 'center') {
+    throw new PSVError('Unable to parse position "center center"');
+  }
+
+  return value;
+}
+
+/**
  * @summary Parses an speed
  * @memberOf PSV.utils
  * @param {string|number} speed - The speed, in radians/degrees/revolutions per second/minute

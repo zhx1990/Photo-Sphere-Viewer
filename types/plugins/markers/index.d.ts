@@ -1,4 +1,4 @@
-import { AbstractPlugin, Animation, ExtendedPosition, PSVError, Viewer } from '../..';
+import { AbstractPlugin, Animation, ExtendedPosition, Viewer } from '../..';
 import { Event } from 'uevent';
 
 export type MarkerType =
@@ -122,6 +122,7 @@ export class MarkersPlugin extends AbstractPlugin {
     SELECT_MARKER_LIST : 'select-marker-list',
     UNSELECT_MARKER    : 'unselect-marker',
     HIDE_MARKERS       : 'hide-markers',
+    SET_MARKERS        : 'set-markers',
     SHOW_MARKERS       : 'show-markers',
   };
 
@@ -143,14 +144,18 @@ export class MarkersPlugin extends AbstractPlugin {
   hideAllTooltips();
 
   /**
-   * @summary Return the total number of markers
+   * @summary Returns the total number of markers
    * @returns {number}
    */
   getNbMarkers(): number;
 
   /**
+   * @summary Returns all the markers
+   */
+  getMarkers(): Marker[];
+
+  /**
    * @summary Adds a new marker to viewer
-   * @returns {PSV.plugins.MarkersPlugin.Marker}
    * @throws {PSVError} when the marker's id is missing or already exists
    */
   addMarker(properties: MarkerProperties, render?: boolean): Marker;
