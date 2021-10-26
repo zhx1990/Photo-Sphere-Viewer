@@ -13,7 +13,7 @@ export class CustomButton extends AbstractButton {
    * @param {PSV.NavbarCustomButton} config
    */
   constructor(navbar, config) {
-    super(navbar, 'psv-custom-button', config.collapsable !== false);
+    super(navbar, 'psv-custom-button', config.collapsable !== false, config.tabbable !== false);
 
     /**
      * @member {Object}

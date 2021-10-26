@@ -2,7 +2,7 @@ import { EVENTS } from '../data/constants';
 import { AbstractComponent } from './AbstractComponent';
 
 /**
- * @summary Notification class
+ * @summary Notification component
  * @extends PSV.components.AbstractComponent
  * @memberof PSV.components
  */

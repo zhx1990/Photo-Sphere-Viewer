@@ -43,7 +43,7 @@ export class AbstractButton extends AbstractComponent {
    * @param {PSV.components.Navbar} navbar
    * @param {string} [className] - Additional CSS classes
    * @param {boolean} [collapsable=false] - `true` if the button can be moved to menu when the navbar is too small
-   * @param {boolean} [tabbable=true] - `true` if the button is accessible with Tab key
+   * @param {boolean} [tabbable=true] - `true` if the button is accessible with the keyboard
    */
   constructor(navbar, className = '', collapsable = false, tabbable = true) {
     super(navbar, 'psv-button ' + className);

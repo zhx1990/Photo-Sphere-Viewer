@@ -4,7 +4,7 @@ import { AbstractComponent } from './AbstractComponent';
 import { PSVError } from '../PSVError';
 
 /**
- * @summary Overlay class
+ * @summary Overlay component
  * @extends PSV.components.AbstractComponent
  * @memberof PSV.components
  */
@@ -103,6 +103,8 @@ export class Overlay extends AbstractComponent {
 
   /**
    * @override
+   * @summary This method is not supported
+   * @throws {PSV.PSVError} always
    */
   toggle() {
     throw new PSVError('Overlay cannot be toggled');

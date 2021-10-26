@@ -28,7 +28,8 @@ const STATE = { NONE: 0, SHOWING: 1, HIDING: 2, READY: 3 };
  */
 
 /**
- * @summary Tooltip class
+ * @summary Tooltip component
+ * @description Never instanciate tooltips directly use {@link PSV.services.TooltipRenderer} instead
  * @extends PSV.components.AbstractComponent
  * @memberof PSV.components
  */
@@ -114,6 +115,8 @@ export class Tooltip extends AbstractComponent {
 
   /**
    * @override
+   * @summary This method is not supported
+   * @throws {PSV.PSVError} always
    */
   toggle() {
     throw new PSVError('Tooltip cannot be toggled');

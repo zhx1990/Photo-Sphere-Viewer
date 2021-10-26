@@ -50,7 +50,7 @@ export function registerButton(button) {
 ].forEach(registerButton);
 
 /**
- * @summary Navigation bar class
+ * @summary Navigation bar component
  * @extends PSV.components.AbstractComponent
  * @memberof PSV.components
  */
@@ -80,6 +80,7 @@ export class Navbar extends AbstractComponent {
   /**
    * @summary Change the buttons visible on the navbar
    * @param {string|Array<string|PSV.NavbarCustomButton>} buttons
+   * @throws {PSV.PSVError} when a button is unknown
    */
   setButtons(buttons) {
     this.children.slice().forEach(item => item.destroy());
@@ -125,6 +126,7 @@ export class Navbar extends AbstractComponent {
   /**
    * @summary Sets the bar caption
    * @param {string} html
+   * @throws {PSV.PSVError} when the caption element is not present
    */
   setCaption(html) {
     const caption = this.getButton('caption', false);

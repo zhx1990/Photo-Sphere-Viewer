@@ -4,12 +4,12 @@ import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
 /**
  * @typedef {Object} PSV.adapters.CubemapAdapter.Cubemap
  * @summary Object defining a cubemap
- * @property {string} top
- * @property {string} right
- * @property {string} bottom
  * @property {string} left
  * @property {string} front
+ * @property {string} right
  * @property {string} back
+ * @property {string} top
+ * @property {string} bottom
  */
 
 const CUBE_VERTICES = 8;

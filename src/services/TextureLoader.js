@@ -51,6 +51,7 @@ export class TextureLoader extends AbstractService {
    * @returns {Promise.<PSV.TextureData>}
    * @throws {PSV.PSVError} when the image cannot be loaded
    * @package
+   * @deprecated
    */
   loadTexture(panorama, newPanoData) {
     return this.psv.adapter.loadTexture(panorama, newPanoData);

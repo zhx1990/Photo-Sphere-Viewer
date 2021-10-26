@@ -4,7 +4,7 @@ import { PSVError } from '../PSVError';
  * @summary General information about the system
  * @constant
  * @memberOf PSV
- * @property {boolean} loaded - Indicates if the system has been loaded yet
+ * @property {boolean} loaded - Indicates if the system data has been loaded
  * @property {Function} load - Loads the system if not already loaded
  * @property {number} pixelRatio
  * @property {boolean} isWebGLSupported

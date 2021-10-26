@@ -13,7 +13,7 @@ import { AbstractComponent } from './AbstractComponent';
 const PANEL_MIN_WIDTH = 200;
 
 /**
- * @summary Panel class
+ * @summary Panel component
  * @extends PSV.components.AbstractComponent
  * @memberof PSV.components
  */
@@ -128,6 +128,8 @@ export class Panel extends AbstractComponent {
 
   /**
    * @override
+   * @summary This method is not supported
+   * @throws {PSV.PSVError} always
    */
   toggle() {
     throw new PSVError('Panel cannot be toggled');
@@ -139,7 +141,7 @@ export class Panel extends AbstractComponent {
    * @param {string} [config.id] - unique identifier to use with "hide" and to store the user desired width
    * @param {string} config.content - HTML content of the panel
    * @param {boolean} [config.noMargin=false] - remove the default margins
-   * @param {string} [config.width] - initial width, if not specified the default width will be used
+   * @param {string} [config.width] - initial width
    * @param {Function} [config.clickHandler] - called when the user clicks inside the panel or presses the Enter key while an element focused
    * @fires PSV.open-panel
    */

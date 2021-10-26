@@ -3,7 +3,7 @@ import { bound, getStyle } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 
 /**
- * @summary Loader class
+ * @summary Loader component
  * @extends PSV.components.AbstractComponent
  * @memberof PSV.components
  */

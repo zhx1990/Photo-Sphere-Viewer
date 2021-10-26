@@ -117,7 +117,7 @@ export class AbstractComponent {
   }
 
   /**
-   * @summary Check if the component is visible
+   * @summary Checks if the component is visible
    * @returns {boolean}
    */
   isVisible() {

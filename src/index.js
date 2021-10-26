@@ -47,13 +47,14 @@ export {
 
 /**
  * @typedef {Object} PSV.CssSize
- * @summary Object defining a size in CSS (px, % or auto)
+ * @summary Object defining a size in CSS
  * @property {string} [width]
  * @property {string} [height]
  */
 
 /**
  * @typedef {Object} PSV.SphereCorrection
+ * @summary Object defining angular corrections to a sphere
  * @property {number} pan
  * @property {number} tilt
  * @property {number} roll
@@ -67,19 +68,15 @@ export {
  */
 
 /**
- * @typedef {PSV.Position} PSV.ExtendedPosition
+ * @typedef {PSV.Position | PSV.Point} PSV.ExtendedPosition
  * @summary Object defining a spherical or texture position
  * @description A position that can be expressed either in spherical coordinates (radians or degrees) or in texture coordinates (pixels)
- * @property {number} [longitude]
- * @property {number} [latitude]
- * @property {number} [x]
- * @property {number} [y]
  */
 
 /**
  * @typedef {PSV.ExtendedPosition} PSV.AnimateOptions
  * @summary Object defining animation options
- * @property {number|string} speed - animation speed or duration (in milliseconds)
+ * @property {number|string} speed - animation speed or duration in milliseconds
  * @property {number} [zoom] - new zoom level between 0 and 100
  */
 
@@ -92,9 +89,9 @@ export {
  * @property {number} croppedHeight
  * @property {number} croppedX
  * @property {number} croppedY
- * @property {number} poseHeading
- * @property {number} posePitch
- * @property {number} poseRoll
+ * @property {number} [poseHeading]
+ * @property {number} [posePitch]
+ * @property {number} [poseRoll]
  */
 
 /**
@@ -109,7 +106,7 @@ export {
  * @typedef {PSV.ExtendedPosition} PSV.PanoramaOptions
  * @summary Object defining panorama and animation options
  * @property {boolean|number} [transition=1500] - duration of the transition between all and new panorama
- * @property {boolean} [showLoader=true] - show the loader
+ * @property {boolean} [showLoader=true] - show the loader while loading the new panorama
  * @property {number} [zoom] - new zoom level between 0 and 100
  * @property {PSV.SphereCorrection} [sphereCorrection] - new sphere correction to apply to the panorama
  * @property {PSV.PanoData | PSV.PanoDataProvider} [panoData] - new data used for this panorama
@@ -132,8 +129,8 @@ export {
  * @property {number} viewerY - position in the viewer
  * @property {number} longitude - position in spherical coordinates
  * @property {number} latitude - position in spherical coordinates
- * @property {number} [textureX] - position on the texture, undefined for cubemaps
- * @property {number} [textureY] - position on the texture, undefined for cubemaps
+ * @property {number} [textureX] - position on the texture, if applicable
+ * @property {number} [textureY] - position on the texture, if applicable
  * @property {PSV.plugins.MarkersPlugin.Marker} [marker] - clicked marker
  */
 
@@ -148,6 +145,7 @@ export {
  * @property {boolean} [disabled=false]
  * @property {boolean} [visible=true]
  * @property {boolean} [collapsable=true]
+ * @property {boolean} [tabbable=true]
  */
 
 /**

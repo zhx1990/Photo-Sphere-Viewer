@@ -61,11 +61,11 @@ CSS class added to the button.
 
 Initially disable the button.
 
-#### `hidden`
+#### `visible`
 - type : `boolean`
-- default : `false`
+- default : `true`
 
-Initially hide the button.
+Initially show the button.
 
 
 ## Example
