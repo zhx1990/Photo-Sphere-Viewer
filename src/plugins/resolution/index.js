@@ -1,9 +1,6 @@
 import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError } from '../..';
-import { SettingsPlugin } from '../settings';
+import { EVENTS } from './constants';
 import { deepEqual } from './utils';
-
-
-DEFAULTS.lang.resolution = 'Quality';
 
 
 /**
@@ -18,6 +15,13 @@ DEFAULTS.lang.resolution = 'Quality';
  * @property {PSV.plugins.ResolutionPlugin.Resolution[]} resolutions - list of available resolutions
  */
 
+
+DEFAULTS.lang.resolution = 'Quality';
+
+
+export { EVENTS } from './constants';
+
+
 /**
  * @summary Adds a setting to choose between multiple resolutions of the panorama.
  * @extends PSV.plugins.AbstractPlugin
@@ -28,20 +32,9 @@ export class ResolutionPlugin extends AbstractPlugin {
   static id = 'resolution';
 
   /**
-   * @summary Available events
-   * @enum {string}
-   * @memberof PSV.plugins.ResolutionPlugin
-   * @constant
+   * @deprecated use the EVENTS constants of the module
    */
-  static EVENTS = {
-    /**
-     * @event resolution-changed
-     * @memberof PSV.plugins.ResolutionPlugin
-     * @summary Triggered when the resolution is changed
-     * @param {string} resolutionId
-     */
-    RESOLUTION_CHANGED: 'resolution-changed',
-  };
+  static EVENTS = EVENTS;
 
   /**
    * @param {PSV.Viewer} psv
@@ -55,7 +48,7 @@ export class ResolutionPlugin extends AbstractPlugin {
      * @readonly
      * @private
      */
-    this.settings = SettingsPlugin ? psv.getPlugin(SettingsPlugin) : null;
+    this.settings = psv.getPlugin('settings');
 
     if (!this.settings) {
       throw new PSVError('Resolution plugin requires the Settings plugin');
@@ -105,7 +98,7 @@ export class ResolutionPlugin extends AbstractPlugin {
   destroy() {
     this.psv.off(CONSTANTS.EVENTS.PANORAMA_LOADED, this);
 
-    this.settings.removeSetting(SettingsPlugin.id);
+    this.settings.removeSetting(ResolutionPlugin.id);
 
     super.destroy();
   }
@@ -167,7 +160,7 @@ export class ResolutionPlugin extends AbstractPlugin {
     const resolution = this.resolutions.find(r => deepEqual(this.psv.config.panorama, r.panorama));
     if (this.prop.resolution !== resolution?.id) {
       this.prop.resolution = resolution?.id;
-      this.trigger(ResolutionPlugin.EVENTS.RESOLUTION_CHANGED, this.prop.resolution);
+      this.trigger(EVENTS.RESOLUTION_CHANGED, this.prop.resolution);
     }
   }
 

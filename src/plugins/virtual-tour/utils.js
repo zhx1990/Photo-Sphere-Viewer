@@ -1,15 +1,10 @@
 import { PSVError, utils } from 'photo-sphere-viewer';
 
 /**
- * @namespace PSV.plugins.VirtualTourPlugin.utils
- */
-
-/**
  * @summary Checks the configuration of a node
- * @memberOf PSV.plugins.VirtualTourPlugin.utils
- * @package
  * @param {PSV.plugins.VirtualTourPlugin.Node} node
  * @param {boolean} isGps
+ * @private
  */
 export function checkNode(node, isGps) {
   if (!node.id) {
@@ -25,11 +20,10 @@ export function checkNode(node, isGps) {
 
 /**
  * @summary Checks the configuration of a link
- * @memberOf PSV.plugins.VirtualTourPlugin.utils
- * @package
  * @param {PSV.plugins.VirtualTourPlugin.Node} node
  * @param {PSV.plugins.VirtualTourPlugin.NodeLink} link
  * @param {boolean} isGps
+ * @private
  */
 export function checkLink(node, link, isGps) {
   if (!link.nodeId) {
@@ -42,10 +36,9 @@ export function checkLink(node, link, isGps) {
 
 /**
  * @summary Changes the color of a mesh
- * @memberOf PSV.plugins.VirtualTourPlugin.utils
- * @package
  * @param {external:THREE.Mesh} mesh
  * @param {*} color
+ * @private
  */
 export function setMeshColor(mesh, color) {
   mesh.material.color.set(color);
@@ -54,11 +47,10 @@ export function setMeshColor(mesh, color) {
 
 /**
  * @summary Returns the distance between two GPS points
- * @memberOf PSV.plugins.VirtualTourPlugin.utils
- * @package
  * @param {number[]} p1
  * @param {number[]} p2
  * @return {number}
+ * @private
  */
 export function distance(p1, p2) {
   return utils.greatArcDistance(p1, p2) * 6371e3;
@@ -67,11 +59,10 @@ export function distance(p1, p2) {
 /**
  * @summary Returns the bearing between two GPS points
  * {@link http://www.movable-type.co.uk/scripts/latlong.html}
- * @memberOf PSV.plugins.VirtualTourPlugin.utils
- * @package
  * @param {number[]} p1
  * @param {number[]} p2
  * @return {number}
+ * @private
  */
 export function bearing(p1, p2) {
   const [λ1, φ1] = p1;

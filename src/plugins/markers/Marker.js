@@ -1,5 +1,5 @@
 import { CONSTANTS, PSVError, utils } from '../..';
-import { MarkersPlugin } from './index';
+import { MARKER_DATA, SVG_NS } from './constants';
 import { getPolygonCenter, getPolylineCenter } from './utils';
 
 /**
@@ -125,17 +125,17 @@ export class Marker {
       this.$el = document.createElement('div');
     }
     else if (this.isPolygon()) {
-      this.$el = document.createElementNS(MarkersPlugin.SVG_NS, 'polygon');
+      this.$el = document.createElementNS(SVG_NS, 'polygon');
     }
     else if (this.isPolyline()) {
-      this.$el = document.createElementNS(MarkersPlugin.SVG_NS, 'polyline');
+      this.$el = document.createElementNS(SVG_NS, 'polyline');
     }
     else {
-      this.$el = document.createElementNS(MarkersPlugin.SVG_NS, this.type);
+      this.$el = document.createElementNS(SVG_NS, this.type);
     }
 
     this.$el.id = `psv-marker-${this.id}`;
-    this.$el[MarkersPlugin.MARKER_DATA] = this;
+    this.$el[MARKER_DATA] = this;
 
     this.update(properties);
   }
@@ -144,7 +144,7 @@ export class Marker {
    * @summary Destroys the marker
    */
   destroy() {
-    delete this.$el[MarkersPlugin.MARKER_DATA];
+    delete this.$el[MARKER_DATA];
     delete this.$el;
     delete this.config;
     delete this.props;

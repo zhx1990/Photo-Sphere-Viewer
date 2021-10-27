@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
 
+
 /**
  * @typedef {Object} PSV.adapters.CubemapAdapter.Cubemap
  * @summary Object defining a cubemap
@@ -12,9 +13,11 @@ import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
  * @property {string} bottom
  */
 
+
 const CUBE_VERTICES = 8;
 const CUBE_MAP = [0, 2, 4, 5, 3, 1];
 const CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
+
 
 /**
  * @summary Adapter for cubemaps

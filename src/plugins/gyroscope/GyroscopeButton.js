@@ -1,6 +1,6 @@
 import { AbstractButton } from '../..';
 import compass from './compass.svg';
-import { GyroscopePlugin } from './index';
+import { EVENTS } from './constants';
 
 /**
  * @summary Navigation bar gyroscope button class
@@ -23,10 +23,10 @@ export class GyroscopeButton extends AbstractButton {
      * @readonly
      * @private
      */
-    this.plugin = this.psv.getPlugin(GyroscopePlugin.id);
+    this.plugin = this.psv.getPlugin('gyroscope');
 
     if (this.plugin) {
-      this.plugin.on(GyroscopePlugin.EVENTS.GYROSCOPE_UPDATED, this);
+      this.plugin.on(EVENTS.GYROSCOPE_UPDATED, this);
     }
   }
 
@@ -35,7 +35,7 @@ export class GyroscopeButton extends AbstractButton {
    */
   destroy() {
     if (this.plugin) {
-      this.plugin.off(GyroscopePlugin.EVENTS.GYROSCOPE_UPDATED, this);
+      this.plugin.off(EVENTS.GYROSCOPE_UPDATED, this);
     }
 
     delete this.plugin;
@@ -56,7 +56,7 @@ export class GyroscopeButton extends AbstractButton {
    * @private
    */
   handleEvent(e) {
-    if (e.type === GyroscopePlugin.EVENTS.GYROSCOPE_UPDATED) {
+    if (e.type === EVENTS.GYROSCOPE_UPDATED) {
       this.toggleActive(e.args[0]);
     }
   }

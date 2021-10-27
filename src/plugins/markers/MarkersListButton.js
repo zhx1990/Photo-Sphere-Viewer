@@ -1,5 +1,5 @@
 import { AbstractButton, CONSTANTS } from '../..';
-import { MarkersPlugin } from './index';
+import { ID_PANEL_MARKERS_LIST } from './constants';
 import pinList from './pin-list.svg';
 
 /**
@@ -21,7 +21,7 @@ export class MarkersListButton extends AbstractButton {
     /**
      * @type {PSV.plugins.MarkersPlugin}
      */
-    this.plugin = this.psv.getPlugin(MarkersPlugin.id);
+    this.plugin = this.psv.getPlugin('markers');
 
     if (this.plugin) {
       this.psv.on(CONSTANTS.EVENTS.OPEN_PANEL, this);
@@ -57,7 +57,7 @@ export class MarkersListButton extends AbstractButton {
     /* eslint-disable */
     switch (e.type) {
       // @formatter:off
-      case CONSTANTS.EVENTS.OPEN_PANEL:  this.toggleActive(e.args[0] === MarkersPlugin.ID_PANEL_MARKERS_LIST); break;
+      case CONSTANTS.EVENTS.OPEN_PANEL:  this.toggleActive(e.args[0] === ID_PANEL_MARKERS_LIST); break;
       case CONSTANTS.EVENTS.CLOSE_PANEL: this.toggleActive(false); break;
       // @formatter:on
     }

@@ -1,6 +1,6 @@
 import { StereoEffect } from 'three/examples/jsm/effects/StereoEffect';
 import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from '../..';
-import { GyroscopePlugin } from '../gyroscope';
+import { EVENTS, ID_OVERLAY_PLEASE_ROTATE } from './constants';
 import mobileRotateIcon from './mobile-rotate.svg';
 import { StereoButton } from './StereoButton';
 
@@ -21,6 +21,9 @@ DEFAULTS.lang.stereoNotification = 'Click anywhere to exit stereo view.';
 DEFAULTS.lang.pleaseRotate = ['Please rotate your device', '(or tap to continue)'];
 
 
+export { EVENTS } from './constants';
+
+
 /**
  * @summary Adds stereo view on mobile devices
  * @extends PSV.plugins.AbstractPlugin
@@ -31,27 +34,9 @@ export class StereoPlugin extends AbstractPlugin {
   static id = 'stereo';
 
   /**
-   * @summary Identifier of the overlay "please rotate your screen"
-   * @type {string}
-   * @constant
+   * @deprecated use the EVENTS constants of the module
    */
-  static ID_OVERLAY_PLEASE_ROTATE = 'pleaseRotate';
-
-  /**
-   * @summary Available events
-   * @enum {string}
-   * @memberof PSV.plugins.StereoPlugin
-   * @constant
-   */
-  static EVENTS = {
-    /**
-     * @event stereo-updated
-     * @memberof PSV.plugins.StereoPlugin
-     * @summary Triggered when the stereo view is enabled/disabled
-     * @param {boolean} enabled
-     */
-    STEREO_UPDATED: 'stereo-updated',
-  };
+  static EVENTS = EVENTS;
 
   /**
    * @param {PSV.Viewer} psv
@@ -64,7 +49,7 @@ export class StereoPlugin extends AbstractPlugin {
      * @readonly
      * @private
      */
-    this.gyroscope = GyroscopePlugin ? psv.getPlugin(GyroscopePlugin) : null;
+    this.gyroscope = psv.getPlugin('gyroscope');
 
     if (!this.gyroscope) {
       throw new PSVError('Stereo plugin requires the Gyroscope plugin');
@@ -164,7 +149,7 @@ export class StereoPlugin extends AbstractPlugin {
       this.psv.navbar.hide();
       this.psv.panel.hide();
 
-      this.trigger(StereoPlugin.EVENTS.STEREO_UPDATED, true);
+      this.trigger(EVENTS.STEREO_UPDATED, true);
 
       this.psv.notification.show({
         content: this.psv.config.lang.stereoNotification,
@@ -198,7 +183,7 @@ export class StereoPlugin extends AbstractPlugin {
       this.psv.exitFullscreen();
       this.gyroscope.stop();
 
-      this.trigger(StereoPlugin.EVENTS.STEREO_UPDATED, false);
+      this.trigger(EVENTS.STEREO_UPDATED, false);
     }
   }
 
@@ -261,7 +246,7 @@ export class StereoPlugin extends AbstractPlugin {
     const displayRotateMessage = () => {
       if (this.isEnabled() && window.innerHeight > window.innerWidth) {
         this.psv.overlay.show({
-          id     : StereoPlugin.ID_OVERLAY_PLEASE_ROTATE,
+          id     : ID_OVERLAY_PLEASE_ROTATE,
           image  : mobileRotateIcon,
           text   : this.psv.config.lang.pleaseRotate[0],
           subtext: this.psv.config.lang.pleaseRotate[1],
@@ -292,7 +277,7 @@ export class StereoPlugin extends AbstractPlugin {
       window.screen.orientation.unlock();
     }
     else {
-      this.psv.overlay.hide(StereoPlugin.ID_OVERLAY_PLEASE_ROTATE);
+      this.psv.overlay.hide(ID_OVERLAY_PLEASE_ROTATE);
     }
   }
 

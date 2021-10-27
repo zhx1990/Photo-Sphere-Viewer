@@ -1,5 +1,5 @@
 import { AbstractButton } from '../..';
-import { MarkersPlugin } from './index';
+import { EVENTS } from './constants';
 import pin from './pin.svg';
 
 /**
@@ -21,11 +21,11 @@ export class MarkersButton extends AbstractButton {
     /**
      * @type {PSV.plugins.MarkersPlugin}
      */
-    this.plugin = this.psv.getPlugin(MarkersPlugin.id);
+    this.plugin = this.psv.getPlugin('markers');
 
     if (this.plugin) {
-      this.plugin.on(MarkersPlugin.EVENTS.SHOW_MARKERS, this);
-      this.plugin.on(MarkersPlugin.EVENTS.HIDE_MARKERS, this);
+      this.plugin.on(EVENTS.SHOW_MARKERS, this);
+      this.plugin.on(EVENTS.HIDE_MARKERS, this);
 
       this.toggleActive(true);
     }
@@ -36,8 +36,8 @@ export class MarkersButton extends AbstractButton {
    */
   destroy() {
     if (this.plugin) {
-      this.plugin.off(MarkersPlugin.EVENTS.SHOW_MARKERS, this);
-      this.plugin.off(MarkersPlugin.EVENTS.HIDE_MARKERS, this);
+      this.plugin.off(EVENTS.SHOW_MARKERS, this);
+      this.plugin.off(EVENTS.HIDE_MARKERS, this);
     }
 
     super.destroy();
@@ -59,8 +59,8 @@ export class MarkersButton extends AbstractButton {
     /* eslint-disable */
     switch (e.type) {
       // @formatter:off
-      case MarkersPlugin.EVENTS.SHOW_MARKERS: this.toggleActive(true); break;
-      case MarkersPlugin.EVENTS.HIDE_MARKERS: this.toggleActive(false); break;
+      case EVENTS.SHOW_MARKERS: this.toggleActive(true); break;
+      case EVENTS.HIDE_MARKERS: this.toggleActive(false); break;
       // @formatter:on
     }
     /* eslint-enable */

@@ -86,16 +86,11 @@ const secondaryConfig = {
     globals: {
       ...baseConfig.output.globals,
       'photo-sphere-viewer': 'PhotoSphereViewer',
-      ...plugins.reduce((globals, p) => {
-        globals[`photo-sphere-viewer/dist/plugins/${p}`] = `PhotoSphereViewer.${camelize(p)}Plugin`;
-        return globals;
-      }, {}),
     },
   },
   external: [
     ...baseConfig.external,
     'photo-sphere-viewer',
-    ...plugins.map(p => `photo-sphere-viewer/dist/plugins/${p}`),
   ],
   plugins: () => [
     replace({
@@ -103,10 +98,6 @@ const secondaryConfig = {
       preventAssignment           : true,
       [`from 'three/examples/jsm`]: `from '../../../three-examples`,
       [`from '../..'`]            : `from 'photo-sphere-viewer'`,
-      ...plugins.reduce((replace, p) => {
-        replace[`from '../${p}'`] = `from 'photo-sphere-viewer/dist/plugins/${p}'`;
-        return replace;
-      }, {}),
     }),
     ...baseConfig.plugins(),
   ],

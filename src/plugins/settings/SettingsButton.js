@@ -1,5 +1,5 @@
 import { AbstractButton, CONSTANTS } from '../..';
-import { SettingsPlugin } from './index';
+import { ID_PANEL } from './constants';
 import icon from './settings.svg';
 
 /**
@@ -23,7 +23,7 @@ export class SettingsButton extends AbstractButton {
      * @private
      * @readonly
      */
-    this.plugin = this.psv.getPlugin(SettingsPlugin.id);
+    this.plugin = this.psv.getPlugin('settings');
 
     if (this.plugin) {
       this.psv.on(CONSTANTS.EVENTS.OPEN_PANEL, this);
@@ -59,7 +59,7 @@ export class SettingsButton extends AbstractButton {
     /* eslint-disable */
     switch (e.type) {
       // @formatter:off
-      case CONSTANTS.EVENTS.OPEN_PANEL:  this.toggleActive(e.args[0] === SettingsPlugin.ID_PANEL); break;
+      case CONSTANTS.EVENTS.OPEN_PANEL:  this.toggleActive(e.args[0] === ID_PANEL); break;
       case CONSTANTS.EVENTS.CLOSE_PANEL: this.toggleActive(false); break;
       // @formatter:on
     }

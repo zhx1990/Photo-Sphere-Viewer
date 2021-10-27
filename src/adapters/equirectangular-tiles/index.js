@@ -3,6 +3,7 @@ import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
 import { Queue } from './Queue';
 import { Task } from './Task';
 
+
 /**
  * @callback TileUrl
  * @summary Function called to build a tile url
@@ -35,6 +36,7 @@ import { Task } from './Task';
  * @property {int} row
  * @property {int} angle
  */
+
 
 const SPHERE_SEGMENTS = 64;
 const NB_VERTICES = 3 * (SPHERE_SEGMENTS * 2 + (SPHERE_SEGMENTS / 2 - 2) * SPHERE_SEGMENTS * 2);

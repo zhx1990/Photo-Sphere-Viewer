@@ -5,7 +5,9 @@ import { PSVError } from '../../PSVError';
 import { createTexture, firstNonNull, getXMPValue, logWarn } from '../../utils';
 import { AbstractAdapter } from '../AbstractAdapter';
 
+
 const SPHERE_SEGMENTS = 64;
+
 
 /**
  * @summary Adapter for equirectangular panoramas

@@ -1,6 +1,6 @@
 import { CONSTANTS, Viewer } from 'photo-sphere-viewer';
 import { EquirectangularTilesAdapter, EquirectangularTilesPanorama } from 'photo-sphere-viewer/dist/adapters/equirectangular-tiles';
-import { MarkersPlugin, MarkersPluginOptions } from 'photo-sphere-viewer/dist/plugins/markers';
+import { MarkersPlugin, MarkersPluginOptions, EVENTS as MAKER_EVENTS } from 'photo-sphere-viewer/dist/plugins/markers';
 import { CustomPlugin } from './CustomPlugin';
 
 const viewer = new Viewer({
@@ -66,7 +66,7 @@ const markers = viewer.getPlugin(MarkersPlugin);
 markers.on('select-marker', (e, marker) => {
   const markerId: string = marker.id;
 });
-markers.on(MarkersPlugin.EVENTS.UNSELECT_MARKER, (e, marker) => {
+markers.on(MAKER_EVENTS.UNSELECT_MARKER, (e, marker) => {
   const markerId: string = marker.id;
 });
 

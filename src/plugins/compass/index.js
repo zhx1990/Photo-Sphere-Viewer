@@ -22,9 +22,6 @@ import './style.scss';
  */
 
 
-/**
- * @private
- */
 const HOTSPOT_SIZE_RATIO = 1 / 40;
 
 

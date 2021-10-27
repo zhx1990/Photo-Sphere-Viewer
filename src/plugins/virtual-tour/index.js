@@ -1,11 +1,23 @@
 import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, utils } from 'photo-sphere-viewer';
 import * as THREE from 'three';
-import arrowGeometryJson from './arrow.json';
-import arrowIconSvg from './arrow.svg';
 import { ClientSideDatasource } from './ClientSideDatasource';
+import {
+  ARROW_GEOM,
+  DEFAULT_ARROW,
+  DEFAULT_MARKER,
+  EVENTS,
+  LINK_DATA,
+  MODE_3D,
+  MODE_CLIENT,
+  MODE_GPS,
+  MODE_MANUAL,
+  MODE_MARKERS,
+  MODE_SERVER
+} from './constants';
 import { ServerSideDatasource } from './ServerSideDatasource';
 import './style.scss';
 import { bearing, distance, setMeshColor } from './utils';
+
 
 /**
  * @callback GetNode
@@ -86,65 +98,7 @@ import { bearing, distance, setMeshColor } from './utils';
 DEFAULTS.lang.loading = 'Loading...';
 
 
-// Load the arrow geometry
-const ARROW_GEOM = (() => {
-  const loader = new THREE.ObjectLoader();
-  const geom = loader.parseGeometries([arrowGeometryJson])[arrowGeometryJson.uuid];
-  geom.scale(0.01, 0.015, 0.015);
-  geom.computeBoundingBox();
-  const b = geom.boundingBox;
-  geom.translate(-(b.max.x - b.min.y) / 2, -(b.max.y - b.min.y) / 2, -(b.max.z - b.min.z) / 2);
-  geom.rotateX(Math.PI);
-  return geom;
-})();
-
-/**
- * @summary In client mode all the nodes are provided in the config or with the `setNodes` method
- * @type {string}
- * @memberof PSV.plugins.VirtualTourPlugin
- * @constant
- */
-export const MODE_CLIENT = 'client';
-
-/**
- * @summary In server mode the nodes are fetched asynchronously
- * @type {string}
- * @memberof PSV.plugins.VirtualTourPlugin
- * @constant
- */
-export const MODE_SERVER = 'server';
-
-/**
- * @summary In manual mode each link is positionned manually on the panorama
- * @type {string}
- * @memberof PSV.plugins.VirtualTourPlugin
- * @constant
- */
-export const MODE_MANUAL = 'manual';
-
-/**
- * @summary In GPS mode each node is globally positionned and the links are automatically computed
- * @type {string}
- * @memberof PSV.plugins.VirtualTourPlugin
- * @constant
- */
-export const MODE_GPS = 'gps';
-
-/**
- * @summaru In markers mode the links are represented using markers
- * @type {string}
- * @memberof PSV.plugins.VirtualTourPlugin
- * @constant
- */
-export const MODE_MARKERS = 'markers';
-
-/**
- * @summaru In 3D mode the links are represented using 3d arrows
- * @type {string}
- * @memberof PSV.plugins.VirtualTourPlugin
- * @constant
- */
-export const MODE_3D = '3d';
+export { EVENTS, MODE_3D, MODE_CLIENT, MODE_GPS, MODE_MANUAL, MODE_MARKERS, MODE_SERVER } from './constants';
 
 
 /**
@@ -155,51 +109,6 @@ export const MODE_3D = '3d';
 export class VirtualTourPlugin extends AbstractPlugin {
 
   static id = 'virtual-tour';
-
-  /**
-   * @summary Available events
-   * @enum {string}
-   * @constant
-   */
-  static EVENTS = {
-    NODE_CHANGED: 'node-changed',
-  };
-
-  /**
-   * @summary Property name added to markers
-   * @type {string}
-   * @constant
-   */
-  static LINK_DATA = 'tourLink';
-
-  /**
-   * @summary Default style of the link marker
-   * @type {PSV.plugins.MarkersPlugin.Properties}
-   * @constant
-   */
-  static DEFAULT_MARKER = {
-    html     : arrowIconSvg,
-    width    : 80,
-    height   : 80,
-    scale    : [0.5, 2],
-    anchor   : 'top center',
-    className: 'psv-virtual-tour__marker',
-    style    : {
-      color: 'rgba(0, 208, 255, 0.8)',
-    },
-  };
-
-  /**
-   * @summary Default style of the link arrow
-   * @type {PSV.plugins.VirtualTourPlugin.ArrowStyle}
-   * @constant
-   */
-  static DEFAULT_ARROW = {
-    color     : 0x0055aa,
-    hoverColor: 0xaa5500,
-    opacity   : 0.8,
-    scale     : [0.5, 2],
-  };
 
   /**
    * @param {PSV.Viewer} psv
@@ -240,15 +149,15 @@ export class VirtualTourPlugin extends AbstractPlugin {
       arrowPosition  : 'bottom',
       linksOnCompass : options?.renderMode === MODE_MARKERS,
       ...options,
-      markerStyle    : {
-        ...VirtualTourPlugin.DEFAULT_MARKER,
+      markerStyle: {
+        ...DEFAULT_MARKER,
         ...options?.markerStyle,
       },
-      arrowStyle     : {
-        ...VirtualTourPlugin.DEFAULT_ARROW,
+      arrowStyle : {
+        ...DEFAULT_ARROW,
         ...options?.arrowStyle,
       },
-      nodes          : null,
+      nodes      : null,
     };
 
     /**
@@ -343,7 +252,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
     let nodeId;
     switch (e.type) {
       case 'select-marker':
-        nodeId = e.args[0].data?.[VirtualTourPlugin.LINK_DATA]?.nodeId;
+        nodeId = e.args[0].data?.[LINK_DATA]?.nodeId;
         if (nodeId) {
           this.setCurrentNode(nodeId);
         }
@@ -357,7 +266,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
         break;
 
       case CONSTANTS.EVENTS.CLICK:
-        nodeId = this.prop.currentArrow?.userData?.[VirtualTourPlugin.LINK_DATA]?.nodeId;
+        nodeId = this.prop.currentArrow?.userData?.[LINK_DATA]?.nodeId;
         if (nodeId) {
           this.setCurrentNode(nodeId);
         }
@@ -460,7 +369,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
             panoData        : node.panoData,
             sphereCorrection: node.sphereCorrection,
           })
-          // eslint-disable-next-line prefer-promise-reject-errors
+            // eslint-disable-next-line prefer-promise-reject-errors
             .catch(() => Promise.reject(null)), // the error is already displayed by the core
           this.datasource.loadLinkedNodes(nodeId),
         ]);
@@ -488,7 +397,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
          * @summary Triggered when the current node is changed
          * @param {string} nodeId
          */
-        this.trigger(VirtualTourPlugin.EVENTS.NODE_CHANGED, nodeId);
+        this.trigger(EVENTS.NODE_CHANGED, nodeId);
       })
       .catch((err) => {
         this.psv.loader.hide();
@@ -524,11 +433,11 @@ export class VirtualTourPlugin extends AbstractPlugin {
 
         setMeshColor(mesh, link.arrowStyle?.color || this.config.arrowStyle.color);
 
-        mesh.userData = { [VirtualTourPlugin.LINK_DATA]: link, longitude: position.longitude };
+        mesh.userData = { [LINK_DATA]: link, longitude  : position.longitude };
         mesh.rotation.order = 'YXZ';
         mesh.rotateY(-position.longitude);
         this.psv.dataHelper
-          .sphericalCoordsToVector3({ longitude: position.longitude, latitude: 0 }, mesh.position)
+          .sphericalCoordsToVector3({ longitude: position.longitude, latitude : 0 }, mesh.position)
           .multiplyScalar(1 / CONSTANTS.SPHERE_RADIUS);
 
         this.arrowsGroup.add(mesh);
@@ -544,7 +453,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
           id      : `tour-link-${link.nodeId}`,
           tooltip : link.name,
           hideList: true,
-          data    : { [VirtualTourPlugin.LINK_DATA]: link },
+          data    : { [LINK_DATA]: link },
           ...position,
         }, false);
       }
@@ -602,7 +511,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
       y: evt.clientY - viewerPos.top,
     };
 
-    const mesh = this.psv.dataHelper.getIntersection(viewerPoint, VirtualTourPlugin.LINK_DATA)?.object;
+    const mesh = this.psv.dataHelper.getIntersection(viewerPoint, LINK_DATA)?.object;
 
     if (mesh === this.prop.currentArrow) {
       if (this.prop.currentTooltip) {
@@ -614,7 +523,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
     }
     else {
       if (this.prop.currentArrow) {
-        const link = this.prop.currentArrow.userData[VirtualTourPlugin.LINK_DATA];
+        const link = this.prop.currentArrow.userData[LINK_DATA];
 
         setMeshColor(this.prop.currentArrow, link.arrowStyle?.color || this.config.arrowStyle.color);
 
@@ -625,7 +534,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
       }
 
       if (mesh) {
-        const link = mesh.userData[VirtualTourPlugin.LINK_DATA];
+        const link = mesh.userData[LINK_DATA];
 
         setMeshColor(mesh, link.arrowStyle?.hoverColor || this.config.arrowStyle.hoverColor);
 

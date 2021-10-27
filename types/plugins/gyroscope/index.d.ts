@@ -6,14 +6,14 @@ export type GyroscopePluginOptions = {
   absolutePosition?: boolean;
 };
 
+export const EVENTS: {
+  GYROSCOPE_UPDATED: 'gyroscope-updated',
+};
+
 /**
  * @summary Adds gyroscope controls on mobile devices
  */
 export class GyroscopePlugin extends AbstractPlugin {
-
-  static EVENTS: {
-    GYROSCOPE_UPDATED: 'gyroscope-updated',
-  };
 
   constructor(psv: Viewer, options: GyroscopePluginOptions);
 

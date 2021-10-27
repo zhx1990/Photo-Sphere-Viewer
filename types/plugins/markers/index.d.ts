@@ -108,23 +108,23 @@ export class Marker {
 
 }
 
+export const EVENTS: {
+  GOTO_MARKER_DONE: 'goto-marker-done',
+  LEAVE_MARKER: 'leave-marker',
+  OVER_MARKER: 'over-marker',
+  RENDER_MARKERS_LIST: 'render-markers-list',
+  SELECT_MARKER: 'select-marker',
+  SELECT_MARKER_LIST: 'select-marker-list',
+  UNSELECT_MARKER: 'unselect-marker',
+  HIDE_MARKERS: 'hide-markers',
+  SET_MARKERS: 'set-markers',
+  SHOW_MARKERS: 'show-markers',
+};
+
 /**
  * @summary Displays various markers on the viewer
  */
 export class MarkersPlugin extends AbstractPlugin {
-
-  static EVENTS: {
-    GOTO_MARKER_DONE   : 'goto-marker-done',
-    LEAVE_MARKER       : 'leave-marker',
-    OVER_MARKER        : 'over-marker',
-    RENDER_MARKERS_LIST: 'render-markers-list',
-    SELECT_MARKER      : 'select-marker',
-    SELECT_MARKER_LIST : 'select-marker-list',
-    UNSELECT_MARKER    : 'unselect-marker',
-    HIDE_MARKERS       : 'hide-markers',
-    SET_MARKERS        : 'set-markers',
-    SHOW_MARKERS       : 'show-markers',
-  };
 
   constructor(psv: Viewer, options: MarkersPluginOptions);
 

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { DeviceOrientationControls } from 'three/examples/jsm/controls/DeviceOrientationControls';
 import { AbstractPlugin, CONSTANTS, DEFAULTS, registerButton, utils } from '../..';
+import { EVENTS } from './constants';
 import { GyroscopeButton } from './GyroscopeButton';
 
 
@@ -16,7 +17,12 @@ DEFAULTS.navbar.splice(-1, 0, GyroscopeButton.id);
 DEFAULTS.lang[GyroscopeButton.id] = 'Gyroscope';
 registerButton(GyroscopeButton);
 
+
+export { EVENTS } from './constants';
+
+
 const direction = new THREE.Vector3();
+
 
 /**
  * @summary Adds gyroscope controls on mobile devices
@@ -28,20 +34,9 @@ export class GyroscopePlugin extends AbstractPlugin {
   static id = 'gyroscope';
 
   /**
-   * @summary Available events
-   * @enum {string}
-   * @memberof PSV.plugins.GyroscopePlugin
-   * @constant
+   * @deprecated use the EVENTS constants of the module
    */
-  static EVENTS = {
-    /**
-     * @event gyroscope-updated
-     * @memberof PSV.plugins.GyroscopePlugin
-     * @summary Triggered when the gyroscope mode is enabled/disabled
-     * @param {boolean} enabled
-     */
-    GYROSCOPE_UPDATED: 'gyroscope-updated',
-  };
+  static EVENTS = EVENTS;
 
   /**
    * @param {PSV.Viewer} psv
@@ -178,7 +173,7 @@ export class GyroscopePlugin extends AbstractPlugin {
         this.prop.alphaOffset = this.config.absolutePosition ? 0 : null;
         this.prop.enabled = true;
 
-        this.trigger(GyroscopePlugin.EVENTS.GYROSCOPE_UPDATED, true);
+        this.trigger(EVENTS.GYROSCOPE_UPDATED, true);
       });
   }
 
@@ -193,7 +188,7 @@ export class GyroscopePlugin extends AbstractPlugin {
       this.prop.enabled = false;
       this.psv.config.moveInertia = this.prop.config_moveInertia;
 
-      this.trigger(GyroscopePlugin.EVENTS.GYROSCOPE_UPDATED, false);
+      this.trigger(EVENTS.GYROSCOPE_UPDATED, false);
     }
   }
 

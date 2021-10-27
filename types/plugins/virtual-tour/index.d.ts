@@ -49,17 +49,17 @@ export type VirtualTourPluginPluginOptions = {
   markerStyle?: MarkerProperties;
   arrowStyle?: VirtualTourArrowStyle;
   markerLatOffset?: number;
-  arrowPosition?: 'top'|'bottom;
+  arrowPosition?: 'top'|'bottom';
 }
+
+export const EVENTS: {
+  NODE_CHANGED: 'node-changed',
+};
 
 /**
  * @summary Replaces the standard autorotate animation by a smooth transition between multiple points
  */
 export class VirtualTourPlugin extends AbstractPlugin {
-
-  static EVENTS: {
-    NODE_CHANGED: 'node-changed',
-  };
 
   constructor(psv: Viewer, options: VirtualTourPluginPluginOptions);
 

@@ -1,10 +1,11 @@
 import * as THREE from 'three';
 import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from '../..';
+import { EVENTS, ID_PANEL_MARKER, ID_PANEL_MARKERS_LIST, MARKER_DATA, MARKERS_LIST_TEMPLATE, SVG_NS } from './constants';
 import { Marker } from './Marker';
 import { MarkersButton } from './MarkersButton';
 import { MarkersListButton } from './MarkersListButton';
-import icon from './pin-list.svg';
 import './style.scss';
+
 
 /**
  * @typedef {Object} PSV.plugins.MarkersPlugin.Options
@@ -28,6 +29,9 @@ registerButton(MarkersButton);
 registerButton(MarkersListButton);
 
 
+export { EVENTS } from './constants';
+
+
 /**
  * @summary Displays various markers on the viewer
  * @extends PSV.plugins.AbstractPlugin
@@ -38,132 +42,9 @@ export class MarkersPlugin extends AbstractPlugin {
   static id = 'markers';
 
   /**
-   * @summary Available events
-   * @enum {string}
-   * @constant
+   * @deprecated use the EVENTS constants of the module
    */
-  static EVENTS = {
-    /**
-     * @event goto-marker-done
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Triggered when the animation to a marker is done
-     * @param {PSV.plugins.MarkersPlugin.Marker} marker
-     */
-    GOTO_MARKER_DONE   : 'goto-marker-done',
-    /**
-     * @event leave-marker
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Triggered when the user puts the cursor away from a marker
-     * @param {PSV.plugins.MarkersPlugin.Marker} marker
-     */
-    LEAVE_MARKER       : 'leave-marker',
-    /**
-     * @event over-marker
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Triggered when the user puts the cursor hover a marker
-     * @param {PSV.plugins.MarkersPlugin.Marker} marker
-     */
-    OVER_MARKER        : 'over-marker',
-    /**
-     * @event filter:render-markers-list
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Used to alter the list of markers displayed on the side-panel
-     * @param {PSV.plugins.MarkersPlugin.Marker[]} markers
-     * @returns {PSV.plugins.MarkersPlugin.Marker[]}
-     */
-    RENDER_MARKERS_LIST: 'render-markers-list',
-    /**
-     * @event select-marker
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Triggered when the user clicks on a marker. The marker can be retrieved from outside the event handler
-     * with {@link PSV.plugins.MarkersPlugin.getCurrentMarker}
-     * @param {PSV.plugins.MarkersPlugin.Marker} marker
-     * @param {PSV.plugins.MarkersPlugin.SelectMarkerData} data
-     */
-    SELECT_MARKER      : 'select-marker',
-    /**
-     * @event select-marker-list
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Triggered when a marker is selected from the side panel
-     * @param {PSV.plugins.MarkersPlugin.Marker} marker
-     */
-    SELECT_MARKER_LIST : 'select-marker-list',
-    /**
-     * @event unselect-marker
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Triggered when a marker was selected and the user clicks elsewhere
-     * @param {PSV.plugins.MarkersPlugin.Marker} marker
-     */
-    UNSELECT_MARKER    : 'unselect-marker',
-    /**
-     * @event hide-markers
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Triggered when the markers are hidden
-     */
-    HIDE_MARKERS       : 'hide-markers',
-    /**
-     * @event set-marker
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Triggered when the list of markers changes
-     * @param {PSV.plugins.MarkersPlugin.Marker[]} markers
-     */
-    SET_MARKERS        : 'set-markers',
-    /**
-     * @event show-markers
-     * @memberof PSV.plugins.MarkersPlugin
-     * @summary Triggered when the markers are shown
-     */
-    SHOW_MARKERS       : 'show-markers',
-  };
-
-  /**
-   * @summary Namespace for SVG creation
-   * @type {string}
-   * @constant
-   */
-  static SVG_NS = 'http://www.w3.org/2000/svg';
-
-  /**
-   * @summary Property name added to marker elements
-   * @type {string}
-   * @constant
-   */
-  static MARKER_DATA = 'psvMarker';
-
-  /**
-   * @summary Panel identifier for marker content
-   * @type {string}
-   * @constant
-   */
-  static ID_PANEL_MARKER = 'marker';
-
-  /**
-   * @summary Panel identifier for markers list
-   * @type {string}
-   * @constant
-   */
-  static ID_PANEL_MARKERS_LIST = 'markersList';
-
-  /**
-   * @summary Markers list template
-   * @param {PSV.Marker[]} markers
-   * @param {string} title
-   * @param {string} dataKey
-   * @returns {string}
-   */
-  static MARKERS_LIST_TEMPLATE = (markers, title, dataKey) => `
-<div class="psv-panel-menu psv-panel-menu--stripped">
-  <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
-  <ul class="psv-panel-menu-list">
-    ${markers.map(marker => `
-    <li data-${dataKey}="${marker.config.id}" class="psv-panel-menu-item" tabindex="0">
-      ${marker.type === 'image' ? `<span class="psv-panel-menu-item-icon" ><img src="${marker.config.image}"/></span>` : ''}
-      <span class="psv-panel-menu-item-label">${marker.getListContent()}</span>
-    </li>
-    `).join('')}
-  </ul>
-</div>
-`;
+  static EVENTS = EVENTS;
 
   /**
    * @param {PSV.Viewer} psv
@@ -212,7 +93,7 @@ export class MarkersPlugin extends AbstractPlugin {
      * @member {SVGElement}
      * @readonly
      */
-    this.svgContainer = document.createElementNS(MarkersPlugin.SVG_NS, 'svg');
+    this.svgContainer = document.createElementNS(SVG_NS, 'svg');
     this.svgContainer.setAttribute('class', 'psv-markers-svg-container');
     this.container.appendChild(this.svgContainer);
 
@@ -294,7 +175,7 @@ export class MarkersPlugin extends AbstractPlugin {
 
     this.renderMarkers();
 
-    this.trigger(MarkersPlugin.EVENTS.SHOW_MARKERS);
+    this.trigger(EVENTS.SHOW_MARKERS);
   }
 
   /**
@@ -306,7 +187,7 @@ export class MarkersPlugin extends AbstractPlugin {
 
     this.renderMarkers();
 
-    this.trigger(MarkersPlugin.EVENTS.HIDE_MARKERS);
+    this.trigger(EVENTS.HIDE_MARKERS);
   }
 
   /**
@@ -376,7 +257,7 @@ export class MarkersPlugin extends AbstractPlugin {
       this.renderMarkers();
       this.__refreshUi();
 
-      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
+      this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
 
     return marker;
@@ -422,7 +303,7 @@ export class MarkersPlugin extends AbstractPlugin {
       this.renderMarkers();
       this.__refreshUi();
 
-      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
+      this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
 
     return marker;
@@ -459,7 +340,7 @@ export class MarkersPlugin extends AbstractPlugin {
     if (render) {
       this.__refreshUi();
 
-      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
+      this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
   }
 
@@ -477,7 +358,7 @@ export class MarkersPlugin extends AbstractPlugin {
       this.renderMarkers();
       this.__refreshUi();
 
-      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
+      this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
   }
 
@@ -492,7 +373,7 @@ export class MarkersPlugin extends AbstractPlugin {
       this.renderMarkers();
       this.__refreshUi();
 
-      this.trigger(MarkersPlugin.EVENTS.SET_MARKERS, this.getMarkers());
+      this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
   }
 
@@ -511,7 +392,7 @@ export class MarkersPlugin extends AbstractPlugin {
       speed,
     })
       .then(() => {
-        this.trigger(MarkersPlugin.EVENTS.GOTO_MARKER_DONE, marker);
+        this.trigger(EVENTS.GOTO_MARKER_DONE, marker);
       });
   }
 
@@ -551,12 +432,12 @@ export class MarkersPlugin extends AbstractPlugin {
 
     if (marker?.config?.content) {
       this.psv.panel.show({
-        id     : MarkersPlugin.ID_PANEL_MARKER,
+        id     : ID_PANEL_MARKER,
         content: marker.config.content,
       });
     }
     else {
-      this.psv.panel.hide(MarkersPlugin.ID_PANEL_MARKER);
+      this.psv.panel.hide(ID_PANEL_MARKER);
     }
   }
 
@@ -564,7 +445,7 @@ export class MarkersPlugin extends AbstractPlugin {
    * @summary Toggles the visibility of markers list
    */
   toggleMarkersList() {
-    if (this.psv.panel.prop.contentId === MarkersPlugin.ID_PANEL_MARKERS_LIST) {
+    if (this.psv.panel.prop.contentId === ID_PANEL_MARKERS_LIST) {
       this.hideMarkersList();
     }
     else {
@@ -584,24 +465,24 @@ export class MarkersPlugin extends AbstractPlugin {
       }
     });
 
-    markers = this.change(MarkersPlugin.EVENTS.RENDER_MARKERS_LIST, markers);
+    markers = this.change(EVENTS.RENDER_MARKERS_LIST, markers);
 
     this.psv.panel.show({
-      id          : MarkersPlugin.ID_PANEL_MARKERS_LIST,
-      content     : MarkersPlugin.MARKERS_LIST_TEMPLATE(
+      id          : ID_PANEL_MARKERS_LIST,
+      content     : MARKERS_LIST_TEMPLATE(
         markers,
         this.psv.config.lang.markers,
-        utils.dasherize(MarkersPlugin.MARKER_DATA)
+        utils.dasherize(MARKER_DATA)
       ),
       noMargin    : true,
       clickHandler: (e) => {
         const li = e.target ? utils.getClosest(e.target, 'li') : undefined;
-        const markerId = li ? li.dataset[MarkersPlugin.MARKER_DATA] : undefined;
+        const markerId = li ? li.dataset[MARKER_DATA] : undefined;
 
         if (markerId) {
           const marker = this.getMarker(markerId);
 
-          this.trigger(MarkersPlugin.EVENTS.SELECT_MARKER_LIST, marker);
+          this.trigger(EVENTS.SELECT_MARKER_LIST, marker);
 
           this.gotoMarker(marker, 1000);
           this.hideMarkersList();
@@ -614,7 +495,7 @@ export class MarkersPlugin extends AbstractPlugin {
    * @summary Closes side panel if it contains the list of markers
    */
   hideMarkersList() {
-    this.psv.panel.hide(MarkersPlugin.ID_PANEL_MARKERS_LIST);
+    this.psv.panel.hide(ID_PANEL_MARKERS_LIST);
   }
 
   /**
@@ -833,7 +714,7 @@ export class MarkersPlugin extends AbstractPlugin {
    */
   __getTargetMarker(target, closest = false) {
     const target2 = closest ? utils.getClosest(target, '.psv-marker') : target;
-    return target2 ? target2[MarkersPlugin.MARKER_DATA] : undefined;
+    return target2 ? target2[MARKER_DATA] : undefined;
   }
 
   /**
@@ -859,7 +740,7 @@ export class MarkersPlugin extends AbstractPlugin {
     if (marker && !marker.isPoly()) {
       this.prop.hoveringMarker = marker;
 
-      this.trigger(MarkersPlugin.EVENTS.OVER_MARKER, marker);
+      this.trigger(EVENTS.OVER_MARKER, marker);
 
       if (!this.prop.showAllTooltips) {
         marker.showTooltip(e);
@@ -878,7 +759,7 @@ export class MarkersPlugin extends AbstractPlugin {
 
     // do not hide if we enter the tooltip itself while hovering a polygon
     if (marker && !(marker.isPoly() && this.__targetOnTooltip(e.relatedTarget, marker.tooltip))) {
-      this.trigger(MarkersPlugin.EVENTS.LEAVE_MARKER, marker);
+      this.trigger(EVENTS.LEAVE_MARKER, marker);
 
       this.prop.hoveringMarker = null;
 
@@ -909,7 +790,7 @@ export class MarkersPlugin extends AbstractPlugin {
 
     if (marker) {
       if (!this.prop.hoveringMarker) {
-        this.trigger(MarkersPlugin.EVENTS.OVER_MARKER, marker);
+        this.trigger(EVENTS.OVER_MARKER, marker);
 
         this.prop.hoveringMarker = marker;
       }
@@ -919,7 +800,7 @@ export class MarkersPlugin extends AbstractPlugin {
       }
     }
     else if (this.prop.hoveringMarker?.isPoly()) {
-      this.trigger(MarkersPlugin.EVENTS.LEAVE_MARKER, this.prop.hoveringMarker);
+      this.trigger(EVENTS.LEAVE_MARKER, this.prop.hoveringMarker);
 
       if (!this.prop.showAllTooltips) {
         this.prop.hoveringMarker.hideTooltip();
@@ -958,7 +839,7 @@ export class MarkersPlugin extends AbstractPlugin {
     if (marker) {
       this.prop.currentMarker = marker;
 
-      this.trigger(MarkersPlugin.EVENTS.SELECT_MARKER, marker, {
+      this.trigger(EVENTS.SELECT_MARKER, marker, {
         dblclick  : dblclick,
         rightclick: data.rightclick,
       });
@@ -977,9 +858,9 @@ export class MarkersPlugin extends AbstractPlugin {
       }
     }
     else if (this.prop.currentMarker) {
-      this.trigger(MarkersPlugin.EVENTS.UNSELECT_MARKER, this.prop.currentMarker);
+      this.trigger(EVENTS.UNSELECT_MARKER, this.prop.currentMarker);
 
-      this.psv.panel.hide(MarkersPlugin.ID_PANEL_MARKER);
+      this.psv.panel.hide(ID_PANEL_MARKER);
 
       this.prop.currentMarker = null;
     }
@@ -998,10 +879,10 @@ export class MarkersPlugin extends AbstractPlugin {
       markersButton?.hide();
       markersListButton?.hide();
 
-      if (this.psv.panel.isVisible(MarkersPlugin.ID_PANEL_MARKERS_LIST)) {
+      if (this.psv.panel.isVisible(ID_PANEL_MARKERS_LIST)) {
         this.psv.panel.hide();
       }
-      else if (this.psv.panel.isVisible(MarkersPlugin.ID_PANEL_MARKER)) {
+      else if (this.psv.panel.isVisible(ID_PANEL_MARKER)) {
         this.psv.panel.hide();
       }
     }
@@ -1009,10 +890,10 @@ export class MarkersPlugin extends AbstractPlugin {
       markersButton?.show();
       markersListButton?.show();
 
-      if (this.psv.panel.isVisible(MarkersPlugin.ID_PANEL_MARKERS_LIST)) {
+      if (this.psv.panel.isVisible(ID_PANEL_MARKERS_LIST)) {
         this.showMarkersList();
       }
-      else if (this.psv.panel.isVisible(MarkersPlugin.ID_PANEL_MARKER)) {
+      else if (this.psv.panel.isVisible(ID_PANEL_MARKER)) {
         this.prop.currentMarker ? this.showMarkerPanel(this.prop.currentMarker) : this.psv.panel.hide();
       }
     }

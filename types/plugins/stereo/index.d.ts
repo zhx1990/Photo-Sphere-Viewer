@@ -1,14 +1,14 @@
 import { AbstractPlugin, Viewer } from '../..';
 import { Event } from 'uevent';
 
+export const EVENTS: {
+  STEREO_UPDATED: 'stereo-updated',
+};
+
 /**
  * @summary Adds stereo view on mobile devices
  */
 export class StereoPlugin extends AbstractPlugin {
-
-  static EVENTS: {
-    STEREO_UPDATED: 'stereo-updated',
-  };
 
   constructor(psv: Viewer);
 

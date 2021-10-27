@@ -1,5 +1,5 @@
 import { AbstractButton } from '../..';
-import { StereoPlugin } from './index';
+import { EVENTS } from './constants';
 import stereo from './stereo.svg';
 
 /**
@@ -23,10 +23,10 @@ export class StereoButton extends AbstractButton {
      * @private
      * @readonly
      */
-    this.plugin = this.psv.getPlugin(StereoPlugin.id);
+    this.plugin = this.psv.getPlugin('stereo');
 
     if (this.plugin) {
-      this.plugin.on(StereoPlugin.EVENTS.STEREO_UPDATED, this);
+      this.plugin.on(EVENTS.STEREO_UPDATED, this);
     }
   }
 
@@ -35,7 +35,7 @@ export class StereoButton extends AbstractButton {
    */
   destroy() {
     if (this.plugin) {
-      this.plugin.off(StereoPlugin.EVENTS.STEREO_UPDATED, this);
+      this.plugin.off(EVENTS.STEREO_UPDATED, this);
     }
 
     delete this.plugin;
@@ -56,7 +56,7 @@ export class StereoButton extends AbstractButton {
    * @private
    */
   handleEvent(e) {
-    if (e.type === StereoPlugin.EVENTS.STEREO_UPDATED) {
+    if (e.type === EVENTS.STEREO_UPDATED) {
       this.toggleActive(e.args[0]);
     }
   }
