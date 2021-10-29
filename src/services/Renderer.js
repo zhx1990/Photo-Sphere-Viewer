@@ -19,58 +19,63 @@ export class Renderer extends AbstractService {
     super(psv);
 
     /**
-     * @member {number}
-     * @private
-     */
-    this.mainReqid = undefined;
-
-    /**
      * @member {external:THREE.WebGLRenderer}
      * @readonly
      * @protected
      */
-    this.renderer = null;
+    this.renderer = new THREE.WebGLRenderer({ alpha: true });
+    this.renderer.setPixelRatio(SYSTEM.pixelRatio);
+    this.renderer.domElement.className = 'psv-canvas';
 
     /**
      * @member {external:THREE.Scene}
      * @readonly
      * @protected
      */
-    this.scene = null;
+    this.scene = new THREE.Scene();
 
     /**
      * @member {external:THREE.PerspectiveCamera}
      * @readonly
      * @protected
      */
-    this.camera = null;
+    this.camera = new THREE.PerspectiveCamera(50, 16 / 9, 1, 2 * SPHERE_RADIUS);
 
     /**
      * @member {external:THREE.Mesh}
      * @readonly
      * @protected
      */
-    this.mesh = null;
+    this.mesh = this.psv.adapter.createMesh();
+    this.mesh.userData = { psvSphere: true };
 
     /**
      * @member {external:THREE.Group}
      * @readonly
      * @private
      */
-    this.meshContainer = null;
+    this.meshContainer = new THREE.Group();
+    this.meshContainer.add(this.mesh);
+    this.scene.add(this.meshContainer);
 
     /**
      * @member {external:THREE.Raycaster}
      * @readonly
      * @protected
      */
-    this.raycaster = null;
+    this.raycaster = new THREE.Raycaster();
 
     /**
      * @member {number}
      * @private
      */
     this.timestamp = null;
+
+    /**
+     * @member {boolean}
+     * @private
+     */
+    this.ready = false;
 
     /**
      * @member {HTMLElement}
@@ -81,12 +86,14 @@ export class Renderer extends AbstractService {
     this.canvasContainer.className = 'psv-canvas-container';
     this.canvasContainer.style.background = this.psv.config.canvasBackground;
     this.canvasContainer.style.cursor = this.psv.config.mousemove ? 'move' : 'default';
+    this.canvasContainer.appendChild(this.renderer.domElement);
     this.psv.container.appendChild(this.canvasContainer);
 
-    psv.on(EVENTS.SIZE_UPDATED, (e, size) => {
-      if (this.renderer) {
-        this.renderer.setSize(size.width, size.height);
-      }
+    psv.on(EVENTS.SIZE_UPDATED, () => {
+      this.renderer.setSize(this.prop.size.width, this.prop.size.height);
+      this.camera.aspect = this.prop.aspect;
+      this.camera.fov = this.prop.vFov;
+      this.camera.updateProjectionMatrix();
     });
 
     psv.on(EVENTS.CONFIG_CHANGED, () => {
@@ -101,14 +108,10 @@ export class Renderer extends AbstractService {
    */
   destroy() {
     // cancel render loop
-    if (this.mainReqid) {
-      window.cancelAnimationFrame(this.mainReqid);
-    }
+    this.renderer.setAnimationLoop(null);
 
     // destroy ThreeJS view
-    if (this.scene) {
-      this.__cleanTHREEScene(this.scene);
-    }
+    this.__cleanTHREEScene(this.scene);
 
     // remove container
     this.psv.container.removeChild(this.canvasContainer);
@@ -142,7 +145,7 @@ export class Renderer extends AbstractService {
    * @summary Main event loop, calls {@link render} if `prop.needsUpdate` is true
    * @param {number} timestamp
    * @fires PSV.before-render
-   * @package
+   * @private
    */
   __renderLoop(timestamp) {
     const elapsed = this.timestamp !== null ? timestamp - this.timestamp : 0;
@@ -155,8 +158,6 @@ export class Renderer extends AbstractService {
       this.render();
       this.prop.needsUpdate = false;
     }
-
-    this.mainReqid = window.requestAnimationFrame(t => this.__renderLoop(t));
   }
 
   /**
@@ -173,23 +174,9 @@ export class Renderer extends AbstractService {
       this.camera.position.copy(this.prop.direction).multiplyScalar(this.config.fisheye / 2).negate();
     }
 
-    this.updateCameraMatrix();
-
     this.renderer.render(this.scene, this.camera);
 
     this.psv.trigger(EVENTS.RENDER);
-  }
-
-  /**
-   * @summary Updates the camera matrix
-   * @package
-   */
-  updateCameraMatrix() {
-    if (this.camera) {
-      this.camera.aspect = this.prop.aspect;
-      this.camera.fov = this.prop.vFov;
-      this.camera.updateProjectionMatrix();
-    }
   }
 
   /**
@@ -199,13 +186,14 @@ export class Renderer extends AbstractService {
    * @package
    */
   setTexture(textureData) {
-    if (!this.scene) {
-      this.__createScene();
-    }
-
     this.prop.panoData = textureData.panoData;
 
     this.psv.adapter.setTexture(this.mesh, textureData);
+
+    if (!this.ready) {
+      this.renderer.setAnimationLoop(t => this.__renderLoop(t));
+      this.ready = true;
+    }
 
     this.psv.needsUpdate();
 
@@ -254,35 +242,6 @@ export class Renderer extends AbstractService {
     else {
       mesh.rotation.set(0, 0, 0);
     }
-  }
-
-  /**
-   * @summary Creates the 3D scene and GUI components
-   * @private
-   */
-  __createScene() {
-    this.raycaster = new THREE.Raycaster();
-
-    this.renderer = new THREE.WebGLRenderer({ alpha: true });
-    this.renderer.setSize(this.prop.size.width, this.prop.size.height);
-    this.renderer.setPixelRatio(SYSTEM.pixelRatio);
-
-    this.camera = new THREE.PerspectiveCamera(this.prop.vFov, this.prop.size.width / this.prop.size.height, 1, 2 * SPHERE_RADIUS);
-    this.camera.position.set(0, 0, 0);
-
-    this.scene = new THREE.Scene();
-    this.scene.add(this.camera);
-
-    this.mesh = this.psv.adapter.createMesh();
-    this.mesh.userData = { psvSphere: true };
-
-    this.meshContainer = new THREE.Group();
-    this.meshContainer.add(this.mesh);
-    this.scene.add(this.meshContainer);
-
-    // create canvas container
-    this.renderer.domElement.className = 'psv-canvas';
-    this.canvasContainer.appendChild(this.renderer.domElement);
   }
 
   /**

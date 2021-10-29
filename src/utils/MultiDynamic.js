@@ -21,7 +21,7 @@ export class MultiDynamic {
 
   /**
    * @param {Record<string, PSV.Dynamic>} dynamics
-   * @param {Function} fn Callback function
+   * @param {Function} [fn] Callback function
    */
   constructor(dynamics, fn) {
     /**
@@ -37,6 +37,10 @@ export class MultiDynamic {
      * @readonly
      */
     this.dynamics = dynamics;
+
+    if (this.fn) {
+      this.fn(this.current, true);
+    }
   }
 
   /**
@@ -100,7 +104,7 @@ export class MultiDynamic {
     });
 
     if (hasUpdates && this.fn) {
-      this.fn(this.current);
+      this.fn(this.current, false);
     }
 
     return hasUpdates;
@@ -116,7 +120,7 @@ export class MultiDynamic {
     });
 
     if (hasUpdates && this.fn) {
-      this.fn(this.current);
+      this.fn(this.current, false);
     }
 
     return hasUpdates;

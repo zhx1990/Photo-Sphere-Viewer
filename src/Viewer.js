@@ -220,21 +220,25 @@ export class Viewer extends EventEmitter {
      * @package
      */
     this.dynamics = {
-      zoom: new Dynamic((value) => {
+      zoom: new Dynamic((value, init) => {
         this.prop.vFov = this.dataHelper.zoomLevelToFov(value);
         this.prop.hFov = this.dataHelper.vFovToHFov(this.prop.vFov);
 
-        this.needsUpdate();
-        this.trigger(EVENTS.ZOOM_UPDATED, value);
-      }, 0, 100),
+        if (!init) {
+          this.needsUpdate();
+          this.trigger(EVENTS.ZOOM_UPDATED, value);
+        }
+      }, this.config.defaultZoomLvl, 0, 100),
 
       position: new MultiDynamic({
-        longitude: new Dynamic(null),
-        latitude : new Dynamic(null, -Math.PI / 2, Math.PI / 2),
-      }, (position) => {
+        longitude: new Dynamic(null, this.config.defaultLong),
+        latitude : new Dynamic(null, this.config.defaultLat, -Math.PI / 2, Math.PI / 2),
+      }, (position, init) => {
         this.dataHelper.sphericalCoordsToVector3(position, this.prop.direction);
-        this.needsUpdate();
-        this.trigger(EVENTS.POSITION_UPDATED, position);
+        if (!init) {
+          this.needsUpdate();
+          this.trigger(EVENTS.POSITION_UPDATED, position);
+        }
       }),
     };
 
@@ -418,10 +422,6 @@ export class Viewer extends EventEmitter {
    */
   needsUpdate() {
     this.prop.needsUpdate = true;
-
-    if (!this.renderer.mainReqid && this.renderer.renderer) {
-      this.renderer.__renderLoop(+new Date());
-    }
   }
 
   /**
@@ -434,8 +434,6 @@ export class Viewer extends EventEmitter {
       this.prop.size.height = Math.round(this.container.clientHeight);
       this.prop.aspect = this.prop.size.width / this.prop.size.height;
       this.prop.hFov = this.dataHelper.vFovToHFov(this.prop.vFov);
-
-      this.renderer.updateCameraMatrix();
 
       this.needsUpdate();
       this.trigger(EVENTS.SIZE_UPDATED, this.getSize());
@@ -459,15 +457,6 @@ export class Viewer extends EventEmitter {
 
     // apply default parameters on first load
     if (!this.prop.ready) {
-      if (!('longitude' in options)) {
-        options.longitude = this.config.defaultLong;
-      }
-      if (!('latitude' in options)) {
-        options.latitude = this.config.defaultLat;
-      }
-      if (!('zoom' in options)) {
-        options.zoom = this.config.defaultZoomLvl;
-      }
       if (!('sphereCorrection' in options)) {
         options.sphereCorrection = this.config.sphereCorrection;
       }
