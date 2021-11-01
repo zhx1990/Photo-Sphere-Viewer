@@ -1,6 +1,5 @@
 import {
   Euler,
-  EventDispatcher,
   MathUtils,
   Quaternion,
   Vector3
@@ -11,18 +10,14 @@ const _euler = new Euler();
 const _q0 = new Quaternion();
 const _q1 = new Quaternion( - Math.sqrt( 0.5 ), 0, 0, Math.sqrt( 0.5 ) ); // - PI/2 around the x-axis
 
-const _changeEvent = { type: 'change' };
-
 /**
  * Copied from three.js examples before deletion in r134
  * (deleted because of constructors/OS inconsistencies)
  * @private
  */
-class DeviceOrientationControls extends EventDispatcher {
+class DeviceOrientationControls {
 
   constructor( object ) {
-
-    super();
 
     if ( window.isSecureContext === false ) {
 
@@ -135,7 +130,6 @@ class DeviceOrientationControls extends EventDispatcher {
         if ( 8 * ( 1 - lastQuaternion.dot( scope.object.quaternion ) ) > EPS ) {
 
           lastQuaternion.copy( scope.object.quaternion );
-          scope.dispatchEvent( _changeEvent );
 
         }
 
