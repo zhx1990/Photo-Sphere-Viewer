@@ -4,7 +4,7 @@ import { each } from './misc';
 /**
  * @summary Implementation of {@link PSV.Dynamic} for any number of variables, unused
  * @memberOf PSV
- * @package
+ * @private
  */
 export class DynamicXD {
 

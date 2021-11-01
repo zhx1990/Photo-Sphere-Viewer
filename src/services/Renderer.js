@@ -89,12 +89,9 @@ export class Renderer extends AbstractService {
     this.canvasContainer.appendChild(this.renderer.domElement);
     this.psv.container.appendChild(this.canvasContainer);
 
-    psv.on(EVENTS.SIZE_UPDATED, () => {
-      this.renderer.setSize(this.prop.size.width, this.prop.size.height);
-      this.camera.aspect = this.prop.aspect;
-      this.camera.fov = this.prop.vFov;
-      this.camera.updateProjectionMatrix();
-    });
+    psv.on(EVENTS.SIZE_UPDATED, this);
+    psv.on(EVENTS.ZOOM_UPDATED, this);
+    psv.on(EVENTS.POSITION_UPDATED, this);
 
     psv.on(EVENTS.CONFIG_CHANGED, () => {
       this.canvasContainer.style.cursor = this.psv.config.mousemove ? 'move' : 'default';
@@ -128,6 +125,23 @@ export class Renderer extends AbstractService {
   }
 
   /**
+   * @summary Handles events
+   * @param {Event} evt
+   * @private
+   */
+  handleEvent(evt) {
+    /* eslint-disable */
+    switch (evt.type) {
+      // @formatter:off
+      case EVENTS.SIZE_UPDATED:     this.__onSizeUpdated(); break;
+      case EVENTS.ZOOM_UPDATED:     this.__onZoomUpdated(); break;
+      case EVENTS.POSITION_UPDATED: this.__onPositionUpdated(); break;
+      // @formatter:on
+    }
+    /* eslint-enable */
+  }
+
+  /**
    * @summary Hides the viewer
    */
   hide() {
@@ -139,6 +153,40 @@ export class Renderer extends AbstractService {
    */
   show() {
     this.canvasContainer.style.opacity = 1;
+  }
+
+  /**
+   * @summary Updates the size of the renderer and the aspect of the camera
+   * @private
+   */
+  __onSizeUpdated() {
+    this.renderer.setSize(this.prop.size.width, this.prop.size.height);
+    this.camera.aspect = this.prop.aspect;
+    this.camera.updateProjectionMatrix();
+    this.prop.needsUpdate = true;
+  }
+
+  /**
+   * @summary Updates the fov of the camera
+   * @private
+   */
+  __onZoomUpdated() {
+    this.camera.fov = this.prop.vFov;
+    this.camera.updateProjectionMatrix();
+    this.prop.needsUpdate = true;
+  }
+
+  /**
+   * @summary Updates the position of the camera
+   * @private
+   */
+  __onPositionUpdated() {
+    this.camera.position.set(0, 0, 0);
+    this.camera.lookAt(this.prop.direction);
+    if (this.config.fisheye) {
+      this.camera.position.copy(this.prop.direction).multiplyScalar(this.config.fisheye / 2).negate();
+    }
+    this.prop.needsUpdate = true;
   }
 
   /**
@@ -167,15 +215,7 @@ export class Renderer extends AbstractService {
    * @fires PSV.render
    */
   render() {
-    this.camera.position.set(0, 0, 0);
-    this.camera.lookAt(this.prop.direction);
-
-    if (this.config.fisheye) {
-      this.camera.position.copy(this.prop.direction).multiplyScalar(this.config.fisheye / 2).negate();
-    }
-
     this.renderer.render(this.scene, this.camera);
-
     this.psv.trigger(EVENTS.RENDER);
   }
 

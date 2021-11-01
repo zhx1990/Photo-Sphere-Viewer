@@ -74,7 +74,7 @@ export class Dynamic {
     this.max = max;
 
     if (this.fn) {
-      this.fn(defaultValue, true);
+      this.fn(defaultValue);
     }
   }
 
@@ -138,7 +138,7 @@ export class Dynamic {
     if (next !== this.current) {
       this.current = next;
       if (this.fn) {
-        this.fn(this.current, false);
+        this.fn(this.current);
       }
       return true;
     }
@@ -184,7 +184,7 @@ export class Dynamic {
       if (next !== this.current) {
         this.current = next;
         if (this.fn) {
-          this.fn(this.current, false);
+          this.fn(this.current);
         }
         return true;
       }

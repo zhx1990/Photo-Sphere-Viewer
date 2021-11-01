@@ -220,25 +220,18 @@ export class Viewer extends EventEmitter {
      * @package
      */
     this.dynamics = {
-      zoom: new Dynamic((value, init) => {
+      zoom: new Dynamic((value) => {
         this.prop.vFov = this.dataHelper.zoomLevelToFov(value);
         this.prop.hFov = this.dataHelper.vFovToHFov(this.prop.vFov);
-
-        if (!init) {
-          this.needsUpdate();
-          this.trigger(EVENTS.ZOOM_UPDATED, value);
-        }
+        this.trigger(EVENTS.ZOOM_UPDATED, value);
       }, this.config.defaultZoomLvl, 0, 100),
 
       position: new MultiDynamic({
         longitude: new Dynamic(null, this.config.defaultLong),
         latitude : new Dynamic(null, this.config.defaultLat, -Math.PI / 2, Math.PI / 2),
-      }, (position, init) => {
+      }, (position) => {
         this.dataHelper.sphericalCoordsToVector3(position, this.prop.direction);
-        if (!init) {
-          this.needsUpdate();
-          this.trigger(EVENTS.POSITION_UPDATED, position);
-        }
+        this.trigger(EVENTS.POSITION_UPDATED, position);
       }),
     };
 

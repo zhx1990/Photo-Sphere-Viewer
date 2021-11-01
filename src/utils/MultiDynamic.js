@@ -39,7 +39,7 @@ export class MultiDynamic {
     this.dynamics = dynamics;
 
     if (this.fn) {
-      this.fn(this.current, true);
+      this.fn(this.current);
     }
   }
 
@@ -104,7 +104,7 @@ export class MultiDynamic {
     });
 
     if (hasUpdates && this.fn) {
-      this.fn(this.current, false);
+      this.fn(this.current);
     }
 
     return hasUpdates;
@@ -120,7 +120,7 @@ export class MultiDynamic {
     });
 
     if (hasUpdates && this.fn) {
-      this.fn(this.current, false);
+      this.fn(this.current);
     }
 
     return hasUpdates;

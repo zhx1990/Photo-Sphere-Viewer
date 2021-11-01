@@ -292,6 +292,10 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     const viewerSize = this.psv.prop.size;
     const panorama = this.psv.config.panorama;
 
+    if (!panorama) {
+      return;
+    }
+
     const tilesToLoad = [];
     const tilePosition = new THREE.Vector3();
 
