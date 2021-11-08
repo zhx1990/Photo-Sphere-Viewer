@@ -35,6 +35,7 @@ export class EventsHandler extends AbstractService {
     /**
      * @summary Internal properties
      * @member {Object}
+     * @property {number} moveThreshold - computed threshold based on device pixel ratio
      * @property {boolean} moving - is the user moving
      * @property {boolean} zooming - is the user zooming
      * @property {number} startMouseX - start x position of the click/touch
@@ -52,6 +53,7 @@ export class EventsHandler extends AbstractService {
      * @protected
      */
     this.state = {
+      moveThreshold    : MOVE_THRESHOLD * SYSTEM.pixelRatio,
       keyboardEnabled  : false,
       moving           : false,
       zooming          : false,
@@ -534,7 +536,8 @@ export class EventsHandler extends AbstractService {
 
     if (this.state.moving) {
       // move threshold to trigger a click
-      if (Math.abs(evt.clientX - this.state.startMouseX) < MOVE_THRESHOLD && Math.abs(evt.clientY - this.state.startMouseY) < MOVE_THRESHOLD) {
+      if (Math.abs(evt.clientX - this.state.startMouseX) < this.state.moveThreshold
+        && Math.abs(evt.clientY - this.state.startMouseY) < this.state.moveThreshold) {
         this.__click(evt);
         this.state.moving = false;
       }
@@ -643,8 +646,8 @@ export class EventsHandler extends AbstractService {
         }, DBLCLICK_DELAY);
       }
       else {
-        if (Math.abs(this.state.dblclickData.clientX - data.clientX) < MOVE_THRESHOLD
-          && Math.abs(this.state.dblclickData.clientY - data.clientY) < MOVE_THRESHOLD) {
+        if (Math.abs(this.state.dblclickData.clientX - data.clientX) < this.state.moveThreshold
+          && Math.abs(this.state.dblclickData.clientY - data.clientY) < this.state.moveThreshold) {
           this.psv.trigger(EVENTS.DOUBLE_CLICK, this.state.dblclickData);
         }
 
