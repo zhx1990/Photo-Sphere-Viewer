@@ -1,10 +1,8 @@
-import { AbstractAdapter, PanoData, PanoDataProvider, TextureData } from '../..';
+import { AbstractAdapter } from '../..';
 
 /**
  * @summary Adapter for equirectangular panoramas
  */
-export class EquirectangularAdapter extends AbstractAdapter {
-
-  loadTexture(panorama: string, newPanoData?: PanoData | PanoDataProvider): Promise<TextureData>;
+export class EquirectangularAdapter extends AbstractAdapter<string> {
 
 }

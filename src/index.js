@@ -150,7 +150,7 @@ export {
 
 /**
  * @typedef {Object} PSV.Options
- * @summary Viewer options, see {@link http://photo-sphere-viewer.js.org/guide/config.html}
+ * @summary Viewer options, see {@link https://photo-sphere-viewer.js.org/guide/config.html}
  */
 
 /**

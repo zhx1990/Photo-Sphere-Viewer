@@ -1,4 +1,9 @@
 /**
+ * @summary Radius of the THREE.SphereGeometry, Half-length of the THREE.BoxGeometry
+ */
+export const SPHERE_RADIUS = 10;
+
+/**
  * @summary Property name added to viewer element
  */
 export const VIEWER_DATA: 'photoSphereViewer';

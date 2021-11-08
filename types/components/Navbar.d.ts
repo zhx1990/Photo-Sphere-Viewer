@@ -5,7 +5,7 @@ import { AbstractComponent } from './AbstractComponent';
 /**
  * @summary Register a new button available for all viewers
  */
-export function registerButton(button: typeof AbstractButton);
+export function registerButton(button: typeof AbstractButton): void;
 
 /**
  * @summary Navigation bar class

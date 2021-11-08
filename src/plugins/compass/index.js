@@ -13,7 +13,7 @@ import './style.scss';
  * @property {boolean} [navigation=true] - allows to click on the compass to rotate the viewer
  * @property {string} [navigationColor='rgba(255, 0, 0, 0.2)'] - color of the navigation cone
  * @property {PSV.plugins.CompassPlugin.Hotspot[]} [hotspots] - small dots visible on the compass (will contain every marker with the "compass" data)
- * @property {string} [hotspotColor='rgba(0, 0, 0, 0.5)'] - color of hotspots
+ * @property {string} [hotspotColor='rgba(0, 0, 0, 0.5)'] - default color of hotspots
  */
 
 /**

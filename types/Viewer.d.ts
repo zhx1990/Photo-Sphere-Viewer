@@ -42,7 +42,7 @@ export type ViewerOptions = {
   defaultZoomLvl?: number;
   defaultLong?: number;
   defaultLat?: number;
-  sphereCorrection?: { pan?: number, tilt?: number, roll?: number },
+  sphereCorrection?: { pan?: number, tilt?: number, roll?: number };
   moveSpeed?: number;
   zoomSpeed?: number;
   autorotateDelay?: number,
@@ -59,10 +59,10 @@ export type ViewerOptions = {
   requestHeaders?: Record<string, string> | ((url: string) => Record<string, string>);
   canvasBackground?: string;
   withCredentials?: boolean;
-  navbar?: string | Array<string | NavbarCustomButton>,
-  lang?: Record<string, string>,
-  keyboard?: Record<string, string>,
-  plugins?: Array<PluginConstructor<any> | [PluginConstructor<any>, any]>,
+  navbar?: string | Array<string | NavbarCustomButton>;
+  lang?: Record<string, string>;
+  keyboard?: Record<string, string>;
+  plugins?: Array<PluginConstructor<any> | [PluginConstructor<any>, any]>;
 };
 
 /**
@@ -98,7 +98,7 @@ export class Viewer extends EventEmitter {
   /**
    * Internal properties
    */
-  prop: ViewerProps;
+  protected readonly prop: ViewerProps;
 
   /**
    * Top most parent
@@ -146,7 +146,7 @@ export class Viewer extends EventEmitter {
   /**
    * @summary Returns the instance of a plugin if it exists
    */
-  getPlugin<T extends AbstractPlugin>(pluginId: string | PluginConstructor<T>): T;
+  getPlugin<T extends AbstractPlugin>(pluginId: string | PluginConstructor<T>): T | undefined;
 
   /**
    * @summary Returns the current position of the camera
@@ -290,6 +290,11 @@ export class Viewer extends EventEmitter {
   stopKeyboardControl();
 
   /**
+   * @summary Triggered when the panorama image has been loaded and the viewer is ready to perform the first render
+   */
+  once(e: 'ready', cb: (e: Event) => void): this;
+
+  /**
    * @summary Triggered when the automatic rotation is enabled/disabled
    */
   on(e: 'autorotate', cb: (e: Event, enabled: true) => void): this;
@@ -353,12 +358,6 @@ export class Viewer extends EventEmitter {
    * @summary Triggered when the view longitude and/or latitude changes
    */
   on(e: 'position-updated', cb: (e: Event, position: Position) => void): this;
-
-  /**
-   * @summary Triggered when the panorama image has been loaded and the viewer is ready to perform the first render
-   */
-  once(e: 'ready', cb: (e: Event) => void): this;
-
   /**
    * @summary Triggered on each viewer render, **this event is triggered very often**
    */

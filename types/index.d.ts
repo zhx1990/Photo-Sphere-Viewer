@@ -1,8 +1,7 @@
-import * as CONSTANTS from './/data/constants';
+import * as CONSTANTS from './data/constants';
 import * as utils from './utils';
 
 export * from './models';
-export * from './data/constants';
 export * from './data/config';
 export * from './data/system';
 export * from './adapters/AbstractAdapter';

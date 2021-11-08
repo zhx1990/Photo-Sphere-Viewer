@@ -4,8 +4,9 @@ import { Viewer } from '../Viewer';
 
 /**
  * @summary Base adapters class
+ * @template T type of the panorama configuration object
  */
-export abstract class AbstractAdapter {
+export abstract class AbstractAdapter<T> {
 
   /**
    * @summary Unique identifier of the adapter
@@ -27,7 +28,7 @@ export abstract class AbstractAdapter {
   /**
    * @summary Loads the panorama texture(s)
    */
-  loadTexture(panorama: any, newPanoData?: PanoData | PanoDataProvider): Promise<TextureData>;
+  loadTexture(panorama: T, newPanoData?: PanoData | PanoDataProvider): Promise<TextureData>;
 
   /**
    * @summary Creates the cube mesh
@@ -47,4 +48,4 @@ export abstract class AbstractAdapter {
 
 }
 
-export type AdapterConstructor<T extends AbstractAdapter> = new (psv: Viewer, options?: any) => T;
+export type AdapterConstructor<T extends AbstractAdapter<any>> = new (psv: Viewer, options?: any) => T;

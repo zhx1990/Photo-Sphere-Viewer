@@ -6,7 +6,7 @@ import { AbstractPlugin, Animation, CONSTANTS, utils } from '../..';
  * @typedef {Object} PSV.plugins.VisibleRangePlugin.Options
  * @property {double[]|string[]} [latitudeRange] - latitude range as two angles
  * @property {double[]|string[]} [longitudeRange] - longitude range as two angles
- * @property {boolean} [usePanoData] - use panoData as visible range, you can also manually call `setRangesFromPanoData`
+ * @property {boolean} [usePanoData=false] - use panoData as visible range, you can also manually call `setRangesFromPanoData`
  */
 
 

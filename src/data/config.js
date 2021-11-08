@@ -15,6 +15,7 @@ export const DEFAULTS = {
   panorama           : null,
   container          : null,
   adapter            : null,
+  plugins            : [],
   caption            : null,
   loadingImg         : null,
   loadingTxt         : 'Loading...',
@@ -74,7 +75,6 @@ export const DEFAULTS = {
     [KEY_CODES.Minus]     : ACTIONS.ZOOM_OUT,
     [KEY_CODES.Space]     : ACTIONS.TOGGLE_AUTOROTATE,
   },
-  plugins            : [],
 };
 
 /**

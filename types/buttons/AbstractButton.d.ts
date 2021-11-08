@@ -21,7 +21,7 @@ export abstract class AbstractButton extends AbstractComponent {
    */
   static iconActive?: string;
 
-  constructor(navbar: Navbar, className?: string, collapsable?: boolean);
+  constructor(navbar: Navbar, className?: string, collapsable?: boolean, tabbable?: boolean);
 
   /**
    * @summary Checks if the button can be displayed
@@ -52,5 +52,10 @@ export abstract class AbstractButton extends AbstractComponent {
    * @summary Uncollapses the button from the navbar menu
    */
   uncollapse();
+
+  /**
+   * Action when the button is clicked
+   */
+  abstract onClick();
 
 }
