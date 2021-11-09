@@ -30,12 +30,8 @@ You can also [download the latest release](https://github.com/mistic100/Photo-Sp
 
 ## Dependencies
 
-#### Required
  * [three.js](https://threejs.org) (use `build/three.min.js` file)
  * [uEvent 2](https://github.com/mistic100/uEvent) (use `browser.js` file)
-
-#### Optional
- * [promise-polyfill](https://github.com/taylorhakes/promise-polyfill) for IE compatibility (use `dist/polyfill.min.js` file)
 
 
 ## Your first viewer
