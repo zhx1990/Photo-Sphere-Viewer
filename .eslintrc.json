@@ -4,7 +4,7 @@
     "DeviceOrientationControls.js"
   ],
   "extends": "airbnb-base",
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
   "env": {
     "browser": true,
     "es6": true
@@ -29,6 +29,9 @@
     "prefer-template": "off",
     "no-mixed-operators": "off",
     "no-restricted-globals": "off",
+    "function-paren-newline": "off",
+    "function-call-argument-newline": "off",
+    "prefer-exponentiation-operator": "off",
     "arrow-parens": [
       "error",
       "as-needed",

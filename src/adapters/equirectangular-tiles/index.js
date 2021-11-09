@@ -409,7 +409,9 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
       this.loader.setRequestHeader(this.psv.config.requestHeaders(url));
     }
 
-    return new Promise((resolve, reject) => this.loader.load(url, resolve, undefined, reject))
+    return new Promise((resolve, reject) => {
+      this.loader.load(url, resolve, undefined, reject);
+    })
       .then((image) => {
         if (!task.isCancelled()) {
           const material = new THREE.MeshBasicMaterial({

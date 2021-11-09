@@ -428,7 +428,6 @@ export class Viewer extends EventEmitter {
       this.prop.aspect = this.prop.size.width / this.prop.size.height;
       this.prop.hFov = this.dataHelper.vFovToHFov(this.prop.vFov);
 
-      this.needsUpdate();
       this.trigger(EVENTS.SIZE_UPDATED, this.getSize());
       this.__resizeRefresh();
     }
