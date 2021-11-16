@@ -318,10 +318,10 @@ export class VirtualTourPlugin extends AbstractPlugin {
     this.datasource.setNodes(nodes);
 
     if (!startNodeId) {
-      startNodeId = this.datasource.nodes[0].id;
+      startNodeId = nodes[0].id;
     }
     else if (!this.datasource.nodes[startNodeId]) {
-      startNodeId = this.datasource.nodes[0].id;
+      startNodeId = nodes[0].id;
       utils.logWarn(`startNodeId not found is provided nodes, resetted to ${startNodeId}`);
     }
 

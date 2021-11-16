@@ -1,7 +1,7 @@
 <template>
-  <div style="display: flex">
-    <div class="custom-block tip" style="flex: 1" v-for="entry in announcements">
-      <p class="custom-block-title">{{entry.title}}
+  <div class="announcements">
+    <div class="custom-block tip" v-for="entry in announcements">
+      <p class="custom-block-title"><Badge text="NEW"/> {{entry.title}}
         <small>{{entry.date}}</small>
       </p>
       <p v-html="entry.body"></p>
@@ -55,3 +55,15 @@
     }
   }
 </script>
+
+<style>
+.announcements {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.announcements > div {
+  flex: 1;
+  min-width: 300px;
+}
+</style>
