@@ -1,16 +1,16 @@
-//*** MAIN ***
+// *** MAIN ***
 $psv-main-background-stops: #fff 0%, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%, #efefef 66%, #dfdfdf 82%, #bfbfbf 100% !default;
 $psv-main-background: radial-gradient($psv-main-background-stops) !default;
 
 
-//*** LOADER ***
+// *** LOADER ***
 $psv-loader-color: rgba(61, 61, 61, .7) !default;
 $psv-loader-width: 150px !default;
 $psv-loader-tickness: 10px !default;
 $psv-loader-font: 14px sans-serif !default;
 
 
-//*** NAVBAR ***
+// *** NAVBAR ***
 $psv-navbar-height: 40px !default;
 $psv-navbar-background: rgba(61, 61, 61, .5) !default;
 
@@ -34,7 +34,7 @@ $psv-zoom-buttons-width: 16px !default;
 $psv-zoom-range-media-min-width: 600px !default;
 
 
-//*** TOOLTIP ***
+// *** TOOLTIP ***
 $psv-tooltip-background-color: rgba(61, 61, 61, .8) !default;
 $psv-tooltip-animate-offset: 5px !default;
 $psv-tooltip-animate-delay: 100ms !default;
@@ -48,23 +48,20 @@ $psv-tooltip-font: 14px sans-serif !default;
 $psv-tooltip-text-shadow: 0 1px #000 !default;
 
 $psv-tooltip-shadow-color: rgba(90, 90, 90, .7) !default;
-// the shadow is always at the opposite side of the arrow
-$psv-tooltip-shadow-offset: 3px !default;
+$psv-tooltip-shadow-offset: 3px !default; // the shadow is always at the opposite side of the arrow
 
 
-//*** PANEL ***
+// *** PANEL ***
 $psv-panel-background: rgba(10, 10, 10, .7) !default;
 $psv-panel-text-color: rgb(220, 220, 220) !default;
 
 $psv-panel-width: 400px !default;
 $psv-panel-padding: 1em !default;
 
-// must be odd
-$psv-panel-resizer-width: 9px !default;
+$psv-panel-resizer-width: 9px !default; // must be odd
 $psv-panel-resizer-background: rgba(0, 0, 0, .9) !default;
 $psv-panel-resizer-grip-color: #fff !default;
-// must be odd
-$psv-panel-resizer-grip-height: 29px !default;
+$psv-panel-resizer-grip-height: 29px !default; // must be odd
 $psv-panel-close-button-width: 24px !default;
 $psv-panel-close-button-background: $psv-panel-resizer-background !default;
 $psv-panel-close-button-color: #fff !default;
@@ -81,7 +78,7 @@ $psv-panel-menu-odd-background: rgba(255, 255, 255, .1) !default;
 $psv-panel-menu-even-background: transparent !default;
 
 
-//*** NOTIFICATION ***
+// *** NOTIFICATION ***
 $psv-notification-bottom: (from: - $psv-navbar-height, to: $psv-navbar-height * 2) !default;
 $psv-notification-animate-delay: 200ms !default;
 $psv-notification-background-color: $psv-tooltip-background-color !default;
@@ -91,7 +88,7 @@ $psv-notification-font: $psv-tooltip-font !default;
 $psv-notification-text-color: $psv-tooltip-text-color !default;
 
 
-//*** OVERLAY ***
+// *** OVERLAY ***
 $psv-overlay-color: black !default;
 $psv-overlay-opacity: .8 !default;
 $psv-overlay-font-family: sans-serif !default;
@@ -100,7 +97,7 @@ $psv-overlay-subtext-size: 20px !default;
 $psv-overlay-image-size: (portrait: 50vw, landscape: 25vw) !default;
 
 
-//*** Z-INDEXES ***
+// *** Z-INDEXES ***
 $psv-canvas-zindex: 0 !default;
 $psv-hud-zindex: 10 !default;
 $psv-polygon-marker-zindex: 20 !default;

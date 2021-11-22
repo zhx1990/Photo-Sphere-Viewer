@@ -1,3 +1,4 @@
+@use 'sass:map';
 @import 'vars';
 
 .psv-overlay {
@@ -19,10 +20,10 @@
     margin-bottom: 4vh;
 
     svg {
-      width: map-get($psv-overlay-image-size, portrait);
+      width: map.get($psv-overlay-image-size, portrait);
 
-      @media (orientation: landscape) { /* stylelint-disable-line scss/media-feature-value-dollar-variable */
-        width: map-get($psv-overlay-image-size, landscape);
+      @media (orientation: landscape) {
+        width: map.get($psv-overlay-image-size, landscape);
       }
     }
   }

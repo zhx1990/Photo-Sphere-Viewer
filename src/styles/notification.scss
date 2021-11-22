@@ -1,9 +1,10 @@
+@use 'sass:map';
 @import 'vars';
 
 .psv-notification {
   position: absolute;
   z-index: $psv-notification-zindex;
-  bottom: map-get($psv-notification-bottom, from);
+  bottom: map.get($psv-notification-bottom, from);
   display: flex;
   justify-content: center;
   box-sizing: border-box;
@@ -25,6 +26,6 @@
 
   &--visible {
     opacity: 100;
-    bottom: map-get($psv-notification-bottom, to);
+    bottom: map.get($psv-notification-bottom, to);
   }
 }

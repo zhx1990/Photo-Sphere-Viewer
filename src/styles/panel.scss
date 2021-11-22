@@ -1,3 +1,4 @@
+@use 'sass:list';
 @import 'vars';
 
 /* stylelint-disable scss/no-duplicate-dollar-variables */
@@ -100,6 +101,7 @@
     cursor: col-resize;
 
     $psv-panel-resizer-grip-width: $psv-panel-resizer-width - 4px;
+
     @if $psv-panel-resizer-grip-width > 0 {
       &::before {
         content: '';
@@ -179,7 +181,7 @@
       flex: none;
       height: $psv-panel-menu-item-height;
       width: $psv-panel-menu-item-height;
-      margin-right: #{nth($psv-panel-menu-item-padding, 1)};
+      margin-right: #{list.nth($psv-panel-menu-item-padding, 1)};
 
       img {
         max-width: 100%;
