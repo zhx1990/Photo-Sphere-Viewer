@@ -59,8 +59,8 @@ const baseConfig = {
     postcss({
       extract  : true,
       sourceMap: true,
+      use      : ['sass'],
       plugins  : [
-        require('@csstools/postcss-sass')({}),
         require('autoprefixer')({}),
         require('postcss-banner')({
           banner   : cssBanner,

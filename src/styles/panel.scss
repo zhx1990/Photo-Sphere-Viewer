@@ -1,13 +1,10 @@
 @use 'sass:list';
 @import 'vars';
 
-/* stylelint-disable scss/no-duplicate-dollar-variables */
-@function make-dot-shadow($color, $width, $height) {
+@function make-dot-shadow($color, $w, $h) {
   $val: 1px 0 $color;
   $x: 3;
   $y: 0;
-  $w: $width / 1px;
-  $h: $height / 1px;
 
   @while $y < $h {
     @if $x > $w {
@@ -21,7 +18,6 @@
 
   @return $val;
 }
-/* stylelint-enable */
 
 .psv-panel {
   position: absolute;
@@ -107,8 +103,8 @@
         content: '';
         position: absolute;
         top: 50%;
-        left: ($psv-panel-resizer-width - $psv-panel-resizer-grip-width) / 2 - 1px;
-        margin-top: (-$psv-panel-resizer-grip-height / 2);
+        left: ($psv-panel-resizer-width - $psv-panel-resizer-grip-width) * .5 - 1px;
+        margin-top: (-$psv-panel-resizer-grip-height * .5);
         width: 1px;
         height: 1px;
         box-shadow: make-dot-shadow($psv-panel-resizer-grip-color, $psv-panel-resizer-grip-width, $psv-panel-resizer-grip-height);
@@ -152,12 +148,12 @@
     display: flex;
     align-items: center;
     font: $psv-panel-title-font;
-    margin: $psv-panel-title-margin $psv-panel-title-margin / 2;
+    margin: $psv-panel-title-margin $psv-panel-title-margin * .5;
 
     svg {
       width: $psv-panel-title-icon-size;
       height: $psv-panel-title-icon-size;
-      margin-right: $psv-panel-title-margin / 2;
+      margin-right: $psv-panel-title-margin * .5;
     }
   }
 

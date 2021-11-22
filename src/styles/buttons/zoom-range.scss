@@ -5,7 +5,7 @@
     width: $psv-zoom-range-width;
     height: $psv-zoom-range-tickness;
     margin: $psv-buttons-padding 0;
-    padding: #{($psv-buttons-height - $psv-zoom-range-tickness) / 2} 0;
+    padding: #{($psv-buttons-height - $psv-zoom-range-tickness) * .5} 0;
     max-width: $psv-zoom-range-media-min-width; // trick for JS access
   }
 
@@ -20,7 +20,7 @@
   &-handle {
     position: absolute;
     border-radius: 50%;
-    top: #{($psv-zoom-range-tickness - $psv-zoom-disk-diameter) / 2};
+    top: #{($psv-zoom-range-tickness - $psv-zoom-disk-diameter) * .5};
     width: $psv-zoom-disk-diameter;
     height: $psv-zoom-disk-diameter;
     background: $psv-buttons-color;
