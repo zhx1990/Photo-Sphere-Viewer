@@ -1,3 +1,4 @@
+import { EVENTS } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { bound, getStyle } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
@@ -113,6 +114,8 @@ export class Loader extends AbstractComponent {
       -Math.PI / 2, bound(value, 0, 100) / 100 * 2 * Math.PI - Math.PI / 2
     );
     context.stroke();
+
+    this.psv.trigger(EVENTS.LOAD_PROGRESS, Math.round(value));
   }
 
 }

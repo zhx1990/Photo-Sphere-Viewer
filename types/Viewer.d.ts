@@ -343,9 +343,13 @@ export class Viewer extends EventEmitter {
    */
   on(e: 'hide-overlay', cb: (e: Event, id: string | undefined) => void): this;
   /**
-   * @summary Trigered when the tooltip is hidden
+   * @summary Triggered when the tooltip is hidden
    */
   on(e: 'hide-tooltip', cb: (e: Event, data: any) => void): this;
+  /**
+   * @summary Triggered when the loader value changes
+   */
+  on(e: 'load-progress', cb: (e: Event, value: number) => void): this;
   /**
    * @summary Triggered when the panel is opened
    */

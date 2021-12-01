@@ -36,6 +36,7 @@ export const EVENTS: {
   HIDE_NOTIFICATION: 'hide-notification',
   HIDE_OVERLAY: 'hide-overlay',
   HIDE_TOOLTIP: 'hide-tooltip',
+  LOAD_PROGRESS: 'load-progress',
   OPEN_PANEL: 'open-panel',
   PANORAMA_LOADED: 'panorama-loaded',
   POSITION_UPDATED: 'position-updated',

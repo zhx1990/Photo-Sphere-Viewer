@@ -167,6 +167,13 @@ export const EVENTS = {
    */
   HIDE_TOOLTIP      : 'hide-tooltip',
   /**
+   * @event load-progress
+   * @memberof PSV
+   * @summary Triggered when the loader value changes
+   * @param {number} value from 0 to 100
+   */
+  LOAD_PROGRESS     : 'load-progress',
+  /**
    * @event open-panel
    * @memberof PSV
    * @summary Triggered when the panel is opened
