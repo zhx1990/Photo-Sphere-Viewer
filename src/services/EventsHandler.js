@@ -341,6 +341,7 @@ export class EventsHandler extends AbstractService {
     }
     else if (evt.touches.length === 2) {
       this.__cancelLongTouch();
+      this.__cancelTwoFingersOverlay();
       this.__startMoveZoom(evt);
       evt.preventDefault();
     }
@@ -357,17 +358,13 @@ export class EventsHandler extends AbstractService {
     }
 
     this.__cancelLongTouch();
+    this.__cancelTwoFingersOverlay();
 
     if (evt.touches.length === 1) {
       this.__stopMoveZoom();
     }
     else if (evt.touches.length === 0) {
       this.__stopMove(evt.changedTouches[0]);
-    }
-
-    if (this.config.touchmoveTwoFingers) {
-      this.__cancelTwoFingersOverlay();
-      this.psv.overlay.hide(IDS.TWO_FINGERS);
     }
   }
 
@@ -380,6 +377,8 @@ export class EventsHandler extends AbstractService {
     if (!this.config.mousemove) {
       return;
     }
+
+    this.__cancelLongTouch();
 
     if (evt.touches.length === 1) {
       if (this.config.touchmoveTwoFingers) {
@@ -401,9 +400,7 @@ export class EventsHandler extends AbstractService {
     else if (evt.touches.length === 2) {
       evt.preventDefault();
       this.__moveZoom(evt);
-      if (this.config.touchmoveTwoFingers) {
-        this.__cancelTwoFingersOverlay();
-      }
+      this.__cancelTwoFingersOverlay();
     }
   }
 
@@ -427,6 +424,7 @@ export class EventsHandler extends AbstractService {
       clearTimeout(this.prop.twofingersTimeout);
       this.prop.twofingersTimeout = null;
     }
+    this.psv.overlay.hide(IDS.TWO_FINGERS);
   }
 
   /**
