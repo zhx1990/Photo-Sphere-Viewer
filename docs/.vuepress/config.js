@@ -16,7 +16,8 @@ module.exports = {
     smoothScroll: true,
     sidebarDepth: 3,
     algolia     : {
-      apiKey   : 'a27daf8784ab1c35fdbdf1dee321428c',
+      appId    : '5AVMW192FM',
+      apiKey   : 'd443b6c08ed5353575f503b7a57f5bbf',
       indexName: 'photo-sphere-viewer',
     },
     nav         : [
@@ -43,19 +44,19 @@ module.exports = {
             'cropped-panorama',
             'migration-v3',
             {
-              title: 'Adapters',
-              path: '/guide/adapters/',
-              collapsable : false,
-              children: [
+              title      : 'Adapters',
+              path       : '/guide/adapters/',
+              collapsable: false,
+              children   : [
                 'adapters/cubemap',
                 'adapters/tiles',
               ],
             },
             {
-              title: 'Reusable components',
-              path: '/guide/components/',
-              collapsable : false,
-              children: [
+              title      : 'Reusable components',
+              path       : '/guide/components/',
+              collapsable: false,
+              children   : [
                 'components/panel',
                 'components/notification',
                 'components/overlay',
@@ -92,9 +93,9 @@ module.exports = {
           ],
         },
       ],
-      '/demos/': [
+      '/demos/'  : [
         {
-          title: 'Demos',
+          title       : 'Demos',
           sidebarDepth: 3,
           collapsable : false,
           children    : [
