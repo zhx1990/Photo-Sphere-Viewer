@@ -7,9 +7,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v2
-    - name: build
-      run: |
-        npm install
-        npm run compile
-        npm run test
+      - uses: actions/checkout@v2
+      - name: build
+        run: |
+          yarn
+          yarn compile
+          yarn test

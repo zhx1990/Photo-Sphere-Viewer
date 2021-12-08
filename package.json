@@ -81,6 +81,10 @@
     "vuepress": "^1.8.2",
     "vuepress-plugin-element-tabs": "^0.2.8"
   },
+  "resolutions": {
+    "node-sass": "^7.0.0",
+    "sass-loader": "^10.2.0"
+  },
   "scripts": {
     "compile": "npm-run-all compile:*",
     "compile:prepare": "cpx \"node_modules/three/examples/jsm/**/*\" three-examples/",
