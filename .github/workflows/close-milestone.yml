@@ -1,0 +1,19 @@
+name: close-milestone
+
+on:
+  milestone:
+    types: [closed]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  comment:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: bflad/action-milestone-comment@v1
+        with:
+          body: |
+            This feature/bug fix has been released in [version ${{ github.event.milestone.title }}](https://github.com/mistic100/Photo-Sphere-Viewer/releases/tag/${{ github.event.milestone.title }}).
