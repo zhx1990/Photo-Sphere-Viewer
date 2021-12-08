@@ -8,9 +8,8 @@ Official plugins (listed on the left menu) are available in the the main `photo-
 
 **Example for the Markers plugin:**
 
-:::: tabs
-
-::: tab Direct import
+<md-tabs md-elevation="1">
+<md-tab md-label="Direct import">
 ```html
 <!-- base imports of PSV and dependencies -->
 
@@ -18,17 +17,16 @@ Official plugins (listed on the left menu) are available in the the main `photo-
 
 <script src="https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/markers.min.js"></script>
 ```
-:::
+</md-tab>
 
-::: tab ES import
+<md-tab md-label="ES import">
 Import `photo-sphere-viewer/dist/plugins/markers.css` with the prefered way depending on your tooling.
 
 ```js
 import { MarkersPlugin } from 'photo-sphere-viewer/dist/plugins/markers';
 ```
-:::
-
-::::
+</md-tab>
+</md-tabs>
 
 
 

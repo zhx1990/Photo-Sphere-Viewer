@@ -14,9 +14,8 @@ The plugin allows to define `nodes` which contains a `panorama` and one or more 
 
 There two different ways to define the position of the links : the manual way and the GPS way.
 
-:::: tabs
-
-::: tab Manual mode
+<md-tabs md-elevation="1">
+<md-tab md-label="Manual mode">
 In manual mode each link must have `longitude`/`latitude` or `x`/`y` coordinates to be placed at the correct location on the panorama. This works exactly like the placement of markers.
 
 ```js
@@ -30,9 +29,9 @@ const node = {
   }],
 };
 ```
-:::
+</md-tab>
 
-::: tab GPS mode
+<md-tab md-label="GPS mode">
 In GPS mode each node has positionning coordinates and the links are placed automatically.
 
 ```js
@@ -46,16 +45,14 @@ const node = {
   }],
 };
 ```
-:::
-
-::::
+</md-tab>
+</md-tabs>
 
 
 The nodes can be provided all at once or asynchronously as the user navigates.
 
-:::: tabs
-
-::: tab Client mode
+<md-tabs md-elevation="1">
+<md-tab md-label="Client mode">
 In client mode you must provide all `nodes` all at once, you can also change all the nodes with the `setNodes` method.
 
 ```js
@@ -64,10 +61,9 @@ const nodes = [
   { id: 'node-2', panorama: '002.jpg', links: [{ nodeId: 'node-1', x: 3000, y: 780}] },
 ];
 ```
+</md-tab>
 
-:::
-
-::: tab Server mode
+<md-tab md-label="Server mode">
 In server mode you provide the callbacks `getNode` and `getLinks` which both return a Promise to load the data of a node and the links of a node.
 
 ```js
@@ -81,10 +77,10 @@ getLinks = (nodeId) => {
 
 ::: tip Optimize HTTP calls
 `getNode` can return a node object with its `links` property already filled, in this case `getLinks` is not called.
-
 :::
 
-::::
+</md-tab>
+</md-tabs>
 
 
 ## Example

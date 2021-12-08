@@ -111,7 +111,6 @@ module.exports = {
       'ga': 'UA-28192323-3',
     }],
     ['@vuepress/back-to-top'],
-    ['vuepress-plugin-element-tabs'],
   ],
   alias      : {
     'photo-sphere-viewer'           : path.resolve(process.cwd(), 'dist/photo-sphere-viewer.js'),

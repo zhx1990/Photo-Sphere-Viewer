@@ -2,7 +2,7 @@
   .playground-container {
     margin: 0 calc(-50vw + 940px / 2);
     display: flex;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
   #form {
@@ -39,8 +39,13 @@
     }
   }
 
-  .playground-container .el-tabs__content {
-    overflow: visible;
+  .playground-container .md-tabs {
+    align-items: stretch;
+  }
+
+  .playground-container .md-tabs-content {
+    overflow-y: visible;
+    height: 100% !important;
   }
 
   .playground-container .md-title {
@@ -55,8 +60,8 @@
 
 <template>
   <div class="playground-container">
-    <Tabs type="border-card" stretch id="form">
-      <Tab label="Panorama">
+    <md-tabs id="form" md-elevation="1" md-alignment="fixed">
+      <md-tab md-label="Panorama">
         <div class="md-layout md-gutter">
           <md-button class="md-primary md-dense md-raised" style="margin: 15px 0 0 20px; width: 150px"
                      v-on:click="loadDefaultFile" target="_blank">
@@ -74,9 +79,9 @@
           <label>Caption</label>
           <md-input name="caption" v-model="options.caption" :disabled="!imageData"/>
         </md-field>
-      </Tab>
+      </md-tab>
 
-      <Tab label="Standard options">
+      <md-tab md-label="Standard options">
         <div class="md-layout md-gutter">
           <div class="md-layout-item md-size-33">
             <md-field>
@@ -154,9 +159,9 @@
             </md-checkbox>
           </div>
         </div>
-      </Tab>
+      </md-tab>
 
-      <Tab label="Advanced options">
+      <md-tab md-label="Advanced options">
         <div class="md-layout md-gutter" style="margin-bottom: 30px">
           <div class="md-layout-item md-size-33">
             <label class="md-caption">Correction, pan</label>
@@ -205,16 +210,16 @@
             </md-field>
           </div>
         </div>
-      </Tab>
+      </md-tab>
 
-      <Tab label="Navbar config">
+      <md-tab md-label="Navbar config">
         <div class="md-layout md-gutter">
           <div class="md-layout-item md-size-33" v-for="item in navbar">
             <md-checkbox class="md-primary" v-model="item.enabled" :disabled="!imageData">{{item.label}}</md-checkbox>
           </div>
         </div>
-      </Tab>
-    </Tabs>
+      </md-tab>
+    </md-tabs>
 
     <div id="viewer"></div>
   </div>

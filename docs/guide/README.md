@@ -38,9 +38,8 @@ You can also [download the latest release](https://github.com/mistic100/Photo-Sp
 
 Include all JS & CSS files in your page manually or with your favorite bundler and init the viewer.
 
-:::: tabs
-
-::: tab Direct import
+<md-tabs md-elevation="1">
+<md-tab md-label="Direct import">
 ```html
 <head>
   <!-- for optimal display on high DPI devices -->
@@ -63,9 +62,9 @@ Include all JS & CSS files in your page manually or with your favorite bundler a
   });
 </script>
 ```
-:::
+</md-tab>
 
-::: tab ES import
+<md-tab md-label="ES import">
 Import `photo-sphere-viewer/dist/photo-sphere-viewer.css` with the prefered way depending on your tooling.
 
 ```html
@@ -86,9 +85,9 @@ const viewer = new Viewer({
   panorama: 'path/to/panorama.jpg'
 });
 ```
-:::
+</md-tab>
+</md-tabs>
 
-::::
 
 The `panorama` must be an [equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection) of your photo. Other modes are supported through [adapters](./adapters/).
 
