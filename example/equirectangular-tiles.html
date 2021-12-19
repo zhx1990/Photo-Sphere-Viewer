@@ -6,22 +6,7 @@
   <title>PhotoSphereViewer - equirectangular tiles demo</title>
 
   <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
-
-  <style>
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-    }
-
-    #photosphere {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -36,7 +21,7 @@
 <script>
   const base = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-  var panos = [
+  const panos = [
     {
       desc    : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
       minFov  : 30,
@@ -80,7 +65,7 @@
     }
   ];
 
-  var viewer = new PhotoSphereViewer.Viewer({
+  const viewer = new PhotoSphereViewer.Viewer({
     container : 'photosphere',
     adapter   : [PhotoSphereViewer.EquirectangularTilesAdapter, {
       showErrorTile: true,
@@ -97,14 +82,14 @@
         title    : 'Change image',
         className: 'custom-button',
         content  : '🔄',
-        onClick  : (function () {
-          var i = 0;
+        onClick  : (() => {
+          let i = 0;
 
-          return function () {
+          return () => {
             i = 1 - i;
             loadPanorama(panos[i]);
           };
-        }()),
+        })(),
       },
       'caption', 'gyroscope', 'fullscreen',
     ],

@@ -6,27 +6,7 @@
   <title>PhotoSphereViewer - equirectangular demo</title>
 
   <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
-
-  <style>
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-    }
-
-    #photosphere {
-      width: 100%;
-      height: 100%;
-    }
-
-    .psv-button.custom-button {
-      font-size: 22px;
-      line-height: 20px;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -40,7 +20,7 @@
 <script src="../dist/plugins/stereo.js"></script>
 
 <script>
-  var panos = [
+  const panos = [
     {
       url : 'sphere.jpg',
       desc: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -51,7 +31,7 @@
     },
   ];
 
-  var PSV = new PhotoSphereViewer.Viewer({
+  const viewer = new PhotoSphereViewer.Viewer({
     container          : 'photosphere',
     panorama           : panos[0].url,
     caption            : panos[0].desc,
@@ -68,25 +48,25 @@
         title    : 'Change image',
         className: 'custom-button',
         content  : '🔄',
-        onClick  : (function () {
-          var i = 0;
+        onClick  : (() => {
+          let i = 0;
 
-          return function () {
+          return () => {
             i = 1 - i;
 
-            PSV.setPanorama(panos[i].url, { longitude: 0, latitude: 0, zoom: 50 })
-              .then(function () {
-                PSV.navbar.setCaption(panos[i].desc);
-              }, function () {});
+            viewer.setPanorama(panos[i].url, { longitude: 0, latitude: 0, zoom: 50 })
+              .then(() => {
+                viewer.navbar.setCaption(panos[i].desc);
+              });
           };
-        }()),
+        })(),
       },
       {
         title    : 'Random position',
         className: 'custom-button',
         content  : '🔀',
-        onClick  : function () {
-          PSV.animate({
+        onClick  : () => {
+          viewer.animate({
             longitude: (Math.random() - 0.5) * 3 / 2 * Math.PI,
             latitude : (Math.random() - 0.5) * 3 / 4 * Math.PI,
             zoom     : Math.random() * 60 + 20,

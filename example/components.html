@@ -6,22 +6,7 @@
   <title>PhotoSphereViewer - components demo</title>
 
   <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
-
-  <style>
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-    }
-
-    #photosphere {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -47,7 +32,7 @@
 <script src="../dist/photo-sphere-viewer.js"></script>
 
 <script>
-  const PSV = new PhotoSphereViewer.Viewer({
+  const viewer = new PhotoSphereViewer.Viewer({
     container : 'photosphere',
     panorama  : 'sphere.jpg',
     caption   : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -56,15 +41,15 @@
       {
         content  : 'Loader',
         onClick  : () => {
-          PSV.loader.show();
-          PSV.loader.setProgress(Math.random() * 100);
+          viewer.loader.show();
+          viewer.loader.setProgress(Math.random() * 100);
         },
       },
       {
         content  : 'Notification',
         onClick  : () => {
           const messages = ['This is a custom notification', 'This is another notification', 'Yet another notification?'];
-          PSV.notification.show({
+          viewer.notification.show({
             content: messages[Math.floor(Math.random() * messages.length)],
             timeout: 2000,
           });
@@ -73,7 +58,7 @@
       {
         content  : 'Overlay',
         onClick  : () => {
-          PSV.overlay.show({
+          viewer.overlay.show({
             id     : 'custom',
             image  : document.getElementById('overlay-icon').innerHTML,
             text   : 'This is a custom overlay',
@@ -84,7 +69,7 @@
       {
         content  : 'Panel',
         onClick  : () => {
-          PSV.panel.show({
+          viewer.panel.show({
             id     : 'custom',
             width  : '50%',
             content: document.getElementById('panel-content').innerHTML,
@@ -95,7 +80,7 @@
         content  : 'Tooltip',
         onClick  : () => {
           const position = ['top center', 'top left', 'top right', 'bottom center', 'bottom left', 'bottom right', 'center left', 'center right'][Math.floor(Math.random() * 8)];
-          PSV.tooltip.create({
+          viewer.tooltip.create({
             top     : Math.random() * (document.body.offsetHeight - 200) + 100,
             left    : Math.random() * (document.body.offsetWidth - 200) + 100,
             position: position,

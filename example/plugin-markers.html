@@ -7,27 +7,9 @@
 
   <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
   <link rel="stylesheet" href="../dist/plugins/markers.css">
+  <link rel="stylesheet" href="style.css">
 
   <style>
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-    }
-
-    #photosphere {
-      width: 100%;
-      height: 100%;
-    }
-
-    .psv-button.custom-button {
-      font-size: 22px;
-      line-height: 20px;
-    }
-
     .demo-label {
       color: white;
       font-size: 20px;
@@ -103,7 +85,7 @@
 </svg>
 
 <script>
-  const PSV = new PhotoSphereViewer.Viewer({
+  const viewer = new PhotoSphereViewer.Viewer({
     container : 'photosphere',
     panorama  : 'sphere.jpg',
     caption   : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -124,12 +106,12 @@
       PhotoSphereViewer.GyroscopePlugin,
       PhotoSphereViewer.StereoPlugin,
       [PhotoSphereViewer.MarkersPlugin, {
-        markers: (function () {
-          var a = [];
+        markers: (() => {
+          const a = [];
 
           // add markers all hover the sphere
-          for (var i = 0; i < Math.PI * 2; i += Math.PI / 4) {
-            for (var j = -Math.PI / 2 + Math.PI / 4; j < Math.PI / 2; j += Math.PI / 4) {
+          for (let i = 0; i < Math.PI * 2; i += Math.PI / 4) {
+            for (let j = -Math.PI / 2 + Math.PI / 4; j < Math.PI / 2; j += Math.PI / 4) {
               a.push({
                 id       : '#' + a.length,
                 tooltip  : '#' + a.length,
@@ -393,14 +375,14 @@
           });
 
           return a;
-        }())
-      }]
-    ]
+        })(),
+      }],
+    ],
   });
 
-  var markers = PSV.getPlugin(PhotoSphereViewer.MarkersPlugin);
+  const markers = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
 
-  PSV.on('click', function (e, data) {
+  viewer.on('click', (e, data) => {
     if (!data.rightclick) {
       markers.addMarker({
         id       : '#' + Math.random(),
@@ -418,7 +400,7 @@
     }
   });
 
-  markers.on('select-marker', function (e, marker, data) {
+  markers.on('select-marker', (e, marker, data) => {
     console.log('select', marker.id);
 
     if (marker.data && marker.data.deletable) {
@@ -434,23 +416,23 @@
     }
   });
 
-  markers.on('unselect-marker', function (e, marker) {
+  markers.on('unselect-marker', (e, marker) => {
     console.log('unselect', marker.id);
   });
 
-  markers.on('over-marker', function (e, marker) {
+  markers.on('over-marker', (e, marker) => {
     console.log('over', marker.id);
   });
 
-  markers.on('leave-marker', function (e, marker) {
+  markers.on('leave-marker', (e, marker) => {
     console.log('leave', marker.id);
   });
 
-  markers.on('select-marker-list', function (e, marker) {
+  markers.on('select-marker-list', (e, marker) => {
     console.log('select-list', marker.id);
   });
 
-  markers.on('goto-marker-done', function (e, marker) {
+  markers.on('goto-marker-done', (e, marker) => {
     console.log('goto-done', marker.id);
   });
 </script>

@@ -7,22 +7,7 @@
 
   <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
   <link rel="stylesheet" href="../dist/plugins/settings.css">
-
-  <style>
-    html, body {
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      margin: 0;
-      padding: 0;
-      font-family: sans-serif;
-    }
-
-    #photosphere {
-      width: 100%;
-      height: 100%;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -35,7 +20,7 @@
 <script src="../dist/plugins/resolution.js"></script>
 
 <script>
-  var PSV = new PhotoSphereViewer.Viewer({
+  const viewer = new PhotoSphereViewer.Viewer({
     container : 'photosphere',
     panorama  : 'sphere_small.jpg',
     caption   : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
