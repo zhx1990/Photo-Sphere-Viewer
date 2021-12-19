@@ -12,7 +12,7 @@ This plugin is available in the core `photo-sphere-viewer` package in `dist/plug
 
 The plugin allows to define `nodes` which contains a `panorama` and one or more `links` to other nodes. The links are represented with a 3D arrow (default) or using the [Markers plugin](./plugin-markers.md).
 
-There two different ways to define the position of the links : the manual way and the GPS way.
+There are two different ways to define the position of the links : the manual mode and the GPS mode.
 
 <md-tabs md-elevation="1">
 <md-tab md-label="Manual mode">
@@ -200,10 +200,10 @@ Initial list of nodes. You can also call `setNodes` method later.
 
 Callback to load the configuration of a node.
 
-#### `getLinks(nodeId)` (required in server mode)
+#### `getLinks(nodeId)` (server mode only)
 - type: `function(nodeId: string) => Promise<NodeLink[]>`
 
-Callback to load the links of a node.
+Callback to load the links of a node. Only used if `getNode()` does not return the links of each node.
 
 #### `startNodeId`
 - type: `string`
@@ -236,6 +236,16 @@ Default value is:
   },
 }
 ```
+
+::: tip
+If you want to use another marker type like `image` you must define `html: null` to remove the default value.
+```js
+markerStyle: {
+  html : null,
+  image: 'path/to/image.png',
+}
+```
+:::
 
 #### `arrowStyle` (3d mode only)
 - type: `object`

@@ -589,7 +589,7 @@ export class Marker {
     const found = [];
 
     utils.each(MARKER_TYPES, (type) => {
-      if (type in properties) {
+      if (!!properties[type]) {
         found.push(type);
       }
     });
