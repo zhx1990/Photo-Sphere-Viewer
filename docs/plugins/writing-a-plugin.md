@@ -93,8 +93,8 @@ If your plugin requires custom CSS, import the stylesheet directly in your main 
 require('rollup-plugin-postcss')({
   extract  : true,
   sourceMap: true,
+  use      : ['sass'],
   plugins  : [
-    require('@csstools/postcss-sass')({}),
     require('autoprefixer')({}),
   ],
 })
@@ -117,8 +117,8 @@ Photo Sphere Viewer buttons **must** extend `AbstractButton`, check the <ApiLink
 - It **can** implement the `isSupported` method to inform the viewer if the action is possible depending on the environement.
 - It **can** provide additional parameters to `super` :
   - 2nd: a CSS class name applied to the button
-  - 3rd: a boolean indicating the button can be collapsed in the menu on small screens
-  - 4th: a boolean indicating the button can be activated with the keyboard
+  - 3rd: a boolean indicating the button can be collapsed in the menu on small screens (default `false`)
+  - 4th: a boolean indicating the button can be activated with the keyboard (default `true`)
 
 ```js
 import { AbstractButton } from 'photo-sphere-viewer';
@@ -129,7 +129,7 @@ export class CustomButton extends AbstractButton {
   static icon = customIcon;
 
   constructor(navbar) {
-    super(navbar, 'custom-button-class', true);
+    super(navbar, 'custom-button-class', true, true);
 
     // do your initialisation logic here
     // you will probably need the instance of your plugin
