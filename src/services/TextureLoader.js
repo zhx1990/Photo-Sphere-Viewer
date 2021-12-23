@@ -15,13 +15,6 @@ export class TextureLoader extends AbstractService {
     super(psv);
 
     /**
-     * @summary Current HTTP requests
-     * @type {XMLHttpRequest[]}
-     * @private
-     */
-    this.requests = [];
-
-    /**
      * @summary THREE file loader
      * @type {external:THREE:FileLoader}
      * @private
@@ -62,7 +55,7 @@ export class TextureLoader extends AbstractService {
    * @package
    */
   abortLoading() {
-    [...this.requests].forEach(r => r.abort());
+    // noop implementation waiting for https://github.com/mrdoob/three.js/pull/23070
   }
 
   /**
@@ -80,12 +73,9 @@ export class TextureLoader extends AbstractService {
       let progress = 0;
       onProgress && onProgress(progress);
 
-      const request = this.loader.load(
+      this.loader.load(
         url,
         (result) => {
-          const rIdx = this.requests.indexOf(request);
-          if (rIdx !== -1) this.requests.splice(rIdx, 1);
-
           progress = 100;
           onProgress && onProgress(progress);
           resolve(result);
@@ -100,17 +90,9 @@ export class TextureLoader extends AbstractService {
           }
         },
         (err) => {
-          const rIdx = this.requests.indexOf(request);
-          if (rIdx !== -1) this.requests.splice(rIdx, 1);
-
           reject(err);
         }
       );
-
-      // when we hit the cache, the result is the cache value
-      if (request instanceof XMLHttpRequest) {
-        this.requests.push(request);
-      }
     });
   }
 

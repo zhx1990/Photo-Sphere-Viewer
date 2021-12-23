@@ -188,8 +188,9 @@ export class Viewer extends EventEmitter {
    * @description Loads a new panorama file, optionally changing the camera position/zoom and activating the transition animation.<br>
    * If the "options" parameter is not defined, the camera will not move and the ongoing animation will continue.<br>
    * If another loading is already in progress it will be aborted.
+   * @returns resolves false if the loading was aborted by another call
    */
-  setPanorama(panorama: any, options?: PanoramaOptions): Promise<void>;
+  setPanorama(panorama: any, options?: PanoramaOptions): Promise<boolean>;
 
   /**
    * @summary Update options

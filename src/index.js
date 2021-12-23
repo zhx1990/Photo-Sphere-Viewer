@@ -115,6 +115,7 @@ export {
 /**
  * @typedef {Object} PSV.TextureData
  * @summary Result of the {@link PSV.adapters.AbstractAdapter#loadTexture} method
+ * @property {*} panorama
  * @property {external:THREE.Texture|external:THREE.Texture[]|Record<string, external:THREE.Texture[]>} texture
  * @property {PSV.PanoData} [panoData]
  */

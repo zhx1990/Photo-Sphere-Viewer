@@ -66,7 +66,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
 
         const texture = this.__createEquirectangularTexture(img, panoData);
 
-        return { texture, panoData };
+        return { panorama, texture, panoData };
       });
   }
 

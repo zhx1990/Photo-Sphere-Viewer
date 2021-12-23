@@ -20,8 +20,10 @@ import { TooltipRenderer } from './services/TooltipRenderer';
 import {
   each,
   exitFullscreen,
+  getAbortError,
   getAngle,
   getShortestArc,
+  isAbortError,
   isExtendedPosition,
   isFullscreenEnabled,
   logWarn,
@@ -440,7 +442,7 @@ export class Viewer extends EventEmitter {
    * If another loading is already in progress it will be aborted.
    * @param {*} path - URL of the new panorama file
    * @param {PSV.PanoramaOptions} [options]
-   * @returns {Promise}
+   * @returns {Promise<boolean>} resolves false if the loading was aborted by another call
    */
   setPanorama(path, options = {}) {
     if (this.prop.loadingPromise !== null) {
@@ -476,20 +478,18 @@ export class Viewer extends EventEmitter {
     this.config.panorama = path;
 
     const done = (err) => {
-      if (err && err.type === 'abort') {
-        console.warn(err);
-      }
-      else if (err) {
-        this.showError(this.config.lang.loadError);
-        console.error(err);
-      }
-
       this.loader.hide();
       this.renderer.show();
 
       this.prop.loadingPromise = null;
 
-      if (err) {
+      if (isAbortError(err)) {
+        console.warn(err);
+        return false;
+      }
+      else if (err) {
+        this.showError(this.config.lang.loadError);
+        console.error(err);
         return Promise.reject(err);
       }
       else {
@@ -497,12 +497,21 @@ export class Viewer extends EventEmitter {
       }
     };
 
-    if (!options.transition || !this.prop.ready || !this.adapter.constructor.supportsTransition) {
-      if (options.showLoader || !this.prop.ready) {
-        this.loader.show();
-      }
+    if (options.showLoader || !this.prop.ready) {
+      this.loader.show();
+    }
 
-      this.prop.loadingPromise = this.adapter.loadTexture(this.config.panorama, options.panoData)
+    const loadingPromise = this.adapter.loadTexture(this.config.panorama, options.panoData)
+      .then((textureData) => {
+        // check if another panorama was requested
+        if (textureData.panorama !== this.config.panorama) {
+          return Promise.reject(getAbortError());
+        }
+        return textureData;
+      });
+
+    if (!options.transition || !this.prop.ready || !this.adapter.constructor.supportsTransition) {
+      this.prop.loadingPromise = loadingPromise
         .then((textureData) => {
           this.renderer.setTexture(textureData);
           this.renderer.setPanoramaPose(textureData.panoData);
@@ -518,11 +527,7 @@ export class Viewer extends EventEmitter {
         .then(done, done);
     }
     else {
-      if (options.showLoader) {
-        this.loader.show();
-      }
-
-      this.prop.loadingPromise = this.adapter.loadTexture(this.config.panorama, options.panoData)
+      this.prop.loadingPromise = loadingPromise
         .then((textureData) => {
           this.loader.hide();
 

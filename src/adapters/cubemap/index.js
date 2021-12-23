@@ -78,7 +78,7 @@ export class CubemapAdapter extends AbstractAdapter {
     }
 
     return Promise.all(promises)
-      .then(texture => ({ texture }));
+      .then(texture => ({ panorama, texture }));
   }
 
   /**

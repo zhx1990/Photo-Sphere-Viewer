@@ -70,7 +70,8 @@ export class VirtualTourPlugin extends AbstractPlugin {
 
   /**
    * @summary Changes the current node
+   * @returns resolves false if the loading was aborted by another call
    */
-  setCurrentNode(nodeId: string);
+  setCurrentNode(nodeId: string): Promise<boolean>;
 
 }

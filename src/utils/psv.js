@@ -20,6 +20,25 @@ export function pluginInterop(plugin, target) {
 }
 
 /**
+ * @summary Builds an Error with name 'AbortError'
+ * @return {Error}
+ */
+export function getAbortError() {
+  const error = new Error('Loading was aborted.');
+  error.name = 'AbortError';
+  return error;
+}
+
+/**
+ * @summary Tests if an Error has name 'AbortError'
+ * @param {Error} err
+ * @return {boolean}
+ */
+export function isAbortError(err) {
+  return err?.name === 'AbortError';
+}
+
+/**
  * @summary Displays a warning in the console
  * @memberOf PSV.utils
  * @param {string} message

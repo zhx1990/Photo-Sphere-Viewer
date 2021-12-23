@@ -122,12 +122,14 @@ export class VirtualTourPlugin extends AbstractPlugin {
      * @property {PSV.plugins.VirtualTourPlugin.Node} currentNode
      * @property {external:THREE.Mesh} currentArrow
      * @property {PSV.Tooltip} currentTooltip
+     * @property {string} loadingNode
      * @private
      */
     this.prop = {
       currentNode   : null,
       currentArrow  : null,
       currentTooltip: null,
+      loadingNode   : null,
     };
 
     /**
@@ -336,18 +338,33 @@ export class VirtualTourPlugin extends AbstractPlugin {
   /**
    * @summary Changes the current node
    * @param {string} nodeId
+   * @returns {Promise<boolean>} resolves false if the loading was aborted by another call
    */
   setCurrentNode(nodeId) {
+    if (nodeId === this.prop.currentNode?.id) {
+      return Promise.resolve(true);
+    }
+
     this.psv.loader.show();
     this.psv.hideError();
+
+    this.prop.loadingNode = nodeId;
 
     // if this node is already preloading, wait for it
     return Promise.resolve(this.preload[nodeId])
       .then(() => {
+        if (this.prop.loadingNode !== nodeId) {
+          return Promise.reject(utils.getAbortError());
+        }
+
         this.psv.textureLoader.abortLoading();
         return this.datasource.loadNode(nodeId);
       })
       .then((node) => {
+        if (this.prop.loadingNode !== nodeId) {
+          return Promise.reject(utils.getAbortError());
+        }
+
         this.psv.navbar.setCaption(`<em>${this.psv.config.lang.loading}</em>`);
 
         this.prop.currentNode = node;
@@ -374,12 +391,18 @@ export class VirtualTourPlugin extends AbstractPlugin {
             panoData        : node.panoData,
             sphereCorrection: node.sphereCorrection,
           })
-            // eslint-disable-next-line prefer-promise-reject-errors
-            .catch(() => Promise.reject(null)), // the error is already displayed by the core
+            .catch((err) => {
+              // the error is already displayed by the core
+              return Promise.reject(utils.isAbortError(err) ? err : null);
+            }),
           this.datasource.loadLinkedNodes(nodeId),
         ]);
       })
       .then(() => {
+        if (this.prop.loadingNode !== nodeId) {
+          return Promise.reject(utils.getAbortError());
+        }
+
         const node = this.prop.currentNode;
 
         if (node.markers) {
@@ -403,14 +426,23 @@ export class VirtualTourPlugin extends AbstractPlugin {
          * @param {string} nodeId
          */
         this.trigger(EVENTS.NODE_CHANGED, nodeId);
+
+        this.prop.loadingNode = null;
+
+        return true;
       })
       .catch((err) => {
+        if (utils.isAbortError(err)) {
+          return Promise.resolve(false);
+        }
+        else if (err) {
+          this.psv.showError(this.psv.config.lang.loadError);
+        }
+
         this.psv.loader.hide();
         this.psv.navbar.setCaption('');
 
-        if (err) {
-          this.psv.showError(this.psv.config.lang.loadError);
-        }
+        this.prop.loadingNode = null;
 
         return Promise.reject(err);
       });

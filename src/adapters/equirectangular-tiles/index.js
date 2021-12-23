@@ -192,10 +192,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
       return Promise.reject(new PSVError('Panorama cols and rows must be powers of 2.'));
     }
 
-    panorama.height = panorama.width / 2;
-
     this.prop.colSize = panorama.width / panorama.cols;
-    this.prop.rowSize = panorama.height / panorama.rows;
+    this.prop.rowSize = panorama.width / 2 / panorama.rows;
     this.prop.facesByCol = SPHERE_SEGMENTS / panorama.cols;
     this.prop.facesByRow = SPHERE_SEGMENTS / 2 / panorama.rows;
 
@@ -207,9 +205,9 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
 
     const panoData = {
       fullWidth    : panorama.width,
-      fullHeight   : panorama.height,
+      fullHeight   : panorama.width / 2,
       croppedWidth : panorama.width,
-      croppedHeight: panorama.height,
+      croppedHeight: panorama.width / 2,
       croppedX     : 0,
       croppedY     : 0,
     };
@@ -217,17 +215,12 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     if (panorama.baseUrl) {
       return this.psv.textureLoader.loadImage(panorama.baseUrl, p => this.psv.loader.setProgress(p))
         .then((img) => {
-          return {
-            texture : this.__createBaseTexture(img),
-            panoData: panoData,
-          };
+          const texture = this.__createBaseTexture(img);
+          return { panorama, texture, panoData };
         });
     }
     else {
-      return Promise.resolve({
-        texture : null,
-        panoData: panoData,
-      });
+      return Promise.resolve({ panorama, panoData });
     }
   }
 
