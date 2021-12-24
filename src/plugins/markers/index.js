@@ -1,6 +1,13 @@
 import * as THREE from 'three';
 import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from '../..';
-import { EVENTS, ID_PANEL_MARKER, ID_PANEL_MARKERS_LIST, MARKER_DATA, MARKERS_LIST_TEMPLATE, SVG_NS } from './constants';
+import {
+  EVENTS,
+  ID_PANEL_MARKER,
+  ID_PANEL_MARKERS_LIST,
+  MARKER_DATA,
+  MARKERS_LIST_TEMPLATE,
+  SVG_NS
+} from './constants';
 import { Marker } from './Marker';
 import { MarkersButton } from './MarkersButton';
 import { MarkersListButton } from './MarkersListButton';
@@ -9,6 +16,8 @@ import './style.scss';
 
 /**
  * @typedef {Object} PSV.plugins.MarkersPlugin.Options
+ * @property {boolean} [hideButton=true] - adds a button to show/hide the markers
+ * @property {boolean} [listButton=true] - adds a button to show the list of markers
  * @property {boolean} [clickEventOnMarker=false] If a `click` event is triggered on the viewer additionally to the `select-marker` event.
  * @property {PSV.plugins.MarkersPlugin.Properties[]} [markers]
  */
@@ -84,6 +93,8 @@ export class MarkersPlugin extends AbstractPlugin {
      * @type {PSV.plugins.MarkersPlugin.Options}
      */
     this.config = {
+      hideButton        : true,
+      listButton        : true,
       clickEventOnMarker: false,
       ...options,
     };
@@ -901,8 +912,12 @@ export class MarkersPlugin extends AbstractPlugin {
       }
     }
     else {
-      markersButton?.show();
-      markersListButton?.show();
+      if (this.config.hideButton) {
+        markersButton?.show();
+      }
+      if (this.config.listButton) {
+        markersListButton?.show();
+      }
 
       if (this.psv.panel.isVisible(ID_PANEL_MARKERS_LIST)) {
         this.showMarkersList();

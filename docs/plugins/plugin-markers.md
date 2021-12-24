@@ -239,6 +239,18 @@ lang: {
 
 _Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
 
+#### `hideButton`
+- type: `boolean`
+- default: `true`
+
+Adds a navbar button to hide/show the markers.
+
+#### `listButton`
+- type: `boolean`
+- default: `true`
+
+Adds a navbar button to display the list of markers.
+
 #### `clickEventOnMarker`
 - type: `boolean`
 - default: `false`

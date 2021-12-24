@@ -106,7 +106,9 @@
       PhotoSphereViewer.GyroscopePlugin,
       PhotoSphereViewer.StereoPlugin,
       [PhotoSphereViewer.MarkersPlugin, {
-        markers: (() => {
+        hideButton: true,
+        listButton: true,
+        markers   : (() => {
           const a = [];
 
           // add markers all hover the sphere
@@ -168,7 +170,7 @@
 
           // polygon with custom style
           a.push({
-            id        : 'polygon-1',
+            id       : 'polygon-1',
             polygonPx: [
               [2941, 1413],
               [3042, 1402],
@@ -178,19 +180,19 @@
               [2775, 1469],
               [2941, 1413],
             ],
-            svgStyle  : {
+            svgStyle : {
               fill       : 'rgba(255,0,0,0.2)',
               stroke     : 'rgba(255, 0, 50, 0.8)',
               strokeWidth: '2px',
             },
-            tooltip   : {
+            tooltip  : {
               content : 'Simple polygon',
               position: 'right bottom',
             },
           });
 
           a.push({
-            id        : 'polygon-2',
+            id       : 'polygon-2',
             polygonPx: [
               [3042, 1402],
               [3222, 1419],
@@ -200,13 +202,13 @@
               [3241, 1543],
               [3041, 1555],
             ],
-            svgStyle  : {
+            svgStyle : {
               fill       : 'url(#image)',
               fillOpacity: '0.5',
               stroke     : 'rgba(255, 0, 50, 0.8)',
               strokeWidth: '2px',
             },
-            tooltip   : {
+            tooltip  : {
               content : 'Polygon with image background',
               position: 'right bottom',
             },
