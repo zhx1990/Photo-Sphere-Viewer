@@ -1,4 +1,4 @@
-import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, utils } from 'photo-sphere-viewer';
+import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from 'photo-sphere-viewer';
 import * as THREE from 'three';
 import { ClientSideDatasource } from './ClientSideDatasource';
 import {
@@ -6,14 +6,17 @@ import {
   DEFAULT_ARROW,
   DEFAULT_MARKER,
   EVENTS,
+  ID_PANEL_NODES_LIST,
   LINK_DATA,
   MODE_3D,
   MODE_CLIENT,
   MODE_GPS,
   MODE_MANUAL,
   MODE_MARKERS,
-  MODE_SERVER
+  MODE_SERVER,
+  NODES_LIST_TEMPLATE
 } from './constants';
+import { NodesListButton } from './NodesListButton';
 import { ServerSideDatasource } from './ServerSideDatasource';
 import './style.scss';
 import { bearing, distance, setMeshColor } from './utils';
@@ -55,6 +58,7 @@ import { bearing, distance, setMeshColor } from './utils';
  * @property {PSV.SphereCorrection} [sphereCorrection] - sphere correction to apply to this panorama
  * @property {string} [name] - short name of the node
  * @property {string} [caption] - caption visible in the navbar
+ * @property {string} [thumbnail] - thumbnail for the nodes list in the side panel
  * @property {PSV.plugins.MarkersPlugin.Properties[]} [markers] - additional markers to use on this node
  */
 
@@ -87,15 +91,20 @@ import { bearing, distance, setMeshColor } from './utils';
  * @property {PSV.plugins.VirtualTourPlugin.GetLinks} [getLinks]
  * @property {string} [startNodeId] - id of the initial node, if not defined the first node will be used
  * @property {boolean|PSV.plugins.VirtualTourPlugin.Preload} [preload=false] - preload linked panoramas
+ * @property {boolean} [listButton] - adds a button to show the list of nodes, defaults to `true` only in client data mode
+ * @property {boolean} [linksOnCompass] - if the Compass plugin is enabled, displays the links on the compass, defaults to `true` on in markers render mode
  * @property {PSV.plugins.MarkersPlugin.Properties} [markerStyle] - global marker style
  * @property {PSV.plugins.VirtualTourPlugin.ArrowStyle} [arrowStyle] - global arrow style
  * @property {number} [markerLatOffset=-0.1] - (GPS & Markers mode) latitude offset applied to link markers, to compensate for viewer height
  * @property {'top'|'bottom'} [arrowPosition='bottom'] - (3D mode) arrows vertical position
- * @property {boolean} [linksOnCompass] - if the Compass plugin is enabled, displays the links on the compass
  */
 
 
+// add markers buttons
+DEFAULTS.navbar.splice(DEFAULTS.navbar.indexOf('caption'), 0, NodesListButton.id);
+DEFAULTS.lang[NodesListButton.id] = 'Locations';
 DEFAULTS.lang.loading = 'Loading...';
+registerButton(NodesListButton);
 
 
 export { EVENTS, MODE_3D, MODE_CLIENT, MODE_GPS, MODE_MANUAL, MODE_MARKERS, MODE_SERVER } from './constants';
@@ -150,6 +159,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
       markerLatOffset: -0.1,
       arrowPosition  : 'bottom',
       linksOnCompass : options?.renderMode === MODE_MARKERS,
+      listButton     : options?.dataMode !== MODE_SERVER,
       ...options,
       markerStyle: {
         ...DEFAULT_MARKER,
@@ -378,13 +388,9 @@ export class VirtualTourPlugin extends AbstractPlugin {
           this.arrowsGroup.remove(...this.arrowsGroup.children.filter(o => o.type === 'Mesh'));
           this.prop.currentArrow = null;
         }
-        else {
-          this.markers.clearMarkers();
-        }
 
-        if (this.config.linksOnCompass && this.compass) {
-          this.compass.setHotspots(null);
-        }
+        this.markers?.clearMarkers();
+        this.compass?.clearHotspots();
 
         return Promise.all([
           this.psv.setPanorama(node.panorama, {
@@ -657,6 +663,51 @@ export class VirtualTourPlugin extends AbstractPlugin {
             delete this.preload[link.nodeId];
           });
       });
+  }
+
+  /**
+   * @summary Toggles the visibility of the list of nodes
+   */
+  toggleNodesList() {
+    if (this.psv.panel.prop.contentId === ID_PANEL_NODES_LIST) {
+      this.hideNodesList();
+    }
+    else {
+      this.showNodesList();
+    }
+  }
+
+  /**
+   * @summary Opens side panel with the list of nodes
+   */
+  showNodesList() {
+    const nodes = this.change(EVENTS.RENDER_NODES_LIST, Object.values(this.datasource.nodes));
+
+    this.psv.panel.show({
+      id          : ID_PANEL_NODES_LIST,
+      content     : NODES_LIST_TEMPLATE(
+        nodes,
+        this.psv.config.lang[NodesListButton.id],
+        this.prop.currentNode?.id
+      ),
+      noMargin    : true,
+      clickHandler: (e) => {
+        const li = e.target ? utils.getClosest(e.target, 'li') : undefined;
+        const nodeId = li ? li.dataset.nodeId : undefined;
+
+        if (nodeId) {
+          this.setCurrentNode(nodeId);
+          this.hideNodesList();
+        }
+      },
+    });
+  }
+
+  /**
+   * @summary Closes side panel if it contains the list of nodes
+   */
+  hideNodesList() {
+    this.psv.panel.hide(ID_PANEL_NODES_LIST);
   }
 
 }

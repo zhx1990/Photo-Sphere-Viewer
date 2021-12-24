@@ -131,6 +131,11 @@ Short name of this node, used in links tooltips.
 
 Caption displayed in th navbar, if not defined the global caption will be used.
 
+#### `thumbnail`
+- type: `string`
+
+Thumbnail for the nodes list in the side panel (see `listButton` configuration option).
+
 #### `markers`
 - type: `array`
 
@@ -171,6 +176,17 @@ Overrides the global style of the marker used to display the link. See global co
 
 
 ## Configuration
+
+#### `lang`
+- type: `object`
+- default:
+```js
+lang: {
+  nodesList: Locations',
+}
+```
+
+_Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
 
 #### `dataMode`
 - type: `'client' | 'server'`
@@ -215,6 +231,18 @@ Id of the initially loaded node. If empty the first node will be displayed. You 
 - default: `false`
 
 Enable the preloading of linked nodes, can be a function that returns true or false for each link.
+
+#### `listButton`
+- type: `boolean`
+- default: `true` id client data mode
+
+Adds a navbar button to display the list of all nodes.
+
+#### `linksOnCompass`
+- type: `boolean`
+- default: `true` if markers render mode
+
+If the [Compass plugin](plugin-compass.md) is enabled, displays the links on the compass.
 
 
 #### `markerStyle` (markers mode only)
@@ -275,12 +303,6 @@ Vertical offset in radians applied to the markers to compensate for the viewer p
 - default: `'bottom'`
 
 Vertical position of the arrows.
-
-#### `linksOnCompass`
-- type: `boolean`
-- default: `true` if markers mode
-
-If the [Compass plugin](plugin-compass.md) is enabled, displays the links on the compass.
 
 
 ## Methods

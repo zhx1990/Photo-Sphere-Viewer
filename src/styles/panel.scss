@@ -173,6 +173,11 @@
     justify-content: flex-start;
     transition: background .1s ease-in-out;
 
+    &--active {
+      outline: $psv-panel-menu-item-active-outline solid currentColor;
+      outline-offset: -$psv-panel-menu-item-active-outline;
+    }
+
     &-icon {
       flex: none;
       height: $psv-panel-menu-item-height;

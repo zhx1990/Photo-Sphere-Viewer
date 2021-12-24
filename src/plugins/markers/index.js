@@ -345,6 +345,21 @@ export class MarkersPlugin extends AbstractPlugin {
   }
 
   /**
+   * @summary Removes multiple markers
+   * @param {string[]} markerIds
+   * @param {boolean} [render=true] - renders the markers immediately
+   */
+  removeMarkers(markerIds, render = true) {
+    markerIds.forEach(markerId => this.removeMarker(markerId, false));
+
+    if (render) {
+      this.__refreshUi();
+
+      this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
+    }
+  }
+
+  /**
    * @summary Replaces all markers
    * @param {PSV.plugins.MarkersPlugin.Properties[]} markers
    * @param {boolean} [render=true] - renders the marker immediately
@@ -442,7 +457,7 @@ export class MarkersPlugin extends AbstractPlugin {
   }
 
   /**
-   * @summary Toggles the visibility of markers list
+   * @summary Toggles the visibility of the list of markers
    */
   toggleMarkersList() {
     if (this.psv.panel.prop.contentId === ID_PANEL_MARKERS_LIST) {
@@ -454,7 +469,7 @@ export class MarkersPlugin extends AbstractPlugin {
   }
 
   /**
-   * @summary Opens side panel with list of markers
+   * @summary Opens side panel with the list of markers
    * @fires PSV.plugins.MarkersPlugin.filter:render-markers-list
    */
   showMarkersList() {
@@ -471,7 +486,7 @@ export class MarkersPlugin extends AbstractPlugin {
       id          : ID_PANEL_MARKERS_LIST,
       content     : MARKERS_LIST_TEMPLATE(
         markers,
-        this.psv.config.lang.markers,
+        this.psv.config.lang[MarkersButton.id],
         utils.dasherize(MARKER_DATA)
       ),
       noMargin    : true,

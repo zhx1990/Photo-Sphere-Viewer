@@ -188,6 +188,13 @@ export class CompassPlugin extends AbstractPlugin {
   }
 
   /**
+   * @summary Removes all hotspots
+   */
+  clearHotspots() {
+    this.setHotspots(null);
+  }
+
+  /**
    * @summary Updates the compass for current zoom and position
    * @private
    */

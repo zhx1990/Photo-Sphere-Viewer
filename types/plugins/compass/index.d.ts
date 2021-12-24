@@ -27,4 +27,9 @@ export class CompassPlugin extends AbstractPlugin {
    */
   setHotspots(hotspots);
 
+  /**
+   * @summary Removes all hotspots
+   */
+  clearHotspots();
+
 }

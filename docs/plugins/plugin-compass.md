@@ -104,3 +104,21 @@ Color of the navigation cone.
 - default: `'rgba(0, 0, 0, 0.5)'`
 
 Default color of hotspots.
+
+
+## Methods
+
+#### `setHotspots(hotspots)`
+
+Changes the hotspots.
+
+```js
+compassPlugin.setHotspots([
+  { longitude: '0deg' },
+  { longitude: '10deg', color: 'red' },
+]);
+```
+
+#### `clearHotspots()`
+
+Removes all hotspots

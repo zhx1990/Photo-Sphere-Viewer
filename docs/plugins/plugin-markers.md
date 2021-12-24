@@ -232,8 +232,8 @@ Any custom data you want to attach to the marker.
 - default:
 ```js
 lang: {
-  markers : 'Markers',
-  markersList : 'Markers list',
+  markers    : 'Markers',
+  markersList: 'Markers list',
 }
 ```
 
@@ -282,7 +282,7 @@ markersPlugin.gotoMarker('marker-1', 1500)
 
 Changes the visiblity of a marker.
 
-#### `removeMarker(id)`
+#### `removeMarker(id)` | `removeMarkers(ids)`
 
 Removes a marker.
 

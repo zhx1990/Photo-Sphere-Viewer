@@ -114,7 +114,7 @@ export const ID_PANEL_MARKERS_LIST = 'markersList';
 
 /**
  * @summary Markers list template
- * @param {PSV.Marker[]} markers
+ * @param {PSV.plugins.MarkersPlugin.Marker[]} markers
  * @param {string} title
  * @param {string} dataKey
  * @returns {string}

@@ -41,7 +41,10 @@
     ],
     "max-len": [
       "error",
-      150
+      {
+        "code": 150,
+        "ignoreComments": true
+      }
     ],
     "brace-style": [
       "error",

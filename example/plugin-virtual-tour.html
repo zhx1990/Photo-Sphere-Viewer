@@ -29,13 +29,14 @@
   // links.position or node.position is used in GPS mode
   const nodes = [
     {
-      id      : '1',
-      panorama: base + 'key-biscayne-1.jpg',
-      name    : 'One',
-      links   : [
+      id       : '1',
+      panorama : base + 'key-biscayne-1.jpg',
+      thumbnail: base + 'key-biscayne-1-thumb.jpg',
+      name     : 'One',
+      links    : [
         { nodeId: '2', latitude: 0, longitude: '100deg' },
       ],
-      markers : [
+      markers  : [
         {
           id       : 'marker-1',
           image    : 'assets/pin-red.png',
@@ -47,64 +48,69 @@
           latitude : '35deg',
         }
       ],
-      position: [-80.156479, 25.666725, 3],
-      panoData: { poseHeading: 327 },
+      position : [-80.156479, 25.666725, 3],
+      panoData : { poseHeading: 327 },
     },
     {
-      id      : '2',
-      panorama: base + 'key-biscayne-2.jpg',
-      name    : 'Two',
-      links   : [
+      id       : '2',
+      panorama : base + 'key-biscayne-2.jpg',
+      thumbnail: base + 'key-biscayne-2-thumb.jpg',
+      name     : 'Two',
+      links    : [
         { nodeId: '3', latitude: 0, longitude: '120deg' },
         { nodeId: '1', latitude: 0, longitude: '280deg' },
       ],
-      position: [-80.156168, 25.666623, 3],
-      panoData: { poseHeading: 318 },
+      position : [-80.156168, 25.666623, 3],
+      panoData : { poseHeading: 318 },
     },
     {
-      id      : '3',
-      panorama: base + 'key-biscayne-3.jpg',
-      name    : 'Three',
-      links   : [
+      id       : '3',
+      panorama : base + 'key-biscayne-3.jpg',
+      thumbnail: base + 'key-biscayne-3-thumb.jpg',
+      name     : 'Three',
+      links    : [
         { nodeId: '4', latitude: 0, longitude: '220deg' },
         { nodeId: '2', latitude: 0, longitude: '310deg' },
         { nodeId: '5', latitude: 0, longitude: '270deg' },
       ],
-      position: [-80.155932, 25.666498, 5],
-      panoData: { poseHeading: 328 },
+      position : [-80.155932, 25.666498, 5],
+      panoData : { poseHeading: 328 },
     },
     {
-      id      : '4',
-      panorama: base + 'key-biscayne-4.jpg',
-      name    : 'Four',
-      links   : [
+      id       : '4',
+      panorama : base + 'key-biscayne-4.jpg',
+      thumbnail: base + 'key-biscayne-4-thumb.jpg',
+      name     : 'Four',
+      links    : [
         { nodeId: '3', latitude: 0, longitude: '40deg' },
         { nodeId: '5', latitude: 0, longitude: '300deg' },
       ],
-      position: [-80.156089, 25.666357, 3],
-      panoData: { poseHeading: 78 },
+      position : [-80.156089, 25.666357, 3],
+      panoData : { poseHeading: 78 },
     },
     {
-      id      : '5',
-      panorama: base + 'key-biscayne-5.jpg',
-      name    : 'Five',
-      links   : [
+      id       : '5',
+      panorama : base + 'key-biscayne-5.jpg',
+      thumbnail: base + 'key-biscayne-5-thumb.jpg',
+      name     : 'Five',
+      links    : [
         { nodeId: '6', latitude: 0, longitude: '280deg' },
         { nodeId: '3', latitude: 0, longitude: '70deg' },
         { nodeId: '4', latitude: 0, longitude: '150deg' },
       ],
-      position: [-80.156292, 25.666446, 2],
-      panoData: { poseHeading: 190 },
+      position : [-80.156292, 25.666446, 2],
+      panoData : { poseHeading: 190 },
     },
     {
-      id      : '6',
-      panorama: base + 'key-biscayne-6.jpg',
-      name    : 'Six',
-      links   : [
+      id       : '6',
+      panorama : base + 'key-biscayne-6.jpg',
+      thumbnail: base + 'key-biscayne-6-thumb.jpg',
+      name     : 'Six',
+      links    : [
         { nodeId: '5', latitude: 0, longitude: '130deg' },
       ],
-      position: [-80.156465, 25.666496, 2],
-      panoData: { poseHeading: 328 },
+      position : [-80.156465, 25.666496, 2],
+      panoData : { poseHeading: 328 },
     },
   ];
 
@@ -127,11 +133,11 @@
         arrowPosition: 'bottom',
 
         // client mode
-        // dataMode: PhotoSphereViewer.VirtualTourPlugin.MODE_CLIENT,
-        // nodes   : nodes,
+        dataMode: PhotoSphereViewer.VirtualTourPlugin.MODE_CLIENT,
+        nodes   : nodes,
 
         // server mode (mock)
-        dataMode: PhotoSphereViewer.VirtualTourPlugin.MODE_SERVER,
+        // dataMode: PhotoSphereViewer.VirtualTourPlugin.MODE_SERVER,
         getNode : (nodeId) => {
           console.log('GET node ' + nodeId);
           return Promise.resolve({
