@@ -22,11 +22,10 @@ import './style.scss';
 
 
 // add markers buttons
-DEFAULTS.navbar.splice(DEFAULTS.navbar.indexOf('caption'), 0, MarkersButton.id, MarkersListButton.id);
 DEFAULTS.lang[MarkersButton.id] = 'Markers';
 DEFAULTS.lang[MarkersListButton.id] = 'Markers list';
-registerButton(MarkersButton);
-registerButton(MarkersListButton);
+registerButton(MarkersButton, 'caption:left');
+registerButton(MarkersListButton, 'caption:left');
 
 
 export { EVENTS } from './constants';

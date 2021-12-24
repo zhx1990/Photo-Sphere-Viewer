@@ -26,14 +26,30 @@ const AVAILABLE_BUTTONS = {};
 /**
  * @summary Register a new button available for all viewers
  * @param {Class<PSV.buttons.AbstractButton>} button
+ * @param {'start' | 'end' | '[id]:left' | '[id]:right'} [defaultPosition]
+ *    If provided the default configuration of the navbar will be modified.
  * @memberOf PSV
  */
-export function registerButton(button) {
+export function registerButton(button, defaultPosition) {
   if (!button.id) {
     throw new PSVError('Button ID is required');
   }
 
   AVAILABLE_BUTTONS[button.id] = button;
+
+  if (typeof defaultPosition === 'string') {
+    switch (defaultPosition) {
+      case 'start':
+        DEFAULTS.navbar.unshift(button.id);
+        break;
+      case 'end':
+        DEFAULTS.navbar.push(button.id);
+        break;
+      default:
+        const [id, pos] = defaultPosition.split(':');
+        DEFAULTS.navbar.splice(DEFAULTS.navbar.indexOf(id) + (pos === 'right' ? 1 : 0), 0, button.id);
+    }
+  }
 }
 
 [

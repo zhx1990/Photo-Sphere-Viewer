@@ -38,9 +38,8 @@ import './style.scss';
 
 
 // add settings button
-DEFAULTS.navbar.splice(DEFAULTS.navbar.indexOf('fullscreen'), 0, SettingsButton.id);
 DEFAULTS.lang[SettingsButton.id] = 'Settings';
-registerButton(SettingsButton);
+registerButton(SettingsButton, 'fullscreen:left');
 
 
 /**

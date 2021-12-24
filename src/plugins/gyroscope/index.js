@@ -13,9 +13,8 @@ import { GyroscopeButton } from './GyroscopeButton';
 
 
 // add gyroscope button
-DEFAULTS.navbar.splice(-1, 0, GyroscopeButton.id);
 DEFAULTS.lang[GyroscopeButton.id] = 'Gyroscope';
-registerButton(GyroscopeButton);
+registerButton(GyroscopeButton, 'caption:right');
 
 
 export { EVENTS } from './constants';

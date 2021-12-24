@@ -101,10 +101,9 @@ import { bearing, distance, setMeshColor } from './utils';
 
 
 // add markers buttons
-DEFAULTS.navbar.splice(DEFAULTS.navbar.indexOf('caption'), 0, NodesListButton.id);
 DEFAULTS.lang[NodesListButton.id] = 'Locations';
 DEFAULTS.lang.loading = 'Loading...';
-registerButton(NodesListButton);
+registerButton(NodesListButton, 'caption:left');
 
 
 export { EVENTS, MODE_3D, MODE_CLIENT, MODE_GPS, MODE_MANUAL, MODE_MARKERS, MODE_SERVER } from './constants';

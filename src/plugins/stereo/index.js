@@ -12,9 +12,8 @@ import { StereoButton } from './StereoButton';
 
 
 // add stereo button
-DEFAULTS.navbar.splice(-1, 0, StereoButton.id);
 DEFAULTS.lang[StereoButton.id] = 'Stereo view';
-registerButton(StereoButton);
+registerButton(StereoButton, 'caption:right');
 
 // other lang strings
 DEFAULTS.lang.stereoNotification = 'Click anywhere to exit stereo view.';
