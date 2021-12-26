@@ -527,6 +527,9 @@ export class MarkersPlugin extends AbstractPlugin {
    * @summary Updates the visibility and the position of all markers
    */
   renderMarkers() {
+    const zoomLevel = this.psv.getZoomLevel();
+    const viewerPosition = this.psv.getPosition();
+
     utils.each(this.markers, (marker) => {
       let isVisible = this.prop.visible && marker.visible;
 
@@ -549,21 +552,19 @@ export class MarkersPlugin extends AbstractPlugin {
           this.__updateMarkerSize(marker);
         }
 
-        const scale = marker.getScale(this.psv.getZoomLevel());
         const position = this.__getMarkerPosition(marker);
         isVisible = this.__isMarkerVisible(marker, position);
 
         if (isVisible) {
           marker.props.position2D = position;
+          const scale = marker.getScale(zoomLevel, viewerPosition);
 
-          let transform;
           if (marker.isSvg()) {
-            transform = `translate(${position.x}, ${position.y}) scale(${scale}, ${scale})`;
-            marker.$el.setAttributeNS(null, 'transform', transform);
+            marker.$el.setAttributeNS(null, 'transform',
+              `translate(${position.x}, ${position.y}) scale(${scale}, ${scale})`);
           }
           else {
-            transform = `translate3D(${position.x}px, ${position.y}px, 0px) scale(${scale}, ${scale})`;
-            marker.$el.style.transform = transform;
+            marker.$el.style.transform = `translate3D(${position.x}px, ${position.y}px, 0px) scale(${scale}, ${scale})`;
           }
         }
       }

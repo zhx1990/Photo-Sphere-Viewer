@@ -33,7 +33,7 @@ export type MarkerProperties = Partial<ExtendedPosition> & {
   id: string;
   width?: number;
   height?: number;
-  scale?: number | [number, number];
+  scale?: number | [number, number] | { zoom?: [number, number], longitude?: [number, number] };
   className?: string;
   style?: Record<string, string>;
   svgStyle?: Record<string, string>;

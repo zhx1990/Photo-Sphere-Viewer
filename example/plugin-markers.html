@@ -354,8 +354,10 @@
 
           a.push({
             id       : 'scale-1',
-            tooltip  : '<code>zoom x2</code>',
-            scale    : 2,
+            tooltip  : '<code>zoom [0.5, 1.5]</code>',
+            scale    : {
+              zoom: [0.5, 1.5],
+            },
             circle   : 20,
             svgStyle : {
               fill: 'rgba(0, 0, 0, 0.5)',
@@ -366,8 +368,10 @@
 
           a.push({
             id       : 'scale-2',
-            tooltip  : '<code>zoom x0.5 ; zoom x1.5</code>',
-            scale    : [0.5, 1.5],
+            tooltip  : '<code>longitude [1, 2]</code>',
+            scale    : {
+              longitude: [1, 2],
+            },
             circle   : 20,
             svgStyle : {
               fill: 'rgba(0, 0, 0, 0.5)',

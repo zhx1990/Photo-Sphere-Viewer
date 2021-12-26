@@ -119,16 +119,37 @@ Size of the marker.
 _(This option is ignored for polygons and polylines)_
 
 #### `scale`
-- type: `double | double[]`
+- type: `double[] | { zoom: double[], longitude: [] }`
+- default: no scalling
 
-Scale factor multiplied by the zoom level. Provide an array of two values for min and max.
-By default the scale is constant.
+Configures the scale of the marker depending on the zoom level and/or the longitude offset. This aims to give a natural feeling to the size of the marker as the users zooms and moves.
 _(This option is ignored for polygons and polylines)_
 
+Scales depending on zoom level, the array contains `[scale at minimum zoom, scale at maximum zoom]` :
 ```js
-scale: 1 // the marker is scalling with the zoom level (from 0 to 100%)
+scale: {
+  // the marker is twice smaller on the minimum zoom level
+  zoom: [0.5, 1]
+}
 
-scale: [0.5, 1] // at minimum zoom level the marker is half its size at maximum zoom level
+// same thing
+scale: [0.5, 1]
+```
+
+Scales depending on position, the array contains `[scale on center, scale on the side]` :
+```js
+scale: {
+  // the marker is twice bigger when on the side of the screen
+  longitude: [1, 2]
+}
+```
+
+Of course the two configurations can be combined :
+```js
+scale: {
+  zoom: [0.5, 1],
+  longitude: [1, 1.5]
+}
 ```
 
 #### `className`
