@@ -29,6 +29,8 @@ export class MarkersButton extends AbstractButton {
 
       this.toggleActive(true);
     }
+
+    this.hide();
   }
 
   /**

@@ -146,6 +146,8 @@ export class Panel extends AbstractComponent {
    * @fires PSV.open-panel
    */
   show(config) {
+    const wasVisible = this.isVisible(config.id);
+
     if (typeof config === 'string') {
       config = { content: config };
     }
@@ -187,9 +189,11 @@ export class Panel extends AbstractComponent {
       this.content.addEventListener('keydown', this.prop.keyHandler);
 
       // focus the first element if possible, after animation ends
-      setTimeout(() => {
-        this.content.querySelector('a,button,[tabindex]')?.focus();
-      }, 300);
+      if (!wasVisible) {
+        setTimeout(() => {
+          this.content.querySelector('a,button,[tabindex]')?.focus();
+        }, 300);
+      }
     }
 
     this.psv.trigger(EVENTS.OPEN_PANEL, config.id);

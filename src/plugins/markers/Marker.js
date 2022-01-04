@@ -259,7 +259,7 @@ export class Marker {
     if (this.config.listContent) {
       return this.config.listContent;
     }
-    else if (this.config.tooltip) {
+    else if (this.config.tooltip?.content) {
       return this.config.tooltip.content;
     }
     else if (this.config.html) {
@@ -275,7 +275,7 @@ export class Marker {
    * @param {{clientX: number, clientY: number}} [mousePosition]
    */
   showTooltip(mousePosition) {
-    if (this.visible && this.config.tooltip && this.props.position2D) {
+    if (this.visible && this.config.tooltip?.content && this.props.position2D) {
       const config = {
         content : this.config.tooltip.content,
         position: this.config.tooltip.position,
@@ -356,11 +356,11 @@ export class Marker {
     if (this.config.className) {
       utils.addClasses(this.$el, this.config.className);
     }
+    if (typeof this.config.tooltip === 'string') {
+      this.config.tooltip = { content: this.config.tooltip };
+    }
     if (this.config.tooltip) {
       utils.addClasses(this.$el, 'psv-marker--has-tooltip');
-      if (typeof this.config.tooltip === 'string') {
-        this.config.tooltip = { content: this.config.tooltip };
-      }
     }
     if (this.config.content) {
       utils.addClasses(this.$el, 'psv-marler--has-content');

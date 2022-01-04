@@ -229,6 +229,11 @@ tooltip: { // tooltip with custom position
 }
 ```
 
+#### `listContent`
+- type: `string`
+
+The name that appears in the list of markers. If not provided, the tooltip content will be used. 
+
 #### `content`
 - type: `string`
 
