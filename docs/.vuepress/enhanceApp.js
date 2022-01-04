@@ -1,4 +1,4 @@
-import { MdButton, MdCheckbox, MdField, MdTabs } from 'vue-material/dist/components';
+import VueMaterial from 'vue-material';
 import VSwatches from 'vue-swatches';
 import VueSlider from 'vue-slider-component/dist-css/vue-slider-component.umd.min';
 
@@ -9,10 +9,7 @@ import 'vue-slider-component/theme/material.css'
 import 'vue-swatches/dist/vue-swatches.css';
 
 export default ({ Vue, router }) => {
-  Vue.use(MdField);
-  Vue.use(MdButton);
-  Vue.use(MdCheckbox);
-  Vue.use(MdTabs);
+  Vue.use(VueMaterial);
   Vue.component('v-swatches', VSwatches);
   Vue.component('vue-slider', VueSlider);
 

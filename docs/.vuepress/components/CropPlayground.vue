@@ -62,8 +62,8 @@
       </div>
       <div class="md-layout-item">
         <label class="md-caption">Pose Roll</label>
-        <vue-slider v-model="panoData.poseRoll" :min="-180" :max="180" :marks="[-180,-90,0,90,180]" :drag-on-click="true"
-                    :disabled="loading"/>
+        <vue-slider v-model="panoData.poseRoll" :min="-180" :max="180" :marks="[-180,-90,0,90,180]"
+                    :drag-on-click="true" :disabled="loading"/>
       </div>
     </div>
 

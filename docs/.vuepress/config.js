@@ -113,19 +113,9 @@ module.exports = {
     ['@vuepress/back-to-top'],
   ],
   alias      : {
-    'photo-sphere-viewer'           : path.resolve(process.cwd(), 'dist/photo-sphere-viewer.js'),
-    'photo-sphere-viewer-stylesheet': path.resolve(process.cwd(), 'dist/photo-sphere-viewer.css'),
-  },
-  chainWebpack(config) {
-    config.module
-      .rule('svg')
-      .exclude.add(path.resolve(process.cwd(), 'src')).end();
-
-    config.module
-      .rule('rawsvg')
-      .test(/\.svg(\?.*)?$/)
-      .include.add(path.resolve(process.cwd(), 'src')).end()
-      .use('raw-loader')
-      .loader('raw-loader');
+    'photo-sphere-viewer'                   : path.resolve(process.cwd(), 'dist/photo-sphere-viewer.js'),
+    'photo-sphere-viewer-markers'           : path.resolve(process.cwd(), 'dist/plugins/markers.js'),
+    'photo-sphere-viewer-stylesheet'        : path.resolve(process.cwd(), 'dist/photo-sphere-viewer.css'),
+    'photo-sphere-viewer-markers-stylesheet': path.resolve(process.cwd(), 'dist/plugins/markers.css'),
   },
 };

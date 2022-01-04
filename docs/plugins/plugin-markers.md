@@ -54,6 +54,10 @@ The following example contains all types of markers. Click anywhere on the panor
 
 <iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/kdpqLey2/embedded/result,js,html/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
+::: tip
+You can try markers live in [the playground](../playground.md).
+:::
+
 
 ## Markers definition
 
