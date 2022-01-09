@@ -48,7 +48,9 @@
 
   const viewer = new PhotoSphereViewer.Viewer({
     container : 'photosphere',
-    adapter   : PhotoSphereViewer.CubemapAdapter,
+    adapter   : [PhotoSphereViewer.CubemapAdapter, {
+      // flipTopBottom: true,
+    }],
     panorama  : panos[0].url,
     caption   : panos[0].desc,
     loadingImg: 'assets/photosphere-logo.gif',

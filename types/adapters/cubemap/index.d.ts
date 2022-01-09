@@ -1,4 +1,4 @@
-import { AbstractAdapter } from '../..';
+import { AbstractAdapter, Viewer } from '../..';
 
 /**
  * @summary Cubemap defined as an array of images
@@ -18,9 +18,15 @@ export type Cubemap = {
   bottom: string;
 };
 
+export type CubemapAdapterOptions = {
+  flipTopBottom?: boolean;
+};
+
 /**
  * @summary Adapter for cubemaps
  */
 export class CubemapAdapter extends AbstractAdapter<CubemapArray | Cubemap> {
+
+  constructor(psv: Viewer, options: CubemapAdapterOptions);
 
 }

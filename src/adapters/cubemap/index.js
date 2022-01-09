@@ -13,10 +13,16 @@ import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
  * @property {string} bottom
  */
 
+/**
+ * @typedef {Object} PSV.adapters.CubemapAdapter.Options
+ * @property {boolean} [flipTopBottom=false] - set to true if the top and bottom faces are not correctly oriented
+ */
+
 
 const CUBE_VERTICES = 8;
 const CUBE_MAP = [0, 2, 4, 5, 3, 1];
 const CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
+const VECTOR2D_CENTER = new THREE.Vector2(0.5, 0.5);
 
 
 /**
@@ -27,6 +33,23 @@ export class CubemapAdapter extends AbstractAdapter {
 
   static id = 'cubemap';
   static supportsTransition = true;
+
+  /**
+   * @param {PSV.Viewer} psv
+   * @param {PSV.adapters.CubemapAdapter.Options} options
+   */
+  constructor(psv, options) {
+    super(psv);
+
+    /**
+     * @member {PSV.adapters.CubemapAdapter.Options}
+     * @private
+     */
+    this.config = {
+      flipTopBottom: false,
+      ...options,
+    };
+  }
 
   /**
    * @override
@@ -139,6 +162,11 @@ export class CubemapAdapter extends AbstractAdapter {
     for (let i = 0; i < 6; i++) {
       if (mesh.material[i].map) {
         mesh.material[i].map.dispose();
+      }
+
+      if (this.config.flipTopBottom && (i === 2 || i === 3)) {
+        texture[i].center = VECTOR2D_CENTER;
+        texture[i].rotation = Math.PI;
       }
 
       mesh.material[i].map = texture[i];
