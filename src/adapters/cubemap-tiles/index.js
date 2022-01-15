@@ -51,7 +51,6 @@ const NB_VERTICES_BY_FACE = 6;
 const NB_VERTICES_BY_PLANE = NB_VERTICES_BY_FACE * CUBE_VERTICES * CUBE_VERTICES;
 const NB_VERTICES = 6 * NB_VERTICES_BY_PLANE;
 const NB_GROUPS_BY_FACE = CUBE_VERTICES * CUBE_VERTICES;
-const VECTOR2D_CENTER = new THREE.Vector2(0.5, 0.5);
 
 function tileId(tile) {
   return `${tile.face}:${tile.col}x${tile.row}`;
@@ -105,7 +104,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
      * @property {int} tileSize - size in pixels of a tile
      * @property {int} facesByTile - number of mesh faces by tile
      * @property {Record<string, boolean>} tiles - loaded tiles
-     * @property {external:THREE.SphereGeometry} geom
+     * @property {external:THREE.BoxGeometry} geom
      * @property {*} originalUvs
      * @property {external:THREE.MeshBasicMaterial} errorMaterial
      * @private
@@ -246,7 +245,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
         const texture = textureData.texture[i];
 
         if (this.config.flipTopBottom && (i === 2 || i === 3)) {
-          texture.center = VECTOR2D_CENTER;
+          texture.center = new THREE.Vector2(0.5, 0.5);
           texture.rotation = Math.PI;
         }
 
@@ -257,6 +256,8 @@ export class CubemapTilesAdapter extends CubemapAdapter {
         }
       }
     }
+
+    // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));
 
     this.__refresh();
   }
@@ -283,24 +284,57 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     for (let face = 0; face < 6; face++) {
       for (let col = 0; col < panorama.nbTiles; col++) {
         for (let row = 0; row < panorama.nbTiles; row++) {
-          // for each tile, find the four vertex corresponding to the four corners
-          // if at least one corner is visible the tile must be loaded
+          // for each tile, find the vertices corresponding to the four corners
+          // if at least one vertex is visible, the tile must be loaded
+          // for larger tiles we also test the four edges centers and the tile center
+          const verticesIndex = [];
 
-          // top-right
+          // top-left
           const v0 = face * NB_VERTICES_BY_PLANE
             + row * this.prop.facesByTile * CUBE_VERTICES * NB_VERTICES_BY_FACE
             + col * this.prop.facesByTile * NB_VERTICES_BY_FACE;
 
-          // bottom-right
+          // bottom-left
           const v1 = v0 + CUBE_VERTICES * NB_VERTICES_BY_FACE * (this.prop.facesByTile - 1) + 1;
 
-          // bottom-left
+          // bottom-right
           const v2 = v1 + this.prop.facesByTile * NB_VERTICES_BY_FACE - 3;
 
-          // top-left
+          // top-right
           const v3 = v0 + this.prop.facesByTile * NB_VERTICES_BY_FACE - 1;
 
-          const vertexVisible = [v0, v1, v2, v3].some((vertexIdx) => {
+          verticesIndex.push(v0, v1, v2, v3);
+
+          if (this.prop.facesByTile >= 8) {
+            // top-center
+            const v4 = v0 + this.prop.facesByTile / 2 * NB_VERTICES_BY_FACE - 1;
+
+            // bottom-center
+            const v5 = v1 + this.prop.facesByTile / 2 * NB_VERTICES_BY_FACE - 3;
+
+            // left-center
+            const v6 = v0 + CUBE_VERTICES * NB_VERTICES_BY_FACE * (this.prop.facesByTile / 2 - 1) + 1;
+
+            // right-center
+            const v7 = v6 + this.prop.facesByTile * NB_VERTICES_BY_FACE - 3;
+
+            // center-center
+            const v8 = v6 + this.prop.facesByTile / 2 * NB_VERTICES_BY_FACE;
+
+            verticesIndex.push(v4, v5, v6, v7, v8);
+          }
+
+          // if (face === 5 && col === 0 && row === 0) {
+          //   verticesIndex.forEach((vertexIdx) => {
+          //     this.psv.renderer.scene.add(createDot(
+          //       verticesPosition.getX(vertexIdx),
+          //       verticesPosition.getY(vertexIdx),
+          //       verticesPosition.getZ(vertexIdx)
+          //     ));
+          //   });
+          // }
+
+          const vertexVisible = verticesIndex.some((vertexIdx) => {
             vertexPosition.set(
               verticesPosition.getX(vertexIdx),
               verticesPosition.getY(vertexIdx),
@@ -438,6 +472,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
    * @summary Create the texture for the base image
    * @param {HTMLImageElement} img
    * @return {external:THREE.Texture}
+   * @override
    * @private
    */
   __createCubemapTexture(img) {

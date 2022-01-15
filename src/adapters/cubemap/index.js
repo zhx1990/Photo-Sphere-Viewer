@@ -19,8 +19,6 @@ import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
  */
 
 
-const VECTOR2D_CENTER = new THREE.Vector2(0.5, 0.5);
-
 // PSV faces order is left, front, right, back, top, bottom
 // 3JS faces order is left, right, top, bottom, back, front
 export const CUBE_ARRAY = [0, 2, 4, 5, 3, 1];
@@ -166,7 +164,7 @@ export class CubemapAdapter extends AbstractAdapter {
       }
 
       if (this.config.flipTopBottom && (i === 2 || i === 3)) {
-        texture[i].center = VECTOR2D_CENTER;
+        texture[i].center = new THREE.Vector2(0.5, 0.5);
         texture[i].rotation = Math.PI;
       }
 
