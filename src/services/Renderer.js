@@ -92,10 +92,7 @@ export class Renderer extends AbstractService {
     psv.on(EVENTS.SIZE_UPDATED, this);
     psv.on(EVENTS.ZOOM_UPDATED, this);
     psv.on(EVENTS.POSITION_UPDATED, this);
-
-    psv.on(EVENTS.CONFIG_CHANGED, () => {
-      this.canvasContainer.style.cursor = this.psv.config.mousemove ? 'move' : 'default';
-    });
+    psv.on(EVENTS.CONFIG_CHANGED, this);
 
     this.hide();
   }
@@ -136,6 +133,14 @@ export class Renderer extends AbstractService {
       case EVENTS.SIZE_UPDATED:     this.__onSizeUpdated(); break;
       case EVENTS.ZOOM_UPDATED:     this.__onZoomUpdated(); break;
       case EVENTS.POSITION_UPDATED: this.__onPositionUpdated(); break;
+      case EVENTS.CONFIG_CHANGED:
+        if (evt.args[0].indexOf('fisheye') !== -1) {
+          this.__onPositionUpdated();
+        }
+        if (evt.args[0].indexOf('mousemove') !== -1) {
+          this.canvasContainer.style.cursor = this.psv.config.mousemove ? 'move' : 'default';
+        }
+        break;
       // @formatter:on
     }
     /* eslint-enable */
