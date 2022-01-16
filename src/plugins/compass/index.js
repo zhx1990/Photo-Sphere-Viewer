@@ -161,6 +161,7 @@ export class CompassPlugin extends AbstractPlugin {
         break;
       case 'mousedown':
         this.prop.mouseDown = true;
+        e.stopPropagation();
         break;
       case 'mouseup':
         this.prop.mouse = e;
