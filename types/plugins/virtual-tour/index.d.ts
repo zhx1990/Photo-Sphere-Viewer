@@ -56,6 +56,7 @@ export type VirtualTourPluginPluginOptions = {
   getLinks?: (nodeId: string) => VirtualTourNodeLink[] | Promise<VirtualTourNodeLink[]>;
   startNodeId?: string;
   preload?: boolean | ((node: VirtualTourNode, link: VirtualTourNodeLink) => boolean);
+  rotateSpeed?: boolean | string | number;
   markerStyle?: MarkerProperties;
   arrowStyle?: VirtualTourArrowStyle;
   markerLatOffset?: number;

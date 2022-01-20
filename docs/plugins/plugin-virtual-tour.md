@@ -232,6 +232,12 @@ Id of the initially loaded node. If empty the first node will be displayed. You 
 
 Enable the preloading of linked nodes, can be a function that returns true or false for each link.
 
+#### `rotateSpeed`
+- type: `boolean | string | number`
+- default: `20rpm`
+
+When a link is clicked, adds a panorama rotation to face it before actually changing the node. If `false` the viewer won't rotate at all and keep the current orientation.
+
 #### `listButton`
 - type: `boolean`
 - default: `true` id client data mode

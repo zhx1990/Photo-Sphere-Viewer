@@ -91,6 +91,7 @@ import { bearing, distance, setMeshColor } from './utils';
  * @property {PSV.plugins.VirtualTourPlugin.GetLinks} [getLinks]
  * @property {string} [startNodeId] - id of the initial node, if not defined the first node will be used
  * @property {boolean|PSV.plugins.VirtualTourPlugin.Preload} [preload=false] - preload linked panoramas
+ * @property {boolean|string|number} [rotateSpeed='20rpm'] - speed of rotation when clicking on a link, if 'false' the viewer won't rotate at all
  * @property {boolean} [listButton] - adds a button to show the list of nodes, defaults to `true` only in client data mode
  * @property {boolean} [linksOnCompass] - if the Compass plugin is enabled, displays the links on the compass, defaults to `true` on in markers render mode
  * @property {PSV.plugins.MarkersPlugin.Properties} [markerStyle] - global marker style
@@ -162,6 +163,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
       positionMode   : MODE_MANUAL,
       renderMode     : MODE_3D,
       preload        : false,
+      rotateSpeed    : '20rpm',
       markerLatOffset: -0.1,
       arrowPosition  : 'bottom',
       linksOnCompass : options?.renderMode === MODE_MARKERS,
@@ -362,7 +364,6 @@ export class VirtualTourPlugin extends AbstractPlugin {
       return Promise.resolve(true);
     }
 
-    this.psv.loader.show();
     this.psv.hideError();
 
     this.prop.loadingNode = nodeId;
@@ -370,17 +371,31 @@ export class VirtualTourPlugin extends AbstractPlugin {
     const fromNode = this.prop.currentNode;
     const fromLinkPosition = fromNode && fromLink ? this.__getLinkPosition(fromNode, fromLink) : null;
 
-    // if this node is already preloading, wait for it
-    return Promise.resolve(this.preload[nodeId])
-      .then(() => {
-        if (this.prop.loadingNode !== nodeId) {
-          return Promise.reject(utils.getAbortError());
-        }
+    return Promise.all([
+      // if this node is already preloading, wait for it
+      Promise.resolve(this.preload[nodeId])
+        .then(() => {
+          if (this.prop.loadingNode !== nodeId) {
+            return Promise.reject(utils.getAbortError());
+          }
 
-        this.psv.textureLoader.abortLoading();
-        return this.datasource.loadNode(nodeId);
-      })
-      .then((node) => {
+          this.psv.textureLoader.abortLoading();
+          return this.datasource.loadNode(nodeId);
+        }),
+      Promise.resolve(fromLinkPosition ? this.config.rotateSpeed : false)
+        .then((speed) => {
+          if (!speed) {
+            return Promise.resolve();
+          }
+          else {
+            return this.psv.animate({ ...fromLinkPosition, speed });
+          }
+        })
+        .then(() => {
+          this.psv.loader.show();
+        }),
+    ])
+      .then(([node]) => {
         if (this.prop.loadingNode !== nodeId) {
           return Promise.reject(utils.getAbortError());
         }
