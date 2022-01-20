@@ -318,12 +318,15 @@ Changes the current node.
 
 ## Events
 
-#### `node-changed(nodeId)`
+#### `node-changed(nodeId, data)`
 
 Triggered when the current node is changed.
 
 ```js
-virtualTourPlugin.on('node-changed', (e, nodeId) => {
+virtualTourPlugin.on('node-changed', (e, nodeId, data) => {
   console.log(`Current node is ${nodeId}`);
+  if (data.fromNode) { // other data are available
+    console.log(`Previous node was ${data.fromNode.id}`);
+  }
 });
 ```

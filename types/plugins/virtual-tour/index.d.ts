@@ -1,5 +1,5 @@
 import { Event } from 'uevent';
-import { AbstractPlugin, Viewer, ViewerOptions } from '../..';
+import { AbstractPlugin, Position, Viewer, ViewerOptions } from '../..';
 import { Marker, MarkerProperties } from '../markers';
 
 /**
@@ -38,6 +38,15 @@ export type VirtualTourArrowStyle = {
   scale?: [number, number];
 };
 
+/**
+ * @summary Data associated to the "node-changed" event
+ */
+export type VirtualTourNodeChangedData = {
+  fromNode?: VirtualTourNode,
+  fromLink?: VirtualTourNodeLink,
+  fromLinkPosition?: Position,
+};
+
 export type VirtualTourPluginPluginOptions = {
   dataMode?: 'client' | 'server';
   positionMode?: 'manual' | 'gps';
@@ -51,7 +60,7 @@ export type VirtualTourPluginPluginOptions = {
   arrowStyle?: VirtualTourArrowStyle;
   markerLatOffset?: number;
   arrowPosition?: 'top' | 'bottom';
-}
+};
 
 export const EVENTS: {
   NODE_CHANGED: 'node-changed',
@@ -94,11 +103,11 @@ export class VirtualTourPlugin extends AbstractPlugin {
   /**
    * @summary Triggered when the current node changes
    */
-  on(e: 'node-changed', cb: (e: Event, node: Node) => void): this;
+  on(e: 'node-changed', cb: (e: Event, nodeId: VirtualTourNode['id'], data: VirtualTourNodeChangedData) => void): this;
 
   /**
    * @summary Used to alter the list of nodes displayed on the side-panel
    */
-  on(e: 'render-nodes-list', cb: (e: Event, nodes: Node[]) => Node[]): this;
+  on(e: 'render-nodes-list', cb: (e: Event, nodes: VirtualTourNode[]) => VirtualTourNode[]): this;
 
 }
