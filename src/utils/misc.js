@@ -172,18 +172,6 @@ export function each(object, callback) {
 }
 
 /**
- * @summary Returns the intersection between two arrays
- * @memberOf PSV.utils
- * @template T
- * @param {T[]} array1
- * @param {T[]} array2
- * @returns {T[]}
- */
-export function intersect(array1, array2) {
-  return array1.filter(value => array2.indexOf(value) !== -1);
-}
-
-/**
  * @summary Returns if a valu is null or undefined
  * @memberOf PSV.utils
  * @param {*} val

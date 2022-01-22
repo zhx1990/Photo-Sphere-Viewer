@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { AbstractPlugin, Animation, CONSTANTS, utils } from '../..';
+import { AbstractPlugin, CONSTANTS, utils } from '../..';
 
 
 /**
@@ -45,6 +45,7 @@ export class VisibleRangePlugin extends AbstractPlugin {
     super.init();
 
     this.psv.on(CONSTANTS.EVENTS.PANORAMA_LOADED, this);
+    this.psv.on(CONSTANTS.EVENTS.POSITION_UPDATED, this);
     this.psv.on(CONSTANTS.EVENTS.ZOOM_UPDATED, this);
     this.psv.on(CONSTANTS.CHANGE_EVENTS.GET_ANIMATE_POSITION, this);
     this.psv.on(CONSTANTS.CHANGE_EVENTS.GET_ROTATE_POSITION, this);
@@ -58,6 +59,7 @@ export class VisibleRangePlugin extends AbstractPlugin {
    */
   destroy() {
     this.psv.off(CONSTANTS.EVENTS.PANORAMA_LOADED, this);
+    this.psv.off(CONSTANTS.EVENTS.POSITION_UPDATED, this);
     this.psv.off(CONSTANTS.EVENTS.ZOOM_UPDATED, this);
     this.psv.off(CONSTANTS.CHANGE_EVENTS.GET_ANIMATE_POSITION, this);
     this.psv.off(CONSTANTS.CHANGE_EVENTS.GET_ROTATE_POSITION, this);
@@ -70,31 +72,33 @@ export class VisibleRangePlugin extends AbstractPlugin {
    */
   // eslint-disable-next-line consistent-return
   handleEvent(e) {
-    if (e.type === CONSTANTS.CHANGE_EVENTS.GET_ANIMATE_POSITION) {
-      const { rangedPosition } = this.applyRanges(e.value);
-      return rangedPosition;
-    }
-    else if (e.type === CONSTANTS.CHANGE_EVENTS.GET_ROTATE_POSITION) {
-      const { rangedPosition, sidesReached } = this.applyRanges(e.value);
+    switch (e.type) {
+      case CONSTANTS.CHANGE_EVENTS.GET_ANIMATE_POSITION:
+      case CONSTANTS.CHANGE_EVENTS.GET_ROTATE_POSITION:
+        return this.applyRanges(e.value).rangedPosition;
 
-      if (utils.intersect(['left', 'right'], sidesReached).length > 0 && this.psv.isAutorotateEnabled()) {
-        this.__reverseAutorotate();
-        return e.value;
-      }
+      case CONSTANTS.EVENTS.POSITION_UPDATED:
+        const { sidesReached } = this.applyRanges(e.args[0]);
+        if ((sidesReached.left || sidesReached.right) && this.psv.isAutorotateEnabled()) {
+          this.__reverseAutorotate(sidesReached.left, sidesReached.right);
+        }
+        break;
 
-      return rangedPosition;
-    }
-    else if (e.type === CONSTANTS.EVENTS.PANORAMA_LOADED) {
-      if (this.config.usePanoData) {
-        this.setRangesFromPanoData();
-      }
-    }
-    else if (e.type === CONSTANTS.EVENTS.ZOOM_UPDATED) {
-      const currentPosition = this.psv.getPosition();
-      const { rangedPosition } = this.applyRanges(currentPosition);
-      if (currentPosition.longitude !== rangedPosition.longitude || currentPosition.latitude !== rangedPosition.latitude) {
-        this.psv.rotate(rangedPosition);
-      }
+      case CONSTANTS.EVENTS.PANORAMA_LOADED:
+        if (this.config.usePanoData) {
+          this.setRangesFromPanoData();
+        }
+        break;
+
+      case CONSTANTS.EVENTS.ZOOM_UPDATED:
+        const currentPosition = this.psv.getPosition();
+        const { rangedPosition } = this.applyRanges(currentPosition);
+        if (currentPosition.longitude !== rangedPosition.longitude || currentPosition.latitude !== rangedPosition.latitude) {
+          this.psv.rotate(rangedPosition);
+        }
+        break;
+
+      default:
     }
   }
 
@@ -200,7 +204,7 @@ export class VisibleRangePlugin extends AbstractPlugin {
       longitude: position.longitude,
       latitude : position.latitude,
     };
-    const sidesReached = [];
+    const sidesReached = {};
 
     let range;
     let offset;
@@ -216,21 +220,21 @@ export class VisibleRangePlugin extends AbstractPlugin {
         if (position.longitude > range[1] && position.longitude < range[0]) {
           if (position.longitude > (range[0] / 2 + range[1] / 2)) { // detect which side we are closer too
             rangedPosition.longitude = range[0];
-            sidesReached.push('left');
+            sidesReached.left = true;
           }
           else {
             rangedPosition.longitude = range[1];
-            sidesReached.push('right');
+            sidesReached.right = true;
           }
         }
       }
       else if (position.longitude < range[0]) {
         rangedPosition.longitude = range[0];
-        sidesReached.push('left');
+        sidesReached.left = true;
       }
       else if (position.longitude > range[1]) {
         rangedPosition.longitude = range[1];
-        sidesReached.push('right');
+        sidesReached.right = true;
       }
     }
 
@@ -243,11 +247,11 @@ export class VisibleRangePlugin extends AbstractPlugin {
 
       if (position.latitude < range[0]) {
         rangedPosition.latitude = range[0];
-        sidesReached.push('bottom');
+        sidesReached.bottom = true;
       }
       else if (position.latitude > range[1]) {
         rangedPosition.latitude = range[1];
-        sidesReached.push('top');
+        sidesReached.top = true;
       }
     }
 
@@ -258,34 +262,14 @@ export class VisibleRangePlugin extends AbstractPlugin {
    * @summary Reverses autorotate direction with smooth transition
    * @private
    */
-  __reverseAutorotate() {
-    const newSpeed = -this.psv.config.autorotateSpeed;
-    const range = this.config.longitudeRange;
-    this.config.longitudeRange = null;
+  __reverseAutorotate(left, right) {
+    // reverse already ongoing
+    if (left && this.psv.config.autorotateSpeed > 0 || right && this.psv.config.autorotateSpeed < 0) {
+      return;
+    }
 
-    new Animation({
-      properties: {
-        speed: { start: this.psv.config.autorotateSpeed, end: 0 },
-      },
-      duration  : 300,
-      easing    : 'inSine',
-      onTick    : (properties) => {
-        this.psv.config.autorotateSpeed = properties.speed;
-      },
-    })
-      .then(() => new Animation({
-        properties: {
-          speed: { start: 0, end: newSpeed },
-        },
-        duration  : 300,
-        easing    : 'outSine',
-        onTick    : (properties) => {
-          this.psv.config.autorotateSpeed = properties.speed;
-        },
-      }))
-      .then(() => {
-        this.config.longitudeRange = range;
-      });
+    this.psv.config.autorotateSpeed = -this.psv.config.autorotateSpeed;
+    this.psv.startAutorotate(true);
   }
 
 }

@@ -233,7 +233,7 @@ export class Viewer extends EventEmitter {
         latitude : new Dynamic(null, this.config.defaultLat, -Math.PI / 2, Math.PI / 2),
       }, (position) => {
         this.dataHelper.sphericalCoordsToVector3(position, this.prop.direction);
-        this.trigger(EVENTS.POSITION_UPDATED, position);
+        this.trigger(EVENTS.POSITION_UPDATED, this.dataHelper.cleanPosition(position));
       }),
     };
 
@@ -373,7 +373,7 @@ export class Viewer extends EventEmitter {
    * @returns {PSV.Position}
    */
   getPosition() {
-    return this.dynamics.position.current;
+    return this.dataHelper.cleanPosition(this.dynamics.position.current);
   }
 
   /**
@@ -627,8 +627,14 @@ export class Viewer extends EventEmitter {
    * @summary Starts the automatic rotation
    * @fires PSV.autorotate
    */
-  startAutorotate() {
-    this.__stopAll();
+  startAutorotate(refresh = false) {
+    if (refresh && !this.isAutorotateEnabled()) {
+      return;
+    }
+
+    if (!refresh) {
+      this.__stopAll();
+    }
 
     this.dynamics.position.roll({
       longitude: this.config.autorotateSpeed < 0,
@@ -640,7 +646,9 @@ export class Viewer extends EventEmitter {
 
     this.prop.autorotateEnabled = true;
 
-    this.trigger(EVENTS.AUTOROTATE, true);
+    if (!refresh) {
+      this.trigger(EVENTS.AUTOROTATE, true);
+    }
   }
 
   /**
