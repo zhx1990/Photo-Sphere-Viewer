@@ -91,11 +91,11 @@ export class EventsHandler extends AbstractService {
     this.psv.container.addEventListener('mouseenter', this);
     this.psv.container.addEventListener('mousedown', this);
     this.psv.container.addEventListener('mouseleave', this);
+    this.psv.container.addEventListener('mousemove', this);
     window.addEventListener('mouseup', this);
     this.psv.container.addEventListener('touchstart', this);
-    window.addEventListener('touchend', this);
-    this.psv.container.addEventListener('mousemove', this);
     this.psv.container.addEventListener('touchmove', this);
+    window.addEventListener('touchend', this);
     this.psv.container.addEventListener(SYSTEM.mouseWheelEvent, this);
 
     if (SYSTEM.fullscreenEvent) {
@@ -113,11 +113,11 @@ export class EventsHandler extends AbstractService {
     this.psv.container.removeEventListener('mouseenter', this);
     this.psv.container.removeEventListener('mousedown', this);
     this.psv.container.removeEventListener('mouseleave', this);
+    this.psv.container.removeEventListener('mousemove', this);
     window.removeEventListener('mouseup', this);
     this.psv.container.removeEventListener('touchstart', this);
-    window.removeEventListener('touchend', this);
-    this.psv.container.removeEventListener('mousemove', this);
     this.psv.container.removeEventListener('touchmove', this);
+    window.removeEventListener('touchend', this);
     this.psv.container.removeEventListener(SYSTEM.mouseWheelEvent, this);
 
     if (SYSTEM.fullscreenEvent) {
@@ -159,9 +159,9 @@ export class EventsHandler extends AbstractService {
         // @formatter:off
         case 'mousedown':  this.__onMouseDown(evt); break;
         case 'mouseenter': this.__onMouseEnter(evt); break;
-        case 'touchstart': this.__onTouchStart(evt); break;
         case 'mouseleave': this.__onMouseLeave(evt); break;
         case 'mousemove':  this.__onMouseMove(evt); break;
+        case 'touchstart': this.__onTouchStart(evt); break;
         case 'touchmove':  this.__onTouchMove(evt); break;
         case SYSTEM.mouseWheelEvent: this.__onMouseWheel(evt); break;
         // @formatter:on
@@ -486,7 +486,6 @@ export class EventsHandler extends AbstractService {
    * @private
    */
   __startMove(evt) {
-    this.psv.stopAutorotate();
     this.psv.stopAnimation()
       .then(() => {
         this.state.mouseX = evt.clientX;

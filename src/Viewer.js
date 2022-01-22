@@ -250,7 +250,7 @@ export class Viewer extends EventEmitter {
     this.config.plugins.forEach(([plugin, opts]) => {
       this.plugins[plugin.id] = new plugin(this, opts); // eslint-disable-line new-cap
     });
-    each(this.plugins, plugin => plugin.init());
+    each(this.plugins, plugin => plugin.init?.());
 
     // init buttons
     this.navbar.setButtons(this.config.navbar);
@@ -709,6 +709,7 @@ export class Viewer extends EventEmitter {
 
     const cleanPosition = this.change(CHANGE_EVENTS.GET_ROTATE_POSITION, this.dataHelper.cleanPosition(position));
     this.dynamics.position.setValue(cleanPosition);
+    this.stopAutorotate();
   }
 
   /**
