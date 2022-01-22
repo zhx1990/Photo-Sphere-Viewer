@@ -305,7 +305,7 @@ export class Renderer extends AbstractService {
     const mesh = this.psv.adapter.createMesh(0.5);
     this.psv.adapter.setTexture(mesh, textureData);
     this.psv.adapter.setTextureOpacity(mesh, 0);
-    this.setPanoramaPose(options.panoData, mesh);
+    this.setPanoramaPose(textureData.panoData, mesh);
     this.setSphereCorrection(options.sphereCorrection, group);
 
     // rotate the new sphere to make the target position face the camera
@@ -335,6 +335,7 @@ export class Renderer extends AbstractService {
       easing    : 'outCubic',
       onTick    : (properties) => {
         this.psv.adapter.setTextureOpacity(mesh, properties.opacity);
+        this.psv.adapter.setTextureOpacity(this.mesh, 1 - properties.opacity);
 
         if (zoomProvided) {
           this.psv.zoom(properties.zoom);
@@ -346,7 +347,8 @@ export class Renderer extends AbstractService {
       .then(() => {
         // remove temp sphere and transfer the texture to the main sphere
         this.setTexture(textureData);
-        this.setPanoramaPose(options.panoData);
+        this.psv.adapter.setTextureOpacity(this.mesh, 1);
+        this.setPanoramaPose(textureData.panoData);
         this.setSphereCorrection(options.sphereCorrection);
 
         this.scene.remove(group);
