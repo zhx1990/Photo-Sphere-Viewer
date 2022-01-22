@@ -273,13 +273,21 @@ _Note: this option is not part of the plugin but is merged with the main [`lang`
 - type: `boolean`
 - default: `true`
 
-Adds a navbar button to hide/show the markers.
+Adds a navbar button to hide/show all the markers.
+
+::: tip Custom navbar
+The button is added to the default navbar configuration. If you use a [custom navbar](../guide/navbar.md) you will need to manually add the `'markers'` button to the list.
+:::
 
 #### `listButton`
 - type: `boolean`
 - default: `true`
 
-Adds a navbar button to display the list of markers.
+Adds a navbar button to display the list of all markers.
+
+::: tip Custom navbar
+The button is added to the default navbar configuration. If you use a [custom navbar](../guide/navbar.md) you will need to manually add the `'markersList'` button to the list.
+:::
 
 #### `clickEventOnMarker`
 - type: `boolean`

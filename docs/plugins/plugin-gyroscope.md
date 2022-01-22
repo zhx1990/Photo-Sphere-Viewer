@@ -20,8 +20,13 @@ const viewer = new PhotoSphereViewer.Viewer({
 ```
 
 ::: warning
-There are known inconsistencies of orientation data accross devices. If the panorama does not display in the expected orientation, this plugin is not faulty.
+There are known inconsistencies of orientation data accross devices. If the panorama is not displayed in the expected orientation, this plugin is not faulty.
 :::
+
+::: tip Custom navbar
+The button is added to the default navbar configuration. If you use a [custom navbar](../guide/navbar.md) you will need to manually add the `'gyroscope'` button to the list.
+:::
+
 
 ## Configuration
 

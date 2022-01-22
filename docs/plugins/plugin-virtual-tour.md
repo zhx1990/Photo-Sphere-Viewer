@@ -244,12 +244,15 @@ When a link is clicked, adds a panorama rotation to face it before actually chan
 
 Adds a navbar button to display the list of all nodes.
 
+::: tip Custom navbar
+The button is added to the default navbar configuration. If you use a [custom navbar](../guide/navbar.md) you will need to manually add the `'nodesList'` button to the list.
+:::
+
 #### `linksOnCompass`
 - type: `boolean`
 - default: `true` if markers render mode
 
 If the [Compass plugin](plugin-compass.md) is enabled, displays the links on the compass.
-
 
 #### `markerStyle` (markers mode only)
 - type: `object`

@@ -19,12 +19,10 @@ The `navbar` option is an array which can contain the following elements:
   - `download`
   - `caption`
   - `fullscreen`
-  - ~~`markers`~~ now part of a [plugin](../plugins/plugin-markers.md)
-  - ~~`markersList`~~ now part of a [plugin](../plugins/plugin-markers.md)
-  - ~~`gyroscope`~~ now part of a [plugin](../plugins/plugin-gyroscope.md)
-  - ~~`stereo`~~ now part of a [plugin](../plugins/plugin-stereo.md)
 
-Other buttons can be made available by plugins.
+## Plugins buttons
+
+Some [plugins](../plugins/) add new buttons to the navbar and will be automatically shown if you don't override the `navbar` option. However if you do, you will have to manually add said buttons in your configuration. The buttons codes are documented on each plugin page.
 
 ## Custom buttons
 
