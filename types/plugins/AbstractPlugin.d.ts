@@ -14,6 +14,11 @@ export abstract class AbstractPlugin extends EventEmitter {
   constructor(psv: Viewer);
 
   /**
+   * @summary Initializes the plugin
+   */
+  init();
+
+  /**
    * @summary Destroys the plugin
    */
   destroy();

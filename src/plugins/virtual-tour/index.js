@@ -1,5 +1,5 @@
-import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from 'photo-sphere-viewer';
 import * as THREE from 'three';
+import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from '../..';
 import { ClientSideDatasource } from './ClientSideDatasource';
 import {
   ARROW_GEOM,
@@ -177,29 +177,24 @@ export class VirtualTourPlugin extends AbstractPlugin {
         ...DEFAULT_ARROW,
         ...options?.arrowStyle,
       },
-      nodes          : null,
     };
 
     /**
      * @type {PSV.plugins.MarkersPlugin}
      * @private
      */
-    this.markers = this.psv.getPlugin('markers');
+    this.markers = null;
 
     /**
      * @type {PSV.plugins.CompassPlugin}
      * @private
      */
-    this.compass = this.psv.getPlugin('compass');
-
-    if (!this.is3D() && !this.markers) {
-      throw new PSVError('Tour plugin requires the Markers plugin in markers mode');
-    }
+    this.compass = null;
 
     /**
      * @type {PSV.plugins.VirtualTourPlugin.AbstractDatasource}
      */
-    this.datasource = this.isServerSide() ? new ServerSideDatasource(this) : new ClientSideDatasource(this);
+    this.datasource = null;
 
     /**
      * @type {external:THREE.Group}
@@ -213,7 +208,25 @@ export class VirtualTourPlugin extends AbstractPlugin {
       const localLight = new THREE.PointLight(0xffffff, 1, 0);
       localLight.position.set(2, 0, 0);
       this.arrowsGroup.add(localLight);
+    }
+  }
 
+  /**
+   * @package
+   */
+  init() {
+    super.init();
+
+    this.markers = this.psv.getPlugin('markers');
+    this.compass = this.psv.getPlugin('compass');
+
+    if (!this.is3D() && !this.markers) {
+      throw new PSVError('Tour plugin requires the Markers plugin in markers mode');
+    }
+
+    this.datasource = this.isServerSide() ? new ServerSideDatasource(this) : new ClientSideDatasource(this);
+
+    if (this.is3D()) {
       this.psv.once(CONSTANTS.EVENTS.READY, () => {
         this.__positionArrows();
         this.psv.renderer.scene.add(this.arrowsGroup);
@@ -239,11 +252,15 @@ export class VirtualTourPlugin extends AbstractPlugin {
         this.setCurrentNode(this.config.startNodeId);
       }
     }
-    else if (options?.nodes) {
-      this.setNodes(options.nodes, this.config.startNodeId);
+    else if (this.config.nodes) {
+      this.setNodes(this.config.nodes, this.config.startNodeId);
+      delete this.config.nodes;
     }
   }
 
+  /**
+   * @package
+   */
   destroy() {
     if (this.markers) {
       this.markers.off('select-marker', this);
@@ -262,7 +279,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
     delete this.preload;
     delete this.datasource;
     delete this.markers;
-    delete this.prop;
+    delete this.compass;
     delete this.arrowsGroup;
 
     super.destroy();

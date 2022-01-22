@@ -67,7 +67,16 @@ export class SettingsPlugin extends AbstractPlugin {
   /**
    * @package
    */
+  init() {
+    super.init();
+  }
+
+  /**
+   * @package
+   */
   destroy() {
+    delete this.settings;
+
     super.destroy();
   }
 

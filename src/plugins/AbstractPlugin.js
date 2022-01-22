@@ -34,6 +34,13 @@ export class AbstractPlugin extends EventEmitter {
   }
 
   /**
+   * @summary Initializes the plugin
+   * @package
+   */
+  init() {
+  }
+
+  /**
    * @summary Destroys the plugin
    * @package
    */

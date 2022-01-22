@@ -62,7 +62,6 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     this.config = {
       startFromClosest: true,
       ...options,
-      keypoints       : null,
     };
 
     /**
@@ -74,10 +73,20 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
      * @type {PSV.plugins.MarkersPlugin}
      * @private
      */
+    this.markers = null;
+  }
+
+  /**
+   * @package
+   */
+  init() {
+    super.init();
+
     this.markers = this.psv.getPlugin('markers');
 
-    if (options?.keypoints) {
-      this.setKeypoints(options.keypoints);
+    if (this.config.keypoints) {
+      this.setKeypoints(this.config.keypoints);
+      delete this.config.keypoints;
     }
 
     this.psv.on(CONSTANTS.EVENTS.AUTOROTATE, this);
@@ -93,7 +102,6 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
 
     delete this.markers;
     delete this.keypoints;
-    delete this.state;
 
     super.destroy();
   }

@@ -62,15 +62,6 @@ export class MarkersPlugin extends AbstractPlugin {
     super(psv);
 
     /**
-     * @member {HTMLElement}
-     * @readonly
-     */
-    this.container = document.createElement('div');
-    this.container.className = 'psv-markers';
-    this.container.style.cursor = this.psv.config.mousemove ? 'move' : 'default';
-    this.psv.container.appendChild(this.container);
-
-    /**
      * @summary All registered markers
      * @member {Object<string, PSV.plugins.MarkersPlugin.Marker>}
      */
@@ -100,6 +91,14 @@ export class MarkersPlugin extends AbstractPlugin {
     };
 
     /**
+     * @member {HTMLElement}
+     * @readonly
+     */
+    this.container = document.createElement('div');
+    this.container.className = 'psv-markers';
+    this.container.style.cursor = this.psv.config.mousemove ? 'move' : 'default';
+
+    /**
      * @member {SVGElement}
      * @readonly
      */
@@ -112,6 +111,15 @@ export class MarkersPlugin extends AbstractPlugin {
     this.container.addEventListener('mouseleave', this, true);
     this.container.addEventListener('mousemove', this, true);
     this.container.addEventListener('contextmenu', this);
+  }
+
+  /**
+   * @package
+   */
+  init() {
+    super.init();
+
+    this.psv.container.appendChild(this.container);
 
     // Viewer events
     this.psv.on(CONSTANTS.EVENTS.CLICK, this);
@@ -119,9 +127,10 @@ export class MarkersPlugin extends AbstractPlugin {
     this.psv.on(CONSTANTS.EVENTS.RENDER, this);
     this.psv.on(CONSTANTS.EVENTS.CONFIG_CHANGED, this);
 
-    if (options?.markers) {
+    if (this.config.markers) {
       this.psv.once(CONSTANTS.EVENTS.READY, () => {
-        this.setMarkers(options.markers);
+        this.setMarkers(this.config.markers);
+        delete this.config.markers;
       });
     }
   }
@@ -147,7 +156,6 @@ export class MarkersPlugin extends AbstractPlugin {
     delete this.svgContainer;
     delete this.markers;
     delete this.container;
-    delete this.prop;
 
     super.destroy();
   }

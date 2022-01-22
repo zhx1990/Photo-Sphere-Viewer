@@ -74,6 +74,13 @@ export class GyroscopePlugin extends AbstractPlugin {
      * @private
      */
     this.controls = null;
+  }
+
+  /**
+   * @package
+   */
+  init() {
+    super.init();
 
     this.psv.on(CONSTANTS.EVENTS.STOP_ALL, this);
     this.psv.on(CONSTANTS.EVENTS.BEFORE_ROTATE, this);
@@ -91,7 +98,6 @@ export class GyroscopePlugin extends AbstractPlugin {
     this.stop();
 
     delete this.controls;
-    delete this.prop;
 
     super.destroy();
   }

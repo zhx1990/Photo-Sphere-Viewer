@@ -48,11 +48,14 @@ export class StereoPlugin extends AbstractPlugin {
      * @readonly
      * @private
      */
-    this.gyroscope = psv.getPlugin('gyroscope');
+    this.gyroscope = null;
 
-    if (!this.gyroscope) {
-      throw new PSVError('Stereo plugin requires the Gyroscope plugin');
-    }
+    /**
+     * @type {PSV.plugins.MarkersPlugin}
+     * @readonly
+     * @private
+     */
+    this.markers = null;
 
     /**
      * @member {Object}
@@ -63,17 +66,27 @@ export class StereoPlugin extends AbstractPlugin {
      * @property {WakeLockSentinel} wakeLock
      */
     this.prop = {
-      isSupported: this.gyroscope.prop.isSupported,
+      isSupported: false,
       renderer   : null,
       noSleep    : null,
       wakeLock   : null,
     };
+  }
 
-    /**
-     * @type {PSV.plugins.MarkersPlugin}
-     * @private
-     */
+  /**
+   * @package
+   */
+  init() {
+    super.init();
+
     this.markers = this.psv.getPlugin('markers');
+    this.gyroscope = this.psv.getPlugin('gyroscope');
+
+    if (!this.gyroscope) {
+      throw new PSVError('Stereo plugin requires the Gyroscope plugin');
+    }
+
+    this.prop.isSupported = this.gyroscope.prop.isSupported;
 
     this.psv.on(CONSTANTS.EVENTS.STOP_ALL, this);
     this.psv.on(CONSTANTS.EVENTS.CLICK, this);
@@ -87,10 +100,6 @@ export class StereoPlugin extends AbstractPlugin {
     this.psv.off(CONSTANTS.EVENTS.CLICK, this);
 
     this.stop();
-
-    if (this.prop.noSleep) {
-      delete this.prop.noSleep;
-    }
 
     super.destroy();
   }
@@ -142,9 +151,7 @@ export class StereoPlugin extends AbstractPlugin {
 
       this.psv.needsUpdate();
 
-      if (this.markers) {
-        this.markers.hide();
-      }
+      this.markers?.hide();
       this.psv.navbar.hide();
       this.psv.panel.hide();
 
@@ -172,9 +179,7 @@ export class StereoPlugin extends AbstractPlugin {
 
       this.psv.needsUpdate();
 
-      if (this.markers) {
-        this.markers.show();
-      }
+      this.markers?.show();
       this.psv.navbar.show();
 
       this.__unlockOrientation();

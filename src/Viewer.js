@@ -250,6 +250,7 @@ export class Viewer extends EventEmitter {
     this.config.plugins.forEach(([plugin, opts]) => {
       this.plugins[plugin.id] = new plugin(this, opts); // eslint-disable-line new-cap
     });
+    each(this.plugins, plugin => plugin.init());
 
     // init buttons
     this.navbar.setButtons(this.config.navbar);

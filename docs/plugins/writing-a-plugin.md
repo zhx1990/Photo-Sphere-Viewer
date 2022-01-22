@@ -9,6 +9,7 @@ The recommended way to create your own plugin is as an ES6 class extending `Abst
 **Requirements:**
 - The plugin class **must** take a `PSV.Viewer` object as first parameter and pass it to the `super` constructor.
 - It **must** have a `static id` property.
+- It **must** implement the `init` method to perform initialization, like subscribing to events.
 - It **must** implement the `destroy` method which is used to cleanup the plugin when the viewer is unloaded.
 - The constructor **can** take an `options` object as second parameter.
 
@@ -25,7 +26,9 @@ export class PhotoSphereViewerCustomPlugin extends AbstractPlugin {
 
   constructor(psv, options) {
     super(psv);
-
+  }
+  
+  init() {
     // do your initialisation logic here
   }
 
@@ -203,7 +206,11 @@ export default class PhotoSphereViewerCustomPlugin extends AbstractPlugin {
     /**
      * @type {PSV.plugins.SettingsPlugin}
      */
-    this.settings = psv.getPlugin('settings');
+    this.settings = null;
+  }
+
+  init() {
+    this.settings = this.psv.getPlugin('settings');
 
     // the user may choose to not import the Settings plugin
     // you may choose to make it a requirement by throwing an error...

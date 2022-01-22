@@ -48,20 +48,7 @@ export class ResolutionPlugin extends AbstractPlugin {
      * @readonly
      * @private
      */
-    this.settings = psv.getPlugin('settings');
-
-    if (!this.settings) {
-      throw new PSVError('Resolution plugin requires the Settings plugin');
-    }
-
-    this.settings.addSetting({
-      id     : ResolutionPlugin.id,
-      type   : 'options',
-      label  : this.psv.config.lang.resolution,
-      current: () => this.prop.resolution,
-      options: () => this.__getSettingsOptions(),
-      apply  : resolution => this.setResolution(resolution),
-    });
+    this.settings = null;
 
     /**
      * @summary Available resolutions
@@ -85,10 +72,40 @@ export class ResolutionPlugin extends AbstractPlugin {
       resolution: null,
     };
 
+    /**
+     * @type {PSV.plugins.ResolutionPlugin.Options}
+     */
+    this.config = {
+      ...options,
+    };
+  }
+
+  /**
+   * @package
+   */
+  init() {
+    super.init();
+
+    this.settings = this.psv.getPlugin('settings');
+
+    if (!this.settings) {
+      throw new PSVError('Resolution plugin requires the Settings plugin');
+    }
+
+    this.settings.addSetting({
+      id     : ResolutionPlugin.id,
+      type   : 'options',
+      label  : this.psv.config.lang.resolution,
+      current: () => this.prop.resolution,
+      options: () => this.__getSettingsOptions(),
+      apply  : resolution => this.setResolution(resolution),
+    });
+
     this.psv.on(CONSTANTS.EVENTS.PANORAMA_LOADED, this);
 
-    if (options?.resolutions) {
-      this.setResolutions(options.resolutions);
+    if (this.config.resolutions) {
+      this.setResolutions(this.config.resolutions);
+      delete this.config.resolutions;
     }
   }
 

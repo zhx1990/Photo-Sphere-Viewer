@@ -70,7 +70,7 @@ export class CompassPlugin extends AbstractPlugin {
      * @type {PSV.plugins.MarkersPlugin}
      * @private
      */
-    this.markers = this.psv.getPlugin('markers');
+    this.markers = null;
 
     /**
      * @member {HTMLElement}
@@ -90,6 +90,15 @@ export class CompassPlugin extends AbstractPlugin {
       this.container.style.marginLeft = `calc(-${this.config.size} / 2)`;
     }
 
+    /**
+     * @member {HTMLCanvasElement}
+     * @readonly
+     * @private
+     */
+    this.canvas = document.createElement('canvas');
+
+    this.container.appendChild(this.canvas);
+
     if (this.config.navigation) {
       this.container.addEventListener('mouseenter', this);
       this.container.addEventListener('mouseleave', this);
@@ -97,19 +106,20 @@ export class CompassPlugin extends AbstractPlugin {
       this.container.addEventListener('mousedown', this);
       this.container.addEventListener('mouseup', this);
     }
+  }
+
+  /**
+   * @package
+   */
+  init() {
+    super.init();
+
+    this.markers = this.psv.getPlugin('markers');
 
     this.psv.container.appendChild(this.container);
 
-    /**
-     * @member {HTMLCanvasElement}
-     * @readonly
-     * @private
-     */
-    this.canvas = document.createElement('canvas');
     this.canvas.width = this.container.clientWidth * SYSTEM.pixelRatio;
     this.canvas.height = this.container.clientWidth * SYSTEM.pixelRatio;
-
-    this.container.appendChild(this.canvas);
 
     this.psv.on(CONSTANTS.EVENTS.RENDER, this);
 

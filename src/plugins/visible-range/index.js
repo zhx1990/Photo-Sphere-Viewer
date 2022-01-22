@@ -34,18 +34,23 @@ export class VisibleRangePlugin extends AbstractPlugin {
       latitudeRange : null,
       longitudeRange: null,
       usePanoData   : false,
+      ...options,
     };
+  }
 
-    if (options) {
-      this.config.usePanoData = !!options.usePanoData;
-      this.setLatitudeRange(options.latitudeRange);
-      this.setLongitudeRange(options.longitudeRange);
-    }
+  /**
+   * @package
+   */
+  init() {
+    super.init();
 
     this.psv.on(CONSTANTS.EVENTS.PANORAMA_LOADED, this);
     this.psv.on(CONSTANTS.EVENTS.ZOOM_UPDATED, this);
     this.psv.on(CONSTANTS.CHANGE_EVENTS.GET_ANIMATE_POSITION, this);
     this.psv.on(CONSTANTS.CHANGE_EVENTS.GET_ROTATE_POSITION, this);
+
+    this.setLatitudeRange(this.config.latitudeRange);
+    this.setLongitudeRange(this.config.longitudeRange);
   }
 
   /**
