@@ -1,7 +1,7 @@
 /**
  * @summary Loading task
  * @memberOf PSV.adapters
- * @package
+ * @private
  */
 export class Task {
 

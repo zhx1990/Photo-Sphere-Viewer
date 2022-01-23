@@ -2,7 +2,7 @@
 
 > Reduce the initial loading time and used bandwidth by slicing big cubemap panoramas into many small tiles.
 
-This adapter is available in the core `photo-sphere-viewer` package in `dist/adapters/cubemap-tiles.js`.
+This adapter is available in the core `photo-sphere-viewer` package in `dist/adapters/cubemap-tiles.js`. It requires `dist/adapters/cubemap.js` to be loaded too.
 
 ```js
 new PhotoSphereViewer.Viewer({
@@ -58,7 +58,7 @@ Shows a warning sign on tiles that cannot be loaded.
 
 ## Panorama options
 
-When using this adapter the `panorama` option and the `setPanorama()` method accept an object to configure the tiles.
+When using this adapter the `panorama` option and the `setPanorama()` method accepts an object to configure the tiles.
 
 #### `faceSize` (required)
 - type: `number`

@@ -46,7 +46,7 @@ Shows a warning sign on tiles that cannot be loaded.
 
 ## Panorama options
 
-When using this adapter the `panorama` option and the `setPanorama()` method accept an object to configure the tiles.
+When using this adapter the `panorama` option and the `setPanorama()` method accepts an object to configure the tiles.
 
 #### `width` (required)
 - type: `number`

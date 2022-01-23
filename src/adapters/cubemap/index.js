@@ -137,19 +137,15 @@ export class CubemapAdapter extends AbstractAdapter {
    */
   createMesh(scale = 1) {
     const cubeSize = CONSTANTS.SPHERE_RADIUS * 2 * scale;
-    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)
+      .scale(1, 1, -1);
 
     const materials = [];
     for (let i = 0; i < 6; i++) {
-      materials.push(new THREE.MeshBasicMaterial({
-        side: THREE.BackSide,
-      }));
+      materials.push(new THREE.MeshBasicMaterial());
     }
 
-    const mesh = new THREE.Mesh(geometry, materials);
-    mesh.scale.set(1, 1, -1);
-
-    return mesh;
+    return new THREE.Mesh(geometry, materials);
   }
 
   /**

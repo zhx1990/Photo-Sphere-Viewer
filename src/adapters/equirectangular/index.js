@@ -164,16 +164,12 @@ export class EquirectangularAdapter extends AbstractAdapter {
    */
   createMesh(scale = 1) {
     // The middle of the panorama is placed at longitude=0
-    const geometry = new THREE.SphereGeometry(SPHERE_RADIUS * scale, SPHERE_SEGMENTS, SPHERE_SEGMENTS / 2, -Math.PI / 2);
+    const geometry = new THREE.SphereGeometry(SPHERE_RADIUS * scale, SPHERE_SEGMENTS, SPHERE_SEGMENTS / 2, -Math.PI / 2)
+      .scale(-1, 1, 1);
 
-    const material = new THREE.MeshBasicMaterial({
-      side: THREE.BackSide,
-    });
+    const material = new THREE.MeshBasicMaterial();
 
-    const mesh = new THREE.Mesh(geometry, material);
-    mesh.scale.set(-1, 1, 1);
-
-    return mesh;
+    return new THREE.Mesh(geometry, material);
   }
 
   /**

@@ -3,7 +3,7 @@ import { Task } from './Task';
 /**
  * @summary Loading queue
  * @memberOf PSV.adapters
- * @package
+ * @private
  */
 export class Queue {
 
@@ -38,7 +38,7 @@ export class Queue {
 
   disableAllTasks() {
     Object.values(this.tasks).forEach((task) => {
-      task.enabled = Task.STATUS.DISABLED;
+      task.status = Task.STATUS.DISABLED;
     });
   }
 

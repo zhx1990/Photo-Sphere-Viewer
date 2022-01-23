@@ -21,6 +21,7 @@ export function pluginInterop(plugin, target) {
 
 /**
  * @summary Builds an Error with name 'AbortError'
+ * @memberOf PSV.utils
  * @return {Error}
  */
 export function getAbortError() {
@@ -31,6 +32,7 @@ export function getAbortError() {
 
 /**
  * @summary Tests if an Error has name 'AbortError'
+ * @memberOf PSV.utils
  * @param {Error} err
  * @return {boolean}
  */

@@ -1,8 +1,8 @@
 import * as THREE from 'three';
-import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
+import { AbstractAdapter, CONSTANTS, PSVError, utils } from '../..';
 import { Queue } from '../tiles-shared/Queue';
 import { Task } from '../tiles-shared/Task';
-import { buildErrorMaterial, powerOfTwo } from '../tiles-shared/utils';
+import { buildErrorMaterial, createBaseTexture, powerOfTwo } from '../tiles-shared/utils';
 
 
 /**
@@ -39,13 +39,23 @@ import { buildErrorMaterial, powerOfTwo } from '../tiles-shared/utils';
  */
 
 
+// the faces of the top and bottom rows are made of a single triangle (3 vertices)
+// all other faces are made of two triangles (6 vertices)
 const SPHERE_SEGMENTS = 64;
-const NB_VERTICES = 3 * (SPHERE_SEGMENTS * 2 + (SPHERE_SEGMENTS / 2 - 2) * SPHERE_SEGMENTS * 2);
-const NB_GROUPS = SPHERE_SEGMENTS * 2 + (SPHERE_SEGMENTS / 2 - 2) * SPHERE_SEGMENTS;
+const SPHERE_HORIZONTAL_SEGMENTS = SPHERE_SEGMENTS / 2;
+const NB_VERTICES_BY_FACE = 6;
+const NB_VERTICES_BY_SMALL_FACE = 3;
+const NB_VERTICES = 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
+  + (SPHERE_HORIZONTAL_SEGMENTS - 2) * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+const NB_GROUPS = SPHERE_SEGMENTS * SPHERE_HORIZONTAL_SEGMENTS;
 
 function tileId(tile) {
   return `${tile.col}x${tile.row}`;
 }
+
+const frustum = new THREE.Frustum();
+const projScreenMatrix = new THREE.Matrix4();
+const vertexPosition = new THREE.Vector3();
 
 
 /**
@@ -181,8 +191,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     if (panorama.cols > SPHERE_SEGMENTS) {
       return Promise.reject(new PSVError(`Panorama cols must not be greater than ${SPHERE_SEGMENTS}.`));
     }
-    if (panorama.rows > SPHERE_SEGMENTS / 2) {
-      return Promise.reject(new PSVError(`Panorama rows must not be greater than ${SPHERE_SEGMENTS / 2}.`));
+    if (panorama.rows > SPHERE_HORIZONTAL_SEGMENTS) {
+      return Promise.reject(new PSVError(`Panorama rows must not be greater than ${SPHERE_HORIZONTAL_SEGMENTS}.`));
     }
     if (!powerOfTwo(panorama.cols) || !powerOfTwo(panorama.rows)) {
       return Promise.reject(new PSVError('Panorama cols and rows must be powers of 2.'));
@@ -191,7 +201,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     this.prop.colSize = panorama.width / panorama.cols;
     this.prop.rowSize = panorama.width / 2 / panorama.rows;
     this.prop.facesByCol = SPHERE_SEGMENTS / panorama.cols;
-    this.prop.facesByRow = SPHERE_SEGMENTS / 2 / panorama.rows;
+    this.prop.facesByRow = SPHERE_HORIZONTAL_SEGMENTS / panorama.rows;
 
     this.__cleanup();
 
@@ -224,34 +234,30 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
    * @override
    */
   createMesh(scale = 1) {
-    const geometry = new THREE.SphereGeometry(CONSTANTS.SPHERE_RADIUS * scale, SPHERE_SEGMENTS, SPHERE_SEGMENTS / 2, -Math.PI / 2)
+    const geometry = new THREE.SphereGeometry(CONSTANTS.SPHERE_RADIUS * scale, SPHERE_SEGMENTS, SPHERE_HORIZONTAL_SEGMENTS, -Math.PI / 2)
+      .scale(-1, 1, 1)
       .toNonIndexed();
 
+    geometry.clearGroups();
     let i = 0;
     let k = 0;
-
     // first row
-    for (; i < SPHERE_SEGMENTS * 3; i += 3) {
-      geometry.addGroup(i, 3, k++);
+    for (; i < SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE; i += NB_VERTICES_BY_SMALL_FACE) {
+      geometry.addGroup(i, NB_VERTICES_BY_SMALL_FACE, k++);
     }
-
     // second to before last rows
-    for (; i < NB_VERTICES - SPHERE_SEGMENTS * 3; i += 6) {
-      geometry.addGroup(i, 6, k++);
+    for (; i < NB_VERTICES - SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE; i += NB_VERTICES_BY_FACE) {
+      geometry.addGroup(i, NB_VERTICES_BY_FACE, k++);
     }
-
     // last row
-    for (; i < NB_VERTICES; i += 3) {
-      geometry.addGroup(i, 3, k++);
+    for (; i < NB_VERTICES; i += NB_VERTICES_BY_SMALL_FACE) {
+      geometry.addGroup(i, NB_VERTICES_BY_SMALL_FACE, k++);
     }
 
     this.prop.geom = geometry;
     this.prop.originalUvs = geometry.getAttribute('uv').clone();
 
-    const mesh = new THREE.Mesh(geometry, this.materials);
-    mesh.scale.set(-1, 1, 1);
-
-    return mesh;
+    return new THREE.Mesh(geometry, this.materials);
   }
 
   /**
@@ -260,103 +266,223 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
    */
   setTexture(mesh, textureData) {
     if (textureData.texture) {
-      const material = new THREE.MeshBasicMaterial({
-        side: THREE.BackSide,
-        map : textureData.texture,
-      });
+      const material = new THREE.MeshBasicMaterial({ map: textureData.texture });
 
       for (let i = 0; i < NB_GROUPS; i++) {
         this.materials.push(material);
       }
     }
 
-    setTimeout(() => this.__refresh());
+    // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));
+
+    setTimeout(() => this.__refresh(true));
   }
 
   /**
    * @summary Compute visible tiles and load them
+   * @param {boolean} [init=false] Indicates initial call
    * @private
    */
-  __refresh() {
-    const viewerSize = this.psv.prop.size;
+  __refresh(init = false) { // eslint-disable-line no-unused-vars
     const panorama = this.psv.config.panorama;
 
     if (!panorama) {
       return;
     }
 
+    const camera = this.psv.renderer.camera;
+    camera.updateMatrixWorld();
+    projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
+    frustum.setFromProjectionMatrix(projScreenMatrix);
+
+    const verticesPosition = this.prop.geom.getAttribute('position');
     const tilesToLoad = [];
-    const tilePosition = new THREE.Vector3();
 
-    for (let col = 0; col <= panorama.cols; col++) {
-      for (let row = 0; row <= panorama.rows; row++) {
-        // TODO prefilter with less complex math if possible
-        const tileTexturePosition = { x: col * this.prop.colSize, y: row * this.prop.rowSize };
-        this.psv.dataHelper.sphericalCoordsToVector3(this.psv.dataHelper.textureCoordsToSphericalCoords(tileTexturePosition), tilePosition);
+    for (let col = 0; col < panorama.cols; col++) {
+      for (let row = 0; row < panorama.rows; row++) {
+        /* for each tile, find the vertices corresponding to the four corners (three for first and last rows)
+         * if at least one vertex is visible, the tile must be loaded
+         * for larger tiles we also test the four edges centers and the tile center
+         *
+         * bellow is the indexing of each face vertices
+         *
+         * first row faces:
+         *     ⋀
+         *    /0\
+         *   /   \
+         *  /     \
+         * /1     2\
+         * ¯¯¯¯¯¯¯¯¯
+         *
+         * other rows faces:
+         * _________
+         * |\1    0|
+         * |3\     |
+         * |  \    |
+         * |   \   |
+         * |    \  |
+         * |     \2|
+         * |4    5\|
+         * ¯¯¯¯¯¯¯¯¯
+         *
+         * last row faces:
+         * _________
+         * \1     0/
+         *  \     /
+         *   \   /
+         *    \2/
+         *     ⋁
+         */
 
-        if (tilePosition.dot(this.psv.prop.direction) > 0) {
-          const tileViewerPosition = this.psv.dataHelper.vector3ToViewerCoords(tilePosition);
+        const verticesIndex = [];
 
-          if (tileViewerPosition.x >= 0
-            && tileViewerPosition.x <= viewerSize.width
-            && tileViewerPosition.y >= 0
-            && tileViewerPosition.y <= viewerSize.height) {
-            const angle = tilePosition.angleTo(this.psv.prop.direction);
+        if (row === 0) {
+          // bottom-left
+          const v0 = this.prop.facesByRow === 1
+            ? col * this.prop.facesByCol * NB_VERTICES_BY_SMALL_FACE + 1
+            : SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
+            + (this.prop.facesByRow - 2) * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
+            + col * this.prop.facesByCol * NB_VERTICES_BY_FACE + 4;
 
-            this.__getAdjacentTiles(col, row)
-              .forEach((tile) => {
-                const existingTile = tilesToLoad.find(c => c.row === tile.row && c.col === tile.col);
-                if (existingTile) {
-                  existingTile.angle = Math.min(existingTile.angle, angle);
-                }
-                else {
-                  tilesToLoad.push({ ...tile, angle });
-                }
-              });
+          // bottom-right
+          const v1 = this.prop.facesByRow === 1
+            ? v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_SMALL_FACE + 1
+            : v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_FACE + 1;
+
+          // top (all vertices are equal)
+          const v2 = 0;
+
+          verticesIndex.push(v0, v1, v2);
+
+          if (this.prop.facesByCol >= SPHERE_SEGMENTS / 8) {
+            // bottom-center
+            const v4 = v0 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+
+            verticesIndex.push(v4);
           }
+
+          if (this.prop.facesByRow >= SPHERE_HORIZONTAL_SEGMENTS / 4) {
+            // left-center
+            const v6 = v0 - this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+
+            // right-center
+            const v7 = v1 - this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+
+            verticesIndex.push(v6, v7);
+          }
+        }
+        else if (row === panorama.rows - 1) {
+          // top-left
+          const v0 = this.prop.facesByRow === 1
+            ? -SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
+            + row * this.prop.facesByRow * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
+            + col * this.prop.facesByCol * NB_VERTICES_BY_SMALL_FACE + 1
+            : -SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
+            + row * this.prop.facesByRow * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
+            + col * this.prop.facesByCol * NB_VERTICES_BY_FACE + 1;
+
+          // top-right
+          const v1 = this.prop.facesByRow === 1
+            ? v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_SMALL_FACE - 1
+            : v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_FACE - 1;
+
+          // bottom (all vertices are equal)
+          const v2 = NB_VERTICES - 1;
+
+          verticesIndex.push(v0, v1, v2);
+
+          if (this.prop.facesByCol >= SPHERE_SEGMENTS / 8) {
+            // top-center
+            const v4 = v0 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+
+            verticesIndex.push(v4);
+          }
+
+          if (this.prop.facesByRow >= SPHERE_HORIZONTAL_SEGMENTS / 4) {
+            // left-center
+            const v6 = v0 + this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+
+            // right-center
+            const v7 = v1 + this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+
+            verticesIndex.push(v6, v7);
+          }
+        }
+        else {
+          // top-left
+          const v0 = -SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
+            + row * this.prop.facesByRow * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
+            + col * this.prop.facesByCol * NB_VERTICES_BY_FACE + 1;
+
+          // bottom-left
+          const v1 = v0 + (this.prop.facesByRow - 1) * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE + 3;
+
+          // bottom-right
+          const v2 = v1 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_FACE + 1;
+
+          // top-right
+          const v3 = v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_FACE - 1;
+
+          verticesIndex.push(v0, v1, v2, v3);
+
+          if (this.prop.facesByCol >= SPHERE_SEGMENTS / 8) {
+            // top-center
+            const v4 = v0 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+
+            // bottom-center
+            const v5 = v1 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+
+            verticesIndex.push(v4, v5);
+          }
+
+          if (this.prop.facesByRow >= SPHERE_HORIZONTAL_SEGMENTS / 4) {
+            // left-center
+            const v6 = v0 + this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+
+            // right-center
+            const v7 = v3 + this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+
+            verticesIndex.push(v6, v7);
+
+            if (this.prop.facesByCol >= SPHERE_SEGMENTS / 8) {
+              // center-center
+              const v8 = v6 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+
+              verticesIndex.push(v8);
+            }
+          }
+        }
+
+        // if (init && col === 0 && row === 0) {
+        //   verticesIndex.forEach((vertexIdx) => {
+        //     this.psv.renderer.scene.add(createDot(
+        //       verticesPosition.getX(vertexIdx),
+        //       verticesPosition.getY(vertexIdx),
+        //       verticesPosition.getZ(vertexIdx)
+        //     ));
+        //   });
+        // }
+
+        const vertexVisible = verticesIndex.some((vertexIdx) => {
+          vertexPosition.set(
+            verticesPosition.getX(vertexIdx),
+            verticesPosition.getY(vertexIdx),
+            verticesPosition.getZ(vertexIdx)
+          );
+          return frustum.containsPoint(vertexPosition);
+        });
+
+        if (vertexVisible) {
+          let angle = vertexPosition.angleTo(this.psv.prop.direction);
+          if (row === 0 || row === panorama.rows - 1) {
+            angle *= 2; // lower priority to top and bottom tiles
+          }
+          tilesToLoad.push({ col, row, angle });
         }
       }
     }
 
     this.__loadTiles(tilesToLoad);
-  }
-
-  /**
-   * @summary Get the 4 adjacent tiles
-   * @private
-   */
-  __getAdjacentTiles(col, row) {
-    const panorama = this.psv.config.panorama;
-
-    return [
-      { col: col - 1, row: row - 1 },
-      { col: col, row: row - 1 },
-      { col: col, row: row }, // eslint-disable-line object-shorthand
-      { col: col - 1, row: row },
-    ]
-      .map((tile) => {
-        // examples are for cols=16 and rows=8
-        if (tile.row < 0) {
-          // wrap on top
-          tile.row = -tile.row - 1; // -1 => 0, -2 => 1
-          tile.col += panorama.cols / 2; // change hemisphere
-        }
-        else if (tile.row >= panorama.rows) {
-          // wrap on bottom
-          tile.row = (panorama.rows - 1) - (tile.row - panorama.rows); // 8 => 7, 9 => 6
-          tile.col += panorama.cols / 2; // change hemisphere
-        }
-        if (tile.col < 0) {
-          // wrap on left
-          tile.col += panorama.cols; // -1 => 15, -2 => 14
-        }
-        else if (tile.col >= panorama.cols) {
-          // wrap on right
-          tile.col -= panorama.cols; // 16 => 0, 17 => 1
-        }
-
-        return tile;
-      });
   }
 
   /**
@@ -402,10 +528,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     })
       .then((image) => {
         if (!task.isCancelled()) {
-          const material = new THREE.MeshBasicMaterial({
-            side: THREE.BackSide,
-            map : utils.createTexture(image),
-          });
+          const material = new THREE.MeshBasicMaterial({ map: utils.createTexture(image) });
           this.__swapMaterial(tile.col, tile.row, material);
           this.psv.needsUpdate();
         }
@@ -437,18 +560,22 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
         const faceCol = col * this.prop.facesByCol + c;
         const faceRow = row * this.prop.facesByRow + r;
         const isFirstRow = faceRow === 0;
-        const isLastRow = faceRow === SPHERE_SEGMENTS / 2 - 1;
+        const isLastRow = faceRow === (SPHERE_HORIZONTAL_SEGMENTS - 1);
 
         // first vertex for this face (3 or 6 vertices in total)
         let firstVertex;
         if (isFirstRow) {
-          firstVertex = faceCol * 3;
+          firstVertex = faceCol * NB_VERTICES_BY_SMALL_FACE;
         }
         else if (isLastRow) {
-          firstVertex = NB_VERTICES - SPHERE_SEGMENTS * 3 + faceCol * 3;
+          firstVertex = NB_VERTICES
+            - SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
+            + faceCol * NB_VERTICES_BY_SMALL_FACE;
         }
         else {
-          firstVertex = 3 * (SPHERE_SEGMENTS + (faceRow - 1) * SPHERE_SEGMENTS * 2 + faceCol * 2);
+          firstVertex = SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
+            + (faceRow - 1) * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
+            + faceCol * NB_VERTICES_BY_FACE;
         }
 
         // swap material
@@ -496,46 +623,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
       utils.logWarn('Invalid base image, the width should be twice the height');
     }
 
-    if (this.config.baseBlur || img.width > SYSTEM.maxTextureWidth) {
-      const ratio = Math.min(1, SYSTEM.getMaxCanvasWidth() / img.width);
-
-      const buffer = document.createElement('canvas');
-      buffer.width = img.width * ratio;
-      buffer.height = buffer.width / 2;
-
-      const ctx = buffer.getContext('2d');
-      if (this.config.baseBlur) {
-        ctx.filter = 'blur(1px)';
-      }
-      ctx.drawImage(img, 0, 0, buffer.width, buffer.height);
-
-      return utils.createTexture(buffer);
-    }
-
-    return utils.createTexture(img);
+    return createBaseTexture(img, this.config.baseBlur, w => w / 2);
   }
 
 }
-
-/* eslint-disable */
-
-/**
- * UNUSED : Returns the apparent size of a segment on the screen
- * @private
- */
-// function getSegmentSize() {
-//   const p1 = this.psv.prop.direction.clone();
-//   const p2 = this.psv.prop.direction.clone();
-//
-//   const angle = Math.PI * 2 / SPHERE_SEGMENTS / 2;
-//   const dst = Math.atan(angle) * CONSTANTS.SPHERE_RADIUS;
-//   const horizontalAxis = new THREE.Vector3(0, 1, 0).cross(this.psv.prop.direction).normalize();
-//
-//   p1.add(horizontalAxis.clone().multiplyScalar(dst));
-//   p2.add(horizontalAxis.clone().multiplyScalar(-dst));
-//
-//   const p1a = this.psv.dataHelper.vector3ToViewerCoords(p1);
-//   const p2a = this.psv.dataHelper.vector3ToViewerCoords(p2);
-//
-//   const segmentSize = p2a.x - p1a.x;
-// }

@@ -1,9 +1,9 @@
 import * as THREE from 'three';
-import { CONSTANTS, PSVError, SYSTEM, utils } from '../..';
+import { CONSTANTS, PSVError, utils } from '../..';
 import { CUBE_HASHMAP, CubemapAdapter } from '../cubemap';
 import { Queue } from '../tiles-shared/Queue';
 import { Task } from '../tiles-shared/Task';
-import { buildErrorMaterial, powerOfTwo } from '../tiles-shared/utils';
+import { buildErrorMaterial, createBaseTexture, powerOfTwo } from '../tiles-shared/utils';
 
 if (!CubemapAdapter) {
   throw new PSVError('CubemapAdapter is missing, please load cubemap.js before cubemap-tiles.js');
@@ -46,11 +46,11 @@ if (!CubemapAdapter) {
  */
 
 
-const CUBE_VERTICES = 16;
+const CUBE_SEGMENTS = 16;
 const NB_VERTICES_BY_FACE = 6;
-const NB_VERTICES_BY_PLANE = NB_VERTICES_BY_FACE * CUBE_VERTICES * CUBE_VERTICES;
+const NB_VERTICES_BY_PLANE = NB_VERTICES_BY_FACE * CUBE_SEGMENTS * CUBE_SEGMENTS;
 const NB_VERTICES = 6 * NB_VERTICES_BY_PLANE;
-const NB_GROUPS_BY_FACE = CUBE_VERTICES * CUBE_VERTICES;
+const NB_GROUPS_BY_FACE = CUBE_SEGMENTS * CUBE_SEGMENTS;
 
 function tileId(tile) {
   return `${tile.face}:${tile.col}x${tile.row}`;
@@ -187,15 +187,15 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     if (typeof panorama !== 'object' || !panorama.faceSize || !panorama.nbTiles || !panorama.tileUrl) {
       return Promise.reject(new PSVError('Invalid panorama configuration, are you using the right adapter?'));
     }
-    if (panorama.nbTiles > CUBE_VERTICES) {
-      return Promise.reject(new PSVError(`Panorama nbTiles must not be greater than ${CUBE_VERTICES}.`));
+    if (panorama.nbTiles > CUBE_SEGMENTS) {
+      return Promise.reject(new PSVError(`Panorama nbTiles must not be greater than ${CUBE_SEGMENTS}.`));
     }
     if (!powerOfTwo(panorama.nbTiles)) {
       return Promise.reject(new PSVError('Panorama nbTiles must be power of 2.'));
     }
 
     this.prop.tileSize = panorama.faceSize / panorama.nbTiles;
-    this.prop.facesByTile = CUBE_VERTICES / panorama.nbTiles;
+    this.prop.facesByTile = CUBE_SEGMENTS / panorama.nbTiles;
 
     this.__cleanup();
 
@@ -220,7 +220,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
    */
   createMesh(scale = 1) {
     const cubeSize = CONSTANTS.SPHERE_RADIUS * 2 * scale;
-    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize, CUBE_VERTICES, CUBE_VERTICES, CUBE_VERTICES)
+    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize, CUBE_SEGMENTS, CUBE_SEGMENTS, CUBE_SEGMENTS)
       .scale(1, 1, -1)
       .toNonIndexed();
 
@@ -259,14 +259,14 @@ export class CubemapTilesAdapter extends CubemapAdapter {
 
     // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));
 
-    this.__refresh();
+    setTimeout(() => this.__refresh(true));
   }
 
   /**
    * @summary Compute visible tiles and load them
    * @private
    */
-  __refresh() {
+  __refresh(init = false) { // eslint-disable-line no-unused-vars
     const panorama = this.psv.config.panorama;
 
     if (!panorama) {
@@ -291,11 +291,11 @@ export class CubemapTilesAdapter extends CubemapAdapter {
 
           // top-left
           const v0 = face * NB_VERTICES_BY_PLANE
-            + row * this.prop.facesByTile * CUBE_VERTICES * NB_VERTICES_BY_FACE
+            + row * this.prop.facesByTile * CUBE_SEGMENTS * NB_VERTICES_BY_FACE
             + col * this.prop.facesByTile * NB_VERTICES_BY_FACE;
 
           // bottom-left
-          const v1 = v0 + CUBE_VERTICES * NB_VERTICES_BY_FACE * (this.prop.facesByTile - 1) + 1;
+          const v1 = v0 + CUBE_SEGMENTS * NB_VERTICES_BY_FACE * (this.prop.facesByTile - 1) + 1;
 
           // bottom-right
           const v2 = v1 + this.prop.facesByTile * NB_VERTICES_BY_FACE - 3;
@@ -305,7 +305,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
 
           verticesIndex.push(v0, v1, v2, v3);
 
-          if (this.prop.facesByTile >= 8) {
+          if (this.prop.facesByTile >= CUBE_SEGMENTS / 2) {
             // top-center
             const v4 = v0 + this.prop.facesByTile / 2 * NB_VERTICES_BY_FACE - 1;
 
@@ -313,7 +313,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
             const v5 = v1 + this.prop.facesByTile / 2 * NB_VERTICES_BY_FACE - 3;
 
             // left-center
-            const v6 = v0 + CUBE_VERTICES * NB_VERTICES_BY_FACE * (this.prop.facesByTile / 2 - 1) + 1;
+            const v6 = v0 + CUBE_SEGMENTS * NB_VERTICES_BY_FACE * (this.prop.facesByTile / 2 - 1) + 1;
 
             // right-center
             const v7 = v6 + this.prop.facesByTile * NB_VERTICES_BY_FACE - 3;
@@ -324,7 +324,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
             verticesIndex.push(v4, v5, v6, v7, v8);
           }
 
-          // if (face === 5 && col === 0 && row === 0) {
+          // if (init && face === 5 && col === 0 && row === 0) {
           //   verticesIndex.forEach((vertexIdx) => {
           //     this.psv.renderer.scene.add(createDot(
           //       verticesPosition.getX(vertexIdx),
@@ -411,7 +411,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
       .catch(() => {
         if (!task.isCancelled() && this.config.showErrorTile) {
           if (!this.prop.errorMaterial) {
-            this.prop.errorMaterial = buildErrorMaterial(this.prop.tileSize, this.prop.tileSize, THREE.FrontSide);
+            this.prop.errorMaterial = buildErrorMaterial(this.prop.tileSize, this.prop.tileSize);
           }
           this.__swapMaterial(tile.face, tile.col, tile.row, this.prop.errorMaterial);
           this.psv.needsUpdate();
@@ -437,7 +437,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
         const faceRow = row * this.prop.facesByTile + r;
 
         // first vertex for this face (6 vertices in total)
-        const firstVertex = NB_VERTICES_BY_PLANE * face + 6 * (CUBE_VERTICES * faceRow + faceCol);
+        const firstVertex = NB_VERTICES_BY_PLANE * face + 6 * (CUBE_SEGMENTS * faceRow + faceCol);
 
         // swap material
         const matIndex = this.prop.geom.groups.find(g => g.start === firstVertex).materialIndex;
@@ -480,23 +480,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
       utils.logWarn('Invalid base image, the width should equals the height');
     }
 
-    if (this.config.baseBlur || img.width > SYSTEM.maxTextureWidth) {
-      const ratio = Math.min(1, SYSTEM.getMaxCanvasWidth() / img.width);
-
-      const buffer = document.createElement('canvas');
-      buffer.width = img.width * ratio;
-      buffer.height = img.height * ratio;
-
-      const ctx = buffer.getContext('2d');
-      if (this.config.baseBlur) {
-        ctx.filter = 'blur(1px)';
-      }
-      ctx.drawImage(img, 0, 0, buffer.width, buffer.height);
-
-      return utils.createTexture(buffer);
-    }
-
-    return utils.createTexture(img);
+    return createBaseTexture(img, this.config.baseBlur, w => w);
   }
 
 }

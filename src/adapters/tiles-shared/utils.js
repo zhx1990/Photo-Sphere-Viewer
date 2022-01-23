@@ -1,11 +1,12 @@
 import * as THREE from 'three';
+import { SYSTEM, utils } from '../..';
 
 /**
  * @summary Tests if a number is power of two
  * @memberOf PSV.adapters
  * @param {number} x
  * @return {boolean}
- * @package
+ * @private
  */
 export function powerOfTwo(x) {
   return (Math.log(x) / Math.log(2)) % 1 === 0;
@@ -15,9 +16,9 @@ export function powerOfTwo(x) {
  * @summary Generates an material for errored tiles
  * @memberOf PSV.adapters
  * @return {external:THREE.MeshBasicMaterial}
- * @package
+ * @private
  */
-export function buildErrorMaterial(width, height, side = THREE.BackSide) {
+export function buildErrorMaterial(width, height) {
   const canvas = document.createElement('canvas');
   canvas.width = width;
   canvas.height = height;
@@ -33,10 +34,36 @@ export function buildErrorMaterial(width, height, side = THREE.BackSide) {
   ctx.fillText('⚠', canvas.width / 2, canvas.height / 2);
 
   const texture = new THREE.CanvasTexture(canvas);
-  return new THREE.MeshBasicMaterial({
-    side: side,
-    map : texture,
-  });
+  return new THREE.MeshBasicMaterial({ map: texture });
+}
+
+/**
+ * @summary Create the texture for the base image
+ * @memberOf PSV.adapters
+ * @param {HTMLImageElement} img
+ * @param {boolean} blur
+ * @param {function} getHeight
+ * @return {external:THREE.Texture}
+ * @private
+ */
+export function createBaseTexture(img, blur, getHeight) {
+  if (blur || img.width > SYSTEM.maxTextureWidth) {
+    const ratio = Math.min(1, SYSTEM.getMaxCanvasWidth() / img.width);
+
+    const buffer = document.createElement('canvas');
+    buffer.width = img.width * ratio;
+    buffer.height = getHeight(img.width);
+
+    const ctx = buffer.getContext('2d');
+    if (blur) {
+      ctx.filter = 'blur(1px)';
+    }
+    ctx.drawImage(img, 0, 0, buffer.width, buffer.height);
+
+    return utils.createTexture(buffer);
+  }
+
+  return utils.createTexture(img);
 }
 
 /**
