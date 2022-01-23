@@ -50,7 +50,6 @@ module.exports = {
               children   : [
                 'adapters/cubemap',
                 'adapters/tiles',
-                ['adapters/cubemap-tiles', 'Cubemap tiles (NEW)'],
               ],
             },
             {

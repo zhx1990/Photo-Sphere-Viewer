@@ -25,6 +25,7 @@
     {
       desc    : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
       minFov  : 30,
+      base    : `${base}sphere-small.jpg`,
       position: {
         longitude: 0,
         latitude : 0,
@@ -34,7 +35,6 @@
         width  : 6656,
         cols   : 16,
         rows   : 8,
-        baseUrl: `${base}sphere-small.jpg`,
         tileUrl: (col, row) => {
           if (col === 8 && row === 4) {
             return 'error.jpg';
@@ -47,6 +47,7 @@
     {
       desc    : 'Simon\'s Town <b>&copy;  Greg Zall (HDRI Haven)</b>',
       minFov  : 10,
+      base    : `${base}sphere-tiles-24k/base.jpg`,
       position: {
         longitude: '52deg',
         latitude : 0,
@@ -56,7 +57,6 @@
         width  : 24576,
         cols   : 64,
         rows   : 32,
-        baseUrl: `${base}sphere-tiles-24k/base.jpg`,
         tileUrl: (col, row) => {
           const num = row * 64 + col;
           return `${base}sphere-tiles-24k/tile_${('0000' + num).slice(-4)}.jpg`;
@@ -98,7 +98,10 @@
   loadPanorama(panos[0]);
 
   function loadPanorama(pano) {
-    return viewer.setPanorama(pano.config, pano.position)
+    return viewer.setPanorama({
+      ...pano.config,
+      baseUrl: pano.base,
+    }, pano.position)
       .then(() => {
         viewer.navbar.setCaption(pano.desc);
         viewer.setOption('minFov', pano.minFov);

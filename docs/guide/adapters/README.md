@@ -6,11 +6,10 @@ The supported adapters are:
 - `equirectangular`: the default adapter, used to load full or partial equirectangular panoramas
 - [cubemap](cubemap.md): used to load cubemaps projections (six textures)
 - [equirectangular tiles](tiles.md): used to load tiled equirectangular panoramas
-- [cubemap tiles](cubemap-tiles.md): used to load tiled cubemap panoramas
 
 ## Import an adapter
 
-Official adapters are available in the the main `photo-sphere-viewer` package inside the `dist/adapters` directory.
+Official adapters (listed on the left menu) are available in the the main `photo-sphere-viewer` package inside the `dist/adapters` directory.
 
 **Example for the Cubemap adapter:**
 

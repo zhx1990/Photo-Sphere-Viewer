@@ -2,7 +2,7 @@ import { Task } from './Task';
 
 /**
  * @summary Loading queue
- * @memberOf PSV.adapters
+ * @memberOf PSV.adapters.EquirectangularTilesAdapter
  * @package
  */
 export class Queue {
@@ -10,7 +10,7 @@ export class Queue {
   /**
    * @param {int} concurency
    */
-  constructor(concurency = 4) {
+  constructor(concurency) {
     this.concurency = concurency;
     this.runningTasks = {};
     this.tasks = {};
@@ -27,18 +27,14 @@ export class Queue {
   }
 
   setPriority(taskId, priority) {
-    const task = this.tasks[taskId];
-    if (task) {
-      task.priority = priority;
-      if (task.status === Task.STATUS.DISABLED) {
-        task.status = Task.STATUS.PENDING;
-      }
+    if (this.tasks[taskId]) {
+      this.tasks[taskId].priority = priority;
     }
   }
 
-  disableAllTasks() {
+  setAllPriorities(priority) {
     Object.values(this.tasks).forEach((task) => {
-      task.enabled = Task.STATUS.DISABLED;
+      task.priority = priority;
     });
   }
 
@@ -48,8 +44,8 @@ export class Queue {
     }
 
     const nextTask = Object.values(this.tasks)
-      .filter(task => task.status === Task.STATUS.PENDING)
-      .sort((a, b) => b.priority - a.priority)
+      .filter(task => task.status === Task.STATUS.PENDING && task.priority > 0)
+      .sort((a, b) => a.priority - b.priority)
       .pop();
 
     if (nextTask) {

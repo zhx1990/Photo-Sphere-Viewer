@@ -1,4 +1,4 @@
-# Cubemap
+# Cubemap adapter
 
 > [Cube mapping](https://en.wikipedia.org/wiki/Cube_mapping) is a kind of projection where the environment is mapped to the six faces of a cube around the viewer.
 

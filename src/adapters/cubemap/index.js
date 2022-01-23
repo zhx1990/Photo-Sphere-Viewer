@@ -19,10 +19,10 @@ import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
  */
 
 
-// PSV faces order is left, front, right, back, top, bottom
-// 3JS faces order is left, right, top, bottom, back, front
-export const CUBE_ARRAY = [0, 2, 4, 5, 3, 1];
-export const CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
+const CUBE_VERTICES = 8;
+const CUBE_MAP = [0, 2, 4, 5, 3, 1];
+const CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
+const VECTOR2D_CENTER = new THREE.Vector2(0.5, 0.5);
 
 
 /**
@@ -66,7 +66,7 @@ export class CubemapAdapter extends AbstractAdapter {
 
       // reorder images
       for (let i = 0; i < 6; i++) {
-        cleanPanorama[i] = panorama[CUBE_ARRAY[i]];
+        cleanPanorama[i] = panorama[CUBE_MAP[i]];
       }
     }
     else if (typeof panorama === 'object') {
@@ -111,25 +111,26 @@ export class CubemapAdapter extends AbstractAdapter {
    * @private
    */
   __createCubemapTexture(img) {
-    if (img.width !== img.height) {
-      utils.logWarn('Invalid base image, the width equal the height');
-    }
+    let finalImage;
 
     // resize image
     if (img.width > SYSTEM.maxTextureWidth) {
+      const buffer = document.createElement('canvas');
       const ratio = SYSTEM.getMaxCanvasWidth() / img.width;
 
-      const buffer = document.createElement('canvas');
       buffer.width = img.width * ratio;
       buffer.height = img.height * ratio;
 
       const ctx = buffer.getContext('2d');
       ctx.drawImage(img, 0, 0, buffer.width, buffer.height);
 
-      return utils.createTexture(buffer);
+      finalImage = buffer;
+    }
+    else {
+      finalImage = img;
     }
 
-    return utils.createTexture(img);
+    return utils.createTexture(finalImage);
   }
 
   /**
@@ -137,7 +138,7 @@ export class CubemapAdapter extends AbstractAdapter {
    */
   createMesh(scale = 1) {
     const cubeSize = CONSTANTS.SPHERE_RADIUS * 2 * scale;
-    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize);
+    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize, CUBE_VERTICES, CUBE_VERTICES, CUBE_VERTICES);
 
     const materials = [];
     for (let i = 0; i < 6; i++) {
@@ -164,7 +165,7 @@ export class CubemapAdapter extends AbstractAdapter {
       }
 
       if (this.config.flipTopBottom && (i === 2 || i === 3)) {
-        texture[i].center = new THREE.Vector2(0.5, 0.5);
+        texture[i].center = VECTOR2D_CENTER;
         texture[i].rotation = Math.PI;
       }
 
