@@ -15,7 +15,7 @@ const plugins = fs.readdirSync(path.join(__dirname, 'src/plugins'))
 
 const adapters = fs.readdirSync(path.join(__dirname, 'src/adapters'))
   .filter(p => fs.lstatSync(`src/adapters/${p}`).isDirectory())
-  .filter(p => p !== 'equirectangular');
+  .filter(p => p !== 'equirectangular' && p !== 'tiles-shared');
 
 const banner = `/*!
 * Photo Sphere Viewer ${pkg.version}
@@ -85,19 +85,21 @@ const secondaryConfig = {
     ...baseConfig.output,
     globals: {
       ...baseConfig.output.globals,
-      'photo-sphere-viewer': 'PhotoSphereViewer',
+      'photo-sphere-viewer'                      : 'PhotoSphereViewer',
+      'photo-sphere-viewer/dist/adapters/cubemap': 'PhotoSphereViewer.CubemapAdapter',
     },
   },
   external: [
     ...baseConfig.external,
     'photo-sphere-viewer',
   ],
-  plugins: () => [
+  plugins : () => [
     replace({
       delimiters                  : ['', ''],
       preventAssignment           : true,
       [`from 'three/examples/jsm`]: `from '../../../three-examples`,
       [`from '../..'`]            : `from 'photo-sphere-viewer'`,
+      [`from '../cubemap'`]       : `from 'photo-sphere-viewer/dist/adapters/cubemap'`,
     }),
     ...baseConfig.plugins(),
   ],
@@ -119,13 +121,11 @@ const secondaryConfigDTS = {
   ],
   plugins : () => [
     replace({
-      delimiters       : ['', ''],
-      preventAssignment: true,
-      [`from '../..'`] : `from 'photo-sphere-viewer'`,
-      ...plugins.reduce((replace, p) => {
-        replace[`from '../${p}'`] = `from 'photo-sphere-viewer/dist/plugins/${p}'`;
-        return replace;
-      }, {}),
+      delimiters           : ['', ''],
+      preventAssignment    : true,
+      [`from '../..'`]     : `from 'photo-sphere-viewer'`,
+      [`from '../markers'`]: `from 'photo-sphere-viewer/dist/plugins/markers'`,
+      [`from '../cubemap'`]: `from 'photo-sphere-viewer/dist/adapters/cubemap'`,
     }),
     ...baseConfigDTS.plugins(),
   ],

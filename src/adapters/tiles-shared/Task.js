@@ -1,11 +1,12 @@
 /**
  * @summary Loading task
- * @memberOf PSV.adapters.EquirectangularTilesAdapter
+ * @memberOf PSV.adapters
  * @package
  */
 export class Task {
 
   static STATUS = {
+    DISABLED : -1,
     PENDING  : 0,
     RUNNING  : 1,
     CANCELLED: 2,

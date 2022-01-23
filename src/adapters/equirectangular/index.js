@@ -127,17 +127,14 @@ export class EquirectangularAdapter extends AbstractAdapter {
    * @private
    */
   __createEquirectangularTexture(img, panoData) {
-    let finalImage;
-
     // resize image / fill cropped parts with black
     if (panoData.fullWidth > SYSTEM.maxTextureWidth
       || panoData.croppedWidth !== panoData.fullWidth
       || panoData.croppedHeight !== panoData.fullHeight
     ) {
-      const resizedPanoData = { ...panoData };
-
       const ratio = SYSTEM.getMaxCanvasWidth() / panoData.fullWidth;
 
+      const resizedPanoData = { ...panoData };
       if (ratio < 1) {
         resizedPanoData.fullWidth *= ratio;
         resizedPanoData.fullHeight *= ratio;
@@ -156,13 +153,10 @@ export class EquirectangularAdapter extends AbstractAdapter {
         resizedPanoData.croppedX, resizedPanoData.croppedY,
         resizedPanoData.croppedWidth, resizedPanoData.croppedHeight);
 
-      finalImage = buffer;
-    }
-    else {
-      finalImage = img;
+      return createTexture(buffer);
     }
 
-    return createTexture(finalImage);
+    return createTexture(img);
   }
 
   /**

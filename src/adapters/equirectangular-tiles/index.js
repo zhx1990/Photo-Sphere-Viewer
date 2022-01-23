@@ -1,7 +1,8 @@
 import * as THREE from 'three';
 import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
-import { Queue } from './Queue';
-import { Task } from './Task';
+import { Queue } from '../tiles-shared/Queue';
+import { Task } from '../tiles-shared/Task';
+import { buildErrorMaterial, powerOfTwo } from '../tiles-shared/utils';
 
 
 /**
@@ -41,14 +42,9 @@ import { Task } from './Task';
 const SPHERE_SEGMENTS = 64;
 const NB_VERTICES = 3 * (SPHERE_SEGMENTS * 2 + (SPHERE_SEGMENTS / 2 - 2) * SPHERE_SEGMENTS * 2);
 const NB_GROUPS = SPHERE_SEGMENTS * 2 + (SPHERE_SEGMENTS / 2 - 2) * SPHERE_SEGMENTS;
-const QUEUE_CONCURENCY = 4;
 
 function tileId(tile) {
   return `${tile.col}x${tile.row}`;
-}
-
-function powerOfTwo(x) {
-  return (Math.log(x) / Math.log(2)) % 1 === 0;
 }
 
 
@@ -85,10 +81,10 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     this.materials = [];
 
     /**
-     * @member {PSV.adapters.EquirectangularTilesAdapter.Queue}
+     * @member {PSV.adapters.Queue}
      * @private
      */
-    this.queue = new Queue(QUEUE_CONCURENCY);
+    this.queue = new Queue();
 
     /**
      * @type {Object}
@@ -369,18 +365,17 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
    * @private
    */
   __loadTiles(tiles) {
-    this.queue.setAllPriorities(0);
+    this.queue.disableAllTasks();
 
     tiles.forEach((tile) => {
       const id = tileId(tile);
-      const priority = Math.PI / 2 - tile.angle;
 
       if (this.prop.tiles[id]) {
-        this.queue.setPriority(id, priority);
+        this.queue.setPriority(id, tile.angle);
       }
       else {
         this.prop.tiles[id] = true;
-        this.queue.enqueue(new Task(id, priority, task => this.__loadTile(tile, task)));
+        this.queue.enqueue(new Task(id, tile.angle, task => this.__loadTile(tile, task)));
       }
     });
 
@@ -390,7 +385,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
   /**
    * @summary Loads and draw a tile
    * @param {PSV.adapters.EquirectangularTilesAdapter.Tile} tile
-   * @param {PSV.adapters.EquirectangularTilesAdapter.Task} task
+   * @param {PSV.adapters.Task} task
    * @return {Promise}
    * @private
    */
@@ -417,8 +412,10 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
       })
       .catch(() => {
         if (!task.isCancelled() && this.config.showErrorTile) {
-          const material = this.__getErrorMaterial();
-          this.__swapMaterial(tile.col, tile.row, material);
+          if (!this.prop.errorMaterial) {
+            this.prop.errorMaterial = buildErrorMaterial(this.prop.colSize, this.prop.rowSize);
+          }
+          this.__swapMaterial(tile.col, tile.row, this.prop.errorMaterial);
           this.psv.needsUpdate();
         }
       });
@@ -486,37 +483,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     }
 
     uvs.needsUpdate = true;
-  }
-
-  /**
-   * @summary Generates an material for errored tiles
-   * @return {external:THREE.MeshBasicMaterial}
-   * @private
-   */
-  __getErrorMaterial() {
-    if (!this.prop.errorMaterial) {
-      const canvas = document.createElement('canvas');
-      canvas.width = this.prop.colSize;
-      canvas.height = this.prop.rowSize;
-
-      const ctx = canvas.getContext('2d');
-
-      ctx.fillStyle = '#333';
-      ctx.fillRect(0, 0, canvas.width, canvas.height);
-      ctx.font = `${canvas.width / 5}px serif`;
-      ctx.fillStyle = '#a22';
-      ctx.textAlign = 'center';
-      ctx.textBaseline = 'middle';
-      ctx.fillText('⚠', canvas.width / 2, canvas.height / 2);
-
-      const texture = new THREE.CanvasTexture(canvas);
-      this.prop.errorMaterial = new THREE.MeshBasicMaterial({
-        side: THREE.BackSide,
-        map : texture,
-      });
-    }
-
-    return this.prop.errorMaterial;
   }
 
   /**
