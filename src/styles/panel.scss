@@ -174,7 +174,7 @@
     transition: background .1s ease-in-out;
 
     &--active {
-      outline: $psv-panel-menu-item-active-outline solid currentColor;
+      outline: $psv-panel-menu-item-active-outline solid currentcolor;
       outline-offset: -$psv-panel-menu-item-active-outline;
     }
 
@@ -196,7 +196,7 @@
     }
 
     &:focus-visible {
-      outline: 1px dotted currentColor;
+      outline: 1px dotted currentcolor;
       outline-offset: -1px;
     }
   }
