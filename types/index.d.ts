@@ -5,6 +5,7 @@ export * from './models';
 export * from './data/config';
 export * from './data/system';
 export * from './adapters/AbstractAdapter';
+export * from './adapters/equirectangular';
 export * from './buttons/AbstractButton';
 export * from './plugins/AbstractPlugin';
 export * from './Animation';

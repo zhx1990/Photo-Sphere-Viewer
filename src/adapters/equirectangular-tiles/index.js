@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { AbstractAdapter, CONSTANTS, PSVError, utils } from '../..';
 import { Queue } from '../tiles-shared/Queue';
 import { Task } from '../tiles-shared/Task';
-import { buildErrorMaterial, createBaseTexture, powerOfTwo } from '../tiles-shared/utils';
+import { buildErrorMaterial, createBaseTexture } from '../tiles-shared/utils';
 
 
 /**
@@ -26,6 +26,7 @@ import { buildErrorMaterial, createBaseTexture, powerOfTwo } from '../tiles-shar
 
 /**
  * @typedef {Object} PSV.adapters.EquirectangularTilesAdapter.Options
+ * @property {number} [resolution=64] - number of faces of the sphere geometry, higher values may decrease performances
  * @property {boolean} [showErrorTile=true] - shows a warning sign on tiles that cannot be loaded
  * @property {boolean} [baseBlur=true] - applies a blur to the low resolution panorama
  */
@@ -38,16 +39,37 @@ import { buildErrorMaterial, createBaseTexture, powerOfTwo } from '../tiles-shar
  * @property {int} angle
  */
 
-
-// the faces of the top and bottom rows are made of a single triangle (3 vertices)
-// all other faces are made of two triangles (6 vertices)
-const SPHERE_SEGMENTS = 64;
-const SPHERE_HORIZONTAL_SEGMENTS = SPHERE_SEGMENTS / 2;
-const NB_VERTICES_BY_FACE = 6;
-const NB_VERTICES_BY_SMALL_FACE = 3;
-const NB_VERTICES = 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-  + (SPHERE_HORIZONTAL_SEGMENTS - 2) * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
-const NB_GROUPS = SPHERE_SEGMENTS * SPHERE_HORIZONTAL_SEGMENTS;
+/* the faces of the top and bottom rows are made of a single triangle (3 vertices)
+ * all other faces are made of two triangles (6 vertices)
+ * bellow is the indexing of each face vertices
+ *
+ * first row faces:
+ *     ⋀
+ *    /0\
+ *   /   \
+ *  /     \
+ * /1     2\
+ * ¯¯¯¯¯¯¯¯¯
+ *
+ * other rows faces:
+ * _________
+ * |\1    0|
+ * |3\     |
+ * |  \    |
+ * |   \   |
+ * |    \  |
+ * |     \2|
+ * |4    5\|
+ * ¯¯¯¯¯¯¯¯¯
+ *
+ * last row faces:
+ * _________
+ * \1     0/
+ *  \     /
+ *   \   /
+ *    \2/
+ *     ⋁
+ */
 
 function tileId(tile) {
   return `${tile.col}x${tile.row}`;
@@ -79,10 +101,23 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
      * @private
      */
     this.config = {
+      resolution   : 64,
       showErrorTile: true,
       baseBlur     : true,
       ...options,
     };
+
+    if (!utils.isPowerOfTwo(this.config.resolution)) {
+      throw new PSVError('EquirectangularAdapter resolution must be power of two');
+    }
+
+    this.SPHERE_SEGMENTS = this.config.resolution;
+    this.SPHERE_HORIZONTAL_SEGMENTS = this.SPHERE_SEGMENTS / 2;
+    this.NB_VERTICES_BY_FACE = 6;
+    this.NB_VERTICES_BY_SMALL_FACE = 3;
+    this.NB_VERTICES = 2 * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_SMALL_FACE
+      + (this.SPHERE_HORIZONTAL_SEGMENTS - 2) * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE;
+    this.NB_GROUPS = this.SPHERE_SEGMENTS * this.SPHERE_HORIZONTAL_SEGMENTS;
 
     /**
      * @member {external:THREE.MeshBasicMaterial[]}
@@ -188,20 +223,20 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     if (typeof panorama !== 'object' || !panorama.width || !panorama.cols || !panorama.rows || !panorama.tileUrl) {
       return Promise.reject(new PSVError('Invalid panorama configuration, are you using the right adapter?'));
     }
-    if (panorama.cols > SPHERE_SEGMENTS) {
-      return Promise.reject(new PSVError(`Panorama cols must not be greater than ${SPHERE_SEGMENTS}.`));
+    if (panorama.cols > this.SPHERE_SEGMENTS) {
+      return Promise.reject(new PSVError(`Panorama cols must not be greater than ${this.SPHERE_SEGMENTS}.`));
     }
-    if (panorama.rows > SPHERE_HORIZONTAL_SEGMENTS) {
-      return Promise.reject(new PSVError(`Panorama rows must not be greater than ${SPHERE_HORIZONTAL_SEGMENTS}.`));
+    if (panorama.rows > this.SPHERE_HORIZONTAL_SEGMENTS) {
+      return Promise.reject(new PSVError(`Panorama rows must not be greater than ${this.SPHERE_HORIZONTAL_SEGMENTS}.`));
     }
-    if (!powerOfTwo(panorama.cols) || !powerOfTwo(panorama.rows)) {
+    if (!utils.isPowerOfTwo(panorama.cols) || !utils.isPowerOfTwo(panorama.rows)) {
       return Promise.reject(new PSVError('Panorama cols and rows must be powers of 2.'));
     }
 
     this.prop.colSize = panorama.width / panorama.cols;
     this.prop.rowSize = panorama.width / 2 / panorama.rows;
-    this.prop.facesByCol = SPHERE_SEGMENTS / panorama.cols;
-    this.prop.facesByRow = SPHERE_HORIZONTAL_SEGMENTS / panorama.rows;
+    this.prop.facesByCol = this.SPHERE_SEGMENTS / panorama.cols;
+    this.prop.facesByRow = this.SPHERE_HORIZONTAL_SEGMENTS / panorama.rows;
 
     this.__cleanup();
 
@@ -234,7 +269,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
    * @override
    */
   createMesh(scale = 1) {
-    const geometry = new THREE.SphereGeometry(CONSTANTS.SPHERE_RADIUS * scale, SPHERE_SEGMENTS, SPHERE_HORIZONTAL_SEGMENTS, -Math.PI / 2)
+    const geometry = new THREE.SphereGeometry(CONSTANTS.SPHERE_RADIUS * scale, this.SPHERE_SEGMENTS, this.SPHERE_HORIZONTAL_SEGMENTS, -Math.PI / 2)
       .scale(-1, 1, 1)
       .toNonIndexed();
 
@@ -242,16 +277,16 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     let i = 0;
     let k = 0;
     // first row
-    for (; i < SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE; i += NB_VERTICES_BY_SMALL_FACE) {
-      geometry.addGroup(i, NB_VERTICES_BY_SMALL_FACE, k++);
+    for (; i < this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_SMALL_FACE; i += this.NB_VERTICES_BY_SMALL_FACE) {
+      geometry.addGroup(i, this.NB_VERTICES_BY_SMALL_FACE, k++);
     }
     // second to before last rows
-    for (; i < NB_VERTICES - SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE; i += NB_VERTICES_BY_FACE) {
-      geometry.addGroup(i, NB_VERTICES_BY_FACE, k++);
+    for (; i < this.NB_VERTICES - this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_SMALL_FACE; i += this.NB_VERTICES_BY_FACE) {
+      geometry.addGroup(i, this.NB_VERTICES_BY_FACE, k++);
     }
     // last row
-    for (; i < NB_VERTICES; i += NB_VERTICES_BY_SMALL_FACE) {
-      geometry.addGroup(i, NB_VERTICES_BY_SMALL_FACE, k++);
+    for (; i < this.NB_VERTICES; i += this.NB_VERTICES_BY_SMALL_FACE) {
+      geometry.addGroup(i, this.NB_VERTICES_BY_SMALL_FACE, k++);
     }
 
     this.prop.geom = geometry;
@@ -268,7 +303,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     if (textureData.texture) {
       const material = new THREE.MeshBasicMaterial({ map: textureData.texture });
 
-      for (let i = 0; i < NB_GROUPS; i++) {
+      for (let i = 0; i < this.NB_GROUPS; i++) {
         this.materials.push(material);
       }
     }
@@ -300,73 +335,43 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
 
     for (let col = 0; col < panorama.cols; col++) {
       for (let row = 0; row < panorama.rows; row++) {
-        /* for each tile, find the vertices corresponding to the four corners (three for first and last rows)
-         * if at least one vertex is visible, the tile must be loaded
-         * for larger tiles we also test the four edges centers and the tile center
-         *
-         * bellow is the indexing of each face vertices
-         *
-         * first row faces:
-         *     ⋀
-         *    /0\
-         *   /   \
-         *  /     \
-         * /1     2\
-         * ¯¯¯¯¯¯¯¯¯
-         *
-         * other rows faces:
-         * _________
-         * |\1    0|
-         * |3\     |
-         * |  \    |
-         * |   \   |
-         * |    \  |
-         * |     \2|
-         * |4    5\|
-         * ¯¯¯¯¯¯¯¯¯
-         *
-         * last row faces:
-         * _________
-         * \1     0/
-         *  \     /
-         *   \   /
-         *    \2/
-         *     ⋁
-         */
+        // for each tile, find the vertices corresponding to the four corners (three for first and last rows)
+        // if at least one vertex is visible, the tile must be loaded
+        // for larger tiles we also test the four edges centers and the tile center
 
         const verticesIndex = [];
 
         if (row === 0) {
           // bottom-left
           const v0 = this.prop.facesByRow === 1
-            ? col * this.prop.facesByCol * NB_VERTICES_BY_SMALL_FACE + 1
-            : SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-            + (this.prop.facesByRow - 2) * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-            + col * this.prop.facesByCol * NB_VERTICES_BY_FACE + 4;
+            ? col * this.prop.facesByCol * this.NB_VERTICES_BY_SMALL_FACE + 1
+            : this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_SMALL_FACE
+            + (this.prop.facesByRow - 2) * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE
+            + col * this.prop.facesByCol * this.NB_VERTICES_BY_FACE + 4;
 
           // bottom-right
           const v1 = this.prop.facesByRow === 1
-            ? v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_SMALL_FACE + 1
-            : v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_FACE + 1;
+            ? v0 + (this.prop.facesByCol - 1) * this.NB_VERTICES_BY_SMALL_FACE + 1
+            : v0 + (this.prop.facesByCol - 1) * this.NB_VERTICES_BY_FACE + 1;
 
           // top (all vertices are equal)
           const v2 = 0;
 
           verticesIndex.push(v0, v1, v2);
 
-          if (this.prop.facesByCol >= SPHERE_SEGMENTS / 8) {
+          if (this.prop.facesByCol >= this.SPHERE_SEGMENTS / 8) {
             // bottom-center
-            const v4 = v0 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+            const v4 = v0 + this.prop.facesByCol / 2 * this.NB_VERTICES_BY_FACE;
 
             verticesIndex.push(v4);
           }
 
-          if (this.prop.facesByRow >= SPHERE_HORIZONTAL_SEGMENTS / 4) {
+          if (this.prop.facesByRow >= this.SPHERE_HORIZONTAL_SEGMENTS / 4) {
             // left-center
-            const v6 = v0 - this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+            const v6 = v0 - this.prop.facesByRow / 2 * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE;
 
             // right-center
-            const v7 = v1 - this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+            const v7 = v1 - this.prop.facesByRow / 2 * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE;
 
             verticesIndex.push(v6, v7);
           }
@@ -374,79 +379,79 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
         else if (row === panorama.rows - 1) {
           // top-left
           const v0 = this.prop.facesByRow === 1
-            ? -SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-            + row * this.prop.facesByRow * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-            + col * this.prop.facesByCol * NB_VERTICES_BY_SMALL_FACE + 1
-            : -SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-            + row * this.prop.facesByRow * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-            + col * this.prop.facesByCol * NB_VERTICES_BY_FACE + 1;
+            ? -this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_SMALL_FACE
+            + row * this.prop.facesByRow * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE
+            + col * this.prop.facesByCol * this.NB_VERTICES_BY_SMALL_FACE + 1
+            : -this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_SMALL_FACE
+            + row * this.prop.facesByRow * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE
+            + col * this.prop.facesByCol * this.NB_VERTICES_BY_FACE + 1;
 
           // top-right
           const v1 = this.prop.facesByRow === 1
-            ? v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_SMALL_FACE - 1
-            : v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_FACE - 1;
+            ? v0 + (this.prop.facesByCol - 1) * this.NB_VERTICES_BY_SMALL_FACE - 1
+            : v0 + (this.prop.facesByCol - 1) * this.NB_VERTICES_BY_FACE - 1;
 
           // bottom (all vertices are equal)
-          const v2 = NB_VERTICES - 1;
+          const v2 = this.NB_VERTICES - 1;
 
           verticesIndex.push(v0, v1, v2);
 
-          if (this.prop.facesByCol >= SPHERE_SEGMENTS / 8) {
+          if (this.prop.facesByCol >= this.SPHERE_SEGMENTS / 8) {
             // top-center
-            const v4 = v0 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+            const v4 = v0 + this.prop.facesByCol / 2 * this.NB_VERTICES_BY_FACE;
 
             verticesIndex.push(v4);
           }
 
-          if (this.prop.facesByRow >= SPHERE_HORIZONTAL_SEGMENTS / 4) {
+          if (this.prop.facesByRow >= this.SPHERE_HORIZONTAL_SEGMENTS / 4) {
             // left-center
-            const v6 = v0 + this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+            const v6 = v0 + this.prop.facesByRow / 2 * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE;
 
             // right-center
-            const v7 = v1 + this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+            const v7 = v1 + this.prop.facesByRow / 2 * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE;
 
             verticesIndex.push(v6, v7);
           }
         }
         else {
           // top-left
-          const v0 = -SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-            + row * this.prop.facesByRow * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-            + col * this.prop.facesByCol * NB_VERTICES_BY_FACE + 1;
+          const v0 = -this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_SMALL_FACE
+            + row * this.prop.facesByRow * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE
+            + col * this.prop.facesByCol * this.NB_VERTICES_BY_FACE + 1;
 
           // bottom-left
-          const v1 = v0 + (this.prop.facesByRow - 1) * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE + 3;
+          const v1 = v0 + (this.prop.facesByRow - 1) * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE + 3;
 
           // bottom-right
-          const v2 = v1 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_FACE + 1;
+          const v2 = v1 + (this.prop.facesByCol - 1) * this.NB_VERTICES_BY_FACE + 1;
 
           // top-right
-          const v3 = v0 + (this.prop.facesByCol - 1) * NB_VERTICES_BY_FACE - 1;
+          const v3 = v0 + (this.prop.facesByCol - 1) * this.NB_VERTICES_BY_FACE - 1;
 
           verticesIndex.push(v0, v1, v2, v3);
 
-          if (this.prop.facesByCol >= SPHERE_SEGMENTS / 8) {
+          if (this.prop.facesByCol >= this.SPHERE_SEGMENTS / 8) {
             // top-center
-            const v4 = v0 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+            const v4 = v0 + this.prop.facesByCol / 2 * this.NB_VERTICES_BY_FACE;
 
             // bottom-center
-            const v5 = v1 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+            const v5 = v1 + this.prop.facesByCol / 2 * this.NB_VERTICES_BY_FACE;
 
             verticesIndex.push(v4, v5);
           }
 
-          if (this.prop.facesByRow >= SPHERE_HORIZONTAL_SEGMENTS / 4) {
+          if (this.prop.facesByRow >= this.SPHERE_HORIZONTAL_SEGMENTS / 4) {
             // left-center
-            const v6 = v0 + this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+            const v6 = v0 + this.prop.facesByRow / 2 * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE;
 
             // right-center
-            const v7 = v3 + this.prop.facesByRow / 2 * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+            const v7 = v3 + this.prop.facesByRow / 2 * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE;
 
             verticesIndex.push(v6, v7);
 
-            if (this.prop.facesByCol >= SPHERE_SEGMENTS / 8) {
+            if (this.prop.facesByCol >= this.SPHERE_SEGMENTS / 8) {
               // center-center
-              const v8 = v6 + this.prop.facesByCol / 2 * NB_VERTICES_BY_FACE;
+              const v8 = v6 + this.prop.facesByCol / 2 * this.NB_VERTICES_BY_FACE;
 
               verticesIndex.push(v8);
             }
@@ -560,22 +565,22 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
         const faceCol = col * this.prop.facesByCol + c;
         const faceRow = row * this.prop.facesByRow + r;
         const isFirstRow = faceRow === 0;
-        const isLastRow = faceRow === (SPHERE_HORIZONTAL_SEGMENTS - 1);
+        const isLastRow = faceRow === (this.SPHERE_HORIZONTAL_SEGMENTS - 1);
 
         // first vertex for this face (3 or 6 vertices in total)
         let firstVertex;
         if (isFirstRow) {
-          firstVertex = faceCol * NB_VERTICES_BY_SMALL_FACE;
+          firstVertex = faceCol * this.NB_VERTICES_BY_SMALL_FACE;
         }
         else if (isLastRow) {
-          firstVertex = NB_VERTICES
-            - SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-            + faceCol * NB_VERTICES_BY_SMALL_FACE;
+          firstVertex = this.NB_VERTICES
+            - this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_SMALL_FACE
+            + faceCol * this.NB_VERTICES_BY_SMALL_FACE;
         }
         else {
-          firstVertex = SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-            + (faceRow - 1) * SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-            + faceCol * NB_VERTICES_BY_FACE;
+          firstVertex = this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_SMALL_FACE
+            + (faceRow - 1) * this.SPHERE_SEGMENTS * this.NB_VERTICES_BY_FACE
+            + faceCol * this.NB_VERTICES_BY_FACE;
         }
 
         // swap material

@@ -2,11 +2,14 @@ import * as THREE from 'three';
 import { SPHERE_RADIUS } from '../../data/constants';
 import { SYSTEM } from '../../data/system';
 import { PSVError } from '../../PSVError';
-import { createTexture, firstNonNull, getXMPValue, logWarn } from '../../utils';
+import { createTexture, firstNonNull, getXMPValue, isPowerOfTwo, logWarn } from '../../utils';
 import { AbstractAdapter } from '../AbstractAdapter';
 
 
-const SPHERE_SEGMENTS = 64;
+/**
+ * @typedef {Object} PSV.adapters.EquirectangularAdapter.Options
+ * @property {number} [resolution=64] - number of faces of the sphere geometry, higher values may decrease performances
+ */
 
 
 /**
@@ -17,6 +20,30 @@ export class EquirectangularAdapter extends AbstractAdapter {
 
   static id = 'equirectangular';
   static supportsTransition = true;
+
+  /**
+   * @param {PSV.Viewer} psv
+   * @param {PSV.adapters.EquirectangularAdapter.Options} options
+   */
+  constructor(psv, options) {
+    super(psv);
+
+    /**
+     * @member {PSV.adapters.EquirectangularAdapter.Options}
+     * @private
+     */
+    this.config = {
+      resolution: 64,
+      ...options,
+    };
+
+    if (!isPowerOfTwo(this.config.resolution)) {
+      throw new PSVError('EquirectangularAdapter resolution must be power of two');
+    }
+
+    this.SPHERE_SEGMENTS = this.config.resolution;
+    this.SPHERE_HORIZONTAL_SEGMENTS = this.SPHERE_SEGMENTS / 2;
+  }
 
   /**
    * @override
@@ -164,7 +191,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
    */
   createMesh(scale = 1) {
     // The middle of the panorama is placed at longitude=0
-    const geometry = new THREE.SphereGeometry(SPHERE_RADIUS * scale, SPHERE_SEGMENTS, SPHERE_SEGMENTS / 2, -Math.PI / 2)
+    const geometry = new THREE.SphereGeometry(SPHERE_RADIUS * scale, this.SPHERE_SEGMENTS, this.SPHERE_HORIZONTAL_SEGMENTS, -Math.PI / 2)
       .scale(-1, 1, 1);
 
     const material = new THREE.MeshBasicMaterial();

@@ -1,4 +1,4 @@
-# CompassPlugin <Badge text="NEW"/>
+# CompassPlugin
 
 <ApiButton page="PSV.plugins.CompassPlugin.html"/>
 

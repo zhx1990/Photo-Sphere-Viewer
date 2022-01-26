@@ -8,6 +8,7 @@ import { SYSTEM } from './data/system';
 import { AbstractPlugin } from './plugins/AbstractPlugin';
 import { PSVError } from './PSVError';
 import { AbstractAdapter } from './adapters/AbstractAdapter';
+import { EquirectangularAdapter } from './adapters/equirectangular';
 import './styles/index.scss';
 import * as utils from './utils';
 import { Viewer } from './Viewer';
@@ -19,6 +20,7 @@ export {
   Animation,
   CONSTANTS,
   DEFAULTS,
+  EquirectangularAdapter,
   PSVError,
   registerButton,
   SYSTEM,

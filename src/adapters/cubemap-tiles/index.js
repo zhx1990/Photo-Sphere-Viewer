@@ -3,7 +3,7 @@ import { CONSTANTS, PSVError, utils } from '../..';
 import { CUBE_HASHMAP, CubemapAdapter } from '../cubemap';
 import { Queue } from '../tiles-shared/Queue';
 import { Task } from '../tiles-shared/Task';
-import { buildErrorMaterial, createBaseTexture, powerOfTwo } from '../tiles-shared/utils';
+import { buildErrorMaterial, createBaseTexture } from '../tiles-shared/utils';
 
 if (!CubemapAdapter) {
   throw new PSVError('CubemapAdapter is missing, please load cubemap.js before cubemap-tiles.js');
@@ -190,7 +190,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     if (panorama.nbTiles > CUBE_SEGMENTS) {
       return Promise.reject(new PSVError(`Panorama nbTiles must not be greater than ${CUBE_SEGMENTS}.`));
     }
-    if (!powerOfTwo(panorama.nbTiles)) {
+    if (!utils.isPowerOfTwo(panorama.nbTiles)) {
       return Promise.reject(new PSVError('Panorama nbTiles must be power of 2.'));
     }
 

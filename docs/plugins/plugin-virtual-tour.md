@@ -1,4 +1,4 @@
-# VirtualTourPlugin <Badge text="NEW"/>
+# VirtualTourPlugin
 
 <ApiButton page="PSV.plugins.VirtualTourPlugin.html"/>
 

@@ -23,6 +23,15 @@ export function isInteger(value) {
   return typeof value === 'number' && Number.isFinite(value) && Math.floor(value) === value;
 }
 
+/**
+ * @summary Tests if a number is power of two
+ * @memberOf PSV.utils
+ * @param {number} x
+ * @return {boolean}
+ */
+export function isPowerOfTwo(x) {
+  return (Math.log(x) / Math.log(2)) % 1 === 0;
+}
 
 /**
  * @summary Computes the sum of an array

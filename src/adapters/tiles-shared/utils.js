@@ -2,17 +2,6 @@ import * as THREE from 'three';
 import { SYSTEM, utils } from '../..';
 
 /**
- * @summary Tests if a number is power of two
- * @memberOf PSV.adapters
- * @param {number} x
- * @return {boolean}
- * @private
- */
-export function powerOfTwo(x) {
-  return (Math.log(x) / Math.log(2)) % 1 === 0;
-}
-
-/**
  * @summary Generates an material for errored tiles
  * @memberOf PSV.adapters
  * @return {external:THREE.MeshBasicMaterial}
