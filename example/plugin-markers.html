@@ -166,6 +166,7 @@
               [5.4694, 0.1880],
               [5.7125, 0.1302],
             ],
+            hideList  : true,
           });
 
           // polygon with custom style
@@ -250,7 +251,7 @@
 
           a.push({
             id       : 'text',
-            html     : 'This <b>is</b> text <img src="assets/pin-blue.png" style="height: 24px; vertical-align: top;"/>',
+            html     : '<code>HTML</code> content <img src="assets/pin-blue.png" style="height: 24px; vertical-align: top;"/>',
             anchor   : 'bottom right',
             style    : {
               color     : 'white',
@@ -260,6 +261,16 @@
             },
             longitude: 0.45,
             latitude : -0.4,
+          });
+
+          a.push({
+            id        : 'imageLayer',
+            imageLayer: 'assets/tent.png',
+            width     : 120,
+            height    : 94,
+            longitude : -0.45,
+            latitude  : -0.1,
+            tooltip   : 'Image embedded in the scene',
           });
 
           // SVG markers

@@ -274,6 +274,18 @@ export const CHANGE_EVENTS = {
 };
 
 /**
+ * @summary Special events emitted to listener using {@link Viewer#observeObjects}
+ * @memberOf PSV.constants
+ * @constant
+ * @package
+ */
+export const OBJECT_EVENTS = {
+  ENTER_OBJECT: 'enter-object',
+  HOVER_OBJECT: 'hover-object',
+  LEAVE_OBJECT: 'leave-object',
+};
+
+/**
  * @summary Internal identifiers for various stuff
  * @memberOf PSV.constants
  * @enum {string}

@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { CONSTANTS, PSVError, utils } from '../..';
+import { CONSTANTS, PSVError, SYSTEM, utils } from '../..';
 import { getShortestArc, logWarn } from '../../utils';
 import { MARKER_DATA, SVG_NS } from './constants';
 import { getPolygonCenter, getPolylineCenter } from './utils';
@@ -13,6 +13,7 @@ import { getPolygonCenter, getPolylineCenter } from './utils';
  */
 const MARKER_TYPES = {
   image      : 'image',
+  imageLayer : 'imageLayer',
   html       : 'html',
   polygonPx  : 'polygonPx',
   polygonRad : 'polygonRad',
@@ -72,7 +73,7 @@ export class Marker {
     this.visible = true;
 
     /**
-     * @member {HTMLElement|SVGElement}
+     * @member {HTMLElement|SVGElement|THREE.Object3D}
      * @readonly
      */
     this.$el = null;
@@ -100,7 +101,6 @@ export class Marker {
      * @summary Computed properties
      * @member {Object}
      * @protected
-     * @property {boolean} inViewport
      * @property {boolean} dynamicSize
      * @property {PSV.Point} anchor
      * @property {PSV.Position} position - position in spherical coordinates
@@ -111,7 +111,6 @@ export class Marker {
      * @property {*} def
      */
     this.props = {
-      inViewport : false,
       dynamicSize: false,
       anchor     : null,
       position   : null,
@@ -121,6 +120,23 @@ export class Marker {
       height     : null,
       def        : null,
     };
+
+    /**
+     * @summary THREE file loader
+     * @type {THREE:TextureLoader}
+     * @private
+     */
+    this.loader = null;
+
+    if (this.is3d()) {
+      this.loader = new THREE.TextureLoader();
+      if (this.psv.config.withCredentials) {
+        this.loader.setWithCredentials(true);
+      }
+      if (this.psv.config.requestHeaders && typeof this.psv.config.requestHeaders === 'object') {
+        this.loader.setRequestHeader(this.psv.config.requestHeaders);
+      }
+    }
 
     // create element
     if (this.isNormal()) {
@@ -132,12 +148,14 @@ export class Marker {
     else if (this.isPolyline()) {
       this.$el = document.createElementNS(SVG_NS, 'polyline');
     }
-    else {
+    else if (this.isSvg()) {
       this.$el = document.createElementNS(SVG_NS, this.type);
     }
 
-    this.$el.id = `psv-marker-${this.id}`;
-    this.$el[MARKER_DATA] = this;
+    if (!this.is3d()) {
+      this.$el.id = `psv-marker-${this.id}`;
+      this.$el[MARKER_DATA] = this;
+    }
 
     this.update(properties);
   }
@@ -151,6 +169,14 @@ export class Marker {
     delete this.config;
     delete this.props;
     delete this.psv;
+  }
+
+  /**
+   * @summary Checks if it is a 3D marker (imageLayer)
+   * @returns {boolean}
+   */
+  is3d() {
+    return this.type === MARKER_TYPES.imageLayer;
   }
 
   /**
@@ -283,7 +309,7 @@ export class Marker {
       };
 
       if (this.isPoly()) {
-        const boundingRect = this.psv.container.getBoundingClientRect();
+        const viewerPos = utils.getPosition(this.psv.container);
 
         config.box = { // separate the tooltip from the cursor
           width : this.psv.tooltip.size.arrow * 2,
@@ -291,8 +317,8 @@ export class Marker {
         };
 
         if (mousePosition) {
-          config.top = mousePosition.clientY - boundingRect.top - this.psv.tooltip.size.arrow / 2;
-          config.left = mousePosition.clientX - boundingRect.left - this.psv.tooltip.size.arrow;
+          config.top = mousePosition.clientY - viewerPos.top - this.psv.tooltip.size.arrow / 2;
+          config.left = mousePosition.clientX - viewerPos.left - this.psv.tooltip.size.arrow;
         }
         else {
           config.top = this.props.position2D.y;
@@ -340,35 +366,38 @@ export class Marker {
     }
 
     utils.deepmerge(this.config, properties);
-    this.data = this.config.data;
-
-    this.visible = properties.visible !== false;
-
-    // reset CSS class
-    if (this.isNormal()) {
-      this.$el.setAttribute('class', 'psv-marker psv-marker--normal');
-    }
-    else {
-      this.$el.setAttribute('class', 'psv-marker psv-marker--svg');
-    }
-
-    // add CSS classes
-    if (this.config.className) {
-      utils.addClasses(this.$el, this.config.className);
-    }
     if (typeof this.config.tooltip === 'string') {
       this.config.tooltip = { content: this.config.tooltip };
     }
-    if (this.config.tooltip) {
-      utils.addClasses(this.$el, 'psv-marker--has-tooltip');
-    }
-    if (this.config.content) {
-      utils.addClasses(this.$el, 'psv-marler--has-content');
-    }
 
-    // apply style
-    if (this.config.style) {
-      utils.deepmerge(this.$el.style, this.config.style);
+    this.data = this.config.data;
+    this.visible = this.config.visible !== false;
+
+    if (!this.is3d()) {
+      // reset CSS class
+      if (this.isNormal()) {
+        this.$el.setAttribute('class', 'psv-marker psv-marker--normal');
+      }
+      else {
+        this.$el.setAttribute('class', 'psv-marker psv-marker--svg');
+      }
+
+      // add CSS classes
+      if (this.config.className) {
+        utils.addClasses(this.$el, this.config.className);
+      }
+
+      if (this.config.tooltip) {
+        utils.addClasses(this.$el, 'psv-marker--has-tooltip');
+      }
+      if (this.config.content) {
+        utils.addClasses(this.$el, 'psv-marler--has-content');
+      }
+
+      // apply style
+      if (this.config.style) {
+        utils.deepmerge(this.$el.style, this.config.style);
+      }
     }
 
     // parse anchor
@@ -391,8 +420,11 @@ export class Marker {
     else if (this.isPoly()) {
       this.__updatePoly();
     }
-    else {
+    else if (this.isSvg()) {
       this.__updateSvg();
+    }
+    else if (this.is3d()) {
+      this.__update3d();
     }
   }
 
@@ -597,6 +629,71 @@ export class Marker {
     this.props.positions3D = this.props.def.map((coord) => {
       return this.psv.dataHelper.sphericalCoordsToVector3({ longitude: coord[0], latitude: coord[1] });
     });
+  }
+
+  /**
+   * @summary Updates a 3D marker
+   * @private
+   */
+  __update3d() {
+    if (!this.config.width || !this.config.height) {
+      throw new PSVError('missing marker width/height');
+    }
+
+    this.props.dynamicSize = false;
+    this.props.width = this.config.width;
+    this.props.height = this.config.height;
+
+    // convert texture coordinates to spherical coordinates
+    this.props.position = this.psv.dataHelper.cleanPosition(this.config);
+
+    // compute x/y/z position
+    this.props.positions3D = [this.psv.dataHelper.sphericalCoordsToVector3(this.props.position)];
+
+    switch (this.type) {
+      case MARKER_TYPES.imageLayer:
+        if (!this.$el) {
+          const material = new THREE.MeshBasicMaterial({ transparent: true });
+          const geometry = new THREE.PlaneGeometry(1, 1);
+          const mesh = new THREE.Mesh(geometry, material);
+          mesh.userData = { [MARKER_DATA]: this };
+          this.$el = new THREE.Group().add(mesh);
+
+          // overwrite the visible property to be tied to the Marker instance
+          // and do it without context bleed
+          Object.defineProperty(this.$el, 'visible', {
+            enumerable: true,
+            get       : function () {
+              return this.children[0].userData[MARKER_DATA].visible;
+            },
+            set       : function (visible) {
+              this.children[0].userData[MARKER_DATA].visible = visible;
+            },
+          });
+        }
+
+        if (this.props.def !== this.config.imageLayer) {
+          if (this.psv.config.requestHeaders && typeof this.psv.config.requestHeaders === 'function') {
+            this.loader.setRequestHeader(this.psv.config.requestHeaders(this.config.imageLayer));
+          }
+          this.$el.children[0].material.map = this.loader.load(this.config.imageLayer, () => this.psv.needsUpdate());
+          this.props.def = this.config.imageLayer;
+        }
+
+        this.$el.children[0].position.set(
+          this.props.anchor.x - 0.5,
+          this.props.anchor.y - 0.5,
+          0
+        );
+
+        this.$el.position.copy(this.props.positions3D[0]);
+        this.$el.lookAt(0, 0, 0);
+        // 100 is magic number that gives a coherent size at default zoom level
+        this.$el.scale.set(this.config.width / 100 * SYSTEM.pixelRatio, this.config.height / 100 * SYSTEM.pixelRatio, 1);
+        break;
+
+      // no default
+    }
   }
 
   /**

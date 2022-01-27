@@ -78,6 +78,7 @@ export class MarkersPlugin extends AbstractPlugin {
       visible       : true,
       currentMarker : null,
       hoveringMarker: null,
+      stopObserver  : null,
     };
 
     /**
@@ -141,10 +142,7 @@ export class MarkersPlugin extends AbstractPlugin {
   destroy() {
     this.clearMarkers(false);
 
-    this.container.removeEventListener('mouseenter', this);
-    this.container.removeEventListener('mouseleave', this);
-    this.container.removeEventListener('mousemove', this);
-    this.container.removeEventListener('contextmenu', this);
+    this.prop.stopObserver?.();
 
     this.psv.off(CONSTANTS.EVENTS.CLICK, this);
     this.psv.off(CONSTANTS.EVENTS.DOUBLE_CLICK, this);
@@ -169,13 +167,16 @@ export class MarkersPlugin extends AbstractPlugin {
     /* eslint-disable */
     switch (e.type) {
       // @formatter:off
-      case 'mouseenter':  this.__onMouseEnter(e);  break;
-      case 'mouseleave':  this.__onMouseLeave(e);  break;
-      case 'mousemove':   this.__onMouseMove(e);   break;
-      case 'contextmenu': this.__onContextMenu(e); break;
+      case 'mouseenter':  this.__onMouseEnter(e, this.__getTargetMarker(e.target)); break;
+      case 'mouseleave':  this.__onMouseLeave(e, this.__getTargetMarker(e.target)); break;
+      case 'mousemove':   this.__onMouseMove(e, this.__getTargetMarker(e.target));  break;
+      case 'contextmenu': e.preventDefault(); break;
       case CONSTANTS.EVENTS.CLICK:        this.__onClick(e, e.args[0], false); break;
       case CONSTANTS.EVENTS.DOUBLE_CLICK: this.__onClick(e, e.args[0], true);  break;
       case CONSTANTS.EVENTS.RENDER:       this.renderMarkers();                        break;
+      case CONSTANTS.OBJECT_EVENTS.ENTER_OBJECT: this.__onMouseEnter(e.detail.originalEvent, e.detail.data); break;
+      case CONSTANTS.OBJECT_EVENTS.LEAVE_OBJECT: this.__onMouseLeave(e.detail.originalEvent, e.detail.data); break;
+      case CONSTANTS.OBJECT_EVENTS.HOVER_OBJECT: this.__onMouseMove(e.detail.originalEvent, e.detail.data);  break;
       case CONSTANTS.EVENTS.CONFIG_CHANGED:
         this.container.style.cursor = this.psv.config.mousemove ? 'move' : 'default';
         break;
@@ -185,7 +186,7 @@ export class MarkersPlugin extends AbstractPlugin {
   }
 
   /**
-   * @override
+   * @summary Shows all markers
    * @fires PSV.plugins.MarkersPlugin.show-markers
    */
   show() {
@@ -197,7 +198,7 @@ export class MarkersPlugin extends AbstractPlugin {
   }
 
   /**
-   * @override
+   * @summary Hides all markers
    * @fires PSV.plugins.MarkersPlugin.hide-markers
    */
   hide() {
@@ -265,8 +266,11 @@ export class MarkersPlugin extends AbstractPlugin {
     if (marker.isNormal()) {
       this.container.appendChild(marker.$el);
     }
-    else {
+    else if (marker.isPoly() || marker.isSvg()) {
       this.svgContainer.appendChild(marker.$el);
+    }
+    else if (marker.is3d()) {
+      this.psv.renderer.scene.add(marker.$el);
     }
 
     this.markers[marker.id] = marker;
@@ -274,6 +278,7 @@ export class MarkersPlugin extends AbstractPlugin {
     if (render) {
       this.renderMarkers();
       this.__refreshUi();
+      this.__checkObjectsObserver();
 
       this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
@@ -321,6 +326,10 @@ export class MarkersPlugin extends AbstractPlugin {
       this.renderMarkers();
       this.__refreshUi();
 
+      if (marker.is3d()) {
+        this.psv.needsUpdate();
+      }
+
       this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
 
@@ -338,8 +347,12 @@ export class MarkersPlugin extends AbstractPlugin {
     if (marker.isNormal()) {
       this.container.removeChild(marker.$el);
     }
-    else {
+    else if (marker.isPoly() || marker.isSvg()) {
       this.svgContainer.removeChild(marker.$el);
+    }
+    else if (marker.is3d()) {
+      this.psv.renderer.scene.remove(marker.$el);
+      this.psv.needsUpdate();
     }
 
     if (this.prop.hoveringMarker === marker) {
@@ -357,6 +370,7 @@ export class MarkersPlugin extends AbstractPlugin {
 
     if (render) {
       this.__refreshUi();
+      this.__checkObjectsObserver();
 
       this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
@@ -372,6 +386,7 @@ export class MarkersPlugin extends AbstractPlugin {
 
     if (render) {
       this.__refreshUi();
+      this.__checkObjectsObserver();
 
       this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
@@ -390,6 +405,7 @@ export class MarkersPlugin extends AbstractPlugin {
     if (render) {
       this.renderMarkers();
       this.__refreshUi();
+      this.__checkObjectsObserver();
 
       this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
@@ -405,6 +421,7 @@ export class MarkersPlugin extends AbstractPlugin {
     if (render) {
       this.renderMarkers();
       this.__refreshUi();
+      this.__checkObjectsObserver();
 
       this.trigger(EVENTS.SET_MARKERS, this.getMarkers());
     }
@@ -434,8 +451,7 @@ export class MarkersPlugin extends AbstractPlugin {
    * @param {string} markerId
    */
   hideMarker(markerId) {
-    this.getMarker(markerId).visible = false;
-    this.renderMarkers();
+    this.toggleMarker(markerId, false);
   }
 
   /**
@@ -443,17 +459,23 @@ export class MarkersPlugin extends AbstractPlugin {
    * @param {string} markerId
    */
   showMarker(markerId) {
-    this.getMarker(markerId).visible = true;
-    this.renderMarkers();
+    this.toggleMarker(markerId, true);
   }
 
   /**
    * @summary Toggles a marker
    * @param {string} markerId
+   * @param {boolean} [visible]
    */
-  toggleMarker(markerId) {
-    this.getMarker(markerId).visible ^= true;
-    this.renderMarkers();
+  toggleMarker(markerId, visible = null) {
+    const marker = this.getMarker(markerId);
+    marker.visible = visible === null ? !marker.visible : visible;
+    if (marker.is3d()) {
+      this.psv.needsUpdate();
+    }
+    else {
+      this.renderMarkers();
+    }
   }
 
   /**
@@ -540,14 +562,18 @@ export class MarkersPlugin extends AbstractPlugin {
 
     utils.each(this.markers, (marker) => {
       let isVisible = this.prop.visible && marker.visible;
+      let position = null;
 
-      if (isVisible && marker.isPoly()) {
+      if (isVisible && marker.is3d()) {
+        position = this.__getMarkerPosition(marker);
+        isVisible = this.__isMarkerVisible(marker, position);
+      }
+      else if (isVisible && marker.isPoly()) {
         const positions = this.__getPolyPositions(marker);
         isVisible = positions.length > (marker.isPolygon() ? 2 : 1);
 
         if (isVisible) {
-          const position = this.__getMarkerPosition(marker);
-          marker.props.position2D = position;
+          position = this.__getMarkerPosition(marker);
 
           const points = positions.map(pos => (pos.x - position.x) + ',' + (pos.y - position.y)).join(' ');
 
@@ -560,11 +586,10 @@ export class MarkersPlugin extends AbstractPlugin {
           this.__updateMarkerSize(marker);
         }
 
-        const position = this.__getMarkerPosition(marker);
+        position = this.__getMarkerPosition(marker);
         isVisible = this.__isMarkerVisible(marker, position);
 
         if (isVisible) {
-          marker.props.position2D = position;
           const scale = marker.getScale(zoomLevel, viewerPosition);
 
           if (marker.isSvg()) {
@@ -579,13 +604,16 @@ export class MarkersPlugin extends AbstractPlugin {
         }
       }
 
-      marker.props.inViewport = isVisible;
-      utils.toggleClass(marker.$el, 'psv-marker--visible', isVisible);
+      marker.props.position2D = isVisible ? position : null;
 
-      if (marker.props.inViewport && (this.prop.showAllTooltips || (marker === this.prop.hoveringMarker && !marker.isPoly()))) {
+      if (!marker.is3d()) {
+        utils.toggleClass(marker.$el, 'psv-marker--visible', isVisible);
+      }
+
+      if (isVisible && (this.prop.showAllTooltips || (marker === this.prop.hoveringMarker && !marker.isPoly()))) {
         marker.showTooltip();
       }
-      else if (!marker.props.inViewport || marker !== this.prop.hoveringMarker) {
+      else if (!isVisible || marker !== this.prop.hoveringMarker) {
         marker.hideTooltip();
       }
     });
@@ -767,12 +795,11 @@ export class MarkersPlugin extends AbstractPlugin {
   /**
    * @summary Handles mouse enter events, show the tooltip for non polygon markers
    * @param {MouseEvent} e
+   * @param {PSV.plugins.MarkersPlugin.Marker} [marker]
    * @fires PSV.plugins.MarkersPlugin.over-marker
    * @private
    */
-  __onMouseEnter(e) {
-    const marker = this.__getTargetMarker(e.target);
-
+  __onMouseEnter(e, marker) {
     if (marker && !marker.isPoly()) {
       this.prop.hoveringMarker = marker;
 
@@ -787,12 +814,11 @@ export class MarkersPlugin extends AbstractPlugin {
   /**
    * @summary Handles mouse leave events, hide the tooltip
    * @param {MouseEvent} e
+   * @param {PSV.plugins.MarkersPlugin.Marker} [marker]
    * @fires PSV.plugins.MarkersPlugin.leave-marker
    * @private
    */
-  __onMouseLeave(e) {
-    const marker = this.__getTargetMarker(e.target);
-
+  __onMouseLeave(e, marker) {
     // do not hide if we enter the tooltip itself while hovering a polygon
     if (marker && !(marker.isPoly() && this.__targetOnTooltip(e.relatedTarget, marker.tooltip))) {
       this.trigger(EVENTS.LEAVE_MARKER, marker);
@@ -808,13 +834,13 @@ export class MarkersPlugin extends AbstractPlugin {
   /**
    * @summary Handles mouse move events, refreshUi the tooltip for polygon markers
    * @param {MouseEvent} e
+   * @param {PSV.plugins.MarkersPlugin.Marker} [targetMarker]
    * @fires PSV.plugins.MarkersPlugin.leave-marker
    * @fires PSV.plugins.MarkersPlugin.over-marker
    * @private
    */
-  __onMouseMove(e) {
+  __onMouseMove(e, targetMarker) {
     let marker;
-    const targetMarker = this.__getTargetMarker(e.target);
 
     if (targetMarker?.isPoly()) {
       marker = targetMarker;
@@ -847,20 +873,6 @@ export class MarkersPlugin extends AbstractPlugin {
   }
 
   /**
-   * @summary Handles context menu events
-   * @param {MouseWheelEvent} evt
-   * @private
-   */
-  __onContextMenu(evt) {
-    if (!utils.getClosest(evt.target, '.psv-marker')) {
-      return true;
-    }
-
-    evt.preventDefault();
-    return false;
-  }
-
-  /**
    * @summary Handles mouse click events, select the marker and open the panel if necessary
    * @param {Event} e
    * @param {Object} data
@@ -870,7 +882,11 @@ export class MarkersPlugin extends AbstractPlugin {
    * @private
    */
   __onClick(e, data, dblclick) {
-    const marker = this.__getTargetMarker(data.target, true);
+    let marker = data.objects.find(o => o.userData[MARKER_DATA])?.userData[MARKER_DATA];
+
+    if (!marker) {
+      marker = this.__getTargetMarker(data.target, true);
+    }
 
     if (marker) {
       this.prop.currentMarker = marker;
@@ -936,6 +952,22 @@ export class MarkersPlugin extends AbstractPlugin {
       else if (this.psv.panel.isVisible(ID_PANEL_MARKER)) {
         this.prop.currentMarker ? this.showMarkerPanel(this.prop.currentMarker) : this.psv.panel.hide();
       }
+    }
+  }
+
+  /**
+   * @summary Adds or remove the objects observer if there are 3D markers
+   * @private
+   */
+  __checkObjectsObserver() {
+    const has3d = Object.values(this.markers).some(marker => marker.is3d());
+
+    if (!has3d && this.prop.stopObserver) {
+      this.prop.stopObserver();
+      this.prop.stopObserver = null;
+    }
+    else if (has3d && !this.prop.stopObserver) {
+      this.prop.stopObserver = this.psv.observeObjects(MARKER_DATA, this);
     }
   }
 

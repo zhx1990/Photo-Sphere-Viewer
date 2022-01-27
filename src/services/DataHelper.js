@@ -148,7 +148,7 @@ export class DataHelper extends AbstractService {
    * @returns {external:THREE.Vector3}
    */
   viewerCoordsToVector3(viewerPoint) {
-    const sphereIntersect = this.getIntersection(viewerPoint, 'psvSphere');
+    const sphereIntersect = this.getIntersections(viewerPoint).filter(i => i.object.userData.psvSphere);
 
     if (sphereIntersect) {
       return sphereIntersect.point;
@@ -183,19 +183,18 @@ export class DataHelper extends AbstractService {
   }
 
   /**
-   * @summary Returns the first intersection with the cursor and having specific data
+   * @summary Returns intersections with objects in the scene
    * @param {PSV.Point} viewerPoint
-   * @param {string} objectDataName
-   * @return {external:THREE.Intersection}
+   * @return {external:THREE.Intersection[]}
    */
-  getIntersection(viewerPoint, objectDataName) {
+  getIntersections(viewerPoint) {
     vector2.x = 2 * viewerPoint.x / this.prop.size.width - 1;
     vector2.y = -2 * viewerPoint.y / this.prop.size.height + 1;
 
     this.psv.renderer.raycaster.setFromCamera(vector2, this.psv.renderer.camera);
 
-    const intersects = this.psv.renderer.raycaster.intersectObjects(this.psv.renderer.scene.children, true);
-    return intersects.find(i => i.object.userData?.[objectDataName]);
+    return this.psv.renderer.raycaster.intersectObjects(this.psv.renderer.scene.children, true)
+      .filter(i => !!i.object.userData);
   }
 
   /**

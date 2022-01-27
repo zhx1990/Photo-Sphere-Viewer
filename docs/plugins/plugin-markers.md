@@ -15,7 +15,7 @@ The plugin provides a powerful markers system allowing to define points of inter
 There are four types of markers :
 
 - **HTML** defined with the `html` attribute
-- **Images** defined with the `image` attribute
+- **Images** defined with the `image` or `imageLayer` attribute
 - **SVGs** defined with the `rect`, `circle`, `ellipse` or `path` attribute
 - **Dynamic polygons & polylines** defined with the `polygonPx`/`polygonRad`/`polylinePx`/`polylineRad` attribute
 
@@ -66,6 +66,7 @@ One of these options is required.
 | Name | Type | Description |
 |---|---|---|
 | `image` | `string` | Path to the image representing the marker. Requires `width` and `height` to be defined. |
+| `imageLayer` | `string` | Path to the image representing the marker. Requires `width` and `height` to be defined. |
 | `html` | `string` | HTML content of the marker. It is recommended to define `width` and `height`. |
 | `square` | `integer` | Size of the square. |
 | `rect` | `integer[2] |`<br>`{width:int,height:int}` | Size of the rectangle. |
@@ -82,6 +83,7 @@ One of these options is required.
 ```js
 {
   image: 'pin-red.png',
+  imageLayer: 'pin-blue.png',
   html: 'Click here',
   square: 10,
   rect: [10, 5],
@@ -97,6 +99,11 @@ One of these options is required.
 }
 ```
 
+::: tip What is the difference between "image" and "imageLayer" ?
+Both allows to display an image but the difference is in the rendering technique.  
+And `image` marker is rendered flat above the viewer but and `imageLayer` is rendered inside the panorama itself, this allows for more natural movements and scaling.
+:::
+
 ::: warning
 Texture coordinates are not applicable to cubemaps.
 :::
@@ -110,24 +117,24 @@ Texture coordinates are not applicable to cubemaps.
 
 Unique identifier of the marker.
 
-#### `x` & `y` or `latitude` & `longitude` (required)
+#### `x` & `y` or `latitude` & `longitude` (required for all but polygons/polylines)
 - type: `integer` or `double`
 
-Position of the marker in **texture coordinates** (pixels) or **spherical coordinates** (radians).
-_(This option is ignored for polygons and polylines)_
+Position of the marker in **texture coordinates** (pixels) or **spherical coordinates** (radians).  
+_(This option is ignored for polygons and polylines)._
 
 #### `width` & `height` (required for images, recommended for html)
 - type: `integer`
 
-Size of the marker.
-_(This option is ignored for polygons and polylines)_
+Size of the marker in pixels.  
+_(This option is ignored for polygons and polylines)._
 
 #### `scale`
 - type: `double[] | { zoom: double[], longitude: [] }`
 - default: no scalling
 
-Configures the scale of the marker depending on the zoom level and/or the longitude offset. This aims to give a natural feeling to the size of the marker as the users zooms and moves.
-_(This option is ignored for polygons and polylines)_
+Configures the scale of the marker depending on the zoom level and/or the longitude offset. This aims to give a natural feeling to the size of the marker as the users zooms and moves.  
+_(This option is ignored for polygons, polylines and imageLayer)._
 
 Scales depending on zoom level, the array contains `[scale at minimum zoom, scale at maximum zoom]` :
 ```js
@@ -159,12 +166,14 @@ scale: {
 #### `className`
 - type: `string`
 
-CSS class(es) added to the marker element.
+CSS class(es) added to the marker element.  
+_(This option is ignored for imageLayer markers)._
 
 #### `style`
 - type: `object`
 
-CSS properties to set on the marker (background, border, etc.).
+CSS properties to set on the marker (background, border, etc.).  
+_(This option is ignored for imageLayer markers)._
 
 ```js
 style: {
@@ -176,7 +185,8 @@ style: {
 #### `svgStyle`
 - type: `object`
 
-SVG properties to set on the marker (fill, stroke, etc.). _Only for SVG and polygons/polylines markers._
+SVG properties to set on the marker (fill, stroke, etc.).  
+_(Only for polygons, polylines and svg markers)._
 
 ```js
 svgStyle: {
@@ -209,8 +219,8 @@ And use it in your marker : `fill: 'url(#image)'`.
 - type: `string`
 - default: `'center center'`
 
-Defines where the marker is placed toward its defined position. Any CSS position is valid like `bottom center` or `20% 80%`.
-_(This option is ignored for polygons and polylines)_
+Defines where the marker is placed toward its defined position. Any CSS position is valid like `bottom center` or `20% 80%`.  
+_(This option is ignored for polygons and polylines)._
 
 #### `visible`
 - type: `boolean`
@@ -252,7 +262,7 @@ Hide the marker in the markers list.
 #### `data`
 - type: `any`
 
-Any custom data you want to attach to the marker.
+Any custom data you want to attach to the marker. You may access this data in the various [events](#events).
 
 
 ## Configuration
@@ -342,12 +352,12 @@ Replaces all markers by new ones.
 
 #### `updateMarker(properties)`
 
-Updates a marker with new properties. The type of marker cannot be changed.
+Updates a marker with new properties. The type of the marker cannot be changed.
 
 ```js
 markersPlugin.updateMarker({
   id: 'existing-marker',
-  image: 'assets/pin-blue.png'
+  image: 'assets/pin-blue.png',
 });
 ```
 

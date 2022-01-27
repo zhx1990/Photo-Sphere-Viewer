@@ -62,9 +62,9 @@ export class DataHelper {
   sphericalCoordsToViewerCoords(position: Position): Point;
 
   /**
-   * @summary Returns the first intersection with the cursor and having specific data
+   * @summary Returns intersections with objects in the scene
    */
-  getIntersection(viewerPoint: Point, objectDataName: string): Intersection;
+  getIntersections(viewerPoint: Point): Intersection[];
 
   /**
    * @summary Converts x/y to latitude/longitude if present and ensure boundaries

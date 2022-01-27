@@ -34,7 +34,7 @@
   },
   "dependencies": {
     "three": "^0.137.0",
-    "uevent": "~2.0.1"
+    "uevent": "^2.1.0"
   },
   "devDependencies": {
     "@babel/core": "^7.15.0",

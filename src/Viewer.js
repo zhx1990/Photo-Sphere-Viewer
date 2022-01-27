@@ -79,6 +79,7 @@ export class Viewer extends EventEmitter {
      * @property {PSV.Animation} animationPromise - promise of the current animation
      * @property {Promise} loadingPromise - promise of the setPanorama method
      * @property startTimeout - timeout id of the automatic rotation delay
+     * @property {object} objectsObservers
      * @property {PSV.Size} size - size of the container
      * @property {PSV.PanoData} panoData - panorama metadata, if supported
      */
@@ -95,6 +96,7 @@ export class Viewer extends EventEmitter {
       animationPromise : null,
       loadingPromise   : null,
       startTimeout     : null,
+      objectsObservers : {},
       size             : {
         width : 0,
         height: 0,
@@ -906,6 +908,21 @@ export class Viewer extends EventEmitter {
    */
   stopKeyboardControl() {
     this.eventsHandler.disableKeyboard();
+  }
+
+  /**
+   * @summary Subscribes to events on objects in the scene
+   * @param {string} userDataKey - only objects with the following `userData` will be emitted
+   * @param {EventListener} listener - must implement `handleEvent
+   * @return {function} call to stop the subscription
+   * @package
+   */
+  observeObjects(userDataKey, listener) {
+    this.prop.objectsObservers[userDataKey] = { listener };
+
+    return () => {
+      delete this.prop.objectsObservers[userDataKey];
+    };
   }
 
   /**

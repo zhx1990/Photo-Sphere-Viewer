@@ -10,12 +10,24 @@ import {
   KEY_CODES,
   LONGTOUCH_DELAY,
   MOVE_THRESHOLD,
+  OBJECT_EVENTS,
   TWOFINGERSOVERLAY_DELAY
 } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import gestureIcon from '../icons/gesture.svg';
 import mousewheelIcon from '../icons/mousewheel.svg';
-import { clone, distance, getClosest, getEventKey, isFullscreenEnabled, normalizeWheel, throttle } from '../utils';
+import {
+  clone,
+  distance,
+  each,
+  getClosest,
+  getEventKey,
+  getPosition,
+  isEmpty,
+  isFullscreenEnabled,
+  normalizeWheel,
+  throttle
+} from '../utils';
 import { PressHandler } from '../utils/PressHandler';
 import { AbstractService } from './AbstractService';
 
@@ -303,16 +315,59 @@ export class EventsHandler extends AbstractService {
    * @private
    */
   __onMouseMove(evt) {
-    if (!this.config.mousemove) {
-      return;
+    if (this.config.mousemove) {
+      if (evt.buttons !== 0) {
+        evt.preventDefault();
+        this.__move(evt);
+      }
+      else if (this.config.captureCursor) {
+        this.__moveAbsolute(evt);
+      }
     }
 
-    if (evt.buttons !== 0) {
-      evt.preventDefault();
-      this.__move(evt);
-    }
-    else if (this.config.captureCursor) {
-      this.__moveAbsolute(evt);
+    if (!isEmpty(this.prop.objectsObservers)) {
+      const viewerPos = getPosition(this.psv.container);
+
+      const viewerPoint = {
+        x: evt.clientX - viewerPos.left,
+        y: evt.clientY - viewerPos.top,
+      };
+
+      const intersections = this.psv.dataHelper.getIntersections(viewerPoint);
+
+      const emit = (observer, key, type) => {
+        observer.listener.handleEvent(new CustomEvent(type, {
+          detail: {
+            originalEvent: evt,
+            object       : observer.object,
+            data         : observer.object.userData[key],
+            viewerPoint  : viewerPoint,
+          },
+        }));
+      };
+
+      each(this.prop.objectsObservers, (observer, key) => {
+        const intersection = intersections.find(i => i.object.userData[key]);
+
+        if (intersection) {
+          if (observer.object && intersection.object !== observer.object) {
+            emit(observer, key, OBJECT_EVENTS.LEAVE_OBJECT);
+            delete observer.object;
+          }
+
+          if (!observer.object) {
+            observer.object = intersection.object;
+            emit(observer, key, OBJECT_EVENTS.ENTER_OBJECT);
+          }
+          else {
+            emit(observer, key, OBJECT_EVENTS.HOVER_OBJECT);
+          }
+        }
+        else if (observer.object) {
+          emit(observer, key, OBJECT_EVENTS.LEAVE_OBJECT);
+          delete observer.object;
+        }
+      });
     }
   }
 
@@ -613,15 +668,19 @@ export class EventsHandler extends AbstractService {
       viewerY   : evt.clientY - boundingRect.top,
     };
 
-    const intersect = this.psv.dataHelper.viewerCoordsToVector3({
+    const intersections = this.psv.dataHelper.getIntersections({
       x: data.viewerX,
       y: data.viewerY,
     });
 
-    if (intersect) {
-      const sphericalCoords = this.psv.dataHelper.vector3ToSphericalCoords(intersect);
+    const sphereIntersection = intersections.find(i => i.object.userData.psvSphere);
+
+    if (sphereIntersection) {
+      const sphericalCoords = this.psv.dataHelper.vector3ToSphericalCoords(sphereIntersection.point);
       data.longitude = sphericalCoords.longitude;
       data.latitude = sphericalCoords.latitude;
+
+      data.objects = intersections.map(i => i.object).filter(o => !o.userData.psvSphere);
 
       try {
         const textureCoords = this.psv.dataHelper.sphericalCoordsToTextureCoords(data);

@@ -242,7 +242,7 @@
             {{ markerForm.saved ? 'Edit' : 'New' }} <code>{{ markerForm.type }}</code> marker
           </div>
           <div class="md-subhead">
-            <span v-if="markerForm.type === 'image' || markerForm.type === 'html'">
+            <span v-if="markerForm.type === 'image' || markerForm.type === 'imageLayer' || markerForm.type === 'html'">
               Click on the viewer the {{ markerForm.saved ? 'move' : 'place' }} the marker.
             </span>
             <span v-else-if="markerForm.type === 'polygonRad' || markerForm.type === 'polylineRad'">
@@ -296,21 +296,21 @@
               </div>
             </div>
 
-            <div class="md-layout md-gutter" v-if="markerForm.type === 'image'">
+            <div class="md-layout md-gutter" v-if="markerForm.type === 'image' || markerForm.type === 'imageLayer'">
               <md-button class="md-icon-button md-raised" style="margin: 15px 0 0 20px;"
-                         v-bind:class="{'md-primary': markerForm.image === PIN_RED_URL }"
-                         v-on:click="markerForm.image = PIN_RED_URL">
+                         v-bind:class="{'md-primary': markerForm[markerForm.type] === PIN_RED_URL }"
+                         v-on:click="markerForm[markerForm.type] = PIN_RED_URL">
                 <img v-bind:src="PIN_RED_URL" width="32px">
               </md-button>
               <md-button class="md-icon-button md-raised" style="margin: 15px 0 0 15px;"
-                         v-bind:class="{'md-primary': markerForm.image === PIN_BLUE_URL }"
-                         v-on:click="markerForm.image = PIN_BLUE_URL">
+                         v-bind:class="{'md-primary': markerForm[markerForm.type] === PIN_BLUE_URL }"
+                         v-on:click="markerForm[markerForm.type] = PIN_BLUE_URL">
                 <img v-bind:src="PIN_BLUE_URL" width="32px">
               </md-button>
               <div class="md-layout-item">
                 <md-field>
                   <label>Image URL</label>
-                  <md-input type="text" v-model="markerForm.image"/>
+                  <md-input type="text" v-model="markerForm[markerForm.type]"/>
                 </md-field>
               </div>
             </div>
@@ -341,19 +341,19 @@
               </div>
             </div>
 
-            <div class="md-layout md-gutter" v-if="markerForm.type === 'image' || markerForm.type === 'html'">
+            <div class="md-layout md-gutter" v-if="markerForm.type === 'image' || markerForm.type === 'imageLayer' || markerForm.type === 'html'">
               <div class="md-layout-item md-size-33">
                 <md-field>
                   <label>Width</label>
                   <md-input type="number" min="0" step="1" v-model="markerForm.width"
-                            :required="markerForm.type === 'image'"/>
+                            :required="markerForm.type === 'image' || markerForm.type === 'imageLayer'"/>
                 </md-field>
               </div>
               <div class="md-layout-item md-size-33">
                 <md-field>
                   <label>Height</label>
                   <md-input type="number" min="0" step="1" v-model="markerForm.height"
-                            :required="markerForm.type === 'image'"/>
+                            :required="markerForm.type === 'image' || markerForm.type === 'imageLayer'"/>
                 </md-field>
               </div>
 
@@ -435,6 +435,7 @@
 
               <md-menu-content>
                 <md-menu-item v-on:click="newMarker('image')">Image</md-menu-item>
+                <md-menu-item v-on:click="newMarker('imageLayer')">Image layer</md-menu-item>
                 <md-menu-item v-on:click="newMarker('html')">Text</md-menu-item>
                 <md-menu-item v-on:click="newMarker('polygonRad')">Polygon</md-menu-item>
                 <md-menu-item v-on:click="newMarker('polylineRad')">Polyline</md-menu-item>
@@ -541,6 +542,7 @@
         id         : null,
         type       : null,
         image      : null,
+        imageLayer : null,
         html       : null,
         polygonRad : null,
         polylineRad: null,
@@ -736,6 +738,13 @@
             this.markerForm.image = this.PIN_RED_URL;
             this.markerForm.width = 32;
             this.markerForm.height = 32;
+            this.markerForm.anchor = 'bottom center';
+            break;
+          case 'imageLayer':
+            this.markerForm.imageLayer = this.PIN_RED_URL;
+            this.markerForm.width = 48;
+            this.markerForm.height = 48;
+            this.markerForm.anchor = 'bottom center';
             break;
           case 'html':
             this.markerForm.html = 'Test content';
@@ -803,6 +812,7 @@
 
         switch (this.markerForm.type) {
           case 'image':
+          case 'imageLayer':
           case 'html':
             if (!this.markerForm.saved) {
               this.markers.addMarker({

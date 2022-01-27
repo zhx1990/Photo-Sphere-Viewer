@@ -3,6 +3,7 @@ import { Event } from 'uevent';
 
 export type MarkerType =
   'image'
+  | 'imageLayer'
   | 'html'
   | 'square'
   | 'rect'
@@ -19,6 +20,7 @@ export type MarkerType =
  */
 export type MarkerProperties = Partial<ExtendedPosition> & {
   image?: string;
+  imageLayer?: string;
   html?: string;
   square?: number;
   rect?: [number, number] | { width: number, height: number };
@@ -70,6 +72,11 @@ export class Marker {
   readonly visible: boolean;
   readonly config: MarkerProperties;
   readonly data?: any;
+
+  /**
+   * @summary Checks if it is a 3D marker (imageLayer)
+   */
+  is3d(): boolean;
 
   /**
    * @summary Checks if it is a normal marker (image or html)
