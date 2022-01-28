@@ -141,17 +141,19 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
      * @property {external:THREE.SphereGeometry} geom
      * @property {*} originalUvs
      * @property {external:THREE.MeshBasicMaterial} errorMaterial
+     * @property {external:THREE.Quaternion} sphereQuaternion
      * @private
      */
     this.prop = {
-      colSize      : 0,
-      rowSize      : 0,
-      facesByCol   : 0,
-      facesByRow   : 0,
-      tiles        : {},
-      geom         : null,
-      originalUvs  : null,
-      errorMaterial: null,
+      colSize         : 0,
+      rowSize         : 0,
+      facesByCol      : 0,
+      facesByRow      : 0,
+      tiles           : {},
+      geom            : null,
+      originalUvs     : null,
+      errorMaterial   : null,
+      sphereQuaternion: new THREE.Quaternion(),
     };
 
     /**
@@ -310,7 +312,10 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
 
     // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));
 
-    setTimeout(() => this.__refresh(true));
+    setTimeout(() => {
+      this.prop.sphereQuaternion.setFromEuler(this.psv.renderer.meshContainer.rotation);
+      this.__refresh(true);
+    });
   }
 
   /**
@@ -474,6 +479,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
             verticesPosition.getY(vertexIdx),
             verticesPosition.getZ(vertexIdx)
           );
+          vertexPosition.applyQuaternion(this.prop.sphereQuaternion);
           return frustum.containsPoint(vertexPosition);
         });
 

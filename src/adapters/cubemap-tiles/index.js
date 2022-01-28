@@ -107,15 +107,17 @@ export class CubemapTilesAdapter extends CubemapAdapter {
      * @property {external:THREE.BoxGeometry} geom
      * @property {*} originalUvs
      * @property {external:THREE.MeshBasicMaterial} errorMaterial
+     * @property {external:THREE.Quaternion} sphereQuaternion
      * @private
      */
     this.prop = {
-      tileSize     : 0,
-      facesByTile  : 0,
-      tiles        : {},
-      geom         : null,
-      originalUvs  : null,
-      errorMaterial: null,
+      tileSize        : 0,
+      facesByTile     : 0,
+      tiles           : {},
+      geom            : null,
+      originalUvs     : null,
+      errorMaterial   : null,
+      sphereQuaternion: new THREE.Quaternion(),
     };
 
     /**
@@ -259,7 +261,10 @@ export class CubemapTilesAdapter extends CubemapAdapter {
 
     // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));
 
-    setTimeout(() => this.__refresh(true));
+    setTimeout(() => {
+      this.prop.sphereQuaternion.setFromEuler(this.psv.renderer.meshContainer.rotation);
+      this.__refresh(true);
+    });
   }
 
   /**
@@ -340,6 +345,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
               verticesPosition.getY(vertexIdx),
               verticesPosition.getZ(vertexIdx)
             );
+            vertexPosition.applyQuaternion(this.prop.sphereQuaternion);
             return frustum.containsPoint(vertexPosition);
           });
 
