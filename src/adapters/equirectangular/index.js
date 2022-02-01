@@ -78,9 +78,9 @@ export class EquirectangularAdapter extends AbstractAdapter {
           croppedHeight: firstNonNull(newPanoData?.croppedHeight, xmpPanoData?.croppedHeight, img.height),
           croppedX     : firstNonNull(newPanoData?.croppedX, xmpPanoData?.croppedX, 0),
           croppedY     : firstNonNull(newPanoData?.croppedY, xmpPanoData?.croppedY, 0),
-          poseHeading  : firstNonNull(newPanoData?.poseHeading, xmpPanoData?.poseHeading),
-          posePitch    : firstNonNull(newPanoData?.posePitch, xmpPanoData?.posePitch),
-          poseRoll     : firstNonNull(newPanoData?.poseRoll, xmpPanoData?.poseRoll),
+          poseHeading  : firstNonNull(newPanoData?.poseHeading, xmpPanoData?.poseHeading, 0),
+          posePitch    : firstNonNull(newPanoData?.posePitch, xmpPanoData?.posePitch, 0),
+          poseRoll     : firstNonNull(newPanoData?.poseRoll, xmpPanoData?.poseRoll, 0),
         };
 
         if (panoData.croppedWidth !== img.width || panoData.croppedHeight !== img.height) {

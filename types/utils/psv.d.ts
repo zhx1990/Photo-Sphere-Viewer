@@ -1,4 +1,4 @@
-import { Texture } from 'three';
+import { Euler, Texture, Vector3 } from 'three';
 import { ExtendedPosition, Point } from '../models';
 
 /**
@@ -52,3 +52,8 @@ export function parseAngle(angle: string | number, zeroCenter?: boolean, halfCir
  * @summary Creates a THREE texture from an image
  */
 export function createTexture(img: HTMLImageElement | HTMLCanvasElement): Texture;
+
+/**
+ * @summary Applies the inverse of Euler angles to a vector
+ */
+export function applyEulerInverse(vector: Vector3, euler: Euler);

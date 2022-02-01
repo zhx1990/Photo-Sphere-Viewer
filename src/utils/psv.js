@@ -318,3 +318,15 @@ export function createTexture(img) {
   texture.generateMipmaps = false;
   return texture;
 }
+
+const quaternion = new THREE.Quaternion();
+
+/**
+ * @summary Applies the inverse of Euler angles to a vector
+ * @param {external:THREE.Vector3} vector
+ * @param {external:THREE.Euler} euler
+ */
+export function applyEulerInverse(vector, euler) {
+  quaternion.setFromEuler(euler).invert();
+  vector.applyQuaternion(quaternion);
+}

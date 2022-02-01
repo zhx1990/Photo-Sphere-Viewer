@@ -108,6 +108,9 @@ export class Viewer extends EventEmitter {
         croppedHeight: 0,
         croppedX     : 0,
         croppedY     : 0,
+        poseHeading  : 0,
+        posePitch    : 0,
+        poseRoll     : 0,
       },
     };
 

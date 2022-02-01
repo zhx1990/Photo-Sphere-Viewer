@@ -168,6 +168,11 @@ export {
  */
 
 /**
+ * @typedef {Object} external:THREE.Euler
+ * @summary {@link https://threejs.org/docs/index.html#api/en/math/Euler}
+ */
+
+/**
  * @typedef {Object} external:THREE.Texture
  * @summary {@link https://threejs.org/docs/index.html#api/en/textures/Texture}
  */

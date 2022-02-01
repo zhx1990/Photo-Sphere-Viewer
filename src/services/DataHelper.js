@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import { SPHERE_RADIUS } from '../data/constants';
 import { PSVError } from '../PSVError';
-import { parseAngle, parseSpeed } from '../utils';
+import { applyEulerInverse, parseAngle, parseSpeed } from '../utils';
 import { AbstractService } from './AbstractService';
 
 const vector2 = new THREE.Vector2();
 const vector3 = new THREE.Vector3();
+const eulerZero = new THREE.Euler(0, 0, 0, 'ZXY');
 
 /**
  * @summary Collections of data converters for the current viewer
@@ -82,12 +83,21 @@ export class DataHelper extends AbstractService {
     const relativeX = (point.x + panoData.croppedX) / panoData.fullWidth * Math.PI * 2;
     const relativeY = (point.y + panoData.croppedY) / panoData.fullHeight * Math.PI;
 
-    // TODO apply the inverse transformation from sphereCorrection/panoData[pose]
-
-    return {
+    const result = {
       longitude: relativeX >= Math.PI ? relativeX - Math.PI : relativeX + Math.PI,
       latitude : Math.PI / 2 - relativeY,
     };
+
+    // Apply panoData pose and sphereCorrection
+    if (!eulerZero.equals(this.psv.renderer.mesh.rotation) || !eulerZero.equals(this.psv.renderer.meshContainer.rotation)) {
+      this.sphericalCoordsToVector3(result, vector3);
+      vector3.applyEuler(this.psv.renderer.mesh.rotation);
+      vector3.applyEuler(this.psv.renderer.meshContainer.rotation);
+      return this.vector3ToSphericalCoords(vector3);
+    }
+    else {
+      return result;
+    }
   }
 
   /**
@@ -100,6 +110,14 @@ export class DataHelper extends AbstractService {
     const panoData = this.prop.panoData;
     if (!panoData) {
       throw new PSVError('Current adapter does not support texture coordinates.');
+    }
+
+    // Apply panoData pose and sphereCorrection
+    if (!eulerZero.equals(this.psv.renderer.mesh.rotation) || !eulerZero.equals(this.psv.renderer.meshContainer.rotation)) {
+      this.sphericalCoordsToVector3(position, vector3);
+      applyEulerInverse(vector3, this.psv.renderer.meshContainer.rotation);
+      applyEulerInverse(vector3, this.psv.renderer.mesh.rotation);
+      position = this.vector3ToSphericalCoords(vector3);
     }
 
     const relativeLong = position.longitude / Math.PI / 2 * panoData.fullWidth;
@@ -221,9 +239,22 @@ export class DataHelper extends AbstractService {
    */
   cleanSphereCorrection(sphereCorrection) {
     return {
-      pan : parseAngle(sphereCorrection.pan || 0),
-      tilt: parseAngle(sphereCorrection.tilt || 0, true),
-      roll: parseAngle(sphereCorrection.roll || 0, true, false),
+      pan : parseAngle(sphereCorrection?.pan || 0),
+      tilt: parseAngle(sphereCorrection?.tilt || 0, true),
+      roll: parseAngle(sphereCorrection?.roll || 0, true, false),
+    };
+  }
+
+  /**
+   * @summary Parse the pose angles of the pano data
+   * @param {PSV.PanoData} panoData
+   * @returns {PSV.SphereCorrection}
+   */
+  cleanPanoramaPose(panoData) {
+    return {
+      pan : THREE.Math.degToRad(panoData?.posePitch || 0),
+      tilt: THREE.Math.degToRad(panoData?.poseHeading || 0),
+      roll: THREE.Math.degToRad(panoData?.poseRoll || 0),
     };
   }
 

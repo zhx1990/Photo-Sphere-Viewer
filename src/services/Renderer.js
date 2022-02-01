@@ -2,7 +2,7 @@ import * as THREE from 'three';
 import { Animation } from '../Animation';
 import { EVENTS, SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
-import { each, isExtendedPosition, isNil } from '../utils';
+import { each, isExtendedPosition } from '../utils';
 import { AbstractService } from './AbstractService';
 
 /**
@@ -253,19 +253,16 @@ export class Renderer extends AbstractService {
    * @package
    */
   setPanoramaPose(panoData, mesh = this.mesh) {
-    if (!isNil(panoData?.poseHeading) || !isNil(panoData?.posePitch) || !isNil(panoData?.poseRoll)) {
-      // By Google documentation the angles are applied on the camera in order : heading, pitch, roll
-      // here we apply the reverse transformation on the sphere
-      mesh.rotation.set(
-        -THREE.Math.degToRad(panoData?.posePitch || 0),
-        -THREE.Math.degToRad(panoData?.poseHeading || 0),
-        -THREE.Math.degToRad(panoData?.poseRoll || 0),
-        'ZXY'
-      );
-    }
-    else {
-      mesh.rotation.set(0, 0, 0);
-    }
+    // By Google documentation the angles are applied on the camera in order : heading, pitch, roll
+    // here we apply the reverse transformation on the sphere
+    const cleanCorrection = this.psv.dataHelper.cleanPanoramaPose(panoData);
+
+    mesh.rotation.set(
+      -cleanCorrection.tilt,
+      -cleanCorrection.pan,
+      -cleanCorrection.roll,
+      'ZXY'
+    );
   }
 
   /**
@@ -275,19 +272,14 @@ export class Renderer extends AbstractService {
    * @package
    */
   setSphereCorrection(sphereCorrection, mesh = this.meshContainer) {
-    if (sphereCorrection) {
-      const cleanCorrection = this.psv.dataHelper.cleanSphereCorrection(sphereCorrection);
+    const cleanCorrection = this.psv.dataHelper.cleanSphereCorrection(sphereCorrection);
 
-      mesh.rotation.set(
-        cleanCorrection.tilt,
-        cleanCorrection.pan,
-        cleanCorrection.roll,
-        'ZXY'
-      );
-    }
-    else {
-      mesh.rotation.set(0, 0, 0);
-    }
+    mesh.rotation.set(
+      cleanCorrection.tilt,
+      cleanCorrection.pan,
+      cleanCorrection.roll,
+      'ZXY'
+    );
   }
 
   /**

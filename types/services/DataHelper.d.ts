@@ -1,5 +1,5 @@
 import { Vector3, Intersection } from 'three';
-import { ExtendedPosition, Point, Position, SphereCorrection } from '../models';
+import { ExtendedPosition, PanoData, Point, Position, SphereCorrection } from '../models';
 
 /**
  * @summary Collections of data converters for the current viewer
@@ -75,5 +75,10 @@ export class DataHelper {
    * @summary Ensure a SphereCorrection object is valid
    */
   cleanSphereCorrection(sphere: SphereCorrection): SphereCorrection;
+
+  /**
+   * @summary Parse the pose angles of the pano data
+   */
+  cleanPanoramaPose(panoData: PanoData): SphereCorrection;
 
 }
