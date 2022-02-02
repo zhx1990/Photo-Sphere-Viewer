@@ -40,7 +40,6 @@ module.exports = {
             'methods',
             'events',
             'navbar',
-            'markers',
             'cropped-panorama',
             'migration-v3',
             {

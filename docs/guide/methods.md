@@ -32,7 +32,7 @@ This section describes the most useful methods available, remember to check the 
 
 ### `animate(options): Animation`
 
-Rotate and zoom the view with a smooth animation. You can change the position (`longitude`, `latitude` or `x`, `y`) and the zoom level (`zoom`). The `speed` option is either a duration in milliseconds or string containing the speed in revolutions per minute (`2rpm`) or degrees per second (`10dps`). It returns a `PSV.Animation` which is a standard Promise with an additional `cancel` method.
+Rotate and zoom the view with a smooth animation. You can change the position (`longitude`, `latitude` or `x`, `y`) and the zoom level (`zoom`). The `speed` option is either a duration in milliseconds or a string containing the speed in revolutions per minute (`2rpm`). It returns a `PSV.Animation` which is a standard Promise with an additional `cancel` method.
 
 ```js
 viewer.animate({
