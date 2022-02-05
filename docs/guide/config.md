@@ -228,11 +228,11 @@ It can also be a function to dynamically compute the cropping config depending o
 ```js
 panoData: (image) => ({
   fullWidth    : image.width,
-  fullHeight   : image.width / 2,
+  fullHeight   : Math.round(image.width / 2),
   croppedWidth : image.width,
   croppedHeight: image.height,
   croppedX     : 0,
-  croppedY     : image.width / 2 - image.height,
+  croppedY     : Math.round((image.width / 2 - image.height) / 2),
 })
 ```
 

@@ -252,8 +252,8 @@ export class DataHelper extends AbstractService {
    */
   cleanPanoramaPose(panoData) {
     return {
-      pan : THREE.Math.degToRad(panoData?.posePitch || 0),
-      tilt: THREE.Math.degToRad(panoData?.poseHeading || 0),
+      pan : THREE.Math.degToRad(panoData?.poseHeading || 0),
+      tilt: THREE.Math.degToRad(panoData?.posePitch || 0),
       roll: THREE.Math.degToRad(panoData?.poseRoll || 0),
     };
   }
