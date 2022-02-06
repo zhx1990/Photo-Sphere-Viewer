@@ -323,6 +323,7 @@ const quaternion = new THREE.Quaternion();
 
 /**
  * @summary Applies the inverse of Euler angles to a vector
+ * @memberOf PSV.utils
  * @param {external:THREE.Vector3} vector
  * @param {external:THREE.Euler} euler
  */
