@@ -1,4 +1,4 @@
-import { PSVError } from 'photo-sphere-viewer';
+import { PSVError, utils } from 'photo-sphere-viewer';
 import { AbstractDatasource } from './AbstractDatasource';
 import { checkLink, checkNode } from './utils';
 
@@ -11,8 +11,8 @@ export class ServerSideDatasource extends AbstractDatasource {
   constructor(plugin) {
     super(plugin);
 
-    if (!plugin.config.getNode || !plugin.config.getLinks) {
-      throw new PSVError('Missing getNode() and/or getLinks() options.');
+    if (!plugin.config.getNode) {
+      throw new PSVError('Missing getNode() option.');
     }
 
     this.nodeResolver = plugin.config.getNode;
@@ -41,6 +41,13 @@ export class ServerSideDatasource extends AbstractDatasource {
       return Promise.resolve();
     }
     else {
+      if (!this.linksResolver) {
+        this.nodes[nodeId].links = [];
+        return Promise.resolve();
+      }
+
+      utils.logWarn(`getLinks() option is deprecated, instead make getNode() also return the node' links.`);
+
       return Promise.resolve(this.linksResolver(nodeId))
         .then(links => links || [])
         .then((links) => {

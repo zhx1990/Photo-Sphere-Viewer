@@ -64,20 +64,14 @@ const nodes = [
 </md-tab>
 
 <md-tab md-label="Server mode">
-In server mode you provide the callbacks `getNode` and `getLinks` which both return a Promise to load the data of a node and the links of a node.
+In server mode you provide the `getNode callbacks function which returns a Promise to load the data of a node.
 
 ```js
-getNode = (nodeId) => {
-  return http.get(`/api/nodes/${nodeId}`);
-};
-getLinks = (nodeId) => {
-  return http.get(`/api/nodes/${nodeId}/links`);
+getNode = async (nodeId) => {
+  const res = await fetch(`/api/nodes/${nodeId}`);
+  return await res.json();
 };
 ```
-
-::: tip Optimize HTTP calls
-`getNode` can return a node object with its `links` property already filled, in this case `getLinks` is not called.
-:::
 
 </md-tab>
 </md-tabs>
@@ -215,11 +209,6 @@ Initial list of nodes. You can also call `setNodes` method later.
 - type: `function(nodeId: string) => Promise<Node>`
 
 Callback to load the configuration of a node.
-
-#### `getLinks(nodeId)` (server mode only)
-- type: `function(nodeId: string) => Promise<NodeLink[]>`
-
-Callback to load the links of a node. Only used if `getNode()` does not return the links of each node.
 
 #### `startNodeId`
 - type: `string`

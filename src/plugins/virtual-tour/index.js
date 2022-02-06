@@ -33,6 +33,7 @@ import { bearing, distance, setMeshColor } from './utils';
 /**
  * @callback GetLinks
  * @summary Function to load the links of a node
+ * @deprecated `getNode` must directly return the links of each node
  * @memberOf PSV.plugins.VirtualTourPlugin
  * @param {string} nodeId
  * @returns {PSV.plugins.VirtualTourPlugin.NodeLink[]|Promise<PSV.plugins.VirtualTourPlugin.NodeLink[]>}
@@ -88,7 +89,7 @@ import { bearing, distance, setMeshColor } from './utils';
  * @property {'markers'|'3d'} [renderMode='3d'] - configure rendering mode of links
  * @property {PSV.plugins.VirtualTourPlugin.Node[]} [nodes] - initial nodes
  * @property {PSV.plugins.VirtualTourPlugin.GetNode} [getNode]
- * @property {PSV.plugins.VirtualTourPlugin.GetLinks} [getLinks]
+ * @property {PSV.plugins.VirtualTourPlugin.GetLinks} [getLinks] - Deprecated: `getNode` must directly return the links of each node
  * @property {string} [startNodeId] - id of the initial node, if not defined the first node will be used
  * @property {boolean|PSV.plugins.VirtualTourPlugin.Preload} [preload=false] - preload linked panoramas
  * @property {boolean|string|number} [rotateSpeed='20rpm'] - speed of rotation when clicking on a link, if 'false' the viewer won't rotate at all

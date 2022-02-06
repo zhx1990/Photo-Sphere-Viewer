@@ -92,6 +92,14 @@
       "error",
       "consistent-as-needed"
     ],
+    "quotes": [
+      "error",
+      "single",
+      {
+        "avoidEscape": true,
+        "allowTemplateLiterals": true
+      }
+    ],
     "lines-between-class-members": [
       "error",
       "always",

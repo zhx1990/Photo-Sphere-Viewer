@@ -53,6 +53,9 @@ export type VirtualTourPluginPluginOptions = {
   renderMode?: '3d' | 'markers';
   nodes?: VirtualTourNode[];
   getNode?: (nodeId: string) => VirtualTourNode | Promise<VirtualTourNode>;
+  /**
+   * @deprecated
+   */
   getLinks?: (nodeId: string) => VirtualTourNodeLink[] | Promise<VirtualTourNodeLink[]>;
   startNodeId?: string;
   preload?: boolean | ((node: VirtualTourNode, link: VirtualTourNodeLink) => boolean);

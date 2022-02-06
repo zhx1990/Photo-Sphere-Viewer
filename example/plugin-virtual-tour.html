@@ -143,20 +143,11 @@
           console.log('GET node ' + nodeId);
           return Promise.resolve({
             ...nodesById[nodeId],
-            links: null, // "links" must be null to asynchronously load the linked nodes
-                         // in can also be preloaded here and avoid call to "getLinks"
-          });
-        },
-        getLinks: (nodeId) => {
-          return new Promise(resolve => {
-            console.log('GET linked nodes for ' + nodeId);
-            setTimeout(() => {
-              resolve(nodesById[nodeId].links.map(link => ({
-                ...link,
-                name    : nodesById[link.nodeId].name,
-                position: nodesById[link.nodeId].position,
-              })));
-            }, Math.random() * 200);
+            links: nodesById[nodeId].links.map(link => ({
+              ...link,
+              name    : nodesById[link.nodeId].name,
+              position: nodesById[link.nodeId].position,
+            })),
           });
         },
       }],
