@@ -143,16 +143,6 @@ export default [
     plugins: baseConfig.plugins(),
   },
   {
-    ...secondaryConfig,
-    input  : 'src/ViewerCompat',
-    output : {
-      ...secondaryConfig.output,
-      file: 'dist/viewer-compat.js',
-      name: 'PhotoSphereViewer.ViewerCompat',
-    },
-    plugins: secondaryConfig.plugins(),
-  },
-  {
     ...baseConfigDTS,
     input  : 'types/index.d.ts',
     output : {
