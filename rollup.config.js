@@ -95,11 +95,10 @@ const secondaryConfig = {
   ],
   plugins : () => [
     replace({
-      delimiters                  : ['', ''],
-      preventAssignment           : true,
-      [`from 'three/examples/jsm`]: `from '../../../three-examples`,
-      [`from '../..'`]            : `from 'photo-sphere-viewer'`,
-      [`from '../cubemap'`]       : `from 'photo-sphere-viewer/dist/adapters/cubemap'`,
+      delimiters           : ['', ''],
+      preventAssignment    : true,
+      [`from '../..'`]     : `from 'photo-sphere-viewer'`,
+      [`from '../cubemap'`]: `from 'photo-sphere-viewer/dist/adapters/cubemap'`,
     }),
     ...baseConfig.plugins(),
   ],

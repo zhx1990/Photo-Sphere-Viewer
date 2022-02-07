@@ -1,8 +1,8 @@
-import { StereoEffect } from 'three/examples/jsm/effects/StereoEffect';
 import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from '../..';
 import { EVENTS, ID_OVERLAY_PLEASE_ROTATE } from './constants';
 import mobileRotateIcon from './mobile-rotate.svg';
 import { StereoButton } from './StereoButton';
+import { StereoEffect } from './StereoEffect';
 
 
 /**
