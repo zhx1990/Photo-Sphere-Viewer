@@ -722,7 +722,6 @@ export class Viewer extends EventEmitter {
 
     const cleanPosition = this.change(CHANGE_EVENTS.GET_ROTATE_POSITION, this.dataHelper.cleanPosition(position));
     this.dynamics.position.setValue(cleanPosition);
-    this.stopAutorotate();
   }
 
   /**

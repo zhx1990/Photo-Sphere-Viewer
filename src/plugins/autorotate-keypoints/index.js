@@ -272,7 +272,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
    */
   __nextPoint() {
     // get the 4 points necessary to compute the current movement
-    // one point before and two points before current
+    // one point before and two points after the current
     const workPoints = [];
     if (this.state.idx === -1) {
       const currentPosition = serializePt(this.psv.getPosition());
@@ -312,9 +312,11 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
       workPoints2.push([workPoints[i][0] + k * 2 * Math.PI, workPoints[i][1]]);
     }
 
+    const curve = this.__getCurvePoints(workPoints2, 0.6, NUM_STEPS);
+    // __debugCurve(this.markers, curve);
+
     // only keep the curve for the current movement
-    this.state.curve = this.__getCurvePoints(workPoints2, 0.6, NUM_STEPS)
-      .slice(NUM_STEPS, NUM_STEPS * 2);
+    this.state.curve = curve.slice(NUM_STEPS, NUM_STEPS * 2);
 
     if (this.state.idx !== -1) {
       this.state.remainingPause = this.keypoints[this.state.idx].pause;
@@ -385,7 +387,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     this.psv.rotate({
       longitude: this.state.startPt[0] + (this.state.endPt[0] - this.state.startPt[0]) * progress,
       latitude : this.state.startPt[1] + (this.state.endPt[1] - this.state.startPt[1]) * progress,
-    }, true);
+    });
   }
 
   /**
@@ -455,4 +457,40 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     return idx;
   }
 
+}
+
+let debugMarkers = [];
+
+function __debugCurve(markers, curve) { // eslint-disable-line no-unused-vars
+  debugMarkers.forEach((marker) => {
+    try {
+      markers.removeMarker(marker.id);
+    }
+    catch (e) {
+      // noop
+    }
+  });
+
+  debugMarkers = [
+    markers.addMarker({
+      id         : 'autorotate-path',
+      polylineRad: curve,
+      svgStyle   : {
+        stroke     : 'white',
+        strokeWidth: '2px',
+      },
+    }),
+  ];
+
+  curve.forEach((pos, i) => {
+    debugMarkers.push(markers.addMarker({
+      id       : 'autorotate-path-' + i,
+      circle   : 5,
+      longitude: pos[0],
+      latitude : pos[1],
+      svgStyle : {
+        fill: 'black',
+      },
+    }));
+  });
 }

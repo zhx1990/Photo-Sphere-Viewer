@@ -95,6 +95,6 @@
     "start": "npm-run-all --parallel dev:**",
     "start:doc": "vuepress dev docs",
     "dev:serve": "live-server --watch=dist,example --open=example",
-    "dev:watch": "npm run compile:prepare && npm run compile:rollup -- --watch"
+    "dev:watch": "npm run compile -- --watch"
   }
 }

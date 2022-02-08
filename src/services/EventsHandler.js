@@ -541,6 +541,7 @@ export class EventsHandler extends AbstractService {
    * @private
    */
   __startMove(evt) {
+    this.psv.stopAutorotate();
     this.psv.stopAnimation()
       .then(() => {
         this.state.mouseX = evt.clientX;
