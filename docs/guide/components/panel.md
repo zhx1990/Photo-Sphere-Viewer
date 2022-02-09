@@ -18,7 +18,7 @@ This example adds a custom button to toggle a panel.
 
 Open the side panel.
 
-| | | |
+| option | type | |
 |---|---|---|
 | `id` | `string` | Unique identifier of the panel, this will be used to `hide` the panel only if the content has not been replaced by something else. It will be used to store the width defined by the user when using the resize handle. |
 | `content` (required) | `string` | HTML content of the panel. |

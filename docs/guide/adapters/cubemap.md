@@ -4,7 +4,7 @@
 
 This adapter is available in the core `photo-sphere-viewer` package in `dist/adapters/cubemap.js`.
 
-Photo Sphere Viewer supports cubemaps as six distinct image files. The files can be provided as an object or an array. All features of Photo Sphere Viewer are fully supported when using cubemaps but the `fisheye` option gives funky results.
+Photo Sphere Viewer supports cubemaps as six distinct image files. The files can be provided as an object or an array.
 
 ```js
 new PhotoSphereViewer.Viewer({

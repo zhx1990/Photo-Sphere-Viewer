@@ -18,12 +18,12 @@ This example displays a overlay at startup.
 
 Show the overlay.
 
-| | | |
+| option | type | |
 |---|---|---|
 | `id` | `string` | Unique identifier of the overlay, this will be used to `hide` the overlay only if the content has not been replaced by something else. |
 | `text` (required) | `string` | Main message of the overlay. |
 | `subtext` | `string` | Secondary message of the overlay. |
-| `image` | `string` |SVG image/icon displayed above the text. |
+| `image` | `string` | SVG icon or image displayed above the text. |
 
 ### `hide([id])`
 

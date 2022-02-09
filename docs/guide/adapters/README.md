@@ -1,6 +1,6 @@
 # Adapters
 
-Adapters are small pieces of code responsible to load the panorama texture(s) in the THREE.js scene.
+Adapters are small pieces of code responsible to load the panorama texture(s) in the Three.js scene.
 
 The supported adapters are:
 - [equirectangular](equirectangular.md): the default adapter, used to load full or partial equirectangular panoramas

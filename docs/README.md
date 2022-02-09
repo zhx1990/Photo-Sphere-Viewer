@@ -16,7 +16,7 @@ features:
  - title: Plugins
    details: New plugins add new features without bloating the main library.
  - title: Modern technologies
-   details: Photo Sphere Viewer is pure JS and based on three.js, allowing very good performances on WebGL enabled systems.
+   details: Photo Sphere Viewer is pure JS and based on Three.js, allowing very good performances on WebGL enabled systems.
 footer: Licensed under MIT License, documentation under CC BY 3.0
 ---
 

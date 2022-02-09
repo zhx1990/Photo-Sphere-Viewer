@@ -46,7 +46,7 @@ viewer.animate({
 
 ### `destroy()`
 
-Remove the viewer from the page and frees memory used by three.js.
+Remove the viewer from the page and free the memory used by Three.js.
 
 ### `getPosition(): Position`
 

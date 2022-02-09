@@ -52,7 +52,7 @@ The XMP payload is as follow:
       <GPano:CroppedAreaImageHeightPixels>2000</GPano:CroppedAreaImageHeightPixels>
       <GPano:CroppedAreaLeftPixels>1000</GPano:CroppedAreaLeftPixels>
       <GPano:CroppedAreaTopPixels>500</GPano:CroppedAreaTopPixels>
-      <GPano:PoseHeadingDegrees>270</GPano:PoseHeadingDegrees>
+      <GPano:PoseHeadingDegrees>0</GPano:PoseHeadingDegrees>
       <GPano:PosePitchDegrees>0</GPano:PosePitchDegrees>
       <GPano:PoseRollDegrees>0</GPano:PoseRollDegrees>
     </rdf:Description>
@@ -75,16 +75,16 @@ You can also directly pass the values to Photo Sphere Viewer with the `panoData`
 var viewer = new PhotoSphereViewer.Viewer({
   container: 'viewer',
   panorama: 'path/to/panorama.jpg',
-   panoData: {
-      fullWidth: 6000,
-      fullHeight: 3000,
-      croppedWidth: 4000,
-      croppedHeight: 2000,
-      croppedX: 1000,
-      croppedY: 500,
-      poseHeading: 270, // 0 to 360
-      posePitch: 0, // -90 to 90
-      poseRoll: 0, // -180 to 180
+  panoData: {
+    fullWidth: 6000,
+    fullHeight: 3000,
+    croppedWidth: 4000,
+    croppedHeight: 2000,
+    croppedX: 1000,
+    croppedY: 500,
+    poseHeading: 0, // 0 to 360
+    posePitch: 0, // -90 to 90
+    poseRoll: 0, // -180 to 180
   }
 });
 ```

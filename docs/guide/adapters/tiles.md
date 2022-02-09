@@ -54,7 +54,7 @@ _Note: the actual number of faces is `resolution² / 2`._
 
 ## Panorama options
 
-When using this adapter the `panorama` option and the `setPanorama()` method accepts an object to configure the tiles.
+When using this adapter the `panorama` option and the `setPanorama()` method accept an object to configure the tiles.
 
 #### `width` (required)
 - type: `number`

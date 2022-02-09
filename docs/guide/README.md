@@ -30,7 +30,7 @@ You can also [download the latest release](https://github.com/mistic100/Photo-Sp
 
 ## Dependencies
 
- * [three.js](https://threejs.org) (use `build/three.min.js` file)
+ * [Three.js](https://threejs.org) (use `build/three.min.js` file)
  * [uEvent 2](https://github.com/mistic100/uEvent) (use `browser.js` file)
 
 
@@ -58,7 +58,7 @@ Include all JS & CSS files in your page manually or with your favorite bundler a
 <script>
   var viewer = new PhotoSphereViewer.Viewer({
     container: document.querySelector('#viewer'),
-    panorama: 'path/to/panorama.jpg'
+    panorama: 'path/to/panorama.jpg',
   });
 </script>
 ```
@@ -82,7 +82,7 @@ import { Viewer } from 'photo-sphere-viewer';
 
 const viewer = new Viewer({
   container: document.querySelector('#viewer'),
-  panorama: 'path/to/panorama.jpg'
+  panorama: 'path/to/panorama.jpg',
 });
 ```
 </md-tab>
@@ -98,5 +98,5 @@ If your image is not covering a full 360°×180° sphere, it will be deformed. Y
 ::: tip Caching
 Previous version of Photo Sphere Viewer had a caching system, which was buggy and thus disabled by default.
 
-Photo Sphere Viewer 4 uses [THREE.js Cache](https://threejs.org/docs/index.html#api/en/loaders/Cache), enabled by default. You can disable this cache by calling `THREE.Cache.enabled = false;` after importing Photo Sphere Viewer.
+Photo Sphere Viewer 4 uses [Three.js Cache](https://threejs.org/docs/index.html#api/en/loaders/Cache), enabled by default. You can disable this cache by calling `THREE.Cache.enabled = false;` after importing Photo Sphere Viewer.
 :::

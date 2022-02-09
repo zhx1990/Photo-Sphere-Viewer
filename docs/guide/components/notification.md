@@ -18,7 +18,7 @@ This example consistently displays new notifications.
 
 Show the notification.
 
-| | | |
+| option | type | |
 |---|---|---|
 | `content` (required) | `string` | HTML content of the notification. |
 | `timeout` | `number` | Auto-hide delay in milliseconds. |

@@ -58,17 +58,17 @@ Shows a warning sign on tiles that cannot be loaded.
 
 ## Panorama options
 
-When using this adapter the `panorama` option and the `setPanorama()` method accepts an object to configure the tiles.
+When using this adapter the `panorama` option and the `setPanorama()` method accept an object to configure the tiles.
 
 #### `faceSize` (required)
 - type: `number`
 
-Size in pixel of a face of the cube. Each face must be square.
+Size in pixel of a face of the cube.
 
 #### `nbTiles` (required)
 - type: `number`
 
-Number of columns and rows on a face. Each tile must be square too. Must be power of two (2, 4, 8, 16) and the maximum value is 16.
+Number of columns and rows on a face. Each tile must be square. Must be power of two (2, 4, 8, 16) and the maximum value is 16.
 
 #### `tileUrl` (required)
 - type: `function: (face, col, row) => string`

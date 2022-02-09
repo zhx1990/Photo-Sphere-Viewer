@@ -31,7 +31,7 @@ You can also add as many custom buttons you want. A Custom buttons is an object 
 #### `content` (required)
 - type : `string`
 
-Content of the button
+Content of the button. Preferably a square image or SVG icon.
 
 #### `onClick` (required)
 - type : `function`
@@ -65,6 +65,12 @@ Initially disable the button.
 
 Initially show the button.
 
+The API allows to change the visibility of the button at any time:
+
+```js
+viewer.navbar.getButton('my-button').show();
+```
+
 
 ## Example
 
@@ -82,10 +88,10 @@ new PhotoSphereViewer.Viewer({
       className: 'custom-button',
       onClick: () => {
         alert('Hello from custom button');
-      }
+      },
     },
     'caption',
-    'fullscreen'
-  ]
+    'fullscreen',
+  ],
 });
 ```

@@ -20,7 +20,7 @@ This example adds a persistent tooltip following the cursor.
 
 Create a tooltip.
 
-| | | |
+| option | type | |
 |---|---|---|
 | `content` (required) | `string` |HTML content of the tooltip. |
 | `top` & `left` (required) | `number` | Pixel coordinates of the tooltip relative to the top-left corner of the viewer. |

@@ -1,6 +1,6 @@
 # Introduction to plugins
 
-Plugins are used to add new functionalities to Photo Sphere Viewer. They can access all internal APIs of the viewer as well as the THREE.js renderer to make the viewer even more awesome.
+Plugins are used to add new functionalities to Photo Sphere Viewer. They can access all internal APIs of the viewer as well as the Three.js renderer to make the viewer even more awesome.
 
 ## Import official plugins
 
@@ -32,7 +32,7 @@ import { MarkersPlugin } from 'photo-sphere-viewer/dist/plugins/markers';
 
 ## Using a plugin
 
-All plugins consists of a JavaScript class which must be provided to the `plugins` array. Some plugins will also take configuration object provided in a nested array.
+All plugins consists of a JavaScript class which must be provided to the `plugins` array. Some plugins will also take a configuration object provided in a nested array.
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({

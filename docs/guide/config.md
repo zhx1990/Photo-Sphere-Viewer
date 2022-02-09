@@ -7,7 +7,7 @@ Photo Sphere Viewer uses a lot of angles for its configuration, most of them can
 :::
 
 ::: tip Positions definitions
-Some methods takes positionnal arguments, this is either on combination `longitude` and `latitude` (radians or degrees, **note:** those are local coordinates and not related to GPS) or `x` and `y` properies (corresponding to the pixel position on the source panorama file).
+Some methods takes positionnal arguments, this is either on combination `longitude` and `latitude` (radians or degrees, **note:** those are local coordinates and not related to GPS) or `x` and `y` properties (corresponding to the pixel position on the source panorama file).
 :::
 
 ## Standard options
@@ -46,7 +46,7 @@ A text displayed in the navbar. If the navbar is disabled it will be shown anywa
 #### `size`
 - type: `{ width: integer, height: integer }`
 
-The final size if the panorama container. By default the size of `container` is used and is followed during window resizes.
+The final size of the panorama container. By default the size of `container` is used and is followed during window resizes.
 
 #### `navbar`
 
@@ -74,10 +74,10 @@ Initial zoom level, between 0 (for `maxFov`) and 100 (for `minfov`).
 - type: `boolean | double`
 - default: `false`
 
-Enable fisheye effect with true or specify effect strength (`true` = `1.0`).
+Enable fisheye effect with `true` or specify the effect strength (`true` = `1.0`).
 
 ::: warning
-This mode can have side-effects on markers rendering.
+This mode can have side-effects on markers rendering and some adapters.
 :::
 
 #### `defaultLong`
@@ -102,7 +102,7 @@ Delay after which the automatic rotation will begin, in milliseconds.
 - type: `string`
 - default: `2rpm`
 
-Speed of the automatic rotation.
+Speed of the automatic rotation. Can be a negative value to reverse the rotation.
 
 #### `autorotateLat`
 - type: `double | string`
@@ -152,13 +152,13 @@ Enables zoom with the mouse wheel.
 - type: `boolean`
 - default: `true`
 
-Enables panorama rotation with the mouse cursor or with a finger swipe on touch screens.
+Enables panorama rotation with mouse click+move or with a finger swipe on touch screens.
 
 #### `mousewheelCtrlKey`
 - type: `boolean`
 - default: `false`
 
-Requires to use the ctrl key to zoom the panorama. The allows to scroll the page without interfering with the viewer. If enabled, an overlay asking the user to use ctrl + scroll is displayed when ctrl key is not pressed.
+Requires to use the ctrl key to zoom the panorama. This allows to scroll on the page without interfering with the viewer. If enabled, an overlay asking the user to use ctrl + scroll is displayed when ctrl key is not pressed.
 
 #### `captureCursor`
 - type: `boolean`
@@ -179,7 +179,7 @@ Requires two fingers to rotate the panorama. This allows standard touch-scroll n
 - type: `{ pan: double, tilt: double, roll: double }`
 - default: `{ pan:0, tilt:0, roll: 0 }`
 
-Sphere rotation angles, in radians.
+Allows to rotate the panorama sphere. Angles are in radians.
 
 **Note** : if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
 
@@ -280,15 +280,15 @@ Use credentials for HTTP requests.
 - default:
 ```js
 keyboard: {
-    'ArrowUp': 'rotateLatitudeUp',
-    'ArrowDown': 'rotateLatitudeDown',
-    'ArrowRight': 'rotateLongitudeRight',
-    'ArrowLeft': 'rotateLongitudeLeft',
-    'PageUp': 'zoomIn',
-    'PageDown': 'zoomOut',
-    '+': 'zoomIn',
-    '-': 'zoomOut',
-    ' ': 'toggleAutorotate'
+  'ArrowUp': 'rotateLatitudeUp',
+  'ArrowDown': 'rotateLatitudeDown',
+  'ArrowRight': 'rotateLongitudeRight',
+  'ArrowLeft': 'rotateLongitudeLeft',
+  'PageUp': 'zoomIn',
+  'PageDown': 'zoomOut',
+  '+': 'zoomIn',
+  '-': 'zoomOut',
+  ' ': 'toggleAutorotate',
 }
 ```
 

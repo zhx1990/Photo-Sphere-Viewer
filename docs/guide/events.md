@@ -14,7 +14,7 @@ This section describes the most useful events available, remember to check the <
 
 ### `click(data)` | `dblclick(data)`
 
-Triggered when the user clicks on the viewer (everywhere excluding the navbar and the side panel), it contains many information about where the user clicked including a [marker](../plugins/plugin-markers.md) if the `clickEventOnMarker` option is enabled.
+Triggered when the user clicks on the viewer (excluding the navbar and the side panel), it contains many information about where the user clicked including a [marker](../plugins/plugin-markers.md) if the `clickEventOnMarker` option is enabled.
 
 ```js
 viewer.on('click', (e, data) => {
@@ -22,7 +22,7 @@ viewer.on('click', (e, data) => {
 });
 ```
 
-The simple `click` event is always fired before  a `dblclick`.
+A `click` event is always fired before a `dblclick`.
 
 ### `position-updated(position)`
 
