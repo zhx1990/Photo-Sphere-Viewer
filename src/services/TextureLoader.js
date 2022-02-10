@@ -121,7 +121,12 @@ export class TextureLoader extends AbstractService {
    * @returns {Promise}
    */
   preloadPanorama(panorama) {
-    return this.psv.adapter.loadTexture(panorama);
+    if (this.psv.adapter.constructor.supportsPreload) {
+      return this.psv.adapter.loadTexture(panorama);
+    }
+    else {
+      return Promise.resolve();
+    }
   }
 
 }

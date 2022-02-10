@@ -68,6 +68,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
 
   static id = 'cubemap-tiles';
   static supportsTransition = false;
+  static supportsPreload = false;
 
   /**
    * @param {PSV.Viewer} psv
@@ -197,8 +198,6 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     this.prop.tileSize = panorama.faceSize / panorama.nbTiles;
     this.prop.facesByTile = CUBE_SEGMENTS / panorama.nbTiles;
 
-    this.__cleanup();
-
     if (this.prop.geom) {
       this.prop.geom.setAttribute('uv', this.prop.originalUvs.clone());
     }
@@ -240,6 +239,8 @@ export class CubemapTilesAdapter extends CubemapAdapter {
    * @override
    */
   setTexture(mesh, textureData) {
+    this.__cleanup();
+
     if (textureData.texture) {
       for (let i = 0; i < 6; i++) {
         const texture = textureData.texture[i];
@@ -251,6 +252,15 @@ export class CubemapTilesAdapter extends CubemapAdapter {
 
         const material = new THREE.MeshBasicMaterial({ map: texture });
 
+        for (let j = 0; j < NB_GROUPS_BY_FACE; j++) {
+          this.materials.push(material);
+        }
+      }
+    }
+    else {
+      const material = new THREE.MeshBasicMaterial({ opacity: 0, transparent: true });
+
+      for (let i = 0; i < 6; i++) {
         for (let j = 0; j < NB_GROUPS_BY_FACE; j++) {
           this.materials.push(material);
         }

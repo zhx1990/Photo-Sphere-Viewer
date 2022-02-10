@@ -28,6 +28,14 @@ export class AbstractAdapter {
   static supportsTransition = false;
 
   /**
+   * @summary Indicates if the adapter supports preload
+   * @type {boolean}
+   * @readonly
+   * @static
+   */
+  static supportsPreload = false;
+
+  /**
    * @param {PSV.Viewer} psv
    */
   constructor(psv) {

@@ -20,6 +20,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
 
   static id = 'equirectangular';
   static supportsTransition = true;
+  static supportsPreload = true;
 
   /**
    * @param {PSV.Viewer} psv

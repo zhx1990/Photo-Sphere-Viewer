@@ -33,6 +33,7 @@ export class CubemapAdapter extends AbstractAdapter {
 
   static id = 'cubemap';
   static supportsTransition = true;
+  static supportsPreload = true;
 
   /**
    * @param {PSV.Viewer} psv

@@ -88,6 +88,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
 
   static id = 'equirectangular-tiles';
   static supportsTransition = false;
+  static supportsPreload = false;
 
   /**
    * @param {PSV.Viewer} psv
@@ -238,8 +239,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     this.prop.facesByCol = this.SPHERE_SEGMENTS / panorama.cols;
     this.prop.facesByRow = this.SPHERE_HORIZONTAL_SEGMENTS / panorama.rows;
 
-    this.__cleanup();
-
     if (this.prop.geom) {
       this.prop.geom.setAttribute('uv', this.prop.originalUvs.clone());
     }
@@ -300,12 +299,18 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
    * @override
    */
   setTexture(mesh, textureData) {
-    if (textureData.texture) {
-      const material = new THREE.MeshBasicMaterial({ map: textureData.texture });
+    this.__cleanup();
 
-      for (let i = 0; i < this.NB_GROUPS; i++) {
-        this.materials.push(material);
-      }
+    let material;
+    if (textureData.texture) {
+      material = new THREE.MeshBasicMaterial({ map: textureData.texture });
+    }
+    else {
+      material = new THREE.MeshBasicMaterial({ opacity: 0, transparent: true });
+    }
+
+    for (let i = 0; i < this.NB_GROUPS; i++) {
+      this.materials.push(material);
     }
 
     // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));

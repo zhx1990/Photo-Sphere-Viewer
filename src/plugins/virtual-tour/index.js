@@ -677,7 +677,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
    * @private
    */
   __preload(node) {
-    if (!this.config.preload || !this.isServerSide()) {
+    if (!this.config.preload) {
       return;
     }
 
