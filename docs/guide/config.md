@@ -201,7 +201,7 @@ Speed multiplicator for panorama zooms. Used for mouse wheel, touch pinch and na
 - type: `boolean`
 - default `true`
 
-Read real image size from XMP data, must be kept `true` if the panorama has been cropped after shot.
+Read real image size from XMP data, must be kept `true` if the panorama has been cropped after shot. This is used for [cropped panorama](./adapters/equirectangular.md#cropped-panorama).
 
 #### `panoData`
 - type: `object | function<Image, object>`

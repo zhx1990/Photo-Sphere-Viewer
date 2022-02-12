@@ -29,7 +29,7 @@ visibleRangePlugin.setLongitudeRange(['0deg', '180deg']);
 visibleRangePlugin.setLatitudeRange(null);
 ```
 
-Alternatively, if `usePanoData` is set to `true`, the visible range is limited to the [cropped panorama data](../guide/cropped-panorama.md#provide-cropping-data) provided to the viewer.
+Alternatively, if `usePanoData` is set to `true`, the visible range is limited to the [cropped panorama data](../guide/adapters/equirectangular.md#cropped-panorama) provided to the viewer.
 
 ## Example
 

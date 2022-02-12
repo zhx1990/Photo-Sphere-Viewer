@@ -92,7 +92,7 @@ const viewer = new Viewer({
 The `panorama` must be an [equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection) of your photo. Other modes are supported through [adapters](./adapters/).
 
 ::: tip Cropped panoramas
-If your image is not covering a full 360°×180° sphere, it will be deformed. You can fix it by providing [cropping data](./cropped-panorama.md).
+If your image is not covering a full 360°×180° sphere, it will be deformed. You can fix it by providing [cropping data](./adapters/equirectangular.md#cropped-panorama).
 :::
 
 ::: tip Caching

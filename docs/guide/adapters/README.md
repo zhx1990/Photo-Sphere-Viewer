@@ -4,7 +4,7 @@ Adapters are small pieces of code responsible to load the panorama texture(s) in
 
 The supported adapters are:
 - [equirectangular](equirectangular.md): the default adapter, used to load full or partial equirectangular panoramas
-- [equirectangular tiles](tiles.md): used to load tiled equirectangular panoramas
+- [equirectangular tiles](equirectangular-tiles.md): used to load tiled equirectangular panoramas
 - [cubemap](cubemap.md): used to load cubemaps projections (six textures)
 - [cubemap tiles](cubemap-tiles.md): used to load tiled cubemap panoramas
 
