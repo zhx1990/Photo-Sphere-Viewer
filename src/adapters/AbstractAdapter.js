@@ -36,6 +36,14 @@ export class AbstractAdapter {
   static supportsPreload = false;
 
   /**
+   * @summary Indicates if the adapter supports panorama download natively
+   * @type {boolean}
+   * @readonly
+   * @static
+   */
+  static supportsDownload = false;
+
+  /**
    * @param {PSV.Viewer} psv
    */
   constructor(psv) {

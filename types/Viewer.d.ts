@@ -33,6 +33,7 @@ export type ViewerOptions = {
   panorama?: any;
   adapter?: AdapterConstructor<any> | [AdapterConstructor<any>, any];
   caption?: string;
+  downloadUrl?: string;
   loadingImg?: string;
   loadingTxt?: string;
   size?: Size;

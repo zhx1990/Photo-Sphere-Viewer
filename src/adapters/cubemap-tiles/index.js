@@ -69,6 +69,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
   static id = 'cubemap-tiles';
   static supportsTransition = false;
   static supportsPreload = false;
+  static supportsDownload = false;
 
   /**
    * @param {PSV.Viewer} psv

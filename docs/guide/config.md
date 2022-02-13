@@ -43,6 +43,12 @@ List of enabled [plugins](../plugins/README.md).
 
 A text displayed in the navbar. If the navbar is disabled it will be shown anyway but with no button. HTML is allowed.
 
+#### `downloadUrl`
+- type: `string`
+- default: `=panorama` for equirectangular panoramas
+
+Define the file which will be downloaded with the `download` button. This is particularly useful for adapters that use multiple files, like the CubemapAdapter or the EquirectangularTilesAdapter.
+
 #### `size`
 - type: `{ width: integer, height: integer }`
 

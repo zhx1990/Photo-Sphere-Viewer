@@ -20,12 +20,19 @@ export class DownloadButton extends AbstractButton {
 
   /**
    * @override
+   */
+  isSupported() {
+    return this.psv.adapter.constructor.supportsDownload || !!this.psv.config.downloadUrl;
+  }
+
+  /**
+   * @override
    * @description Asks the browser to download the panorama source file
    */
   onClick() {
     const link = document.createElement('a');
-    link.href = this.psv.config.panorama;
-    link.download = this.psv.config.panorama;
+    link.href = this.psv.config.downloadUrl || this.psv.config.panorama;
+    link.download = link.href.split('/').pop();
     this.psv.container.appendChild(link);
     link.click();
 

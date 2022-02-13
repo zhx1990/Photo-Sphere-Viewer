@@ -89,6 +89,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
   static id = 'equirectangular-tiles';
   static supportsTransition = false;
   static supportsPreload = false;
+  static supportsDownload = false;
 
   /**
    * @param {PSV.Viewer} psv

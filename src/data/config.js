@@ -17,6 +17,7 @@ export const DEFAULTS = {
   adapter            : null,
   plugins            : [],
   caption            : null,
+  downloadUrl        : null,
   loadingImg         : null,
   loadingTxt         : 'Loading...',
   size               : null,
