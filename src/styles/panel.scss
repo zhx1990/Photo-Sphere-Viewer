@@ -36,7 +36,7 @@
   margin-left: $psv-panel-resizer-width;
 
   .psv--has-navbar & {
-    height: calc(100% - #{$psv-buttons-height + 2 * $psv-buttons-padding});
+    height: calc(100% - #{$psv-navbar-height});
   }
 
   &-close-button {

@@ -40,6 +40,7 @@ module.exports = {
             'methods',
             'events',
             'navbar',
+            'style',
             {
               title      : 'Adapters',
               path       : '/guide/adapters/',

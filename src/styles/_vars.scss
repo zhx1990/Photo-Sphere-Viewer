@@ -18,7 +18,7 @@ $psv-caption-font: 16px sans-serif !default;
 $psv-caption-color: rgba(255, 255, 255, .7) !default;
 
 $psv-buttons-height: 20px !default;
-$psv-buttons-padding: 10px !default;
+$psv-buttons-padding: (($psv-navbar-height - $psv-buttons-height) * .5) !default;
 $psv-buttons-background: transparent !default;
 $psv-buttons-active-background: rgba(255, 255, 255, .2) !default;
 $psv-buttons-color: rgba(255, 255, 255, .7) !default;
@@ -30,7 +30,6 @@ $psv-buttons-hover-scale-delay: 200ms !default;
 $psv-zoom-range-width: 80px !default;
 $psv-zoom-range-tickness: 1px !default;
 $psv-zoom-disk-diameter: 7px !default;
-$psv-zoom-buttons-width: 16px !default;
 $psv-zoom-range-media-min-width: 600px !default;
 
 
@@ -54,7 +53,7 @@ $psv-tooltip-shadow-offset: 3px !default; // the shadow is always at the opposit
 // *** PANEL ***
 $psv-panel-background: rgba(10, 10, 10, .7) !default;
 $psv-panel-text-color: rgb(220, 220, 220) !default;
-
+$psv-panel-font: 16px sans-serif !default;
 $psv-panel-width: 400px !default;
 $psv-panel-padding: 1em !default;
 
@@ -65,8 +64,6 @@ $psv-panel-resizer-grip-height: 29px !default; // must be odd
 $psv-panel-close-button-width: 24px !default;
 $psv-panel-close-button-background: $psv-panel-resizer-background !default;
 $psv-panel-close-button-color: #fff !default;
-
-$psv-panel-font: 16px sans-serif !default;
 
 $psv-panel-title-font: 24px sans-serif !default;
 $psv-panel-title-icon-size: 24px !default;
@@ -80,7 +77,8 @@ $psv-panel-menu-even-background: transparent !default;
 
 
 // *** NOTIFICATION ***
-$psv-notification-bottom: (from: - $psv-navbar-height, to: $psv-navbar-height * 2) !default;
+$psv-notification-position-from: -$psv-navbar-height !default;
+$psv-notification-position-to: $psv-navbar-height * 2 !default;
 $psv-notification-animate-delay: 200ms !default;
 $psv-notification-background-color: $psv-tooltip-background-color !default;
 $psv-notification-radius: $psv-tooltip-radius !default;

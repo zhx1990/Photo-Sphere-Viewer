@@ -4,7 +4,7 @@
 .psv-notification {
   position: absolute;
   z-index: $psv-notification-zindex;
-  bottom: map.get($psv-notification-bottom, from);
+  bottom: $psv-notification-position-from;
   display: flex;
   justify-content: center;
   box-sizing: border-box;
@@ -26,6 +26,6 @@
 
   &--visible {
     opacity: 100;
-    bottom: map.get($psv-notification-bottom, to);
+    bottom: $psv-notification-position-to;
   }
 }
