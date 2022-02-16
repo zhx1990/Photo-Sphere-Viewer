@@ -176,7 +176,7 @@ Overrides the global style of the marker used to display the link. See global co
 - default:
 ```js
 lang: {
-  nodesList: Locations',
+  nodesList: 'Locations',
 }
 ```
 

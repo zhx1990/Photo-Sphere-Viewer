@@ -89,7 +89,7 @@ viewer.setOptions({
 
 ### `setPanorama(panorama, options): Promise`
 
-Change the panorama image with an optional transition animation (enabled by default). You can also set the new `sphereCorrection` and `panoData` if needed.
+Change the panorama image with an optional transition animation (enabled by default). See all options on the <ApiLink page="PSV.html#.PanoramaOptions"/>.
 
 ```js
 viewer.setPanorama('image.jpg')

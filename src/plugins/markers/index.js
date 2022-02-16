@@ -88,8 +88,8 @@ export class MarkersPlugin extends AbstractPlugin {
     };
 
     if (options?.listButton === false || options?.hideButton === false) {
-      utils.logWarn('MarkersPlugin: listButton and hideButton options are deprecated. ' +
-        'Please define the global navbar options according to your needs.');
+      utils.logWarn('MarkersPlugin: listButton and hideButton options are deprecated. '
+        + 'Please define the global navbar options according to your needs.');
     }
 
     /**

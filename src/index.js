@@ -107,6 +107,7 @@ export {
 /**
  * @typedef {PSV.ExtendedPosition} PSV.PanoramaOptions
  * @summary Object defining panorama and animation options
+ * @property {string} [caption] - new navbar caption
  * @property {boolean|number} [transition=1500] - duration of the transition between all and new panorama
  * @property {boolean} [showLoader=true] - show the loader while loading the new panorama
  * @property {number} [zoom] - new zoom level between 0 and 100

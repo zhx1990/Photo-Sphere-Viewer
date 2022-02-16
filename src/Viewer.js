@@ -471,6 +471,9 @@ export class Viewer extends EventEmitter {
     if (options.showLoader === undefined) {
       options.showLoader = true;
     }
+    if (options.caption === undefined) {
+      options.caption = this.config.caption;
+    }
 
     const positionProvided = isExtendedPosition(options);
     const zoomProvided = 'zoom' in options;
@@ -482,6 +485,7 @@ export class Viewer extends EventEmitter {
     this.hideError();
 
     this.config.panorama = path;
+    this.config.caption = options.caption;
 
     const done = (err) => {
       this.loader.hide();
@@ -494,15 +498,18 @@ export class Viewer extends EventEmitter {
         return false;
       }
       else if (err) {
+        this.navbar.setCaption('');
         this.showError(this.config.lang.loadError);
         console.error(err);
         return Promise.reject(err);
       }
       else {
+        this.navbar.setCaption(this.config.caption);
         return true;
       }
     };
 
+    this.navbar.setCaption(`<em>${this.config.loadingTxt || ''}</em>`);
     if (options.showLoader || !this.prop.ready) {
       this.loader.show();
     }

@@ -142,16 +142,10 @@ export class Navbar extends AbstractComponent {
   /**
    * @summary Sets the bar caption
    * @param {string} html
-   * @throws {PSV.PSVError} when the caption element is not present
    */
   setCaption(html) {
     const caption = this.getButton('caption', false);
-
-    if (!caption) {
-      throw new PSVError('Cannot set caption, the navbar caption container is not initialized.');
-    }
-
-    caption.setCaption(html);
+    caption?.setCaption(html);
   }
 
   /**

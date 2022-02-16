@@ -110,7 +110,6 @@ import { bearing, distance, setMeshColor } from './utils';
 
 // add markers buttons
 DEFAULTS.lang[NodesListButton.id] = 'Locations';
-DEFAULTS.lang.loading = 'Loading...';
 registerButton(NodesListButton, 'caption:left');
 
 
@@ -179,8 +178,8 @@ export class VirtualTourPlugin extends AbstractPlugin {
     };
 
     if (options?.listButton === false) {
-      utils.logWarn('VirtualTourPlugin: listButton option is deprecated. ' +
-        'Please define the global navbar options according to your needs.');
+      utils.logWarn('VirtualTourPlugin: listButton option is deprecated. '
+        + 'Please define the global navbar options according to your needs.');
     }
     if (options?.listButton === true && this.config.dataMode === MODE_SERVER) {
       utils.logWarn('VirtualTourPlugin: the list button is not supported in server mode.');
@@ -424,8 +423,6 @@ export class VirtualTourPlugin extends AbstractPlugin {
           return Promise.reject(utils.getAbortError());
         }
 
-        this.psv.navbar.setCaption(`<em>${this.psv.config.lang.loading}</em>`);
-
         this.prop.currentNode = node;
 
         if (this.prop.currentTooltip) {
@@ -442,6 +439,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
 
         return Promise.all([
           this.psv.setPanorama(node.panorama, {
+            caption         : node.caption,
             panoData        : node.panoData,
             sphereCorrection: node.sphereCorrection,
           })
@@ -470,8 +468,6 @@ export class VirtualTourPlugin extends AbstractPlugin {
 
         this.__renderLinks(node);
         this.__preload(node);
-
-        this.psv.navbar.setCaption(node.caption || this.psv.config.caption);
 
         /**
          * @event node-changed

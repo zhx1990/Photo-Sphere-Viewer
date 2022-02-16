@@ -75,9 +75,10 @@ export type PanoDataProvider = (image: HTMLImageElement) => PanoData;
  * Object defining panorama and animation options
  */
 export type PanoramaOptions = (ExtendedPosition | {}) & {
-  zoom?: number;
+  caption?: string;
   transition?: boolean | number;
   showLoader?: boolean;
+  zoom?: number;
   sphereCorrection?: SphereCorrection;
   panoData?: PanoData | PanoDataProvider;
 };
