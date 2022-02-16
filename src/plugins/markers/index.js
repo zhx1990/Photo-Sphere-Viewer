@@ -16,8 +16,6 @@ import './style.scss';
 
 /**
  * @typedef {Object} PSV.plugins.MarkersPlugin.Options
- * @property {boolean} [hideButton=true] - adds a button to show/hide the markers
- * @property {boolean} [listButton=true] - adds a button to show the list of markers
  * @property {boolean} [clickEventOnMarker=false] If a `click` event is triggered on the viewer additionally to the `select-marker` event.
  * @property {PSV.plugins.MarkersPlugin.Properties[]} [markers]
  */
@@ -85,11 +83,14 @@ export class MarkersPlugin extends AbstractPlugin {
      * @type {PSV.plugins.MarkersPlugin.Options}
      */
     this.config = {
-      hideButton        : true,
-      listButton        : true,
       clickEventOnMarker: false,
       ...options,
     };
+
+    if (options?.listButton === false || options?.hideButton === false) {
+      utils.logWarn('MarkersPlugin: listButton and hideButton options are deprecated. ' +
+        'Please define the global navbar options according to your needs.');
+    }
 
     /**
      * @member {HTMLElement}
@@ -939,12 +940,8 @@ export class MarkersPlugin extends AbstractPlugin {
       }
     }
     else {
-      if (this.config.hideButton) {
-        markersButton?.show();
-      }
-      if (this.config.listButton) {
-        markersListButton?.show();
-      }
+      markersButton?.show();
+      markersListButton?.show();
 
       if (this.psv.panel.isVisible(ID_PANEL_MARKERS_LIST)) {
         this.showMarkersList();

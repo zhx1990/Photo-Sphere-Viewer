@@ -45,7 +45,7 @@ export class MarkersListButton extends AbstractButton {
    * @override
    */
   isSupported() {
-    return this.plugin?.config.listButton;
+    return !!this.plugin;
   }
 
   /**

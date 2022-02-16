@@ -483,7 +483,6 @@
 
   export default {
     data: () => ({
-      psv             : null,
       markers         : null,
       file            : null,
       imageData       : null,
@@ -493,7 +492,7 @@
         roll: 0
       },
       options         : {
-        ...omit(cloneDeep(DEFAULTS), ['panorama', 'panoData', 'container', 'plugins', 'navbar', 'loadingImg']),
+        ...omit(cloneDeep(DEFAULTS), ['panorama', 'panoData', 'sphereCorrection', 'container', 'plugins', 'navbar', 'loadingImg']),
       },
       panoData        : {
         fullWidth    : null,
@@ -585,42 +584,17 @@
 
       this.oldOptions = cloneDeep(this.options);
 
-      this.applyOptions = debounce(() => {
-        try {
-          if (this.options.defaultZoomLvl !== this.oldOptions.defaultZoomLvl) {
-            this.psv.zoom(this.options.defaultZoomLvl);
-          }
-          else if (this.options.defaultLong !== this.oldOptions.defaultLong || this.options.defaultLat !== this.oldOptions.defaultLat) {
-            this.psv.rotate({
-              longitude: this.options.defaultLong,
-              latitude : this.options.defaultLat,
-            });
-          }
-          else {
-            Object.keys(this.options)
-              .some(optName => {
-                if (!isEqual(this.options[optName], this.oldOptions[optName])) {
-                  this.psv.setOption(optName, this.options[optName]);
-                  return true;
-                }
-              });
-          }
-        } catch (e) {
-          // ignore parsing errors
-        }
-        this.oldOptions = cloneDeep(this.options);
-      }, 200);
+      this._applyOptions = debounce(() => this.applyOptions(), 200);
 
       this.psv = new Viewer({
         container : 'viewer',
         loadingImg: 'https://photo-sphere-viewer.js.org/assets/photosphere-logo.gif',
         plugins   : [
-          [MarkersPlugin, {
-            hideButton: false,
-            listButton: false,
-          }],
+          [MarkersPlugin, {}],
         ],
       });
+
+      this.applyNavbar();
 
       this.markers = this.psv.getPlugin(MarkersPlugin);
 
@@ -638,7 +612,7 @@
       options         : {
         deep: true,
         handler() {
-          this.applyOptions();
+          this._applyOptions();
         },
       },
       sphereCorrection: {
@@ -654,7 +628,7 @@
       navbar          : {
         deep: true,
         handler() {
-          this.psv.setOption('navbar', this.navbar.filter(i => i.enabled).map(i => i.code));
+          this.applyNavbar();
         },
       },
       markerForm      : {
@@ -724,6 +698,36 @@
             dissmisable: false,
           });
         }
+      },
+
+      applyOptions() {
+        try {
+          if (this.options.defaultZoomLvl !== this.oldOptions.defaultZoomLvl) {
+            this.psv.zoom(this.options.defaultZoomLvl);
+          }
+          else if (this.options.defaultLong !== this.oldOptions.defaultLong || this.options.defaultLat !== this.oldOptions.defaultLat) {
+            this.psv.rotate({
+              longitude: this.options.defaultLong,
+              latitude : this.options.defaultLat,
+            });
+          }
+          else {
+            Object.keys(this.options)
+              .some(optName => {
+                if (!isEqual(this.options[optName], this.oldOptions[optName])) {
+                  this.psv.setOption(optName, this.options[optName]);
+                  return true;
+                }
+              });
+          }
+        } catch (e) {
+          // ignore parsing errors
+        }
+        this.oldOptions = cloneDeep(this.options);
+      },
+
+      applyNavbar() {
+        this.psv.setOption('navbar', this.navbar.filter(i => i.enabled).map(i => i.code));
       },
 
       newMarker(type) {

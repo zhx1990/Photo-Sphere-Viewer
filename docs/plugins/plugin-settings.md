@@ -21,10 +21,6 @@ const viewer = new PhotoSphereViewer.Viewer({
 });
 ```
 
-::: tip Custom navbar
-The button is added to the default navbar configuration. If you use a [custom navbar](../guide/navbar.md) you will need to manually add the `'settings'` button to the list.
-:::
-
 
 ## Example
 
@@ -82,3 +78,11 @@ lang: {
 ```
 
 _Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
+
+
+## Buttons
+
+This plugin adds buttons to the default navbar:
+- `settings` allows to open the settings panel
+
+If you use a [custom navbar](../guide/navbar.md) you will need to manually add the buttons to the list.

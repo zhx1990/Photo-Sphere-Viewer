@@ -23,10 +23,6 @@ const viewer = new PhotoSphereViewer.Viewer({
 There are known inconsistencies of orientation data accross devices. If the panorama is not displayed in the expected orientation, this plugin is not faulty.
 :::
 
-::: tip Custom navbar
-The button is added to the default navbar configuration. If you use a [custom navbar](../guide/navbar.md) you will need to manually add the `'gyroscope'` button to the list.
-:::
-
 
 ## Configuration
 
@@ -52,3 +48,11 @@ lang: {
 ```
 
 _Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
+
+
+## Buttons
+
+This plugin adds buttons to the default navbar:
+- `gyroscope` allows to toggle the gyroscope control
+
+If you use a [custom navbar](../guide/navbar.md) you will need to manually add the buttons to the list.

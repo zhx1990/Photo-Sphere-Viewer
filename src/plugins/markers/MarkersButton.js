@@ -49,7 +49,7 @@ export class MarkersButton extends AbstractButton {
    * @override
    */
   isSupported() {
-    return this.plugin?.config.hideButton;
+    return !!this.plugin;
   }
 
   /**

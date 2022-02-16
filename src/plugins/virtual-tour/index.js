@@ -93,7 +93,6 @@ import { bearing, distance, setMeshColor } from './utils';
  * @property {string} [startNodeId] - id of the initial node, if not defined the first node will be used
  * @property {boolean|PSV.plugins.VirtualTourPlugin.Preload} [preload=false] - preload linked panoramas
  * @property {boolean|string|number} [rotateSpeed='20rpm'] - speed of rotation when clicking on a link, if 'false' the viewer won't rotate at all
- * @property {boolean} [listButton] - adds a button to show the list of nodes, defaults to `true` only in client data mode
  * @property {boolean} [linksOnCompass] - if the Compass plugin is enabled, displays the links on the compass, defaults to `true` on in markers render mode
  * @property {PSV.plugins.MarkersPlugin.Properties} [markerStyle] - global marker style
  * @property {PSV.plugins.VirtualTourPlugin.ArrowStyle} [arrowStyle] - global arrow style
@@ -168,7 +167,6 @@ export class VirtualTourPlugin extends AbstractPlugin {
       markerLatOffset: -0.1,
       arrowPosition  : 'bottom',
       linksOnCompass : options?.renderMode === MODE_MARKERS,
-      listButton     : options?.dataMode !== MODE_SERVER,
       ...options,
       markerStyle    : {
         ...DEFAULT_MARKER,
@@ -179,6 +177,14 @@ export class VirtualTourPlugin extends AbstractPlugin {
         ...options?.arrowStyle,
       },
     };
+
+    if (options?.listButton === false) {
+      utils.logWarn('VirtualTourPlugin: listButton option is deprecated. ' +
+        'Please define the global navbar options according to your needs.');
+    }
+    if (options?.listButton === true && this.config.dataMode === MODE_SERVER) {
+      utils.logWarn('VirtualTourPlugin: the list button is not supported in server mode.');
+    }
 
     /**
      * @type {PSV.plugins.MarkersPlugin}

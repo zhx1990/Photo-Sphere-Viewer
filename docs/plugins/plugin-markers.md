@@ -25,7 +25,7 @@ Markers can be added at startup with the `markers` option or after load with the
 const viewer = new PhotoSphereViewer.Viewer({
   plugins: [
     [PhotoSphereViewer.MarkersPlugin, {
-      markers: [ 
+      markers: [
         {
           id: 'new-marker',
           longitude: '45deg',
@@ -33,7 +33,7 @@ const viewer = new PhotoSphereViewer.Viewer({
           image: 'assets/pin-red.png',
         },
       ],
-    }], 
+    }],
   ],
 });
 
@@ -100,7 +100,7 @@ One of these options is required.
 ```
 
 ::: tip What is the difference between "image" and "imageLayer" ?
-Both allows to display an image but the difference is in the rendering technique.  
+Both allows to display an image but the difference is in the rendering technique.
 And `image` marker is rendered flat above the viewer but and `imageLayer` is rendered inside the panorama itself, this allows for more natural movements and scaling.
 :::
 
@@ -120,20 +120,20 @@ Unique identifier of the marker.
 #### `x` & `y` or `latitude` & `longitude` (required for all but polygons/polylines)
 - type: `integer` or `double`
 
-Position of the marker in **texture coordinates** (pixels) or **spherical coordinates** (radians).  
+Position of the marker in **texture coordinates** (pixels) or **spherical coordinates** (radians).
 _(This option is ignored for polygons and polylines)._
 
 #### `width` & `height` (required for images, recommended for html)
 - type: `integer`
 
-Size of the marker in pixels.  
+Size of the marker in pixels.
 _(This option is ignored for polygons and polylines)._
 
 #### `scale`
 - type: `double[] | { zoom: double[], longitude: [] }`
 - default: no scalling
 
-Configures the scale of the marker depending on the zoom level and/or the longitude offset. This aims to give a natural feeling to the size of the marker as the users zooms and moves.  
+Configures the scale of the marker depending on the zoom level and/or the longitude offset. This aims to give a natural feeling to the size of the marker as the users zooms and moves.
 _(This option is ignored for polygons, polylines and imageLayer)._
 
 Scales depending on zoom level, the array contains `[scale at minimum zoom, scale at maximum zoom]` :
@@ -166,13 +166,13 @@ scale: {
 #### `className`
 - type: `string`
 
-CSS class(es) added to the marker element.  
+CSS class(es) added to the marker element.
 _(This option is ignored for imageLayer markers)._
 
 #### `style`
 - type: `object`
 
-CSS properties to set on the marker (background, border, etc.).  
+CSS properties to set on the marker (background, border, etc.).
 _(This option is ignored for imageLayer markers)._
 
 ```js
@@ -185,7 +185,7 @@ style: {
 #### `svgStyle`
 - type: `object`
 
-SVG properties to set on the marker (fill, stroke, etc.).  
+SVG properties to set on the marker (fill, stroke, etc.).
 _(Only for polygons, polylines and svg markers)._
 
 ```js
@@ -219,7 +219,7 @@ And use it in your marker : `fill: 'url(#image)'`.
 - type: `string`
 - default: `'center center'`
 
-Defines where the marker is placed toward its defined position. Any CSS position is valid like `bottom center` or `20% 80%`.  
+Defines where the marker is placed toward its defined position. Any CSS position is valid like `bottom center` or `20% 80%`.
 _(This option is ignored for polygons and polylines)._
 
 #### `visible`
@@ -246,7 +246,7 @@ tooltip: { // tooltip with custom position
 #### `listContent`
 - type: `string`
 
-The name that appears in the list of markers. If not provided, the tooltip content will be used. 
+The name that appears in the list of markers. If not provided, the tooltip content will be used.
 
 #### `content`
 - type: `string`
@@ -278,26 +278,6 @@ lang: {
 ```
 
 _Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
-
-#### `hideButton`
-- type: `boolean`
-- default: `true`
-
-Adds a navbar button to hide/show all the markers.
-
-::: tip Custom navbar
-The button is added to the default navbar configuration. If you use a [custom navbar](../guide/navbar.md) you will need to manually add the `'markers'` button to the list.
-:::
-
-#### `listButton`
-- type: `boolean`
-- default: `true`
-
-Adds a navbar button to display the list of all markers.
-
-::: tip Custom navbar
-The button is added to the default navbar configuration. If you use a [custom navbar](../guide/navbar.md) you will need to manually add the `'markersList'` button to the list.
-:::
 
 #### `clickEventOnMarker`
 - type: `boolean`
@@ -381,3 +361,12 @@ Triggered when the user clicks on a marker. The `data` object indicates if the m
 #### `unselect-marker(marker)`
 
 Triggered when a marker was selected and the user clicks elsewhere.
+
+
+## Buttons
+
+This plugin adds buttons to the default navbar:
+- `markers` allows to hide/show all markers
+- `markersList` allows to open a list of all markers on the left panel
+
+If you use a [custom navbar](../guide/navbar.md) you will need to manually add the buttons to the list.
