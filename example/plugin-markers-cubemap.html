@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhotoSphereViewer - markers demo (cubemap)</title>
+
+  <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
+  <link rel="stylesheet" href="../dist/plugins/markers.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="photosphere"></div>
+
+<script src="../node_modules/three/build/three.js"></script>
+<script src="../node_modules/uevent/browser.js"></script>
+<script src="../dist/photo-sphere-viewer.js"></script>
+<script src="../dist/adapters/cubemap.js"></script>
+<script src="../dist/plugins/markers.js"></script>
+
+<script>
+  const viewer = new PhotoSphereViewer.Viewer({
+    container : 'photosphere',
+    adapter   : [PhotoSphereViewer.CubemapAdapter, {
+      // flipTopBottom: true,
+    }],
+    panorama  : {
+      left  : 'cubemap/px.jpg',
+      front : 'cubemap/nz.jpg',
+      right : 'cubemap/nx.jpg',
+      back  : 'cubemap/pz.jpg',
+      top   : 'cubemap/py.jpg',
+      bottom: 'cubemap/ny.jpg'
+    },
+    caption   : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    loadingImg: 'assets/photosphere-logo.gif',
+    navbar    : [
+      'markers', 'markersList',
+      {
+        content  : '💬',
+        title    : 'Show all tooltips',
+        className: 'custom-button',
+        onClick  : function () {
+          markers.toggleAllTooltips();
+        }
+      },
+      'caption', 'fullscreen',
+    ],
+    plugins   : [
+      [PhotoSphereViewer.MarkersPlugin, {
+        markers: (() => {
+          const a = [];
+          for (let i = 0; i < Math.PI * 2; i += Math.PI / 4) {
+            for (let j = -Math.PI / 2 + Math.PI / 4; j < Math.PI / 2; j += Math.PI / 4) {
+              a.push({
+                id       : '#' + a.length,
+                tooltip  : '#' + a.length,
+                latitude : j,
+                longitude: i,
+                image    : 'assets/pin-red.png',
+                width    : 32,
+                height   : 32,
+                anchor   : 'bottom center',
+                data     : {
+                  deletable: true,
+                },
+              });
+            }
+          }
+
+          a.push({
+            id         : 'polygon',
+            svgStyle   : {
+              fill: 'rgba(255, 0, 111, 0.26)',
+            },
+            polylineRad: [
+              [6.2208, 0.0906],
+              [0.0443, 0.1028],
+              [0.2322, 0.0849],
+              [0.4531, 0.0387],
+              [0.5022, -0.0056],
+              [0.4587, -0.0396],
+              [0.2520, -0.0453],
+              [0.0434, -0.0575],
+              [6.1302, -0.0623],
+              [6.0094, -0.0169],
+              [6.0471, 0.0320],
+              [6.2208, 0.0906],
+            ],
+            tooltip    : {
+              content : 'This is a mountain',
+              position: 'right bottom',
+            },
+          });
+
+          return a;
+        })(),
+      }],
+    ],
+  });
+
+  const markers = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
+</script>
+</body>
+</html>

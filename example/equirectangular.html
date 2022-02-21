@@ -14,10 +14,7 @@
 
 <script src="../node_modules/three/build/three.js"></script>
 <script src="../node_modules/uevent/browser.js"></script>
-<script src="../node_modules/nosleep.js/dist/NoSleep.js"></script>
 <script src="../dist/photo-sphere-viewer.js"></script>
-<script src="../dist/plugins/gyroscope.js"></script>
-<script src="../dist/plugins/stereo.js"></script>
 
 <script>
   const panos = [
@@ -74,15 +71,8 @@
           });
         },
       },
-      'caption', 'gyroscope', 'stereo', 'fullscreen',
+      'caption', 'fullscreen',
     ],
-    plugins            : [
-      [PhotoSphereViewer.GyroscopePlugin, {
-        touchmove       : true,
-        absolutePosition: false,
-      }],
-      PhotoSphereViewer.StereoPlugin,
-    ]
   });
 
 </script>
