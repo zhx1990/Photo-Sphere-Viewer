@@ -235,15 +235,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
       return Promise.reject(new PSVError('Panorama cols and rows must be powers of 2.'));
     }
 
-    this.prop.colSize = panorama.width / panorama.cols;
-    this.prop.rowSize = panorama.width / 2 / panorama.rows;
-    this.prop.facesByCol = this.SPHERE_SEGMENTS / panorama.cols;
-    this.prop.facesByRow = this.SPHERE_HORIZONTAL_SEGMENTS / panorama.rows;
-
-    if (this.prop.geom) {
-      this.prop.geom.setAttribute('uv', this.prop.originalUvs.clone());
-    }
-
     const panoData = {
       fullWidth    : panorama.width,
       fullHeight   : panorama.width / 2,
@@ -300,11 +291,20 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
    * @override
    */
   setTexture(mesh, textureData) {
+    const { panorama, texture } = textureData;
+
     this.__cleanup();
 
+    this.prop.colSize = panorama.width / panorama.cols;
+    this.prop.rowSize = panorama.width / 2 / panorama.rows;
+    this.prop.facesByCol = this.SPHERE_SEGMENTS / panorama.cols;
+    this.prop.facesByRow = this.SPHERE_HORIZONTAL_SEGMENTS / panorama.rows;
+
+    this.prop.geom.setAttribute('uv', this.prop.originalUvs.clone());
+
     let material;
-    if (textureData.texture) {
-      material = new THREE.MeshBasicMaterial({ map: textureData.texture });
+    if (texture) {
+      material = new THREE.MeshBasicMaterial({ map: texture });
     }
     else {
       material = new THREE.MeshBasicMaterial({ opacity: 0, transparent: true });

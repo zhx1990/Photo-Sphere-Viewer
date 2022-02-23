@@ -196,13 +196,6 @@ export class CubemapTilesAdapter extends CubemapAdapter {
       return Promise.reject(new PSVError('Panorama nbTiles must be power of 2.'));
     }
 
-    this.prop.tileSize = panorama.faceSize / panorama.nbTiles;
-    this.prop.facesByTile = CUBE_SEGMENTS / panorama.nbTiles;
-
-    if (this.prop.geom) {
-      this.prop.geom.setAttribute('uv', this.prop.originalUvs.clone());
-    }
-
     if (panorama.baseUrl) {
       return super.loadTexture(panorama.baseUrl)
         .then(textureData => ({
@@ -240,18 +233,23 @@ export class CubemapTilesAdapter extends CubemapAdapter {
    * @override
    */
   setTexture(mesh, textureData) {
+    const { panorama, texture } = textureData;
+
     this.__cleanup();
 
-    if (textureData.texture) {
-      for (let i = 0; i < 6; i++) {
-        const texture = textureData.texture[i];
+    this.prop.tileSize = panorama.faceSize / panorama.nbTiles;
+    this.prop.facesByTile = CUBE_SEGMENTS / panorama.nbTiles;
 
+    this.prop.geom.setAttribute('uv', this.prop.originalUvs.clone());
+
+    if (texture) {
+      for (let i = 0; i < 6; i++) {
         if (this.config.flipTopBottom && (i === 2 || i === 3)) {
-          texture.center = new THREE.Vector2(0.5, 0.5);
-          texture.rotation = Math.PI;
+          texture[i].center = new THREE.Vector2(0.5, 0.5);
+          texture[i].rotation = Math.PI;
         }
 
-        const material = new THREE.MeshBasicMaterial({ map: texture });
+        const material = new THREE.MeshBasicMaterial({ map: texture[i] });
 
         for (let j = 0; j < NB_GROUPS_BY_FACE; j++) {
           this.materials.push(material);
