@@ -63,8 +63,6 @@
 
           return () => {
             i = 1 - i;
-            markers.clearMarkers();
-
             viewer.setPanorama(panos[i].url, { longitude: 0, latitude: 0, zoom: 50 })
               .then(() => {
                 viewer.navbar.setCaption(panos[i].desc);

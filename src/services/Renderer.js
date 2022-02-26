@@ -24,7 +24,6 @@ export class Renderer extends AbstractService {
      * @protected
      */
     this.renderer = new THREE.WebGLRenderer({ alpha: true });
-    this.renderer.context.disable(this.renderer.context.DEPTH_TEST);
     this.renderer.setPixelRatio(SYSTEM.pixelRatio);
     this.renderer.domElement.className = 'psv-canvas';
 

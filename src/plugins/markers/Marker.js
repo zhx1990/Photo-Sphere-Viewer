@@ -653,7 +653,7 @@ export class Marker {
     switch (this.type) {
       case MARKER_TYPES.imageLayer:
         if (!this.$el) {
-          const material = new THREE.MeshBasicMaterial({ transparent: true });
+          const material = new THREE.MeshBasicMaterial({ transparent: true, depthTest: false });
           const geometry = new THREE.PlaneGeometry(1, 1);
           const mesh = new THREE.Mesh(geometry, material);
           mesh.userData = { [MARKER_DATA]: this };
