@@ -1,3 +1,4 @@
+import { Event } from 'uevent';
 import { AbstractPlugin, Viewer } from '../..';
 
 /**
@@ -6,6 +7,7 @@ import { AbstractPlugin, Viewer } from '../..';
 export type BaseSetting = {
   id: string;
   label: string;
+  badge?: () => string;
 };
 
 /**
@@ -36,6 +38,10 @@ export type SettingOption = {
 };
 
 export type Setting = OptionsSetting | ToggleSetting;
+
+export const EVENTS: {
+  SETTING_CHANGED: 'setting-changed',
+};
 
 /**
  * @summary Adds a button to access various settings.
@@ -69,5 +75,10 @@ export class SettingsPlugin extends AbstractPlugin {
    * @summary Shows the settings panel
    */
   showSettings();
+
+  /**
+   * @summary Triggered when a setting is changed
+   */
+  on(e: 'setting-changed', cb: (e: Event, settingId: string, value: any) => void): this;
 
 }

@@ -5,6 +5,24 @@ import switchOff from './switch-off.svg';
 import switchOn from './switch-on.svg';
 
 /**
+ * @summary Available events
+ * @enum {string}
+ * @memberof PSV.plugins.ResolutionPlugin
+ * @constant
+ */
+export const EVENTS = {
+  /**
+   * @event setting-changed
+   * @memberof PSV.plugins.SettingsPlugin
+   * @summary Triggered when a setting is changed
+   * @param {string} settingId
+   * @param {any} value
+   */
+  SETTING_CHANGED: 'setting-changed',
+};
+
+
+/**
  * @summary Panel identifier for settings content
  * @type {string}
  * @constant

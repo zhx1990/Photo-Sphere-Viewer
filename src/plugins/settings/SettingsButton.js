@@ -25,6 +25,16 @@ export class SettingsButton extends AbstractButton {
      */
     this.plugin = this.psv.getPlugin('settings');
 
+    /**
+     * @member {HTMLElement}
+     * @private
+     * @readonly
+     */
+    this.badge = document.createElement('div');
+    this.badge.className = 'psv-settings-badge';
+    this.badge.style.display = 'none';
+    this.container.appendChild(this.badge);
+
     if (this.plugin) {
       this.psv.on(CONSTANTS.EVENTS.OPEN_PANEL, this);
       this.psv.on(CONSTANTS.EVENTS.CLOSE_PANEL, this);
@@ -72,6 +82,15 @@ export class SettingsButton extends AbstractButton {
    */
   onClick() {
     this.plugin.toggleSettings();
+  }
+
+  /**
+   * @summary Changes the badge value
+   * @param {string} value
+   */
+  setBadge(value) {
+    this.badge.innerText = value;
+    this.badge.style.display = value ? '' : 'none';
   }
 
 }

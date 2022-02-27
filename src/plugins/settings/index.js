@@ -1,5 +1,12 @@
 import { AbstractPlugin, DEFAULTS, PSVError, registerButton, utils } from '../..';
-import { ID_PANEL, SETTING_DATA, SETTING_OPTIONS_TEMPLATE, SETTINGS_TEMPLATE, SETTINGS_TEMPLATE_ } from './constants';
+import {
+  EVENTS,
+  ID_PANEL,
+  SETTING_DATA,
+  SETTING_OPTIONS_TEMPLATE,
+  SETTINGS_TEMPLATE,
+  SETTINGS_TEMPLATE_
+} from './constants';
 import { SettingsButton } from './SettingsButton';
 import './style.scss';
 
@@ -10,6 +17,7 @@ import './style.scss';
  * @property {string} id - identifier of the setting
  * @property {string} label - label of the setting
  * @property {'options' | 'toggle'} type - type of the setting
+ * @property {function} [badge] - function which returns the value of the button badge
  */
 
 /**
@@ -42,6 +50,9 @@ DEFAULTS.lang[SettingsButton.id] = 'Settings';
 registerButton(SettingsButton, 'fullscreen:left');
 
 
+export { EVENTS } from './constants';
+
+
 /**
  * @summary Adds a button to access various settings.
  * @extends PSV.plugins.AbstractPlugin
@@ -69,6 +80,9 @@ export class SettingsPlugin extends AbstractPlugin {
    */
   init() {
     super.init();
+
+    // buttons are initialized just after plugins
+    setTimeout(() => this.updateBadge());
   }
 
   /**
@@ -95,11 +109,17 @@ export class SettingsPlugin extends AbstractPlugin {
       throw new PSVError('Unsupported setting type');
     }
 
+    if (setting.badge && this.settings.some(s => s.badge)) {
+      utils.logWarn('More than one setting with a badge are declared, the result is unpredictable.');
+    }
+
     this.settings.push(setting);
 
     if (this.psv.panel.prop.contentId === ID_PANEL) {
       this.showSettings();
     }
+
+    this.updateBadge();
   }
 
   /**
@@ -122,6 +142,8 @@ export class SettingsPlugin extends AbstractPlugin {
       if (this.psv.panel.prop.contentId === ID_PANEL) {
         this.showSettings();
       }
+
+      this.updateBadge();
     }
   }
 
@@ -170,7 +192,9 @@ export class SettingsPlugin extends AbstractPlugin {
           switch (setting.type) {
             case 'toggle':
               setting.toggle();
+              this.trigger(EVENTS.SETTING_CHANGED, setting.id, setting.active());
               this.showSettings();
+              this.updateBadge();
               break;
 
             case 'options':
@@ -213,10 +237,20 @@ export class SettingsPlugin extends AbstractPlugin {
         }
         else {
           setting.apply(optionId);
+          this.trigger(EVENTS.SETTING_CHANGED, setting.id, setting.current());
           this.hideSettings();
+          this.updateBadge();
         }
       },
     });
+  }
+
+  /**
+   * @summary Updates the badge in the button
+   */
+  updateBadge() {
+    const value = this.settings.find(s => s.badge)?.badge();
+    this.psv.navbar.getButton(SettingsButton.id, false)?.setBadge(value);
   }
 
 }

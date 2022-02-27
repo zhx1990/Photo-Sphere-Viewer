@@ -57,11 +57,23 @@ settings.addSetting({
   label  : 'Options setting',
   type   : 'options',
   options: () => ([
-    { id: 'option-a', label: 'Option A' },
-    { id: 'option-b', label: 'Option B' },
+    { id: 'A', label: 'Option A' },
+    { id: 'B', label: 'Option B' },
   ]),
   current: () => currentOption,
   apply  : (option) => currentOption = option,
+});
+```
+
+
+## Button badge
+
+A setting can also have a `badge` function, which return value will be used as a badge on the settings button itself. **Only one setting can declare a badge.**
+
+```js
+settings.addSetting({
+  ...,
+  badge: () => currentOption,
 });
 ```
 
@@ -78,6 +90,19 @@ lang: {
 ```
 
 _Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
+
+
+## Events
+
+#### `setting-changed(id, value)`
+
+Triggered when the resolution is changed.
+
+```js
+settingsPlugin.on('resolution-changed', (e, id, value) => {
+  console.log(`${id}: ${value}`);
+});
+```
 
 
 ## Buttons

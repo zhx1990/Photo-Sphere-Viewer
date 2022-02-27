@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhotoSphereViewer - settings demo</title>
+
+  <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
+  <link rel="stylesheet" href="../dist/plugins/settings.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="photosphere"></div>
+
+<script src="../node_modules/three/build/three.js"></script>
+<script src="../node_modules/uevent/browser.js"></script>
+<script src="../dist/photo-sphere-viewer.js"></script>
+<script src="../dist/plugins/settings.js"></script>
+
+<script>
+  const viewer = new PhotoSphereViewer.Viewer({
+    container : 'photosphere',
+    panorama  : 'sphere.jpg',
+    caption   : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    loadingImg: 'assets/photosphere-logo.gif',
+    plugins   : [
+      PhotoSphereViewer.SettingsPlugin,
+    ],
+  });
+
+  const settings = viewer.getPlugin(PhotoSphereViewer.SettingsPlugin);
+
+  let currentToggle = true;
+  let currentOption = 'A';
+
+  settings.addSetting({
+    id    : 'custom-toggle-setting',
+    label : 'Toggle setting',
+    type  : 'toggle',
+    active: () => currentToggle,
+    toggle: () => currentToggle = !currentToggle,
+  });
+
+  settings.addSetting({
+    id     : 'custom-options-setting',
+    label  : 'Options setting',
+    type   : 'options',
+    current: () => currentOption,
+    options: () => ([
+      { id: 'A', label: 'Option A' },
+      { id: 'B', label: 'Option B' },
+    ]),
+    apply  : (option) => currentOption = option,
+    badge  : () => currentOption,
+  });
+
+  settings.on('setting-changed', (e, id, value) => {
+    console.log(`${id}: ${value}`);
+  })
+</script>
+</body>
+</html>
