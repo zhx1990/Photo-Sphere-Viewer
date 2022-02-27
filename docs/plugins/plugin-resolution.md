@@ -52,6 +52,12 @@ The following example provides two resolutions for the panorama, "small" is load
 List of available resolutions. Each resolution consist of an object with the properties `id`, `label` and `panorama`.
 Cubemaps are supported.
 
+#### `showBadge`
+- type: `boolean`
+- default: `true`
+
+Show the resolution id as a badge on the settings button.
+
 #### `lang`
 - type: `object`
 - default:
@@ -62,3 +68,16 @@ lang: {
 ```
 
 _Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
+
+
+## Events
+
+#### `resolution-changed(id)`
+
+Triggered when the resolution is changed.
+
+```js
+resolutionPlugin.on('resolution-changed', (e, id) => {
+  console.log(`Current resolution: ${id}`);
+});
+```

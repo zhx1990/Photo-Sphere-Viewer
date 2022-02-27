@@ -13,6 +13,7 @@ import { deepEqual } from './utils';
 /**
  * @typedef {Object} PSV.plugins.ResolutionPlugin.Options
  * @property {PSV.plugins.ResolutionPlugin.Resolution[]} resolutions - list of available resolutions
+ * @property {boolean} [showBadge=true] - show the resolution id as a badge on the settings button
  */
 
 
@@ -76,6 +77,7 @@ export class ResolutionPlugin extends AbstractPlugin {
      * @type {PSV.plugins.ResolutionPlugin.Options}
      */
     this.config = {
+      showBadge: true,
       ...options,
     };
   }
@@ -99,6 +101,7 @@ export class ResolutionPlugin extends AbstractPlugin {
       current: () => this.prop.resolution,
       options: () => this.__getSettingsOptions(),
       apply  : resolution => this.setResolution(resolution),
+      badge  : !this.config.showBadge ? null : () => this.prop.resolution,
     });
 
     this.psv.on(CONSTANTS.EVENTS.PANORAMA_LOADED, this);
@@ -177,6 +180,7 @@ export class ResolutionPlugin extends AbstractPlugin {
     const resolution = this.resolutions.find(r => deepEqual(this.psv.config.panorama, r.panorama));
     if (this.prop.resolution !== resolution?.id) {
       this.prop.resolution = resolution?.id;
+      this.settings?.updateBadge();
       this.trigger(EVENTS.RESOLUTION_CHANGED, this.prop.resolution);
     }
   }
