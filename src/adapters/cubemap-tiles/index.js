@@ -52,6 +52,10 @@ const NB_VERTICES_BY_PLANE = NB_VERTICES_BY_FACE * CUBE_SEGMENTS * CUBE_SEGMENTS
 const NB_VERTICES = 6 * NB_VERTICES_BY_PLANE;
 const NB_GROUPS_BY_FACE = CUBE_SEGMENTS * CUBE_SEGMENTS;
 
+const ATTR_UV = 'uv';
+const ATTR_ORIGINAL_UV = 'originaluv';
+const ATTR_POSITION = 'position';
+
 function tileId(tile) {
   return `${tile.face}:${tile.col}x${tile.row}`;
 }
@@ -67,8 +71,6 @@ const vertexPosition = new THREE.Vector3();
 export class CubemapTilesAdapter extends CubemapAdapter {
 
   static id = 'cubemap-tiles';
-  static supportsTransition = false;
-  static supportsPreload = false;
   static supportsDownload = false;
 
   /**
@@ -90,12 +92,6 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     };
 
     /**
-     * @member {external:THREE.MeshBasicMaterial[]}
-     * @private
-     */
-    this.materials = [];
-
-    /**
      * @member {PSV.adapters.Queue}
      * @private
      */
@@ -107,7 +103,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
      * @property {int} facesByTile - number of mesh faces by tile
      * @property {Record<string, boolean>} tiles - loaded tiles
      * @property {external:THREE.BoxGeometry} geom
-     * @property {*} originalUvs
+     * @property {external:THREE.MeshBasicMaterial[]} materials
      * @property {external:THREE.MeshBasicMaterial} errorMaterial
      * @private
      */
@@ -116,7 +112,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
       facesByTile  : 0,
       tiles        : {},
       geom         : null,
-      originalUvs  : null,
+      materials    : [],
       errorMaterial: null,
     };
 
@@ -136,6 +132,9 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     this.psv.on(CONSTANTS.EVENTS.ZOOM_UPDATED, this);
   }
 
+  /**
+   * @override
+   */
   destroy() {
     this.psv.off(CONSTANTS.EVENTS.POSITION_UPDATED, this);
     this.psv.off(CONSTANTS.EVENTS.ZOOM_UPDATED, this);
@@ -148,12 +147,14 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     delete this.queue;
     delete this.loader;
     delete this.prop.geom;
-    delete this.prop.originalUvs;
     delete this.prop.errorMaterial;
 
     super.destroy();
   }
 
+  /**
+   * @private
+   */
   handleEvent(e) {
     /* eslint-disable */
     switch (e.type) {
@@ -173,11 +174,25 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     this.queue.clear();
     this.prop.tiles = {};
 
-    this.materials.forEach((mat) => {
+    this.prop.materials.forEach((mat) => {
       mat?.map?.dispose();
       mat?.dispose();
     });
-    this.materials.length = 0;
+    this.prop.materials.length = 0;
+  }
+
+  /**
+   * @override
+   */
+  supportsTransition(panorama) {
+    return !!panorama.baseUrl;
+  }
+
+  /**
+   * @override
+   */
+  supportsPreload(panorama) {
+    return !!panorama.baseUrl;
   }
 
   /**
@@ -222,53 +237,70 @@ export class CubemapTilesAdapter extends CubemapAdapter {
       geometry.addGroup(i, NB_VERTICES_BY_FACE, k++);
     }
 
-    this.prop.geom = geometry;
-    this.prop.originalUvs = geometry.getAttribute('uv').clone();
+    geometry.setAttribute(ATTR_ORIGINAL_UV, geometry.getAttribute(ATTR_UV).clone());
 
-    return new THREE.Mesh(geometry, this.materials);
+    return new THREE.Mesh(geometry, []);
   }
 
   /**
    * @summary Applies the base texture and starts the loading of tiles
    * @override
    */
-  setTexture(mesh, textureData) {
+  setTexture(mesh, textureData, transition) {
     const { panorama, texture } = textureData;
 
+    if (transition) {
+      this.__setTexture(mesh, texture);
+      return;
+    }
+
     this.__cleanup();
+    this.__setTexture(mesh, texture);
+
+    this.prop.materials = mesh.material;
+    this.prop.geom = mesh.geometry;
+    this.prop.geom.setAttribute(ATTR_UV, this.prop.geom.getAttribute(ATTR_ORIGINAL_UV).clone());
 
     this.prop.tileSize = panorama.faceSize / panorama.nbTiles;
     this.prop.facesByTile = CUBE_SEGMENTS / panorama.nbTiles;
 
-    this.prop.geom.setAttribute('uv', this.prop.originalUvs.clone());
+    // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));
 
-    if (texture) {
-      for (let i = 0; i < 6; i++) {
+    setTimeout(() => this.__refresh(true));
+  }
+
+  /**
+   * @private
+   */
+  __setTexture(mesh, texture) {
+    for (let i = 0; i < 6; i++) {
+      let material;
+      if (texture) {
         if (this.config.flipTopBottom && (i === 2 || i === 3)) {
           texture[i].center = new THREE.Vector2(0.5, 0.5);
           texture[i].rotation = Math.PI;
         }
 
-        const material = new THREE.MeshBasicMaterial({ map: texture[i] });
+        material = new THREE.MeshBasicMaterial({ map: texture[i] });
+      }
+      else {
+        material = new THREE.MeshBasicMaterial({ opacity: 0, transparent: true });
+      }
 
-        for (let j = 0; j < NB_GROUPS_BY_FACE; j++) {
-          this.materials.push(material);
-        }
+      for (let j = 0; j < NB_GROUPS_BY_FACE; j++) {
+        mesh.material.push(material);
       }
     }
-    else {
-      const material = new THREE.MeshBasicMaterial({ opacity: 0, transparent: true });
+  }
 
-      for (let i = 0; i < 6; i++) {
-        for (let j = 0; j < NB_GROUPS_BY_FACE; j++) {
-          this.materials.push(material);
-        }
-      }
+  /**
+   * @override
+   */
+  setTextureOpacity(mesh, opacity) {
+    for (let i = 0; i < 6; i++) {
+      mesh.material[i * NB_GROUPS_BY_FACE].opacity = opacity;
+      mesh.material[i * NB_GROUPS_BY_FACE].transparent = opacity < 1;
     }
-
-    // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));
-
-    setTimeout(() => this.__refresh(true));
   }
 
   /**
@@ -287,7 +319,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromProjectionMatrix(projScreenMatrix);
 
-    const verticesPosition = this.prop.geom.getAttribute('position');
+    const verticesPosition = this.prop.geom.getAttribute(ATTR_POSITION);
     const tilesToLoad = [];
 
     for (let face = 0; face < 6; face++) {
@@ -438,7 +470,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
    * @private
    */
   __swapMaterial(face, col, row, material) {
-    const uvs = this.prop.geom.getAttribute('uv');
+    const uvs = this.prop.geom.getAttribute(ATTR_UV);
 
     for (let c = 0; c < this.prop.facesByTile; c++) {
       for (let r = 0; r < this.prop.facesByTile; r++) {
@@ -451,7 +483,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
 
         // swap material
         const matIndex = this.prop.geom.groups.find(g => g.start === firstVertex).materialIndex;
-        this.materials[matIndex] = material;
+        this.prop.materials[matIndex] = material;
 
         // define new uvs
         let top = 1 - r / this.prop.facesByTile;

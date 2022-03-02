@@ -227,6 +227,12 @@ Enable the preloading of linked nodes, can be a function that returns true or fa
 
 When a link is clicked, adds a panorama rotation to face it before actually changing the node. If `false` the viewer won't rotate at all and keep the current orientation.
 
+#### `transition`
+- type: `boolean | number`
+- default: `1500`
+
+Duration of the transition between nodes.
+
 #### `linksOnCompass`
 - type: `boolean`
 - default: `true` if markers render mode

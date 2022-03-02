@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { AbstractAdapter, CONSTANTS, PSVError, utils } from '../..';
+import { CONSTANTS, EquirectangularAdapter, PSVError, utils } from '../..';
 import { Queue } from '../tiles-shared/Queue';
 import { Task } from '../tiles-shared/Task';
 import { buildErrorMaterial, createBaseTexture } from '../tiles-shared/utils';
@@ -36,7 +36,7 @@ import { buildErrorMaterial, createBaseTexture } from '../tiles-shared/utils';
  * @private
  * @property {int} col
  * @property {int} row
- * @property {int} angle
+ * @property {float} angle
  */
 
 /* the faces of the top and bottom rows are made of a single triangle (3 vertices)
@@ -71,6 +71,10 @@ import { buildErrorMaterial, createBaseTexture } from '../tiles-shared/utils';
  *     ⋁
  */
 
+const ATTR_UV = 'uv';
+const ATTR_ORIGINAL_UV = 'originaluv';
+const ATTR_POSITION = 'position';
+
 function tileId(tile) {
   return `${tile.col}x${tile.row}`;
 }
@@ -84,11 +88,9 @@ const vertexPosition = new THREE.Vector3();
  * @summary Adapter for tiled panoramas
  * @memberof PSV.adapters
  */
-export class EquirectangularTilesAdapter extends AbstractAdapter {
+export class EquirectangularTilesAdapter extends EquirectangularAdapter {
 
   static id = 'equirectangular-tiles';
-  static supportsTransition = false;
-  static supportsPreload = false;
   static supportsDownload = false;
 
   /**
@@ -97,6 +99,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
    */
   constructor(psv, options) {
     super(psv);
+
+    this.psv.config.useXmpData = false;
 
     /**
      * @member {PSV.adapters.EquirectangularTilesAdapter.Options}
@@ -122,12 +126,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     this.NB_GROUPS = this.SPHERE_SEGMENTS * this.SPHERE_HORIZONTAL_SEGMENTS;
 
     /**
-     * @member {external:THREE.MeshBasicMaterial[]}
-     * @private
-     */
-    this.materials = [];
-
-    /**
      * @member {PSV.adapters.Queue}
      * @private
      */
@@ -141,7 +139,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
      * @property {int} facesByRow - number of mesh faces by row
      * @property {Record<string, boolean>} tiles - loaded tiles
      * @property {external:THREE.SphereGeometry} geom
-     * @property {*} originalUvs
+     * @property {external:THREE.MeshBasicMaterial[]} materials
      * @property {external:THREE.MeshBasicMaterial} errorMaterial
      * @private
      */
@@ -152,7 +150,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
       facesByRow   : 0,
       tiles        : {},
       geom         : null,
-      originalUvs  : null,
+      materials    : [],
       errorMaterial: null,
     };
 
@@ -172,6 +170,9 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     this.psv.on(CONSTANTS.EVENTS.ZOOM_UPDATED, this);
   }
 
+  /**
+   * @override
+   */
   destroy() {
     this.psv.off(CONSTANTS.EVENTS.POSITION_UPDATED, this);
     this.psv.off(CONSTANTS.EVENTS.ZOOM_UPDATED, this);
@@ -184,12 +185,14 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     delete this.queue;
     delete this.loader;
     delete this.prop.geom;
-    delete this.prop.originalUvs;
     delete this.prop.errorMaterial;
 
     super.destroy();
   }
 
+  /**
+   * @private
+   */
   handleEvent(e) {
     /* eslint-disable */
     switch (e.type) {
@@ -209,11 +212,25 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     this.queue.clear();
     this.prop.tiles = {};
 
-    this.materials.forEach((mat) => {
+    this.prop.materials.forEach((mat) => {
       mat?.map?.dispose();
       mat?.dispose();
     });
-    this.materials.length = 0;
+    this.prop.materials.length = 0;
+  }
+
+  /**
+   * @override
+   */
+  supportsTransition(panorama) {
+    return !!panorama.baseUrl;
+  }
+
+  /**
+   * @override
+   */
+  supportsPreload(panorama) {
+    return !!panorama.baseUrl;
   }
 
   /**
@@ -245,11 +262,12 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     };
 
     if (panorama.baseUrl) {
-      return this.psv.textureLoader.loadImage(panorama.baseUrl, p => this.psv.loader.setProgress(p))
-        .then((img) => {
-          const texture = this.__createBaseTexture(img);
-          return { panorama, texture, panoData };
-        });
+      return super.loadTexture(panorama.baseUrl)
+        .then(textureData => ({
+          panorama: panorama,
+          texture : textureData.texture,
+          panoData: panoData,
+        }));
     }
     else {
       return Promise.resolve({ panorama, panoData });
@@ -280,28 +298,44 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
       geometry.addGroup(i, this.NB_VERTICES_BY_SMALL_FACE, k++);
     }
 
-    this.prop.geom = geometry;
-    this.prop.originalUvs = geometry.getAttribute('uv').clone();
+    geometry.setAttribute(ATTR_ORIGINAL_UV, geometry.getAttribute(ATTR_UV).clone());
 
-    return new THREE.Mesh(geometry, this.materials);
+    return new THREE.Mesh(geometry, []);
   }
 
   /**
    * @summary Applies the base texture and starts the loading of tiles
    * @override
    */
-  setTexture(mesh, textureData) {
+  setTexture(mesh, textureData, transition) {
     const { panorama, texture } = textureData;
 
+    if (transition) {
+      this.__setTexture(mesh, texture);
+      return;
+    }
+
     this.__cleanup();
+    this.__setTexture(mesh, texture);
+
+    this.prop.materials = mesh.material;
+    this.prop.geom = mesh.geometry;
+    this.prop.geom.setAttribute(ATTR_UV, this.prop.geom.getAttribute(ATTR_ORIGINAL_UV).clone());
 
     this.prop.colSize = panorama.width / panorama.cols;
     this.prop.rowSize = panorama.width / 2 / panorama.rows;
     this.prop.facesByCol = this.SPHERE_SEGMENTS / panorama.cols;
     this.prop.facesByRow = this.SPHERE_HORIZONTAL_SEGMENTS / panorama.rows;
 
-    this.prop.geom.setAttribute('uv', this.prop.originalUvs.clone());
+    // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));
 
+    setTimeout(() => this.__refresh(true));
+  }
+
+  /**
+   * @private
+   */
+  __setTexture(mesh, texture) {
     let material;
     if (texture) {
       material = new THREE.MeshBasicMaterial({ map: texture });
@@ -311,12 +345,16 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     }
 
     for (let i = 0; i < this.NB_GROUPS; i++) {
-      this.materials.push(material);
+      mesh.material.push(material);
     }
+  }
 
-    // this.psv.renderer.scene.add(createWireFrame(this.prop.geom));
-
-    setTimeout(() => this.__refresh(true));
+  /**
+   * @override
+   */
+  setTextureOpacity(mesh, opacity) {
+    mesh.material[0].opacity = opacity;
+    mesh.material[0].transparent = opacity < 1;
   }
 
   /**
@@ -336,7 +374,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
     projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromProjectionMatrix(projScreenMatrix);
 
-    const verticesPosition = this.prop.geom.getAttribute('position');
+    const verticesPosition = this.prop.geom.getAttribute(ATTR_POSITION);
     const tilesToLoad = [];
 
     for (let col = 0; col < panorama.cols; col++) {
@@ -564,7 +602,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
    * @private
    */
   __swapMaterial(col, row, material) {
-    const uvs = this.prop.geom.getAttribute('uv');
+    const uvs = this.prop.geom.getAttribute(ATTR_UV);
 
     for (let c = 0; c < this.prop.facesByCol; c++) {
       for (let r = 0; r < this.prop.facesByRow; r++) {
@@ -592,7 +630,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter {
 
         // swap material
         const matIndex = this.prop.geom.groups.find(g => g.start === firstVertex).materialIndex;
-        this.materials[matIndex] = material;
+        this.prop.materials[matIndex] = material;
 
         // define new uvs
         const top = 1 - r / this.prop.facesByRow;

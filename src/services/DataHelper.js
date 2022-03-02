@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { SPHERE_RADIUS } from '../data/constants';
+import { MESH_USER_DATA, SPHERE_RADIUS } from '../data/constants';
 import { PSVError } from '../PSVError';
 import { applyEulerInverse, parseAngle, parseSpeed } from '../utils';
 import { AbstractService } from './AbstractService';
@@ -166,7 +166,7 @@ export class DataHelper extends AbstractService {
    * @returns {external:THREE.Vector3}
    */
   viewerCoordsToVector3(viewerPoint) {
-    const sphereIntersect = this.getIntersections(viewerPoint).filter(i => i.object.userData.psvSphere);
+    const sphereIntersect = this.getIntersections(viewerPoint).filter(i => i.object.userData[MESH_USER_DATA]);
 
     if (sphereIntersect) {
       return sphereIntersect.point;

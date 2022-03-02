@@ -128,8 +128,9 @@
       [PhotoSphereViewer.VirtualTourPlugin, {
         positionMode : PhotoSphereViewer.VirtualTourPlugin.MODE_GPS,
         renderMode   : PhotoSphereViewer.VirtualTourPlugin.MODE_3D,
-        startNodeId  : nodes[0].id,
+        startNodeId  : nodes[1].id,
         preload      : true,
+        // transition   : false,
         // rotateSpeed  : false,
         arrowPosition: 'bottom',
 
@@ -139,7 +140,7 @@
 
         // server mode (mock)
         // dataMode: PhotoSphereViewer.VirtualTourPlugin.MODE_SERVER,
-        getNode : (nodeId) => {
+        getNode: (nodeId) => {
           console.log('GET node ' + nodeId);
           return Promise.resolve({
             ...nodesById[nodeId],

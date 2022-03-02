@@ -19,8 +19,6 @@ import { AbstractAdapter } from '../AbstractAdapter';
 export class EquirectangularAdapter extends AbstractAdapter {
 
   static id = 'equirectangular';
-  static supportsTransition = true;
-  static supportsPreload = true;
   static supportsDownload = true;
 
   /**
@@ -45,6 +43,20 @@ export class EquirectangularAdapter extends AbstractAdapter {
 
     this.SPHERE_SEGMENTS = this.config.resolution;
     this.SPHERE_HORIZONTAL_SEGMENTS = this.SPHERE_SEGMENTS / 2;
+  }
+
+  /**
+   * @override
+   */
+  supportsTransition() {
+    return true;
+  }
+
+  /**
+   * @override
+   */
+  supportsPreload() {
+    return true;
   }
 
   /**
@@ -89,7 +101,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
           logWarn(`Invalid panoData, croppedWidth and/or croppedHeight is not coherent with loaded image.
     panoData: ${panoData.croppedWidth}x${panoData.croppedHeight}, image: ${img.width}x${img.height}`);
         }
-        if (panoData.fullWidth !== panoData.fullHeight * 2) {
+        if ((newPanoData || xmpPanoData) && panoData.fullWidth !== panoData.fullHeight * 2) {
           logWarn('Invalid panoData, fullWidth should be twice fullHeight');
         }
 
@@ -207,10 +219,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
   setTexture(mesh, textureData) {
     const { texture } = textureData;
 
-    if (mesh.material.map) {
-      mesh.material.map.dispose();
-    }
-
+    mesh.material.map?.dispose();
     mesh.material.map = texture;
   }
 
@@ -220,6 +229,13 @@ export class EquirectangularAdapter extends AbstractAdapter {
   setTextureOpacity(mesh, opacity) {
     mesh.material.opacity = opacity;
     mesh.material.transparent = opacity < 1;
+  }
+
+  /**
+   * @override
+   */
+  disposeTexture(textureData) {
+    textureData.texture?.dispose();
   }
 
 }

@@ -3,6 +3,14 @@
  */
 
 /**
+ * @summary Default duration of the transition between panoramas
+ * @memberOf PSV.constants
+ * @type {number}
+ * @constant
+ */
+export const DEFAULT_TRANSITION = 1500;
+
+/**
  * @summary Number of pixels bellow which a mouse move will be considered as a click
  * @memberOf PSV.constants
  * @type {number}
@@ -65,6 +73,14 @@ export const SPHERE_RADIUS = 10;
  * @constant
  */
 export const VIEWER_DATA = 'photoSphereViewer';
+
+/**
+ * @summary Property added the the main Mesh object
+ * @memberOf PSV.constants
+ * @type {string}
+ * @constant
+ */
+export const MESH_USER_DATA = 'psvSphere';
 
 /**
  * @summary Available actions

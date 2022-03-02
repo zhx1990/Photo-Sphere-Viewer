@@ -640,8 +640,10 @@ export class EventsHandler extends AbstractService {
       onTick    : (properties) => {
         this.__move(properties, false);
       },
-    })
-      .finally(() => {
+    });
+
+    this.prop.animationPromise
+      .then(() => {
         this.state.moving = false;
       });
   }

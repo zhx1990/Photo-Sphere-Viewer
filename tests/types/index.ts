@@ -1,6 +1,9 @@
-import { CONSTANTS, Viewer } from 'photo-sphere-viewer';
-import { EquirectangularTilesAdapter, EquirectangularTilesPanorama } from 'photo-sphere-viewer/dist/adapters/equirectangular-tiles';
-import { MarkersPlugin, MarkersPluginOptions, EVENTS as MAKER_EVENTS } from 'photo-sphere-viewer/dist/plugins/markers';
+import { Animation, CONSTANTS, Viewer } from 'photo-sphere-viewer';
+import {
+  EquirectangularTilesAdapter,
+  EquirectangularTilesPanorama
+} from 'photo-sphere-viewer/dist/adapters/equirectangular-tiles';
+import { EVENTS as MAKER_EVENTS, MarkersPlugin, MarkersPluginOptions } from 'photo-sphere-viewer/dist/plugins/markers';
 import { CustomPlugin } from './CustomPlugin';
 
 const viewer = new Viewer({
@@ -75,3 +78,15 @@ customPlugin.doSomething();
 
 const customPluginAgain = viewer.getPlugin<CustomPlugin>('custom');
 customPluginAgain.doSomething();
+
+const anim = new Animation({
+  duration: 1000,
+  properties: {
+    foo: {start: 0, end: 1},
+  },
+  onTick: (properties) => {
+    console.log(properties.foo);
+  }
+});
+
+anim.then(completed => console.log(completed));

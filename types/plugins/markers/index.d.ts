@@ -209,7 +209,7 @@ export class MarkersPlugin extends AbstractPlugin {
   /**
    * @summary Rotate the view to face the marker
    */
-  gotoMarker(markerId: string, speed: string | number): Animation;
+  gotoMarker(markerId: string, speed: string | number): Animation<any>;
 
   /**
    * @summary Hides a marker

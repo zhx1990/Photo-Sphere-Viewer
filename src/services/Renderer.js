@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Animation } from '../Animation';
-import { EVENTS, SPHERE_RADIUS } from '../data/constants';
+import { EVENTS, MESH_USER_DATA, SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { each, isExtendedPosition } from '../utils';
 import { AbstractService } from './AbstractService';
@@ -47,7 +47,7 @@ export class Renderer extends AbstractService {
      * @protected
      */
     this.mesh = this.psv.adapter.createMesh();
-    this.mesh.userData = { psvSphere: true };
+    this.mesh.userData = { [MESH_USER_DATA]: true };
 
     /**
      * @member {external:THREE.Group}
@@ -292,10 +292,10 @@ export class Renderer extends AbstractService {
     const positionProvided = isExtendedPosition(options);
     const zoomProvided = 'zoom' in options;
 
+    // create temp group and new mesh, half size to be in "front" of the first one
     const group = new THREE.Group();
-
     const mesh = this.psv.adapter.createMesh(0.5);
-    this.psv.adapter.setTexture(mesh, textureData);
+    this.psv.adapter.setTexture(mesh, textureData, true);
     this.psv.adapter.setTextureOpacity(mesh, 0);
     this.setPanoramaPose(textureData.panoData, mesh);
     this.setSphereCorrection(options.sphereCorrection, group);
@@ -316,9 +316,8 @@ export class Renderer extends AbstractService {
 
     group.add(mesh);
     this.scene.add(group);
-    this.psv.needsUpdate();
 
-    return new Animation({
+    const animation = new Animation({
       properties: {
         opacity: { start: 0.0, end: 1.0 },
         zoom   : zoomProvided ? { start: this.psv.getZoomLevel(), end: options.zoom } : undefined,
@@ -335,23 +334,32 @@ export class Renderer extends AbstractService {
 
         this.psv.needsUpdate();
       },
-    })
-      .then(() => {
-        // remove temp sphere and transfer the texture to the main sphere
-        this.setTexture(textureData);
-        this.psv.adapter.setTextureOpacity(this.mesh, 1);
-        this.setPanoramaPose(textureData.panoData);
-        this.setSphereCorrection(options.sphereCorrection);
+    });
+
+    animation
+      .then((completed) => {
+        if (completed) {
+          // remove temp sphere and transfer the texture to the main mesh
+          this.setTexture(textureData);
+          this.psv.adapter.setTextureOpacity(this.mesh, 1);
+          this.setPanoramaPose(textureData.panoData);
+          this.setSphereCorrection(options.sphereCorrection);
+
+          // actually rotate the camera
+          if (positionProvided) {
+            this.psv.rotate(options);
+          }
+        }
+        else {
+          this.psv.adapter.disposeTexture(textureData);
+        }
 
         this.scene.remove(group);
         mesh.geometry.dispose();
         mesh.geometry = null;
-
-        // actually rotate the camera
-        if (positionProvided) {
-          this.psv.rotate(options);
-        }
       });
+
+    return animation;
   }
 
   /**

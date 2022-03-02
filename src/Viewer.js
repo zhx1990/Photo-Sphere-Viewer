@@ -7,7 +7,7 @@ import { Notification } from './components/Notification';
 import { Overlay } from './components/Overlay';
 import { Panel } from './components/Panel';
 import { CONFIG_PARSERS, DEFAULTS, DEPRECATED_OPTIONS, getConfig, READONLY_OPTIONS } from './data/config';
-import { CHANGE_EVENTS, EVENTS, IDS, SPHERE_RADIUS, VIEWER_DATA } from './data/constants';
+import { CHANGE_EVENTS, DEFAULT_TRANSITION, EVENTS, IDS, SPHERE_RADIUS, VIEWER_DATA } from './data/constants';
 import { SYSTEM } from './data/system';
 import errorIcon from './icons/error.svg';
 import { AbstractPlugin } from './plugins/AbstractPlugin';
@@ -451,9 +451,8 @@ export class Viewer extends EventEmitter {
    * @returns {Promise<boolean>} resolves false if the loading was aborted by another call
    */
   setPanorama(path, options = {}) {
-    if (this.prop.loadingPromise !== null) {
-      this.textureLoader.abortLoading();
-    }
+    this.textureLoader.abortLoading();
+    this.prop.transitionAnimation?.cancel();
 
     // apply default parameters on first load
     if (!this.prop.ready) {
@@ -466,7 +465,7 @@ export class Viewer extends EventEmitter {
     }
 
     if (options.transition === undefined || options.transition === true) {
-      options.transition = 1500;
+      options.transition = DEFAULT_TRANSITION;
     }
     if (options.showLoader === undefined) {
       options.showLoader = true;
@@ -489,19 +488,17 @@ export class Viewer extends EventEmitter {
 
     const done = (err) => {
       this.loader.hide();
-      this.renderer.show();
 
       this.prop.loadingPromise = null;
 
       if (isAbortError(err)) {
-        console.warn(err);
         return false;
       }
       else if (err) {
         this.navbar.setCaption('');
         this.showError(this.config.lang.loadError);
         console.error(err);
-        return Promise.reject(err);
+        throw err;
       }
       else {
         this.navbar.setCaption(this.config.caption);
@@ -518,14 +515,16 @@ export class Viewer extends EventEmitter {
       .then((textureData) => {
         // check if another panorama was requested
         if (textureData.panorama !== this.config.panorama) {
-          return Promise.reject(getAbortError());
+          this.adapter.disposeTexture(textureData);
+          throw getAbortError();
         }
         return textureData;
       });
 
-    if (!options.transition || !this.prop.ready || !this.adapter.constructor.supportsTransition) {
+    if (!options.transition || !this.prop.ready || !this.adapter.supportsTransition(this.config.panorama)) {
       this.prop.loadingPromise = loadingPromise
         .then((textureData) => {
+          this.renderer.show();
           this.renderer.setTexture(textureData);
           this.renderer.setPanoramaPose(textureData.panoData);
           this.renderer.setSphereCorrection(options.sphereCorrection);
@@ -544,7 +543,14 @@ export class Viewer extends EventEmitter {
         .then((textureData) => {
           this.loader.hide();
 
-          return this.renderer.transition(textureData, options);
+          this.prop.transitionAnimation = this.renderer.transition(textureData, options);
+          return this.prop.transitionAnimation
+            .then((completed) => {
+              this.prop.transitionAnimation = null;
+              if (!completed) {
+                throw getAbortError();
+              }
+            });
         })
         .then(done, done);
     }
@@ -780,7 +786,7 @@ export class Viewer extends EventEmitter {
         this.zoom(options.zoom);
       }
 
-      return Animation.resolve();
+      return new Animation();
     }
 
     this.prop.animationPromise = new Animation({
@@ -808,7 +814,7 @@ export class Viewer extends EventEmitter {
   stopAnimation() {
     if (this.prop.animationPromise) {
       return new Promise((resolve) => {
-        this.prop.animationPromise.finally(resolve);
+        this.prop.animationPromise.then(resolve);
         this.prop.animationPromise.cancel();
         this.prop.animationPromise = null;
       });

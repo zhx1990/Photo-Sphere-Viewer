@@ -1,5 +1,5 @@
 import { EASINGS } from './data/constants';
-import { each } from './utils';
+import { each, logWarn } from './utils';
 
 /**
  * @callback OnTick
@@ -13,16 +13,20 @@ import { each } from './utils';
  * @summary Interpolation helper for animations
  * @memberOf PSV
  * @description
- * Implements the Promise API with an additional "cancel" and "finally" methods.
- * The promise is resolved when the animation is complete and rejected if the animation is cancelled.
+ * Implements the Promise API with an additional "cancel" method.
+ * The promise is resolved with `true` when the animation is completed and `false` if the animation is cancelled.
  * @example
- * new Animation({
+ * const anim = new Animation({
  *     properties: {
  *         width: {start: 100, end: 200}
  *     },
  *     duration: 5000,
  *     onTick: (properties) => element.style.width = `${properties.width}px`;
- * })
+ * });
+ *
+ * anim.then((completed) => ...);
+ *
+ * anim.cancel()
  */
 export class Animation {
 
@@ -37,30 +41,28 @@ export class Animation {
    * @param {PSV.Animation.OnTick} options.onTick - called on each frame
    */
   constructor(options) {
-    this.__cancelled = false;
-    this.__resolved = false;
-
-    this.__promise = new Promise((resolve, reject) => {
-      this.__resolve = resolve;
-      this.__reject = reject;
-    });
+    this.__callbacks = [];
 
     if (options) {
       if (!options.easing || typeof options.easing === 'string') {
         options.easing = EASINGS[options.easing || 'linear'];
       }
+
       this.__start = null;
       this.options = options;
 
       if (options.delay) {
         this.__delayTimeout = setTimeout(() => {
           this.__delayTimeout = null;
-          window.requestAnimationFrame(t => this.__run(t));
+          this.__animationFrame = window.requestAnimationFrame(t => this.__run(t));
         }, options.delay);
       }
       else {
-        window.requestAnimationFrame(t => this.__run(t));
+        this.__animationFrame = window.requestAnimationFrame(t => this.__run(t));
       }
+    }
+    else {
+      this.__resolved = true;
     }
   }
 
@@ -70,11 +72,6 @@ export class Animation {
    * @private
    */
   __run(timestamp) {
-    // the animation has been cancelled
-    if (this.__cancelled) {
-      return;
-    }
-
     // first iteration
     if (this.__start === null) {
       this.__start = timestamp;
@@ -91,10 +88,9 @@ export class Animation {
           current[name] = prop.start + (prop.end - prop.start) * this.options.easing(progress);
         }
       });
-
       this.options.onTick(current, progress);
 
-      window.requestAnimationFrame(t => this.__run(t));
+      this.__animationFrame = window.requestAnimationFrame(t => this.__run(t));
     }
     else {
       // call onTick one last time with final values
@@ -103,52 +99,43 @@ export class Animation {
           current[name] = prop.end;
         }
       });
-
       this.options.onTick(current, 1.0);
 
-      window.requestAnimationFrame(() => {
+      this.__animationFrame = window.requestAnimationFrame(() => {
         this.__resolved = true;
-        this.__resolve();
+        this.__resolve(true);
       });
     }
   }
 
   /**
-   * @summary Animation chaining
-   * @param {Function} [onFulfilled] - Called when the animation is complete, can return a new animation
-   * @param {Function} [onRejected] - Called when the animation is cancelled
-   * @returns {PSV.Animation}
+   * @private
+   */
+  __resolve(value) {
+    this.__callbacks.forEach(cb => cb(value));
+    this.__callbacks.length = 0;
+  }
+
+  /**
+   * @summary Promise chaining
+   * @param {Function} [onFulfilled] - Called when the animation is complete (true) or cancelled (false)
+   * @param {Function} [onRejected] - deprecated
+   * @returns {PSV.Promise}
    */
   then(onFulfilled = null, onRejected = null) {
-    const p = new Animation();
+    if (onRejected) {
+      logWarn('Animation#then does not accept a rejection handler anymore');
+    }
 
-    // Allow cancellation to climb up the promise chain
-    p.__promise.then(null, () => this.cancel());
+    if (this.__resolved || this.__cancelled) {
+      return Promise.resolve(this.__resolved)
+        .then(onFulfilled);
+    }
 
-    this.__promise.then(
-      () => p.__resolve(onFulfilled ? onFulfilled() : undefined),
-      () => p.__reject(onRejected ? onRejected() : undefined)
-    );
-
-    return p;
-  }
-
-  /**
-   * @summary Alias to `.then(null, onRejected)`
-   * @param {Function} onRejected - Called when the animation has been cancelled
-   * @returns {PSV.Animation}
-   */
-  catch(onRejected) {
-    return this.then(undefined, onRejected);
-  }
-
-  /**
-   * @summary Alias to `.then(onFinally, onFinally)`
-   * @param {Function} onFinally - Called when the animation is either complete or cancelled
-   * @returns {PSV.Animation}
-   */
-  finally(onFinally) {
-    return this.then(onFinally, onFinally);
+    return new Promise((resolve) => {
+      this.__callbacks.push(resolve);
+    })
+      .then(onFulfilled);
   }
 
   /**
@@ -157,27 +144,40 @@ export class Animation {
   cancel() {
     if (!this.__cancelled && !this.__resolved) {
       this.__cancelled = true;
-      this.__reject();
+      this.__resolve(false);
 
       if (this.__delayTimeout) {
-        window.cancelAnimationFrame(this.__delayTimeout);
+        window.clearTimeout(this.__delayTimeout);
         this.__delayTimeout = null;
+      }
+      if (this.__animationFrame) {
+        window.cancelAnimationFrame(this.__animationFrame);
+        this.__animationFrame = null;
       }
     }
   }
 
   /**
-   * @summary Returns a resolved animation promise
-   * @returns {PSV.Animation}
+   * @deprecated not supported anymore
+   */
+  catch() {
+    logWarn('Animation#catch is not supported anymore');
+    return this.then();
+  }
+
+  /**
+   * @deprecated not supported anymore
+   */
+  finally(onFinally) {
+    logWarn('Animation#finally is not supported anymore');
+    return this.then(onFinally);
+  }
+
+  /**
+   * @deprecated not supported anymore
    */
   static resolve() {
-    const p = Promise.resolve();
-    p.cancel = () => {
-    };
-    p.finally = (onFinally) => {
-      return p.then(onFinally, onFinally);
-    };
-    return p;
+    logWarn('Animation.resolve is not supported anymore');
   }
 
 }

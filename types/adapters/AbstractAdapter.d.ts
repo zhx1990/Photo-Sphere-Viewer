@@ -14,14 +14,9 @@ export abstract class AbstractAdapter<T> {
   static id: string;
 
   /**
-   * @summary Indicates if the adapter supports transitions between panoramas
+   * @summary Indicates if the adapter supports panorama download natively
    */
-  static supportsTransition: boolean;
-
-  /**
-   * @summary Indicates if the adapter supports preload
-   */
-  static supportsPreload: boolean;
+  static supportsDownload: boolean;
 
   constructor(parent: Viewer);
 
@@ -29,6 +24,16 @@ export abstract class AbstractAdapter<T> {
    * @summary Destroys the adapter
    */
   destroy();
+
+  /**
+   * @summary Indicates if the adapter supports transitions between panoramas
+   */
+  supportsTransition(panorama: T): boolean;
+
+  /**
+   * @summary Indicates if the adapter supports preload of a panorama
+   */
+  supportsPreload(panorama: T): boolean;
 
   /**
    * @summary Loads the panorama texture(s)
@@ -44,12 +49,17 @@ export abstract class AbstractAdapter<T> {
   /**
    * @summary Applies the texture to the mesh
    */
-  setTexture(mesh: Mesh, textureData: TextureData);
+  setTexture(mesh: Mesh, textureData: TextureData, transition?: boolean);
 
   /**
    * @summary Changes the opacity of the mesh
    */
   setTextureOpacity(mesh: Mesh, opacity: number);
+
+  /**
+   * @abstract
+   */
+  disposeTexture(textureData: TextureData);
 
 }
 
