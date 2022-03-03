@@ -129,6 +129,12 @@ _(This option is ignored for polygons and polylines)._
 Size of the marker in pixels.
 _(This option is ignored for polygons and polylines)._
 
+#### `orientation` (only for `imageLayer`)
+- type: `'front' | 'horizontal' | 'vertical-left' | 'vertical-right'`
+- default: `'front'`
+
+Applies a perspective on the image to make it look like placed on the floor or on a wall.
+
 #### `scale`
 - type: `double[] | { zoom: double[], longitude: [] }`
 - default: no scalling
@@ -163,17 +169,23 @@ scale: {
 }
 ```
 
+#### `opacity`
+- type: `number`
+- default: `1`
+
+Opacity of the marker. (Works for `imageLayer` too).
+
 #### `className`
 - type: `string`
 
 CSS class(es) added to the marker element.
-_(This option is ignored for imageLayer markers)._
+_(This option is ignored for `imageLayer` markers)._
 
 #### `style`
 - type: `object`
 
 CSS properties to set on the marker (background, border, etc.).
-_(This option is ignored for imageLayer markers)._
+_(This option is ignored for `imageLayer` markers)._
 
 ```js
 style: {

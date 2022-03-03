@@ -395,6 +395,7 @@ export class Marker {
       }
 
       // apply style
+      this.$el.style.opacity = this.config.opacity ?? 1;
       if (this.config.style) {
         utils.deepmerge(this.$el.style, this.config.style);
       }
@@ -627,7 +628,7 @@ export class Marker {
 
     // compute x/y/z positions
     this.props.positions3D = this.props.def.map((coord) => {
-      return this.psv.dataHelper.sphericalCoordsToVector3({ longitude: coord[0], latitude: coord[1] });
+      return this.psv.dataHelper.sphericalCoordsToVector3({ longitude: coord[0], latitude : coord[1] });
     });
   }
 
@@ -653,7 +654,11 @@ export class Marker {
     switch (this.type) {
       case MARKER_TYPES.imageLayer:
         if (!this.$el) {
-          const material = new THREE.MeshBasicMaterial({ transparent: true, depthTest: false });
+          const material = new THREE.MeshBasicMaterial({
+            transparent: true,
+            opacity    : this.config.opacity ?? 1,
+            depthTest  : false,
+          });
           const geometry = new THREE.PlaneGeometry(1, 1);
           const mesh = new THREE.Mesh(geometry, material);
           mesh.userData = { [MARKER_DATA]: this };
@@ -676,7 +681,10 @@ export class Marker {
           if (this.psv.config.requestHeaders && typeof this.psv.config.requestHeaders === 'function') {
             this.loader.setRequestHeader(this.psv.config.requestHeaders(this.config.imageLayer));
           }
-          this.$el.children[0].material.map = this.loader.load(this.config.imageLayer, () => this.psv.needsUpdate());
+          this.$el.children[0].material.map = this.loader.load(this.config.imageLayer, (texture) => {
+            texture.anisotropy = 4;
+            this.psv.needsUpdate();
+          });
           this.props.def = this.config.imageLayer;
         }
 
@@ -687,7 +695,25 @@ export class Marker {
         );
 
         this.$el.position.copy(this.props.positions3D[0]);
-        this.$el.lookAt(0, 0, 0);
+
+        switch (this.config.orientation) {
+          case 'horizontal':
+            this.$el.lookAt(0, this.$el.position.y, 0);
+            this.$el.rotateX(this.props.position.latitude < 0 ? -Math.PI / 2 : Math.PI / 2);
+            break;
+          case 'vertical-left':
+            this.$el.lookAt(0, 0, 0);
+            this.$el.rotateY(-Math.PI * 0.4);
+            break;
+          case 'vertical-right':
+            this.$el.lookAt(0, 0, 0);
+            this.$el.rotateY(Math.PI * 0.4);
+            break;
+          default:
+            this.$el.lookAt(0, 0, 0);
+            break;
+        }
+
         // 100 is magic number that gives a coherent size at default zoom level
         this.$el.scale.set(this.config.width / 100 * SYSTEM.pixelRatio, this.config.height / 100 * SYSTEM.pixelRatio, 1);
         break;
