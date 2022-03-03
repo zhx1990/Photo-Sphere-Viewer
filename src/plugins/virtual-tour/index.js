@@ -3,6 +3,7 @@ import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } 
 import { ClientSideDatasource } from './ClientSideDatasource';
 import {
   ARROW_GEOM,
+  ARROW_OUTLINE_GEOM,
   DEFAULT_ARROW,
   DEFAULT_MARKER,
   EVENTS,
@@ -76,9 +77,9 @@ import { bearing, distance, setMeshColor } from './utils';
 /**
  * @typedef {Object} PSV.plugins.VirtualTourPlugin.ArrowStyle
  * @summary Style of the arrow in 3D mode
- * @property {string} [color=#0055aa]
- * @property {string} [hoverColor=#aa5500]
- * @property {number} [opacity=0.8]
+ * @property {string} [color=0xaaaaaa]
+ * @property {string} [hoverColor=0xaa5500]
+ * @property {number} [outlineColor=0x000000]
  * @property {number[]} [scale=[0.5,2]]
  */
 
@@ -212,7 +213,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
       this.arrowsGroup = new THREE.Group();
 
       const localLight = new THREE.PointLight(0xffffff, 1, 0);
-      localLight.position.set(2, 0, 0);
+      localLight.position.set(0, this.config.arrowPosition === 'bottom' ? 2 : -2, 0);
       this.arrowsGroup.add(localLight);
     }
   }
@@ -516,15 +517,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
       positions.push(position);
 
       if (this.is3D()) {
-        const arrow = ARROW_GEOM.clone();
-        const mat = new THREE.MeshLambertMaterial({
-          transparent: true,
-          opacity    : link.arrowStyle?.opacity || this.config.arrowStyle.opacity,
-        });
-        const mesh = new THREE.Mesh(arrow, mat);
-
-        setMeshColor(mesh, link.arrowStyle?.color || this.config.arrowStyle.color);
-
+        const mesh = new THREE.Mesh(ARROW_GEOM, new THREE.MeshLambertMaterial());
         mesh.userData = { [LINK_DATA]: link, longitude: position.longitude };
         mesh.rotation.order = 'YXZ';
         mesh.rotateY(-position.longitude);
@@ -532,7 +525,15 @@ export class VirtualTourPlugin extends AbstractPlugin {
           .sphericalCoordsToVector3({ longitude: position.longitude, latitude: 0 }, mesh.position)
           .multiplyScalar(1 / CONSTANTS.SPHERE_RADIUS);
 
+        const outlineMesh = new THREE.Mesh(ARROW_OUTLINE_GEOM, new THREE.MeshBasicMaterial({ side: THREE.BackSide }));
+        outlineMesh.position.copy(mesh.position);
+        outlineMesh.rotation.copy(mesh.rotation);
+
+        setMeshColor(mesh, link.arrowStyle?.color || this.config.arrowStyle.color);
+        setMeshColor(outlineMesh, link.arrowStyle?.outlineColor || this.config.arrowStyle.outlineColor);
+
         this.arrowsGroup.add(mesh);
+        this.arrowsGroup.add(outlineMesh);
       }
       else {
         if (this.isGps()) {
@@ -652,25 +653,6 @@ export class VirtualTourPlugin extends AbstractPlugin {
     const f = s[1] + (s[0] - s[1]) * CONSTANTS.EASINGS.linear(this.psv.getZoomLevel() / 100);
     this.arrowsGroup.position.y += isBottom ? -1.5 : 1.5;
     this.arrowsGroup.scale.set(f, f, f);
-
-    // slightly rotates each arrow to make the center ones standing out
-    const position = this.psv.getPosition();
-    if (isBottom ? (position.latitude < Math.PI / 8) : (position.latitude > -Math.PI / 8)) {
-      this.arrowsGroup.children
-        .filter(o => o.type === 'Mesh')
-        .forEach((arrow) => {
-          const d = Math.abs(utils.getShortestArc(arrow.userData.longitude, position.longitude));
-          const x = CONSTANTS.EASINGS.inOutSine(Math.max(0, Math.PI / 4 - d) / (Math.PI / 4)) / 3; // magic !
-          arrow.rotation.x = isBottom ? -x : x;
-        });
-    }
-    else {
-      this.arrowsGroup.children
-        .filter(o => o.type === 'Mesh')
-        .forEach((arrow) => {
-          arrow.rotation.x = 0;
-        });
-    }
   }
 
   /**

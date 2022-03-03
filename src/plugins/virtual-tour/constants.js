@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import arrowGeometryJson from './arrow.json';
 import arrowIconSvg from './arrow.svg';
+import arrowOutlineGeometryJson from './arrow_outline.json';
 import nodesList from './nodes-list.svg';
 
 /**
@@ -64,7 +65,7 @@ export const EVENTS = {
    * @summary Triggered when the current node changes
    * @param {string} nodeId
    */
-  NODE_CHANGED: 'node-changed',
+  NODE_CHANGED     : 'node-changed',
   /**
    * @event filter:render-nodes-list
    * @memberof PSV.plugins.VirtualTourPlugin
@@ -108,10 +109,10 @@ export const DEFAULT_MARKER = {
  * @private
  */
 export const DEFAULT_ARROW = {
-  color     : 0x0055aa,
-  hoverColor: 0xaa5500,
-  opacity   : 0.8,
-  scale     : [0.5, 2],
+  color       : 0xaaaaaa,
+  hoverColor  : 0xaa5500,
+  outlineColor: 0x000000,
+  scale       : [0.5, 2],
 };
 
 /**
@@ -119,15 +120,18 @@ export const DEFAULT_ARROW = {
  * @constant
  * @private
  */
-export const ARROW_GEOM = (() => {
+export const { ARROW_GEOM, ARROW_OUTLINE_GEOM } = (() => {
   const loader = new THREE.ObjectLoader();
-  const geom = loader.parseGeometries([arrowGeometryJson])[arrowGeometryJson.uuid];
-  geom.scale(0.01, 0.015, 0.015);
-  geom.computeBoundingBox();
-  const b = geom.boundingBox;
-  geom.translate(-(b.max.x - b.min.y) / 2, -(b.max.y - b.min.y) / 2, -(b.max.z - b.min.z) / 2);
-  geom.rotateX(Math.PI);
-  return geom;
+  const geometries = loader.parseGeometries([arrowGeometryJson, arrowOutlineGeometryJson]);
+  const arrow = geometries[arrowGeometryJson.uuid];
+  const arrowOutline = geometries[arrowOutlineGeometryJson.uuid];
+  const scale = 0.015;
+  const rot = Math.PI / 2;
+  arrow.scale(scale, scale, scale);
+  arrow.rotateX(rot);
+  arrowOutline.scale(scale, scale, scale);
+  arrowOutline.rotateX(rot);
+  return { ARROW_GEOM: arrow, ARROW_OUTLINE_GEOM: arrowOutline };
 })();
 
 /**

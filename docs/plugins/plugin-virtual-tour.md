@@ -271,10 +271,10 @@ Style of the arrow used to display links.
 Default value is:
 ```js
 {
-  color     : 0x0055aa,
-  hoverColor: 0xaa5500,
-  opacity   : 0.8,
-  scale     : [0.5, 2],
+  color       : 0xaaaaaa,
+  hoverColor  : 0xaa5500,
+  outlineColor: 0x000000,
+  scale       : [0.5, 2],
 }
 ```
 

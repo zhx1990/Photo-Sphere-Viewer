@@ -34,6 +34,10 @@ export type VirtualTourNodeLink = {
 export type VirtualTourArrowStyle = {
   color?: string;
   hoverColor?: string;
+  outlineColor?: number;
+  /**
+   * @deprecated
+   */
   opacity?: number;
   scale?: [number, number];
 };

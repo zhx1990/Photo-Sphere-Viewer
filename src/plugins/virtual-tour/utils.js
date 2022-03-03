@@ -42,7 +42,6 @@ export function checkLink(node, link, isGps) {
  */
 export function setMeshColor(mesh, color) {
   mesh.material.color.set(color);
-  mesh.material.emissive.set(color);
 }
 
 /**
