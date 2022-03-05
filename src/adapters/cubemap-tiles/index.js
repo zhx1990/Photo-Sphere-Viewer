@@ -308,9 +308,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
    * @private
    */
   __refresh(init = false) { // eslint-disable-line no-unused-vars
-    const panorama = this.psv.config.panorama;
-
-    if (!panorama) {
+    if (!this.prop.geom) {
       return;
     }
 
@@ -319,6 +317,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
     frustum.setFromProjectionMatrix(projScreenMatrix);
 
+    const panorama = this.psv.config.panorama;
     const verticesPosition = this.prop.geom.getAttribute(ATTR_POSITION);
     const tilesToLoad = [];
 
