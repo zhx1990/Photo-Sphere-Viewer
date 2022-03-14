@@ -74,6 +74,19 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ## Configuration
 
+#### `keypoints`
+- type: `Array<{ position, time }>`
+
+Defines timed keypoints that will be used with by the autorotate button.
+
+```js
+keypoints: [
+  { time: 0,    position: { longitude: 0,    latitude: 0 } },
+  { time: 5.5,  position: { longitude: 0.25, latitude: 0 } },
+  { time: 12.8, position: { longitude: 0.3,  latitude: -12 } },
+]
+```
+
 #### `progressbar`
 - type: `boolean`
 - default: `true`

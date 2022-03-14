@@ -11,7 +11,8 @@ import { string } from 'rollup-plugin-string';
 import pkg from './package.json';
 
 const plugins = fs.readdirSync(path.join(__dirname, 'src/plugins'))
-  .filter(p => fs.lstatSync(`src/plugins/${p}`).isDirectory());
+  .filter(p => fs.lstatSync(`src/plugins/${p}`).isDirectory())
+  .filter(p => p !== 'shared');
 
 const adapters = fs.readdirSync(path.join(__dirname, 'src/adapters'))
   .filter(p => fs.lstatSync(`src/adapters/${p}`).isDirectory())

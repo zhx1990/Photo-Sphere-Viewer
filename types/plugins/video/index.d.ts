@@ -1,5 +1,5 @@
-import { AbstractPlugin, Viewer } from '../..';
 import { Event } from 'uevent';
+import { AbstractPlugin, ExtendedPosition, Viewer } from '../..';
 
 export const EVENTS: {
   PLAY: 'play',
@@ -9,9 +9,18 @@ export const EVENTS: {
   BUFFER: 'buffer',
 };
 
+/**
+ * @summary Definition of keypoints for automatic rotation, can be a position object, a marker id or an object with the following properties
+ */
+export type AutorotateKeypoint = {
+  position: ExtendedPosition;
+  time: number;
+};
+
 export type VideoPluginOptions = {
   progressbar?: boolean;
-  progressbar?: boolean;
+  bigbutton?: boolean;
+  keypoints?: AutorotateKeypoint[];
 };
 
 /**
@@ -21,28 +30,69 @@ export class VideoPlugin extends AbstractPlugin {
 
   constructor(psv: Viewer, options: VideoPluginOptions);
 
+  /**
+   * @summary Changes the keypoints
+   */
+  setKeypoints(keypoints: AutorotateKeypoint[]);
+
+  /**
+   * @summary Returns the durection of the video
+   */
   getDuration(): number;
 
+  /**
+   * @summary Returns the current time of the video
+   */
   getTime(): number;
 
+  /**
+   * @summary Returns the play progression of the video
+   */
   getProgress(): number;
 
+  /**
+   * @summary Returns if the video is playing
+   */
   isPlaying(): boolean;
 
+  /**
+   * @summary Returns the video volume
+   */
   getVolume(): number;
 
+  /**
+   * @summary Starts or pause the video
+   */
   playPause(): void;
 
+  /**
+   * @summary Starts the video if paused
+   */
   play(): void;
 
+  /**
+   * @summary Pauses the cideo if playing
+   */
   pause(): void;
 
+  /**
+   * @summary Sets the volume of the video
+   */
   setVolume(volume: number): void;
 
+  /**
+   * @summary (Un)mutes the video
+   */
   setMute(mute?: boolean): void;
 
+  /**
+   * @summary Changes the current time of the video
+   */
   setTime(time: number): void;
 
+  /**
+   * @summary Changes the progression of the video
+   */
   setProgress(progress: number): void;
 
   /**

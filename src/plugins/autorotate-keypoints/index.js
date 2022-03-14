@@ -320,7 +320,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
       .getPoints(NUM_STEPS * 3)
       .map(p => ([p.x, p.y]));
 
-    // __debugCurve(this.markers, curve);
+    // debugCurve(this.markers, curve, NUM_STEPS);
 
     // only keep the curve for the current movement
     this.state.curve = curve.slice(NUM_STEPS + 1, NUM_STEPS * 2 + 1);
@@ -415,40 +415,4 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     return idx;
   }
 
-}
-
-let debugMarkers = [];
-
-function __debugCurve(markers, curve) { // eslint-disable-line no-unused-vars
-  debugMarkers.forEach((marker) => {
-    try {
-      markers.removeMarker(marker.id);
-    }
-    catch (e) {
-      // noop
-    }
-  });
-
-  debugMarkers = [
-    markers.addMarker({
-      id         : 'autorotate-path',
-      polylineRad: curve,
-      svgStyle   : {
-        stroke     : 'white',
-        strokeWidth: '2px',
-      },
-    }),
-  ];
-
-  curve.forEach((pos, i) => {
-    debugMarkers.push(markers.addMarker({
-      id       : 'autorotate-path-' + i,
-      circle   : 5,
-      longitude: pos[0],
-      latitude : pos[1],
-      svgStyle : {
-        fill: 'black',
-      },
-    }));
-  });
 }

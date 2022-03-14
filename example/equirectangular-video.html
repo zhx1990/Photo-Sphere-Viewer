@@ -6,6 +6,7 @@
   <title>PhotoSphereViewer - equirectangular video demo</title>
 
   <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
+  <link rel="stylesheet" href="../dist/plugins/markers.css">
   <link rel="stylesheet" href="../dist/plugins/settings.css">
   <link rel="stylesheet" href="../dist/plugins/video.css">
   <link rel="stylesheet" href="style.css">
@@ -18,6 +19,7 @@
 <script src="../node_modules/uevent/browser.js"></script>
 <script src="../dist/photo-sphere-viewer.js"></script>
 <script src="../dist/adapters/equirectangular-video.js"></script>
+<script src="../dist/plugins/markers.js"></script>
 <script src="../dist/plugins/settings.js"></script>
 <script src="../dist/plugins/resolution.js"></script>
 <script src="../dist/plugins/video.js"></script>
@@ -37,7 +39,18 @@
       [PhotoSphereViewer.VideoPlugin, {
         progressbar: true,
         bigbutton  : true,
+        keypoints  : [
+          { time: 0, position: { longitude: 0, latitude: 0 } },
+          { time: 5, position: { longitude: -Math.PI / 4, latitude: Math.PI / 8 } },
+          { time: 10, position: { longitude: -Math.PI / 2, latitude: 0 } },
+          { time: 15, position: { longitude: -3 * Math.PI / 4, latitude: -Math.PI / 8 } },
+          { time: 20, position: { longitude: -Math.PI, latitude: 0 } },
+          { time: 25, position: { longitude: -5 * Math.PI / 4, latitude: Math.PI / 8 } },
+          { time: 30, position: { longitude: -3 * Math.PI / 2, latitude: 0 } },
+          { time: 35, position: { longitude: -7 * Math.PI / 4, latitude: -Math.PI / 8 } },
+        ]
       }],
+      PhotoSphereViewer.MarkersPlugin,
       PhotoSphereViewer.SettingsPlugin,
       [PhotoSphereViewer.ResolutionPlugin, {
         resolutions: [
@@ -65,7 +78,7 @@
       }]
     ],
     loadingImg: 'assets/photosphere-logo.gif',
-    navbar    : 'video zoom move caption settings fullscreen',
+    navbar    : 'autorotate video zoom move caption settings fullscreen',
   });
 </script>
 </body>

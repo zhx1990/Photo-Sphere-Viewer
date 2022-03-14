@@ -1,4 +1,5 @@
-import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton } from '../..';
+import * as THREE from 'three';
+import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from '../..';
 import { EVENTS } from './constants';
 import { PauseOverlay } from './PauseOverlay';
 import { PlayPauseButton } from './PlayPauseButton';
@@ -9,9 +10,16 @@ import './style.scss';
 
 
 /**
+ * @typedef {Object} PSV.plugins.VideoPlugin.Keypoint
+ * @property {PSV.ExtendedPosition} position
+ * @property {number} time
+ */
+
+/**
  * @typedef {Object} PSV.plugins.VideoPlugin.Options
  * @property {boolean} [progressbar=true] - displays a progressbar on top of the navbar
  * @property {boolean} [bigbutton=true] - displays a big "play" button in the center of the viewer
+ * @property {PSV.plugins.VideoPlugin.Keypoint[]} [keypoints] - defines autorotate timed keypoints
  */
 
 
@@ -49,9 +57,18 @@ export class VideoPlugin extends AbstractPlugin {
 
     /**
      * @member {Object}
+     * @property {THREE.SplineCurve} curve
+     * @property {PSV.plugins.VideoPlugin.Keypoint} start
+     * @property {PSV.plugins.VideoPlugin.Keypoint} end
+     * @property {PSV.plugins.VideoPlugin.Keypoint[]} keypoints
      * @private
      */
-    this.prop = {};
+    this.autorotate = {
+      curve    : null,
+      start    : null,
+      end      : null,
+      keypoints: [],
+    };
 
     /**
      * @member {PSV.plugins.VideoPlugin.Options}
@@ -70,6 +87,12 @@ export class VideoPlugin extends AbstractPlugin {
     if (this.config.bigbutton) {
       this.overlay = new PauseOverlay(this);
     }
+
+    /**
+     * @type {PSV.plugins.MarkersPlugin}
+     * @private
+     */
+    this.markers = null;
   }
 
   /**
@@ -78,6 +101,15 @@ export class VideoPlugin extends AbstractPlugin {
   init() {
     super.init();
 
+    this.markers = this.psv.getPlugin('markers');
+
+    if (this.config.keypoints) {
+      this.setKeypoints(this.config.keypoints);
+      delete this.config.keypoints;
+    }
+
+    this.psv.on(CONSTANTS.EVENTS.AUTOROTATE, this);
+    this.psv.on(CONSTANTS.EVENTS.BEFORE_RENDER, this);
     this.psv.on(CONSTANTS.EVENTS.PANORAMA_LOADED, this);
     this.psv.on(CONSTANTS.EVENTS.KEY_PRESS, this);
   }
@@ -86,12 +118,15 @@ export class VideoPlugin extends AbstractPlugin {
    * @package
    */
   destroy() {
+    this.psv.off(CONSTANTS.EVENTS.AUTOROTATE, this);
+    this.psv.off(CONSTANTS.EVENTS.BEFORE_RENDER, this);
     this.psv.off(CONSTANTS.EVENTS.PANORAMA_LOADED, this);
     this.psv.off(CONSTANTS.EVENTS.KEY_PRESS, this);
 
     this.progressbar?.destroy();
     this.overlay?.destroy();
 
+    delete this.autorotate;
     delete this.progressbar;
     delete this.overlay;
 
@@ -105,6 +140,12 @@ export class VideoPlugin extends AbstractPlugin {
     /* eslint-disable */
     // @formatter:off
     switch (e.type) {
+      case CONSTANTS.EVENTS.BEFORE_RENDER:
+        this.__autorotate();
+        break;
+      case CONSTANTS.EVENTS.AUTOROTATE:
+        this.__configureAutorotate();
+        break;
       case CONSTANTS.EVENTS.PANORAMA_LOADED:
         this.__bindVideo(e.args[0]);
         this.progressbar?.show();
@@ -285,6 +326,147 @@ export class VideoPlugin extends AbstractPlugin {
     else {
       return 0;
     }
+  }
+
+  /**
+   * @summary Changes the keypoints
+   * @param {PSV.plugins.VideoPlugin.Keypoint[]} keypoints
+   */
+  setKeypoints(keypoints) {
+    if (keypoints && keypoints.length < 2) {
+      throw new PSVError('At least two points are required');
+    }
+
+    this.autorotate.keypoints = utils.clone(keypoints);
+
+    if (this.autorotate.keypoints) {
+      this.autorotate.keypoints.forEach((pt, i) => {
+        if (pt.position) {
+          const position = this.psv.dataHelper.cleanPosition(pt.position);
+          pt.position = [position.longitude, position.latitude];
+        }
+        else {
+          throw new PSVError(`Keypoint #${i} is missing marker or position`);
+        }
+
+        if (utils.isNil(pt.time)) {
+          throw new PSVError(`Keypoint #${i} is missing time`);
+        }
+      });
+
+      this.autorotate.keypoints.sort((a, b) => a.time - b.time);
+    }
+
+    this.__configureAutorotate();
+  }
+
+  /**
+   * @private
+   */
+  __configureAutorotate() {
+    delete this.autorotate.curve;
+    delete this.autorotate.start;
+    delete this.autorotate.end;
+
+    if (this.psv.isAutorotateEnabled() && this.autorotate.keypoints) {
+      // cancel core rotation
+      this.psv.dynamics.position.stop();
+    }
+  }
+
+  /**
+   * @private
+   */
+  __autorotate() {
+    if (!this.psv.isAutorotateEnabled()) {
+      return;
+    }
+
+    const currentTime = this.getTime();
+    const autorotate = this.autorotate;
+
+    if (!autorotate.curve || currentTime < autorotate.start.time || currentTime >= autorotate.end.time) {
+      this.__autorotateNext(currentTime);
+    }
+
+    if (autorotate.start === autorotate.end) {
+      this.psv.rotate({
+        longitude: autorotate.start.position[0],
+        latitude : autorotate.start.position[1],
+      });
+    }
+    else {
+      const progress = (currentTime - autorotate.start.time) / (autorotate.end.time - autorotate.start.time);
+      // only the middle segment contains the current section
+      const pt = autorotate.curve.getPoint(1 / 3 + progress / 3);
+
+      this.psv.rotate({
+        longitude: pt.x,
+        latitude : pt.y,
+      });
+    }
+  }
+
+  /**
+   * @private
+   */
+  __autorotateNext(currentTime) {
+    let k1 = null;
+    let k2 = null;
+
+    const keypoints = this.autorotate.keypoints;
+    const l = keypoints.length - 1;
+
+    if (currentTime < keypoints[0].time) {
+      k1 = 0;
+      k2 = 0;
+    }
+    for (let i = 0; i < l; i++) {
+      if (currentTime >= keypoints[i].time && currentTime < keypoints[i + 1].time) {
+        k1 = i;
+        k2 = i + 1;
+        break;
+      }
+    }
+    if (currentTime >= keypoints[l].time) {
+      k1 = l;
+      k2 = l;
+    }
+
+    // get the 4 points necessary to compute the current movement
+    // one point before and two points after the current
+    const workPoints = [
+      keypoints[Math.max(0, k1 - 1)].position,
+      keypoints[k1].position,
+      keypoints[k2].position,
+      keypoints[Math.min(l, k2 + 1)].position,
+    ];
+
+    // apply offsets to avoid crossing the origin
+    const workVectors = [new THREE.Vector2(...workPoints[0])];
+
+    let k = 0;
+    for (let i = 1; i <= 3; i++) {
+      const d = workPoints[i - 1][0] - workPoints[i][0];
+      if (d > Math.PI) { // crossed the origin left to right
+        k += 1;
+      }
+      else if (d < -Math.PI) { // crossed the origin right to left
+        k -= 1;
+      }
+      if (k !== 0 && i === 1) {
+        // do not modify first point, apply the reverse offset the the previous point instead
+        workVectors[0].x -= k * 2 * Math.PI;
+        k = 0;
+      }
+      workVectors.push(new THREE.Vector2(workPoints[i][0] + k * 2 * Math.PI, workPoints[i][1]));
+    }
+
+    this.autorotate.curve = new THREE.SplineCurve(workVectors);
+    this.autorotate.start = keypoints[k1];
+    this.autorotate.end = keypoints[k2];
+
+    // debugCurve(this.markers, this.autorotate.curve.getPoints(16 * 3).map(p => ([p.x, p.y])), 16);
   }
 
 }
