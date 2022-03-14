@@ -1,19 +1,23 @@
+import * as THREE from 'three';
 import { AbstractPlugin, CONSTANTS, PSVError, utils } from '../..';
 
+/**
+ * @typedef {Object} PSV.plugins.AutorotateKeypointsPlugin.KeypointObject
+ * @property {PSV.ExtendedPosition} [position]
+ * @property {string} [markerId] - use the position and tooltip of a marker
+ * @property {number} [pause=0] - pause the animation when reaching this point, will display the tooltip if available
+ * @property {string|{content: string, position: string}} [tooltip]
+ */
 
 /**
- * @typedef {PSV.ExtendedPosition|string|Object} PSV.plugins.AutorotateKeypointsPlugin.Keypoints
- * @summary Definition of keypoints for automatic rotation, can be a position object, a marker id or an object with the following properties
- * @property {string} [markerId]
- * @property {PSV.ExtendedPosition} [position]
- * @property {string|{content: string, position: string}} [tooltip]
- * @property {number} [pause=0]
+ * @typedef {PSV.ExtendedPosition|string|PSV.plugins.AutorotateKeypointsPlugin.KeypointObject} PSV.plugins.AutorotateKeypointsPlugin.Keypoint
+ * @summary Definition of keypoints for automatic rotation, can be a position object, a marker id or an keypoint object
  */
 
 /**
  * @typedef {Object} PSV.plugins.AutorotateKeypointsPlugin.Options
  * @property {boolean} [startFromClosest=true] - start from the closest keypoint instead of the first keypoint
- * @property {PSV.plugins.AutorotateKeypointsPlugin.Keypoints[]} keypoints
+ * @property {PSV.plugins.AutorotateKeypointsPlugin.Keypoint[]} keypoints
  */
 
 
@@ -44,8 +48,8 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
      * @member {Object}
      * @property {number} idx -  current index in keypoints
      * @property {number[][]} curve - curve between idx and idx + 1
-     * @property {number[]} startPt - start point of the current step
-     * @property {number[]} endPt - end point of the current step
+     * @property {number[]} startStep - start point of the current step
+     * @property {number[]} endStep - end point of the current step
      * @property {number} startTime - start time of the current step
      * @property {number} stepDuration - expected duration of the step
      * @property {number} remainingPause - time remaining for the pause
@@ -65,7 +69,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     };
 
     /**
-     * @type {PSV.plugins.AutorotateKeypointsPlugin.Keypoints[]} keypoints
+     * @type {PSV.plugins.AutorotateKeypointsPlugin.Keypoint[]} keypoints
      */
     this.keypoints = null;
 
@@ -120,7 +124,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
 
   /**
    * @summary Changes the keypoints
-   * @param {PSV.plugins.AutorotateKeypointsPlugin.Keypoints[]} keypoints
+   * @param {PSV.plugins.AutorotateKeypointsPlugin.Keypoint[]} keypoints
    */
   setKeypoints(keypoints) {
     if (keypoints?.length < 2) {
@@ -139,7 +143,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
         }
         if (pt.markerId) {
           if (!this.markers) {
-            throw new PSVError(`Keypoint #${i} references a marker but markers plugin is not loaded`);
+            throw new PSVError(`Keypoint #${i} references a marker but the markers plugin is not loaded`);
           }
           const marker = this.markers.getMarker(pt.markerId);
           pt.position = serializePt(marker.props.position);
@@ -178,8 +182,8 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     this.state = {
       idx           : -1,
       curve         : [],
-      startPt       : null,
-      endPt         : null,
+      startStep     : null,
+      endStep       : null,
       startTime     : null,
       stepDuration  : null,
       remainingPause: null,
@@ -204,7 +208,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     if (this.psv.isAutorotateEnabled()) {
       // initialisation
       if (!this.state.startTime) {
-        this.state.endPt = serializePt(this.psv.getPosition());
+        this.state.endStep = serializePt(this.psv.getPosition());
         this.__nextStep();
 
         this.state.startTime = timestamp;
@@ -272,7 +276,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
    */
   __nextPoint() {
     // get the 4 points necessary to compute the current movement
-    // one point before and two points after the current
+    // the two points of the current segments and one point before and after
     const workPoints = [];
     if (this.state.idx === -1) {
       const currentPosition = serializePt(this.psv.getPosition());
@@ -293,7 +297,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     }
 
     // apply offsets to avoid crossing the origin
-    const workPoints2 = [workPoints[0].slice(0)];
+    const workVectors = [new THREE.Vector2(...workPoints[0])];
 
     let k = 0;
     for (let i = 1; i <= 3; i++) {
@@ -306,17 +310,20 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
       }
       if (k !== 0 && i === 1) {
         // do not modify first point, apply the reverse offset the the previous point instead
-        workPoints2[0][0] -= k * 2 * Math.PI;
+        workVectors[0].x -= k * 2 * Math.PI;
         k = 0;
       }
-      workPoints2.push([workPoints[i][0] + k * 2 * Math.PI, workPoints[i][1]]);
+      workVectors.push(new THREE.Vector2(workPoints[i][0] + k * 2 * Math.PI, workPoints[i][1]));
     }
 
-    const curve = this.__getCurvePoints(workPoints2, 0.6, NUM_STEPS);
+    const curve = new THREE.SplineCurve(workVectors)
+      .getPoints(NUM_STEPS * 3)
+      .map(p => ([p.x, p.y]));
+
     // __debugCurve(this.markers, curve);
 
     // only keep the curve for the current movement
-    this.state.curve = curve.slice(NUM_STEPS, NUM_STEPS * 2);
+    this.state.curve = curve.slice(NUM_STEPS + 1, NUM_STEPS * 2 + 1);
 
     if (this.state.idx !== -1) {
       this.state.remainingPause = this.keypoints[this.state.idx].pause;
@@ -341,15 +348,15 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
       this.__nextPoint();
 
       // reset transformation made to the previous point
-      this.state.endPt[0] = utils.parseAngle(this.state.endPt[0]);
+      this.state.endStep[0] = utils.parseAngle(this.state.endStep[0]);
     }
 
     // target next point
-    this.state.startPt = this.state.endPt;
-    this.state.endPt = this.state.curve.shift();
+    this.state.startStep = this.state.endStep;
+    this.state.endStep = this.state.curve.shift();
 
     // compute duration from distance and speed
-    const distance = utils.greatArcDistance(this.state.startPt, this.state.endPt);
+    const distance = utils.greatArcDistance(this.state.startStep, this.state.endStep);
     this.state.stepDuration = distance * 1000 / Math.abs(this.psv.config.autorotateSpeed);
 
     if (distance === 0) { // edge case
@@ -385,63 +392,14 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     }
 
     this.psv.rotate({
-      longitude: this.state.startPt[0] + (this.state.endPt[0] - this.state.startPt[0]) * progress,
-      latitude : this.state.startPt[1] + (this.state.endPt[1] - this.state.startPt[1]) * progress,
+      longitude: this.state.startStep[0] + (this.state.endStep[0] - this.state.startStep[0]) * progress,
+      latitude : this.state.startStep[1] + (this.state.endStep[1] - this.state.startStep[1]) * progress,
     });
   }
 
   /**
-   * @summary Interpolate curvature points using cardinal spline
-   * {@link https://stackoverflow.com/a/15528789/1207670}
-   * @param {number[][]} pts
-   * @param {number} [tension=0.5]
-   * @param {number} [numOfSegments=16]
-   * @returns {number[][]}
    * @private
    */
-  __getCurvePoints(pts, tension = 0.5, numOfSegments = 16) {
-    const res = [];
-
-    // The algorithm require a previous and next point to the actual point array.
-    const _pts = pts.slice(0);
-    _pts.unshift(pts[0]);
-    _pts.push(pts[pts.length - 1]);
-
-    // 1. loop through each point
-    // 2. loop through each segment
-    for (let i = 1; i < _pts.length - 2; i++) {
-      // calc tension vectors
-      const t1x = (_pts[i + 1][0] - _pts[i - 1][0]) * tension;
-      const t2x = (_pts[i + 2][0] - _pts[i][0]) * tension;
-
-      const t1y = (_pts[i + 1][1] - _pts[i - 1][1]) * tension;
-      const t2y = (_pts[i + 2][1] - _pts[i][1]) * tension;
-
-      for (let t = 1; t <= numOfSegments; t++) {
-        // calc step
-        const st = t / numOfSegments;
-
-        const st3 = Math.pow(st, 3);
-        const st2 = Math.pow(st, 2);
-
-        // calc cardinals
-        const c1 = 2 * st3 - 3 * st2 + 1;
-        const c2 = -2 * st3 + 3 * st2;
-        const c3 = st3 - 2 * st2 + st;
-        const c4 = st3 - st2;
-
-        // calc x and y cords with common control vectors
-        const x = c1 * _pts[i][0] + c2 * _pts[i + 1][0] + c3 * t1x + c4 * t2x;
-        const y = c1 * _pts[i][1] + c2 * _pts[i + 1][1] + c3 * t1y + c4 * t2y;
-
-        // store points in array
-        res.push([x, y]);
-      }
-    }
-
-    return res;
-  }
-
   __findMinIndex(array, mapper) {
     let idx = 0;
     let current = Number.MAX_VALUE;
