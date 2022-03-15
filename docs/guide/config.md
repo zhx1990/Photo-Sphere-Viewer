@@ -23,15 +23,15 @@ container: document.querySelector('.viewer')
 container: 'viewer' // will target [id="viewer"]
 ```
 
-#### `adapter`
-- default: `equirectangular`
-
-Which [adapter](./adapters) used to load the panorama.
-
 #### `panorama` (required)
 - type: `*`
 
 Path to the panorama. Must be a single URL for the default equirectangular adapter. Other adapters support other values.
+
+#### `adapter`
+- default: `equirectangular`
+
+Which [adapter](./adapters) used to load the panorama.
 
 #### `plugins`
 - type: `array`

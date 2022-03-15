@@ -2,14 +2,14 @@
 
 <ApiButton page="PSV.plugins.CompassPlugin.html"/>
 
-> Adds a compass on the viewer
+> Adds a compass on the viewer to represent which portion of the sphere is currently visible.
 
 This plugin is available in the core `photo-sphere-viewer` package in `dist/plugins/compass.js` and `dist/plugins/compass.css`.
 
 
 ## Usage
 
-This plugins adds a compass above the viewer to represent which portion of the sphere is currently visible.
+The plugin can be configured with `hotspots` which are small dots on the compass. It can also use markers as hotspots (see bellow).
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
@@ -17,6 +17,7 @@ const viewer = new PhotoSphereViewer.Viewer({
     [PhotoSphereViewer.CompassPlugin, {
       hotspots: [
         { longitude: '45deg' },
+        { longitude: '60deg', color: 'red' },
       ],
     }],
   ],
@@ -59,7 +60,7 @@ Allows to click on the compass to rotate the viewer.
 
 Small dots visible on the compass. Each spot consist of a position (either `x`/`y` or `longitude`/`latitude`) and an optional `color` which overrides the global `hotspotColor`.
 
-::: tip Markers
+::: tip
 [Markers](plugin-markers.md) can be displayed on the compass by defining their `compass` data which can be `true` or a specific color.
 
 ```js

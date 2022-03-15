@@ -1,4 +1,4 @@
-# VideoPlugin
+# VideoPlugin <Badge text="NEW"/>
 
 <ApiButton page="PSV.plugins.VideoPlugin.html"/>
 
@@ -18,6 +18,8 @@ Once enabled it will add various elements to the viewer:
 - time indicator in the navbar
 - Progress bar above the navbar
 - Play button in the center of the viewer
+
+It also supports advanced autorotate with times `keypoints`.
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({

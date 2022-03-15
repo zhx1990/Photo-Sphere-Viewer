@@ -11,7 +11,7 @@ This plugin is available in the core `photo-sphere-viewer` package in `dist/plug
 
 ## Usage
 
-Once enabled the plugin will add a new "Settings" button which other plugins cas use to display various settings in the side panel.
+Once enabled the plugin will add a new "Settings" button which other plugins can use to display various settings in the side panel.
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
@@ -38,6 +38,8 @@ Registering a new setting is done by calling the `addSetting` on the plugin. The
 This a setting which has only two values : `true` and `false`. It is required to provide the `active(): boolean` and `toggle(): void` functions.
 
 ```js
+let enabled = false;
+
 settings.addSetting({
   id    : 'custom-toggle-setting',
   label : 'Toggle setting',
@@ -52,6 +54,8 @@ settings.addSetting({
 This is a setting which has multiple available values (or options). It is required to provide the `current(): string`, `options(): Options[]` and `apply(option: string): void` functions.
 
 ```js
+let currentOption = 'A';
+
 settings.addSetting({
   id     : 'custom-options-setting',
   label  : 'Options setting',
@@ -99,7 +103,7 @@ _Note: this option is not part of the plugin but is merged with the main [`lang`
 Triggered when the resolution is changed.
 
 ```js
-settingsPlugin.on('resolution-changed', (e, id, value) => {
+settingsPlugin.on('setting-changed', (e, id, value) => {
   console.log(`${id}: ${value}`);
 });
 ```

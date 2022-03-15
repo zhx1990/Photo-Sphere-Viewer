@@ -15,18 +15,18 @@ Once enabled the plugin will add a new setting the user can use to change the re
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
-  panorama: 'sphere_small.jpg',
+  panorama: 'sphere_small.jpg', // must match with one of the resolutions
   plugins: [
     PhotoSphereViewer.SettingsPlugin,
     [PhotoSphereViewer.ResolutionPlugin, {
       resolutions: [
         {
-          id      : 'small',
+          id      : 'SD',
           label   : 'Small',
           panorama: 'sphere_small.jpg',
         },
         {
-          id      : 'normal',
+          id      : 'HD',
           label   : 'Normal',
           panorama: 'sphere.jpg',
         },

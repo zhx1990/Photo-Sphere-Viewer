@@ -51,6 +51,8 @@ After initializayion the plugin instance can be obtained with the `getPlugin` me
 ```js
 const markersPlugin = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
 
+markersPlugin.addMarker(/* ... */);
+
 markersPlugin.on('select-marker', () => {
   /* ... */
 });

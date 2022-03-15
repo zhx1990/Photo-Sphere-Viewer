@@ -56,7 +56,7 @@ Include all JS & CSS files in your page manually or with your favorite bundler a
 <div id="viewer" style="width: 100vw; height: 100vh;"></div>
 
 <script>
-  var viewer = new PhotoSphereViewer.Viewer({
+  const viewer = new PhotoSphereViewer.Viewer({
     container: document.querySelector('#viewer'),
     panorama: 'path/to/panorama.jpg',
   });
@@ -93,10 +93,4 @@ The `panorama` must be an [equirectangular projection](https://en.wikipedia.org/
 
 ::: tip Cropped panoramas
 If your image is not covering a full 360°×180° sphere, it will be deformed. You can fix it by providing [cropping data](./adapters/equirectangular.md#cropped-panorama).
-:::
-
-::: tip Caching
-Previous version of Photo Sphere Viewer had a caching system, which was buggy and thus disabled by default.
-
-Photo Sphere Viewer 4 uses [Three.js Cache](https://threejs.org/docs/index.html#api/en/loaders/Cache), enabled by default. You can disable this cache by calling `THREE.Cache.enabled = false;` after importing Photo Sphere Viewer.
 :::

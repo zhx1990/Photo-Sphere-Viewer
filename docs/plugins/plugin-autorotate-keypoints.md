@@ -11,35 +11,33 @@ This plugin is available in the core `photo-sphere-viewer` package in `dist/plug
 
 ## Usage
 
-The plugin is configured with `keypoints` which can be either a position object (`longitude` + `latitude`) or the identifier of an existing [marker](./plugin-markers.md).
+The plugin is configured with `keypoints` which can be either a position object (either `x`/`y` or `longitude`/`latitude`) or the identifier of an existing [marker](./plugin-markers.md).
 
 It is also possible to configure each keypoint with a pause time and a tooltip.
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
   plugins: [
-    PhotoSphereViewer.AutorotateKeypointsPlugin,
+    [PhotoSphereViewer.AutorotateKeypointsPlugin, {
+      keypoints: [
+         'existing-marker-id',
+         
+         { longitude: Math.PI / 2, latitude: 0 },
+         
+         {
+           position: { longitude: Math.PI, latitude: Math.PI / 6 },
+           pause   : 5000,
+           tooltip : 'This is interesting',
+         },
+         
+         {
+           markerId: 'another-marker', // will use the marker tooltip if any
+           pause   : 2500,
+         },
+       ],
+    }],
   ],
 });
-
-const keypointsPlugin = viewer.getPlugin(PhotoSphereViewer.AutorotateKeypointsPlugin);
-
-keypointsPlugin.setKeypoints([
-  'existing-marker-id',
-  
-  { longitude: Math.PI / 2, latitude: 0 },
-  
-  {
-    position: { longitude: Math.PI, latitude: Math.PI / 6 },
-    pause   : 5000,
-    tooltip : 'This is interesting',
-  },
-  
-  {
-    markerId: 'another-marker', // will use the marker tooltip if any
-    pause   : 2500,
-  },
-]);
 ```
 
 The plugin reacts to the standard `autorotateDelay` and `autorotateSpeed` options and can be started with `startAutorotate` or the button in the navbar.
