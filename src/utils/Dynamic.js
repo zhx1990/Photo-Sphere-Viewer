@@ -1,4 +1,5 @@
-import { bound } from './index';
+import { PSVError } from '../PSVError';
+import { bound, loop } from './index';
 
 /**
  * @summary Represents a variable that can dynamically change with time (using requestAnimationFrame)
@@ -15,8 +16,9 @@ export class Dynamic {
    * @param {number} [defaultValue] Default position
    * @param {number} [min] Minimum position
    * @param {number} [max] Maximum position
+   * @param {boolean} [loopValue] Loop value between min and max
    */
-  constructor(fn, defaultValue = 0, min = -Infinity, max = Infinity) {
+  constructor(fn, defaultValue = 0, min = -Infinity, max = Infinity, loopValue = false) {
     /**
      * @type {Function}
      * @private
@@ -72,6 +74,16 @@ export class Dynamic {
      */
     this.max = max;
 
+    /**
+     * @type {boolean}
+     * @private
+     */
+    this.loopValue = loopValue;
+
+    if (loopValue && min !== 0) {
+      throw new PSVError('invalid config');
+    }
+
     if (this.fn) {
       this.fn(defaultValue);
     }
@@ -92,7 +104,7 @@ export class Dynamic {
    */
   goto(position, speedMult = 1) {
     this.mode = Dynamic.POSITION;
-    this.target = bound(position, this.min, this.max);
+    this.target = this.loopValue ? loop(position, this.max) : bound(position, this.min, this.max);
     this.speedMult = speedMult;
   }
 
@@ -128,14 +140,13 @@ export class Dynamic {
 
   /**
    * Defines the current position and immediately stops movement
-   * @param {number} values
+   * @param {number} value
    */
-  setValue(values) {
-    const next = bound(values, this.min, this.max);
-    this.target = next;
+  setValue(value) {
+    this.target = this.loopValue ? loop(value, this.max) : bound(value, this.min, this.max);
     this.mode = Dynamic.STOP;
-    if (next !== this.current) {
-      this.current = next;
+    if (this.target !== this.current) {
+      this.current = this.target;
       if (this.fn) {
         this.fn(this.current);
       }
@@ -150,6 +161,11 @@ export class Dynamic {
   update(elapsed) {
     // in position mode switch to stop mode when in the decceleration window
     if (this.mode === Dynamic.POSITION) {
+      // in loop mode, alter "current" to avoid crossing the origin
+      if (this.loopValue && Math.abs(this.target - this.current) > this.max / 2) {
+        this.current = this.current < this.target ? this.current + this.max : this.current - this.max;
+      }
+
       const dstStop = this.currentSpeed * this.currentSpeed / (this.speed * this.speedMult * 4);
       if (Math.abs(this.target - this.current) <= dstStop) {
         this.mode = Dynamic.STOP;
@@ -179,7 +195,7 @@ export class Dynamic {
 
     // apply value
     if (next !== null) {
-      next = bound(next, this.min, this.max);
+      next = this.loopValue ? loop(next, this.max) : bound(next, this.min, this.max);
       if (next !== this.current) {
         this.current = next;
         if (this.fn) {

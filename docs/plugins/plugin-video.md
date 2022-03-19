@@ -16,7 +16,7 @@ Once enabled it will add various elements to the viewer:
 - Play/pause button
 - Volume button
 - time indicator in the navbar
-- Progress bar above the navbar
+- Progressbar above the navbar
 - Play button in the center of the viewer
 
 It also supports advanced autorotate with times `keypoints`.

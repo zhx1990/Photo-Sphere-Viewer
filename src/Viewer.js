@@ -234,11 +234,11 @@ export class Viewer extends EventEmitter {
       }, this.config.defaultZoomLvl, 0, 100),
 
       position: new MultiDynamic({
-        longitude: new Dynamic(null, this.config.defaultLong),
+        longitude: new Dynamic(null, this.config.defaultLong, 0, 2 * Math.PI, true),
         latitude : new Dynamic(null, this.config.defaultLat, -Math.PI / 2, Math.PI / 2),
       }, (position) => {
         this.dataHelper.sphericalCoordsToVector3(position, this.prop.direction);
-        this.trigger(EVENTS.POSITION_UPDATED, this.dataHelper.cleanPosition(position));
+        this.trigger(EVENTS.POSITION_UPDATED, position);
       }),
     };
 

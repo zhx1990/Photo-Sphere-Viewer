@@ -11,6 +11,22 @@ export function bound(x, min, max) {
 }
 
 /**
+ * @summary Ensure a value is within 0 and `max`
+ * @param {number} value
+ * @param {number} max
+ * @return {number}
+ */
+export function loop(value, max) {
+  let result = value % max;
+
+  if (result < 0) {
+    result += max;
+  }
+
+  return result;
+}
+
+/**
  * @summary Checks if a value is an integer
  * @memberOf PSV.utils
  * @param {*} value

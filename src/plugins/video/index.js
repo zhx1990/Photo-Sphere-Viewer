@@ -67,7 +67,7 @@ export class VideoPlugin extends AbstractPlugin {
       curve    : null,
       start    : null,
       end      : null,
-      keypoints: [],
+      keypoints: null,
     };
 
     /**
@@ -378,7 +378,7 @@ export class VideoPlugin extends AbstractPlugin {
    * @private
    */
   __autorotate() {
-    if (!this.psv.isAutorotateEnabled()) {
+    if (!this.psv.isAutorotateEnabled() || !this.autorotate.keypoints) {
       return;
     }
 
@@ -400,7 +400,7 @@ export class VideoPlugin extends AbstractPlugin {
       // only the middle segment contains the current section
       const pt = autorotate.curve.getPoint(1 / 3 + progress / 3);
 
-      this.psv.rotate({
+      this.psv.dynamics.position.goto({
         longitude: pt.x,
         latitude : pt.y,
       });

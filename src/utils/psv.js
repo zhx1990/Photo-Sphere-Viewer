@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { PSVError } from '../PSVError';
-import { bound } from './math';
+import { bound, loop } from './math';
 
 /**
  * @summary Returns the plugin constructor from the imported object
@@ -296,11 +296,7 @@ export function parseAngle(angle, zeroCenter = false, halfCircle = zeroCenter) {
     throw new PSVError('Unknown angle "' + angle + '"');
   }
 
-  parsed = (zeroCenter ? parsed + Math.PI : parsed) % (Math.PI * 2);
-
-  if (parsed < 0) {
-    parsed += Math.PI * 2;
-  }
+  parsed = loop(zeroCenter ? parsed + Math.PI : parsed, Math.PI * 2);
 
   return zeroCenter ? bound(parsed - Math.PI, -Math.PI / (halfCircle ? 2 : 1), Math.PI / (halfCircle ? 2 : 1)) : parsed;
 }

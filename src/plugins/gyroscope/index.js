@@ -222,13 +222,15 @@ export class GyroscopePlugin extends AbstractPlugin {
       return;
     }
 
+    const position = this.psv.getPosition();
+
     // on first run compute the offset depending on the current viewer position and device orientation
     if (this.prop.alphaOffset === null) {
       this.controls.update();
       this.controls.object.getWorldDirection(direction);
 
       const sphericalCoords = this.psv.dataHelper.vector3ToSphericalCoords(direction);
-      this.prop.alphaOffset = sphericalCoords.longitude - this.psv.getPosition().longitude;
+      this.prop.alphaOffset = sphericalCoords.longitude - position.longitude;
     }
     else {
       this.controls.alphaOffset = this.prop.alphaOffset;
@@ -236,11 +238,14 @@ export class GyroscopePlugin extends AbstractPlugin {
       this.controls.object.getWorldDirection(direction);
 
       const sphericalCoords = this.psv.dataHelper.vector3ToSphericalCoords(direction);
-      // TODO use dynamic goto for smooth movement
-      this.psv.dynamics.position.setValue({
+
+      const target = {
         longitude: sphericalCoords.longitude,
         latitude : -sphericalCoords.latitude,
-      });
+      };
+
+      // having a slow speed on smalls movements allows to absorb the device/hand vibrations
+      this.psv.dynamics.position.goto(target, utils.getAngle(position, target) < 0.01 ? 1 : 3);
     }
   }
 
