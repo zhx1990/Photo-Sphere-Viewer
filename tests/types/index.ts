@@ -72,6 +72,9 @@ markers.on('select-marker', (e, marker) => {
 markers.on(MAKER_EVENTS.UNSELECT_MARKER, (e, marker) => {
   const markerId: string = marker.id;
 });
+markers.on(MarkersPlugin.EVENTS.UNSELECT_MARKER, (e, marker) => {
+  const markerId: string = marker.id;
+});
 
 const customPlugin = viewer.getPlugin(CustomPlugin);
 customPlugin.doSomething();

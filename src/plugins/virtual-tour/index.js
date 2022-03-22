@@ -127,6 +127,14 @@ export class VirtualTourPlugin extends AbstractPlugin {
 
   static id = 'virtual-tour';
 
+  static EVENTS = EVENTS;
+  static MODE_CLIENT = MODE_CLIENT;
+  static MODE_SERVER = MODE_SERVER;
+  static MODE_3D = MODE_3D;
+  static MODE_MARKERS = MODE_MARKERS;
+  static MODE_MANUAL = MODE_MANUAL;
+  static MODE_GPS = MODE_GPS;
+
   /**
    * @param {PSV.Viewer} psv
    * @param {PSV.plugins.VirtualTourPlugin.Options} [options]

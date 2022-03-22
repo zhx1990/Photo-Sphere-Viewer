@@ -28,6 +28,8 @@ export type VideoPluginOptions = {
  */
 export class VideoPlugin extends AbstractPlugin {
 
+  static EVENTS: typeof EVENTS;
+
   constructor(psv: Viewer, options: VideoPluginOptions);
 
   /**

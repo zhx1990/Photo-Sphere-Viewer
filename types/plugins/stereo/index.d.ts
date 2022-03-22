@@ -10,6 +10,8 @@ export const EVENTS: {
  */
 export class StereoPlugin extends AbstractPlugin {
 
+  static EVENTS: typeof EVENTS;
+
   constructor(psv: Viewer);
 
   /**

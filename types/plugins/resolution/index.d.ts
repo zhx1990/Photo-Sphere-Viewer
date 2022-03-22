@@ -21,6 +21,8 @@ export const EVENTS: {
  */
 export class ResolutionPlugin extends AbstractPlugin {
 
+  static EVENTS: typeof EVENTS;
+
   constructor(psv: Viewer, options: ResolutionPluginOptions);
 
   /**

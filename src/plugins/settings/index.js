@@ -62,6 +62,8 @@ export class SettingsPlugin extends AbstractPlugin {
 
   static id = 'settings';
 
+  static EVENTS = EVENTS;
+
   /**
    * @param {PSV.Viewer} psv
    */

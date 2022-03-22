@@ -47,9 +47,6 @@ export class MarkersPlugin extends AbstractPlugin {
 
   static id = 'markers';
 
-  /**
-   * @deprecated use the EVENTS constants of the module
-   */
   static EVENTS = EVENTS;
 
   /**

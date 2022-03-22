@@ -32,9 +32,6 @@ export class StereoPlugin extends AbstractPlugin {
 
   static id = 'stereo';
 
-  /**
-   * @deprecated use the EVENTS constants of the module
-   */
   static EVENTS = EVENTS;
 
   /**

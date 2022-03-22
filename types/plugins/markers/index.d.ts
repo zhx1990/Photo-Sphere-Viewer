@@ -135,6 +135,8 @@ export const EVENTS: {
  */
 export class MarkersPlugin extends AbstractPlugin {
 
+  static EVENTS: typeof EVENTS;
+
   constructor(psv: Viewer, options: MarkersPluginOptions);
 
   /**

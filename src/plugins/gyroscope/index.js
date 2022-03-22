@@ -32,9 +32,6 @@ export class GyroscopePlugin extends AbstractPlugin {
 
   static id = 'gyroscope';
 
-  /**
-   * @deprecated use the EVENTS constants of the module
-   */
   static EVENTS = EVENTS;
 
   /**

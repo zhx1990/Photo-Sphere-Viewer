@@ -32,9 +32,6 @@ export class ResolutionPlugin extends AbstractPlugin {
 
   static id = 'resolution';
 
-  /**
-   * @deprecated use the EVENTS constants of the module
-   */
   static EVENTS = EVENTS;
 
   /**

@@ -44,6 +44,8 @@ export class VideoPlugin extends AbstractPlugin {
 
   static id = 'video';
 
+  static EVENTS = EVENTS;
+
   /**
    * @param {PSV.Viewer} psv
    * @param {PSV.plugins.VideoPlugin.Options} options
