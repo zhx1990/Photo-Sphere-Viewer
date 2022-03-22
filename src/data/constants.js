@@ -166,6 +166,7 @@ export const EVENTS = {
    * @event hide-notification
    * @memberof PSV
    * @summary Triggered when the notification is hidden
+   * @param {string} [id]
    */
   HIDE_NOTIFICATION : 'hide-notification',
   /**
@@ -233,6 +234,7 @@ export const EVENTS = {
    * @event show-notification
    * @memberof PSV
    * @summary Triggered when the notification is shown
+   * @param {string} [id]
    */
   SHOW_NOTIFICATION : 'show-notification',
   /**
@@ -320,6 +322,7 @@ export const IDS = {
   TWO_FINGERS: 'twoFingers',
   CTRL_ZOOM  : 'ctrlZoom',
   ERROR      : 'error',
+  DESCRIPTION: 'description',
 };
 
 /* eslint-disable */

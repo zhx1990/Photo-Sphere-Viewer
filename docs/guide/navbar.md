@@ -17,6 +17,7 @@ The `navbar` option is an array which can contain the following elements:
   - `moveDown`
   - `move` = `moveLeft` + `moveRight` + `moveTop` + `moveDown`
   - `download`
+  - `description`
   - `caption`
   - `fullscreen`
 

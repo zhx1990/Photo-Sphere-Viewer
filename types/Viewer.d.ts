@@ -34,6 +34,7 @@ export type ViewerOptions = {
   panorama?: any;
   adapter?: AdapterConstructor<any> | [AdapterConstructor<any>, any];
   caption?: string;
+  description?: string;
   downloadUrl?: string;
   loadingImg?: string;
   loadingTxt?: string;
@@ -340,7 +341,7 @@ export class Viewer extends EventEmitter {
   /**
    * @summary Triggered when the notification is hidden
    */
-  on(e: 'hide-notification', cb: (e: Event) => void): this;
+  on(e: 'hide-notification', cb: (e: Event, id: string | undefined) => void): this;
   /**
    * @summary Triggered when the overlay is hidden
    */
@@ -376,7 +377,7 @@ export class Viewer extends EventEmitter {
   /**
    * @summary Trigered when the notification is shown
    */
-  on(e: 'show-notification', cb: (e: Event) => void): this;
+  on(e: 'show-notification', cb: (e: Event, id: string | undefined) => void): this;
   /**
    * @summary Trigered when the overlay is shown
    */

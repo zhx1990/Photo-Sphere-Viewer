@@ -1,6 +1,7 @@
 import { AbstractComponent } from './AbstractComponent';
 
 export type NotificationOptions = {
+  id?: string;
   content: string;
   timeout?: number;
 };

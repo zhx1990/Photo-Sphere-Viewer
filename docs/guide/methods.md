@@ -87,7 +87,7 @@ viewer.setOptions({
 });
 ```
 
-### `setPanorama(panorama, options): Promise`
+### `setPanorama(panorama[, options]): Promise`
 
 Change the panorama image with an optional transition animation (enabled by default). See all options on the <ApiLink page="PSV.html#.PanoramaOptions"/>.
 

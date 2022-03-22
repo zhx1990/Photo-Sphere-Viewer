@@ -23,7 +23,7 @@
 
   const panos = [
     {
-      desc    : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+      caption : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
       minFov  : 30,
       position: {
         longitude: 0,
@@ -45,7 +45,7 @@
       },
     },
     {
-      desc    : 'Simon\'s Town <b>&copy;  Greg Zall (HDRI Haven)</b>',
+      caption : 'Simon\'s Town <b>&copy;  Greg Zall (HDRI Haven)</b>',
       minFov  : 10,
       position: {
         longitude: '52deg',
@@ -100,7 +100,7 @@
   function loadPanorama(pano) {
     return viewer.setPanorama(pano.config, pano.position)
       .then(() => {
-        viewer.navbar.setCaption(pano.desc);
+        viewer.navbar.setCaption(pano.caption);
         viewer.setOption('minFov', pano.minFov);
       });
   }

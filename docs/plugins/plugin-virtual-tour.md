@@ -107,6 +107,29 @@ GPS coordinates of this node as an array of two or three values (`[longitude, la
 Only the [ESPG:4326 projection](https://epsg.io/4326) is supported.
 :::
 
+#### `name`
+- type: `string`
+
+Short name of this node, used in links tooltips and the nodes list.
+
+#### `caption`
+
+Replace the global caption. Refer to the main [config page](../guide/config.md#caption).
+
+#### `description`
+
+Replace the global description. Refer to the main [config page](../guide/config.md#description).
+
+#### `thumbnail`
+- type: `string`
+
+Thumbnail for the nodes list in the side panel.
+
+#### `markers`
+- type: `array`
+
+Additional markers displayed on this node, requires the [Markers plugin](./plugin-markers.md).
+
 #### `panoData`
 
 Refer to the main [config page](../guide/config.md#panodata).
@@ -114,26 +137,6 @@ Refer to the main [config page](../guide/config.md#panodata).
 #### `sphereCorrection`
 
 Refer to the main [config page](../guide/config.md#spherecorrection).
-
-#### `name`
-- type: `string`
-
-Short name of this node, used in links tooltips.
-
-#### `caption`
-- type: `string`
-
-Caption displayed in th navbar, if not defined the global caption will be used.
-
-#### `thumbnail`
-- type: `string`
-
-Thumbnail for the nodes list in the side panel (see `listButton` configuration option).
-
-#### `markers`
-- type: `array`
-
-Additional markers displayed on this node, requires the [Markers plugin](./plugin-markers.md).
 
 
 ## Links options

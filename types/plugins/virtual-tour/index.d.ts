@@ -14,6 +14,7 @@ export type VirtualTourNode = {
   sphereCorrection?: ViewerOptions['sphereCorrection'];
   name?: string;
   caption?: string;
+  description?: string;
   markers?: Marker[];
 };
 

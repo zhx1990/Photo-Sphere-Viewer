@@ -20,24 +20,25 @@ Show the notification.
 
 | option | type | |
 |---|---|---|
+| `id` | `string` | Unique identifier of the notification, this will be used to `hide` the notification only if the content has not been replaced by something else. |
 | `content` (required) | `string` | HTML content of the notification. |
 | `timeout` | `number` | Auto-hide delay in milliseconds. |
 
-### `hide()`
+### `hide([id])`
 
-Hide the notification.
+Hide the notification, without condition if `id` is not provided, or only if the last `show` was called with the same `id`.
 
-### `isVisible(): boolean`
+### `isVisible([id]): boolean`
 
 Check if the notification is visible.
 
 
 ## Events
 
-### `show-notification`
+### `show-notification(id)`
 
 Triggered when the notification is shown.
 
-### `hide-notification`
+### `hide-notification(id)`
 
 Triggered when the notification is hidden.

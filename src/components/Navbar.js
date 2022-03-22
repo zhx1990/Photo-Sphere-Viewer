@@ -1,5 +1,6 @@
 import { AutorotateButton } from '../buttons/AutorotateButton';
 import { CustomButton } from '../buttons/CustomButton';
+import { DescriptionButton } from '../buttons/DescriptionButton';
 import { DownloadButton } from '../buttons/DownloadButton';
 import { FullscreenButton } from '../buttons/FullscreenButton';
 import { MenuButton } from '../buttons/MenuButton';
@@ -69,6 +70,7 @@ export function registerButton(button, defaultPosition) {
   ZoomOutButton,
   ZoomRangeButton,
   ZoomInButton,
+  DescriptionButton,
   DownloadButton,
   FullscreenButton,
   MoveLeftButton,
@@ -114,8 +116,15 @@ export class Navbar extends AbstractComponent {
     this.children.slice().forEach(item => item.destroy());
     this.children.length = 0;
 
+    const cleanedButtons = this.__cleanButtons(buttons);
+
+    // force description button if caption is present (used on narrow screens)
+    if (cleanedButtons.indexOf(NavbarCaption.id) !== -1 && cleanedButtons.indexOf(DescriptionButton.id) === -1) {
+      cleanedButtons.splice(cleanedButtons.indexOf(NavbarCaption.id), 0, DescriptionButton.id);
+    }
+
     /* eslint-disable no-new */
-    this.__cleanButtons(buttons).forEach((button) => {
+    cleanedButtons.forEach((button) => {
       if (typeof button === 'object') {
         new CustomButton(this, button);
       }
@@ -148,7 +157,7 @@ export class Navbar extends AbstractComponent {
    * @param {string} html
    */
   setCaption(html) {
-    const caption = this.getButton('caption', false);
+    const caption = this.getButton(NavbarCaption.id, false);
     caption?.setCaption(html);
   }
 

@@ -60,6 +60,7 @@ import { bearing, distance, setMeshColor } from './utils';
  * @property {PSV.SphereCorrection} [sphereCorrection] - sphere correction to apply to this panorama
  * @property {string} [name] - short name of the node
  * @property {string} [caption] - caption visible in the navbar
+ * @property {string} [description] - description visible in the side panel
  * @property {string} [thumbnail] - thumbnail for the nodes list in the side panel
  * @property {PSV.plugins.MarkersPlugin.Properties[]} [markers] - additional markers to use on this node
  */
@@ -448,6 +449,7 @@ export class VirtualTourPlugin extends AbstractPlugin {
           this.psv.setPanorama(node.panorama, {
             transition      : this.config.transition,
             caption         : node.caption,
+            description     : node.description,
             panoData        : node.panoData,
             sphereCorrection: node.sphereCorrection,
           })

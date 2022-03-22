@@ -119,17 +119,22 @@ export class AbstractButton extends AbstractComponent {
           return; // the component has been destroyed
         }
         this.prop.supported = supported;
-        if (!supported && this.prop.visible) {
+        if (!supported) {
           this.hide();
         }
-        else if (supported && !this.prop.visible) {
+        else {
           this.show();
         }
       });
     }
-    else if (!supportedOrObject) {
-      this.hide();
-      this.prop.supported = false;
+    else {
+      this.prop.supported = supportedOrObject;
+      if (!supportedOrObject) {
+        this.hide();
+      }
+      else {
+        this.show();
+      }
     }
   }
 

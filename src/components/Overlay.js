@@ -149,7 +149,7 @@ export class Overlay extends AbstractComponent {
    * @fires PSV.hide-overlay
    */
   hide(id) {
-    if (this.isVisible() && (!id || !this.prop.contentId || this.prop.contentId === id)) {
+    if (this.isVisible(id)) {
       const contentId = this.prop.contentId;
 
       super.hide();

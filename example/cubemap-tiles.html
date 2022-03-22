@@ -24,7 +24,7 @@
 
   const panos = [
     {
-      desc         : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+      caption      : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
       minFov       : 30,
       flipTopBottom: false,
       position     : {
@@ -35,7 +35,7 @@
       config       : {
         faceSize: 1500,
         nbTiles : 4,
-        baseUrl      : {
+        baseUrl : {
           left  : base + 'cubemap/px.jpg',
           front : base + 'cubemap/nz.jpg',
           right : base + 'cubemap/nx.jpg',
@@ -53,7 +53,7 @@
       },
     },
     {
-      desc         : 'Simon\'s Town <b>&copy;  Greg Zall (HDRI Haven)</b>',
+      caption      : 'Simon\'s Town <b>&copy;  Greg Zall (HDRI Haven)</b>',
       minFov       : 10,
       flipTopBottom: true,
       position     : {
@@ -64,7 +64,7 @@
       config       : {
         faceSize: 4096,
         nbTiles : 8,
-        baseUrl      : {
+        baseUrl : {
           left  : base + 'cubemap-tiles-24k/left_base.jpg',
           front : base + 'cubemap-tiles-24k/front_base.jpg',
           right : base + 'cubemap-tiles-24k/right_base.jpg',
@@ -118,7 +118,7 @@
 
     return viewer.setPanorama(pano.config, pano.position)
       .then(() => {
-        viewer.navbar.setCaption(pano.desc);
+        viewer.navbar.setCaption(pano.caption);
         viewer.setOption('minFov', pano.minFov);
       });
   }

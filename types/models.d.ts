@@ -76,6 +76,7 @@ export type PanoDataProvider = (image: HTMLImageElement) => PanoData;
  */
 export type PanoramaOptions = (ExtendedPosition | {}) & {
   caption?: string;
+  description?: string;
   transition?: boolean | number;
   showLoader?: boolean;
   zoom?: number;

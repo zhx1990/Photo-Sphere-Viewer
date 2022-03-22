@@ -41,7 +41,12 @@ List of enabled [plugins](../plugins/README.md).
 #### `caption`
 - type: `string`
 
-A text displayed in the navbar. If the navbar is disabled it will be shown anyway but with no button. HTML is allowed.
+A text displayed in the navbar. If the navbar is disabled, the caption won't be visible. HTML is allowed.
+
+#### `description`
+- type: `string`
+
+A text displayed in the side panel when the user clicks the "i" button. HTML is allowed.
 
 #### `downloadUrl`
 - type: `string`

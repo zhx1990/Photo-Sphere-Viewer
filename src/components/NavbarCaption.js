@@ -1,4 +1,4 @@
-import { CaptionButton } from '../buttons/CaptionButton';
+import { DescriptionButton } from '../buttons/DescriptionButton';
 import { AbstractComponent } from './AbstractComponent';
 
 /**
@@ -18,14 +18,6 @@ export class NavbarCaption extends AbstractComponent {
     super(navbar, 'psv-caption');
 
     /**
-     * @member {PSV.buttons.CaptionButton}
-     * @readonly
-     * @private
-     */
-    this.button = new CaptionButton(this);
-    this.button.hide();
-
-    /**
      * @override
      * @property {string} id
      * @property {boolean} collapsable
@@ -38,7 +30,7 @@ export class NavbarCaption extends AbstractComponent {
       ...this.prop,
       id            : this.constructor.id,
       collapsable   : false,
-      width         : this.button.prop.width,
+      width         : 0,
       caption       : '',
       contentVisible: true,
       contentWidth  : 0,
@@ -60,7 +52,6 @@ export class NavbarCaption extends AbstractComponent {
    * @override
    */
   destroy() {
-    delete this.button;
     delete this.content;
 
     super.destroy();
@@ -78,6 +69,10 @@ export class NavbarCaption extends AbstractComponent {
       this.prop.contentWidth = this.content.offsetWidth;
       this.refreshUi('caption change');
     }
+    else if (!this.prop.contentVisible) {
+      this.prop.contentVisible = true;
+      this.__refreshButton();
+    }
   }
 
   /**
@@ -89,13 +84,19 @@ export class NavbarCaption extends AbstractComponent {
     if (availableWidth >= this.prop.contentWidth && !this.prop.contentVisible) {
       this.content.style.display = '';
       this.prop.contentVisible = true;
-      this.button.hide(false);
     }
     else if (availableWidth < this.prop.contentWidth && this.prop.contentVisible) {
       this.content.style.display = 'none';
       this.prop.contentVisible = false;
-      this.button.show(false);
     }
+    this.__refreshButton();
+  }
+
+  /**
+   * @private
+   */
+  __refreshButton() {
+    this.psv.navbar.getButton(DescriptionButton.id, false)?.refreshUi(true);
   }
 
 }

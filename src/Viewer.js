@@ -473,6 +473,9 @@ export class Viewer extends EventEmitter {
     if (options.caption === undefined) {
       options.caption = this.config.caption;
     }
+    if (options.description === undefined) {
+      options.description = this.config.description;
+    }
 
     const positionProvided = isExtendedPosition(options);
     const zoomProvided = 'zoom' in options;
@@ -485,6 +488,7 @@ export class Viewer extends EventEmitter {
 
     this.config.panorama = path;
     this.config.caption = options.caption;
+    this.config.description = options.description;
 
     const done = (err) => {
       this.loader.hide();
@@ -588,7 +592,8 @@ export class Viewer extends EventEmitter {
 
       switch (key) {
         case 'caption':
-          this.navbar.setCaption(value);
+        case 'description':
+          this.navbar.setCaption(this.config.caption);
           break;
 
         case 'size':
