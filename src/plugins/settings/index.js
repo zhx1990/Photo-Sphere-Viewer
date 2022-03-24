@@ -91,7 +91,7 @@ export class SettingsPlugin extends AbstractPlugin {
    * @package
    */
   destroy() {
-    delete this.settings;
+    this.settings.length = 0;
 
     super.destroy();
   }

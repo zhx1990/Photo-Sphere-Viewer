@@ -125,9 +125,6 @@ export class VideoPlugin extends AbstractPlugin {
     this.psv.off(CONSTANTS.EVENTS.PANORAMA_LOADED, this);
     this.psv.off(CONSTANTS.EVENTS.KEY_PRESS, this);
 
-    this.progressbar?.destroy();
-    this.overlay?.destroy();
-
     delete this.autorotate;
     delete this.progressbar;
     delete this.overlay;
