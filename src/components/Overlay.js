@@ -1,7 +1,6 @@
 import { EVENTS, KEY_CODES } from '../data/constants';
-import { getEventKey } from '../utils';
-import { AbstractComponent } from './AbstractComponent';
 import { PSVError } from '../PSVError';
+import { AbstractComponent } from './AbstractComponent';
 
 /**
  * @summary Overlay component
@@ -87,7 +86,7 @@ export class Overlay extends AbstractComponent {
     switch (e.type) {
       // @formatter:off
       case 'mouseup':  this.prop.dissmisable && this.hide(); break;
-      case 'keydown':  getEventKey(e) === KEY_CODES.Escape && this.prop.dissmisable && this.hide(); break;
+      case 'keydown':  e.key === KEY_CODES.Escape && this.prop.dissmisable && this.hide(); break;
       // @formatter:on
     }
     /* eslint-enable */

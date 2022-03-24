@@ -134,10 +134,10 @@ export class Renderer extends AbstractService {
       case EVENTS.ZOOM_UPDATED:     this.__onZoomUpdated(); break;
       case EVENTS.POSITION_UPDATED: this.__onPositionUpdated(); break;
       case EVENTS.CONFIG_CHANGED:
-        if (evt.args[0].indexOf('fisheye') !== -1) {
+        if (evt.args[0].includes('fisheye')) {
           this.__onPositionUpdated();
         }
-        if (evt.args[0].indexOf('mousemove') !== -1) {
+        if (evt.args[0].includes('mousemove')) {
           this.canvasContainer.style.cursor = this.psv.config.mousemove ? 'move' : 'default';
         }
         break;

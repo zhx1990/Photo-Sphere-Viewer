@@ -1,5 +1,4 @@
 import * as THREE from 'three';
-import { Animation } from '../utils/Animation';
 import {
   ACTIONS,
   CTRLZOOM_TIMEOUT,
@@ -16,18 +15,8 @@ import {
 import { SYSTEM } from '../data/system';
 import gestureIcon from '../icons/gesture.svg';
 import mousewheelIcon from '../icons/mousewheel.svg';
-import {
-  clone,
-  distance,
-  each,
-  getClosest,
-  getEventKey,
-  getPosition,
-  isEmpty,
-  isFullscreenEnabled,
-  normalizeWheel,
-  throttle
-} from '../utils';
+import { clone, distance, each, getClosest, getPosition, isEmpty, isFullscreenEnabled, normalizeWheel, throttle } from '../utils';
+import { Animation } from '../utils/Animation';
 import { PressHandler } from '../utils/PressHandler';
 import { AbstractService } from './AbstractService';
 
@@ -200,14 +189,12 @@ export class EventsHandler extends AbstractService {
 
   /**
    * @summary Handles keyboard events
-   * @param {KeyboardEvent} evt
+   * @param {KeyboardEvent} e
    * @private
    */
-  __onKeyDown(evt) {
-    const key = getEventKey(evt);
-
+  __onKeyDown(e) {
     if (this.config.mousewheelCtrlKey) {
-      this.state.ctrlKeyDown = key === KEY_CODES.Control;
+      this.state.ctrlKeyDown = e.key === KEY_CODES.Control;
 
       if (this.state.ctrlKeyDown) {
         clearTimeout(this.state.ctrlZoomTimeout);
@@ -215,8 +202,8 @@ export class EventsHandler extends AbstractService {
       }
     }
 
-    const e = this.psv.trigger(EVENTS.KEY_PRESS, key);
-    if (e.isDefaultPrevented()) {
+    const e2 = this.psv.trigger(EVENTS.KEY_PRESS, e.key);
+    if (e2.isDefaultPrevented()) {
       return;
     }
 
@@ -224,12 +211,12 @@ export class EventsHandler extends AbstractService {
       return;
     }
 
-    if (this.config.keyboard[key] === ACTIONS.TOGGLE_AUTOROTATE) {
+    if (this.config.keyboard[e.key] === ACTIONS.TOGGLE_AUTOROTATE) {
       this.psv.toggleAutorotate();
     }
-    else if (this.config.keyboard[key] && !this.state.keyHandler.time) {
+    else if (this.config.keyboard[e.key] && !this.state.keyHandler.time) {
       /* eslint-disable */
-      switch (this.config.keyboard[key]) {
+      switch (this.config.keyboard[e.key]) {
         // @formatter:off
         case ACTIONS.ROTATE_LAT_UP: this.psv.dynamics.position.roll({latitude: false}); break;
         case ACTIONS.ROTATE_LAT_DOWN: this.psv.dynamics.position.roll({latitude: true});  break;

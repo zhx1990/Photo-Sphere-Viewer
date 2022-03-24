@@ -24,11 +24,6 @@ export function hasParent(el: HTMLElement, parent: HTMLElement): boolean;
 export function getClosest(el: HTMLElement | SVGElement, selector: string): HTMLElement;
 
 /**
- * @summary Returns the key name of a KeyboardEvent
- */
-export function getEventKey(evt: KeyboardEvent): string;
-
-/**
  * @summary Detects if fullscreen is enabled
  */
 export function isFullscreenEnabled(elt: HTMLElement): boolean;

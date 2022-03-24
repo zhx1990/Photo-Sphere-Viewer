@@ -6,22 +6,7 @@
  * @param {boolean} [active] - forced state
  */
 export function toggleClass(element, className, active) {
-  // manual implementation for IE11 and SVGElement
-  if (!element.classList) {
-    let currentClassName = element.getAttribute('class') || '';
-    const currentActive = currentClassName.indexOf(className) !== -1;
-    const regex = new RegExp('(?:^|\\s)' + className + '(?:\\s|$)');
-
-    if ((active === undefined || active) && !currentActive) {
-      currentClassName += currentClassName.length > 0 ? ' ' + className : className;
-    }
-    else if (!active) {
-      currentClassName = currentClassName.replace(regex, ' ');
-    }
-
-    element.setAttribute('class', currentClassName);
-  }
-  else if (active === undefined) {
+  if (active === undefined) {
     element.classList.toggle(className);
   }
   else if (active && !element.classList.contains(className)) {
@@ -88,15 +73,15 @@ export function hasParent(el, parent) {
  * @returns {HTMLElement}
  */
 export function getClosest(el, selector) {
-  const matches = el.matches || el.msMatchesSelector;
-  let test = el;
   // When el is document or window, the matches does not exist
-  if (!matches) {
+  if (!el.matches) {
     return null;
   }
 
+  let test = el;
+
   do {
-    if (matches.bind(test)(selector)) {
+    if (test.matches(selector)) {
       return test;
     }
     test = test instanceof SVGElement ? test.parentNode : test.parentElement;
@@ -127,72 +112,13 @@ export function getPosition(el) {
 }
 
 /**
- * @summary Map between keyboard events `keyCode|which` and `key`
- * @memberOf PSV.utils
- * @type {Object<int, string>}
- * @readonly
- * @private
- */
-const KEYMAP = {
-  13 : 'Enter',
-  17 : 'Control',
-  27 : 'Escape',
-  32 : ' ',
-  33 : 'PageUp',
-  34 : 'PageDown',
-  37 : 'ArrowLeft',
-  38 : 'ArrowUp',
-  39 : 'ArrowRight',
-  40 : 'ArrowDown',
-  46 : 'Delete',
-  107: '+',
-  109: '-',
-};
-
-/**
- * @summary Map for non standard keyboard events `key` for IE and Edge
- * @see https://github.com/shvaikalesh/shim-keyboard-event-key
- * @type {Object<string, string>}
- * @readonly
- * @private
- */
-const MS_KEYMAP = {
-  Add     : '+',
-  Del     : 'Delete',
-  Down    : 'ArrowDown',
-  Esc     : 'Escape',
-  Left    : 'ArrowLeft',
-  Right   : 'ArrowRight',
-  Spacebar: ' ',
-  Subtract: '-',
-  Up      : 'ArrowUp',
-};
-
-/**
- * @summary Returns the key name of a KeyboardEvent
- * @memberOf PSV.utils
- * @param {KeyboardEvent} evt
- * @returns {string}
- */
-export function getEventKey(evt) {
-  let key = evt.key || KEYMAP[evt.keyCode || evt.which];
-
-  if (key && MS_KEYMAP[key]) {
-    key = MS_KEYMAP[key];
-  }
-
-  return key;
-}
-
-/**
  * @summary Detects if fullscreen is enabled
  * @memberOf PSV.utils
  * @param {HTMLElement} elt
  * @returns {boolean}
  */
 export function isFullscreenEnabled(elt) {
-  /* eslint-disable-next-line max-len */
-  return (document.fullscreenElement || document.mozFullScreenElement || document.webkitFullscreenElement || document.msFullscreenElement) === elt;
+  return (document.fullscreenElement || document.webkitFullscreenElement) === elt;
 }
 
 /**
@@ -201,8 +127,7 @@ export function isFullscreenEnabled(elt) {
  * @param {HTMLElement} elt
  */
 export function requestFullscreen(elt) {
-  /* eslint-disable-next-line max-len */
-  (elt.requestFullscreen || elt.mozRequestFullScreen || elt.webkitRequestFullscreen || elt.msRequestFullscreen).call(elt);
+  (elt.requestFullscreen || elt.webkitRequestFullscreen).call(elt);
 }
 
 /**
@@ -210,8 +135,7 @@ export function requestFullscreen(elt) {
  * @memberOf PSV.utils
  */
 export function exitFullscreen() {
-  /* eslint-disable-next-line max-len */
-  (document.exitFullscreen || document.mozCancelFullScreen || document.webkitExitFullscreen || document.msExitFullscreen).call(document);
+  (document.exitFullscreen || document.webkitExitFullscreen).call(document);
 }
 
 /**

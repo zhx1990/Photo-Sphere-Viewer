@@ -128,7 +128,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
         const b = binary.indexOf('</x:xmpmeta>');
         const data = binary.substring(a, b);
 
-        if (a !== -1 && b !== -1 && data.indexOf('GPano:') !== -1) {
+        if (a !== -1 && b !== -1 && data.includes('GPano:')) {
           return {
             fullWidth    : getXMPValue(data, 'FullPanoWidthPixels'),
             fullHeight   : getXMPValue(data, 'FullPanoHeightPixels'),

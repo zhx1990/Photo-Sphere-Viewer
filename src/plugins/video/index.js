@@ -53,7 +53,7 @@ export class VideoPlugin extends AbstractPlugin {
   constructor(psv, options) {
     super(psv);
 
-    if (this.psv.adapter.constructor.id.indexOf('video') === -1) {
+    if (!this.psv.adapter.constructor.id.includes('video')) {
       throw new PSVError('VideoPlugin can only be used with a video adapter.');
     }
 

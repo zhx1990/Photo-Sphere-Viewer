@@ -1,7 +1,7 @@
 import { AbstractComponent } from '../components/AbstractComponent';
 import { KEY_CODES } from '../data/constants';
 import { PSVError } from '../PSVError';
-import { getEventKey, isPlainObject, toggleClass } from '../utils';
+import { isPlainObject, toggleClass } from '../utils';
 
 /**
  * @namespace PSV.buttons
@@ -96,7 +96,7 @@ export class AbstractButton extends AbstractComponent {
     });
 
     this.container.addEventListener('keydown', (e) => {
-      if (getEventKey(e) === KEY_CODES.Enter && this.prop.enabled) {
+      if (e.key === KEY_CODES.Enter && this.prop.enabled) {
         this.onClick();
         e.stopPropagation();
       }
@@ -225,8 +225,8 @@ export class AbstractButton extends AbstractComponent {
   __setIcon(icon, container = this.container) {
     if (icon) {
       container.innerHTML = icon;
-      // classList not supported on IE11, className is read-only !!!!
-      container.querySelector('svg').setAttribute('class', 'psv-button-svg');
+      // className is read-only on SVGElement
+      container.querySelector('svg').classList.add('psv-button-svg');
     }
     else {
       container.innerHTML = '';

@@ -129,15 +129,7 @@ export class SettingsPlugin extends AbstractPlugin {
    * @param {string} id
    */
   removeSetting(id) {
-    let idx = -1;
-    // FIXME use findIndex, one day, when IE11 is totally dead
-    this.settings.some((setting, i) => {
-      if (setting.id === id) {
-        idx = i;
-        return true;
-      }
-      return false;
-    });
+    const idx = this.settings.findIndex(setting => setting.id === id);
     if (idx !== -1) {
       this.settings.splice(idx, 1);
 

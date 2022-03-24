@@ -1,7 +1,7 @@
 import { EVENTS, KEY_CODES } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { PSVError } from '../PSVError';
-import { getEventKey, toggleClass } from '../utils';
+import { toggleClass } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 
 /**
@@ -112,7 +112,7 @@ export class Panel extends AbstractComponent {
       case 'touchmove':  this.__onTouchMove(e);  break;
       case 'mouseup':    this.__onMouseUp(e);    break;
       case 'touchend':   this.__onMouseUp(e);    break;
-      case 'keydown':    getEventKey(e) === KEY_CODES.Escape && this.hide(); break;
+      case 'keydown':    e.key === KEY_CODES.Escape && this.hide(); break;
       // @formatter:on
     }
     /* eslint-enable */
@@ -181,7 +181,7 @@ export class Panel extends AbstractComponent {
     if (config.clickHandler) {
       this.prop.clickHandler = config.clickHandler;
       this.prop.keyHandler = (e) => {
-        if (getEventKey(e) === KEY_CODES.Enter) {
+        if (e.key === KEY_CODES.Enter) {
           config.clickHandler(e);
         }
       };
