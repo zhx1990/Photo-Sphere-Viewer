@@ -245,7 +245,7 @@ export class StereoPlugin extends AbstractPlugin {
     let displayRotateMessageTimeout;
 
     const displayRotateMessage = () => {
-      if (this.isEnabled() && window.innerHeight > window.innerWidth) {
+      if (window.innerHeight > window.innerWidth) {
         this.psv.overlay.show({
           id     : ID_OVERLAY_PLEASE_ROTATE,
           image  : mobileRotateIcon,

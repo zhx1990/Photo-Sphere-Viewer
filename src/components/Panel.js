@@ -77,19 +77,19 @@ export class Panel extends AbstractComponent {
     this.psv.container.addEventListener('mousemove', this);
     this.psv.container.addEventListener('touchmove', this);
 
-    document.addEventListener('keydown', this);
+    this.psv.on(EVENTS.KEY_PRESS, this);
   }
 
   /**
    * @override
    */
   destroy() {
+    this.psv.off(EVENTS.KEY_PRESS, this);
+
     this.psv.container.removeEventListener('mousemove', this);
     this.psv.container.removeEventListener('touchmove', this);
     this.psv.container.removeEventListener('mouseup', this);
     this.psv.container.removeEventListener('touchend', this);
-
-    document.removeEventListener('keydown', this);
 
     delete this.prop;
     delete this.content;
@@ -112,7 +112,12 @@ export class Panel extends AbstractComponent {
       case 'touchmove':  this.__onTouchMove(e);  break;
       case 'mouseup':    this.__onMouseUp(e);    break;
       case 'touchend':   this.__onMouseUp(e);    break;
-      case 'keydown':    e.key === KEY_CODES.Escape && this.hide(); break;
+      case EVENTS.KEY_PRESS:
+        if (this.isVisible() && e.args[0] === KEY_CODES.Escape) {
+          this.hide();
+          e.preventDefault();
+        }
+        break;
       // @formatter:on
     }
     /* eslint-enable */
