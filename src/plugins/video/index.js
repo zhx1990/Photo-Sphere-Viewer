@@ -442,7 +442,7 @@ export class VideoPlugin extends AbstractPlugin {
     ];
 
     // apply offsets to avoid crossing the origin
-    const workVectors = [new THREE.Vector2(...workPoints[0])];
+    const workVectors = [new THREE.Vector2(workPoints[0][0], workPoints[0][1])];
 
     let k = 0;
     for (let i = 1; i <= 3; i++) {
