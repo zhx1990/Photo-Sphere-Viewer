@@ -132,9 +132,6 @@ export class AbstractButton extends AbstractComponent {
       if (!supportedOrObject) {
         this.hide();
       }
-      else {
-        this.show();
-      }
     }
   }
 

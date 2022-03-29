@@ -90,7 +90,7 @@ module.exports = {
             'plugin-resolution',
             'plugin-settings',
             'plugin-stereo',
-            ['plugin-video', 'Video (NEW)'],
+            ['plugin-video', 'VideoPlugin (NEW)'],
             'plugin-virtual-tour',
             'plugin-visible-range',
           ],

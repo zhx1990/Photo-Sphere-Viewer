@@ -50,7 +50,7 @@ export class MenuButton extends AbstractButton {
     this.psv.on(EVENTS.OPEN_PANEL, this);
     this.psv.on(EVENTS.CLOSE_PANEL, this);
 
-    this.hide();
+    super.hide();
   }
 
   /**
@@ -129,9 +129,7 @@ export class MenuButton extends AbstractButton {
   }
 
   __hideMenu() {
-    if (this.psv.panel) {
-      this.psv.panel.hide(IDS.MENU);
-    }
+    this.psv.panel.hide(IDS.MENU);
   }
 
 }

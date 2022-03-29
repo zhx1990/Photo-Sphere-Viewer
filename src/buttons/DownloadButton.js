@@ -1,5 +1,5 @@
-import { AbstractButton } from './AbstractButton';
 import download from '../icons/download.svg';
+import { AbstractButton } from './AbstractButton';
 
 /**
  * @summary Navigation bar download button class
@@ -20,13 +20,6 @@ export class DownloadButton extends AbstractButton {
 
   /**
    * @override
-   */
-  isSupported() {
-    return this.psv.adapter.constructor.supportsDownload || !!this.psv.config.downloadUrl;
-  }
-
-  /**
-   * @override
    * @description Asks the browser to download the panorama source file
    */
   onClick() {
@@ -39,6 +32,19 @@ export class DownloadButton extends AbstractButton {
     setTimeout(() => {
       this.psv.container.removeChild(link);
     }, 100);
+  }
+
+  /**
+   * @override
+   */
+  refreshUi() {
+    const supported = this.psv.adapter.constructor.supportsDownload || this.psv.config.downloadUrl;
+    if (supported && !this.prop.visible) {
+      this.show();
+    }
+    else if (!supported && this.prop.visible) {
+      this.hide();
+    }
   }
 
 }

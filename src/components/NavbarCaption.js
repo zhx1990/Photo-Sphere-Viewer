@@ -22,18 +22,14 @@ export class NavbarCaption extends AbstractComponent {
      * @property {string} id
      * @property {boolean} collapsable
      * @property {number} width
-     * @property {string} caption
-     * @property {boolean} contentVisible - if the content is visible in the navbar
-     * @property {number} contentWidth - with of the caption content
+     * @property {number} contentWidth - width of the caption content
      */
     this.prop = {
       ...this.prop,
-      id            : this.constructor.id,
-      collapsable   : false,
-      width         : 0,
-      caption       : '',
-      contentVisible: true,
-      contentWidth  : 0,
+      id          : this.constructor.id,
+      collapsable : false,
+      width       : 0,
+      contentWidth: 0,
     };
 
     /**
@@ -62,17 +58,10 @@ export class NavbarCaption extends AbstractComponent {
    * @param {string} html
    */
   setCaption(html) {
-    this.prop.caption = html || '';
-    this.content.innerHTML = this.prop.caption;
-
-    if (html) {
-      this.prop.contentWidth = this.content.offsetWidth;
-      this.refreshUi('caption change');
-    }
-    else if (!this.prop.contentVisible) {
-      this.prop.contentVisible = true;
-      this.__refreshButton();
-    }
+    this.show();
+    this.content.innerHTML = html;
+    this.prop.contentWidth = html ? this.content.offsetWidth : 0;
+    this.refreshUi();
   }
 
   /**
@@ -81,15 +70,29 @@ export class NavbarCaption extends AbstractComponent {
    */
   refreshUi() {
     const availableWidth = this.container.offsetWidth;
-    if (availableWidth >= this.prop.contentWidth && !this.prop.contentVisible) {
-      this.content.style.display = '';
-      this.prop.contentVisible = true;
+    if (availableWidth >= this.prop.contentWidth) {
+      this.show();
     }
-    else if (availableWidth < this.prop.contentWidth && this.prop.contentVisible) {
-      this.content.style.display = 'none';
-      this.prop.contentVisible = false;
+    else if (availableWidth < this.prop.contentWidth) {
+      this.hide();
     }
     this.__refreshButton();
+  }
+
+  /**
+   * @override
+   */
+  hide() {
+    this.content.style.display = 'none';
+    this.prop.visible = false;
+  }
+
+  /**
+   * @override
+   */
+  show() {
+    this.content.style.display = '';
+    this.prop.visible = true;
   }
 
   /**

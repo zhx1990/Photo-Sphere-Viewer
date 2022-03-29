@@ -104,7 +104,7 @@ export class DescriptionButton extends AbstractButton {
   refreshUi(refresh = false) {
     if (refresh) {
       const caption = this.psv.navbar.getButton(NavbarCaption.id, false);
-      const captionHidden = caption && !caption.prop.contentVisible;
+      const captionHidden = caption && !caption.isVisible();
       const hasDescription = !!this.psv.config.description;
 
       if (captionHidden || hasDescription) {

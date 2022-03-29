@@ -23,7 +23,7 @@ export class AbstractVideoAdapter extends AbstractAdapter {
 
   static supportsTransition = false;
   static supportsPreload = false;
-  static supportsDownload = true;
+  static supportsDownload = false;
 
   constructor(psv, options) {
     super(psv);

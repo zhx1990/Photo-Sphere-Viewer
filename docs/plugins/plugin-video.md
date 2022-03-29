@@ -19,7 +19,7 @@ Once enabled it will add various elements to the viewer:
 - Progressbar above the navbar
 - Play button in the center of the viewer
 
-It also supports advanced autorotate with times `keypoints`.
+It also supports advanced autorotate with timed `keypoints`.
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
@@ -79,7 +79,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 #### `keypoints`
 - type: `Array<{ position, time }>`
 
-Defines timed keypoints that will be used with by the autorotate button.
+Defines timed keypoints that will be used by the autorotate button.
 
 ```js
 keypoints: [
