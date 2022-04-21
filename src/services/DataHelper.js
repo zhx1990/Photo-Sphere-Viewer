@@ -168,8 +168,8 @@ export class DataHelper extends AbstractService {
   viewerCoordsToVector3(viewerPoint) {
     const sphereIntersect = this.getIntersections(viewerPoint).filter(i => i.object.userData[MESH_USER_DATA]);
 
-    if (sphereIntersect) {
-      return sphereIntersect.point;
+    if (sphereIntersect.length) {
+      return sphereIntersect[0].point;
     }
     else {
       return null;
