@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { CONSTANTS, PSVError, SYSTEM, utils } from '../..';
+import { CONSTANTS, PSVError, utils } from '../..';
 import { getShortestArc, logWarn } from '../../utils';
 import { MARKER_DATA, SVG_NS } from './constants';
 import { getPolygonCenter, getPolylineCenter } from './utils';

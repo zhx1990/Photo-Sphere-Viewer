@@ -265,7 +265,8 @@ export class Viewer extends EventEmitter {
       this.setPanorama(this.config.panorama);
     }
 
-    SYSTEM.isTouchEnabled.then(enabled => toggleClass(this.container, 'psv--is-touch', enabled));
+    toggleClass(this.container, 'psv--is-touch', SYSTEM.isTouchEnabled.initial);
+    SYSTEM.isTouchEnabled.promise.then(enabled => toggleClass(this.container, 'psv--is-touch', enabled));
 
     // enable GUI after first render
     this.once(EVENTS.RENDER, () => {

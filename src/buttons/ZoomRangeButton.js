@@ -104,7 +104,10 @@ export class ZoomRangeButton extends AbstractButton {
    * @override
    */
   isSupported() {
-    return { initial: true, promise: SYSTEM.isTouchEnabled.then(enabled => !enabled) };
+    return {
+      initial: !SYSTEM.isTouchEnabled.initial,
+      promise: SYSTEM.isTouchEnabled.promise.then(enabled => !enabled),
+    };
   }
 
   /**

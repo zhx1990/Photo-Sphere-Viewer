@@ -1,4 +1,7 @@
 import { PSVError } from '../PSVError';
+import { VIEWER_DATA } from './constants';
+
+const LOCALSTORAGE_TOUCH_SUPPORT = `${VIEWER_DATA}_touchSupport`;
 
 /**
  * @summary General information about the system
@@ -12,7 +15,7 @@ import { PSVError } from '../PSVError';
  * @property {string} mouseWheelEvent
  * @property {string} fullscreenEvent
  * @property {Function} getMaxCanvasWidth - Returns the max width of a canvas allowed by the browser
- * @property {Promise<boolean>} isTouchEnabled
+ * @property {{initial: boolean, promise: Promise<boolean>}} isTouchEnabled
  */
 export const SYSTEM = {
   loaded          : false,
@@ -81,27 +84,47 @@ function getWebGLCtx() {
 
 /**
  * @summary Detects if the user is using a touch screen
- * @returns {Promise<boolean>}
+ * @returns {{initial: boolean, promise: Promise<boolean>}}
  * @private
  */
 function isTouchEnabled() {
-  return new Promise((resolve) => {
-    const listener = (e) => {
-      if (e) {
-        resolve(true);
-      }
-      else {
-        resolve(false);
-      }
+  let initial = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0);
+  if (LOCALSTORAGE_TOUCH_SUPPORT in localStorage) {
+    initial = localStorage[LOCALSTORAGE_TOUCH_SUPPORT] === 'true';
+  }
 
-      window.removeEventListener('touchstart', listener);
+  const promise = new Promise((resolve) => {
+    let clear;
+
+    const listenerMouse = () => {
+      clear();
+      localStorage[LOCALSTORAGE_TOUCH_SUPPORT] = false;
+      resolve(false);
     };
 
-    window.addEventListener('touchstart', listener, false);
+    const listenerTouch = () => {
+      clear();
+      localStorage[LOCALSTORAGE_TOUCH_SUPPORT] = true;
+      resolve(true);
+    };
 
-    // after 10 secs auto-reject the promise
-    setTimeout(listener, 10000);
+    const listenerTimeout = () => {
+      clear();
+      localStorage[LOCALSTORAGE_TOUCH_SUPPORT] = initial;
+      resolve(initial);
+    };
+
+    clear = () => {
+      window.removeEventListener('mousedown', listenerMouse);
+      window.removeEventListener('touchstart', listenerTouch);
+    };
+
+    window.addEventListener('mousedown', listenerMouse, false);
+    window.addEventListener('touchstart', listenerTouch, false);
+    setTimeout(listenerTimeout, 10000);
   });
+
+  return { initial, promise };
 }
 
 /**
