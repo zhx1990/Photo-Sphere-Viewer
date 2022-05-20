@@ -162,6 +162,7 @@ export class AbstractVideoAdapter extends AbstractAdapter {
     const video = document.createElement('video');
     video.crossOrigin = this.psv.config.withCredentials ? 'use-credentials' : 'anonymous';
     video.loop = true;
+    video.playsinline = true;
     video.style.display = 'none';
     video.muted = this.config.muted;
     video.src = src;
