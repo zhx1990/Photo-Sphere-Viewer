@@ -279,9 +279,7 @@ export class GyroscopePlugin extends AbstractPlugin {
         };
 
         window.addEventListener('deviceorientation', listener, false);
-
-        // after 2 secs, auto-reject the promise
-        setTimeout(listener, 2000);
+        setTimeout(listener, 10000);
       });
     }
     else {
