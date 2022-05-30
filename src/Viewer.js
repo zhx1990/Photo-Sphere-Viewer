@@ -963,7 +963,7 @@ export class Viewer extends EventEmitter {
    */
   __updateSpeeds() {
     this.dynamics.zoom.setSpeed(this.config.zoomSpeed * 50);
-    this.dynamics.position.setSpeed(THREE.Math.degToRad(this.config.moveSpeed * 50));
+    this.dynamics.position.setSpeed(THREE.MathUtils.degToRad(this.config.moveSpeed * 50));
   }
 
 }

@@ -266,7 +266,7 @@ export class Marker {
     }
     if (Array.isArray(this.config.scale.longitude)) {
       const bounds = this.config.scale.longitude;
-      const halfFov = THREE.Math.degToRad(this.psv.prop.hFov) / 2;
+      const halfFov = THREE.MathUtils.degToRad(this.psv.prop.hFov) / 2;
       const arc = Math.abs(getShortestArc(this.props.position.longitude, position.longitude));
       scale *= bounds[1] + (bounds[0] - bounds[1]) * CONSTANTS.EASINGS.outQuad(Math.max(0, (halfFov - arc) / halfFov));
     }

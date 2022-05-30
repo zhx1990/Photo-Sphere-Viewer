@@ -47,7 +47,7 @@ export class DataHelper extends AbstractService {
    * @returns {number}
    */
   vFovToHFov(vFov) {
-    return THREE.Math.radToDeg(2 * Math.atan(Math.tan(THREE.Math.degToRad(vFov) / 2) * this.prop.aspect));
+    return THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(vFov) / 2) * this.prop.aspect));
   }
 
   /**
@@ -252,9 +252,9 @@ export class DataHelper extends AbstractService {
    */
   cleanPanoramaPose(panoData) {
     return {
-      pan : THREE.Math.degToRad(panoData?.poseHeading || 0),
-      tilt: THREE.Math.degToRad(panoData?.posePitch || 0),
-      roll: THREE.Math.degToRad(panoData?.poseRoll || 0),
+      pan : THREE.MathUtils.degToRad(panoData?.poseHeading || 0),
+      tilt: THREE.MathUtils.degToRad(panoData?.posePitch || 0),
+      roll: THREE.MathUtils.degToRad(panoData?.poseRoll || 0),
     };
   }
 

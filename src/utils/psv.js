@@ -218,7 +218,7 @@ export function parseSpeed(speed) {
       case 'degrees per minute':
       case 'dps':
       case 'degrees per second':
-        parsed = THREE.Math.degToRad(speedValue);
+        parsed = THREE.MathUtils.degToRad(speedValue);
         break;
 
       // Radians per minute / second
@@ -275,7 +275,7 @@ export function parseAngle(angle, zeroCenter = false, halfCircle = zeroCenter) {
       switch (unit) {
         case 'deg':
         case 'degs':
-          parsed = THREE.Math.degToRad(value);
+          parsed = THREE.MathUtils.degToRad(value);
           break;
         case 'rad':
         case 'rads':

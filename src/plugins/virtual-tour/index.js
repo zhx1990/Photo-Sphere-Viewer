@@ -582,8 +582,8 @@ export class VirtualTourPlugin extends AbstractPlugin {
    */
   __getLinkPosition(node, link) {
     if (this.isGps()) {
-      const p1 = [THREE.Math.degToRad(node.position[0]), THREE.Math.degToRad(node.position[1])];
-      const p2 = [THREE.Math.degToRad(link.position[0]), THREE.Math.degToRad(link.position[1])];
+      const p1 = [THREE.MathUtils.degToRad(node.position[0]), THREE.MathUtils.degToRad(node.position[1])];
+      const p2 = [THREE.MathUtils.degToRad(link.position[0]), THREE.MathUtils.degToRad(link.position[1])];
       const h1 = node.position[2] !== undefined ? node.position[2] : link.position[2] || 0;
       const h2 = link.position[2] !== undefined ? link.position[2] : node.position[2] || 0;
 

@@ -227,7 +227,7 @@ export class CompassPlugin extends AbstractPlugin {
     context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 
     const longitude = this.psv.getPosition().longitude;
-    const fov = THREE.Math.degToRad(this.psv.prop.hFov);
+    const fov = THREE.MathUtils.degToRad(this.psv.prop.hFov);
 
     this.__drawCone(context, this.config.coneColor, longitude, fov);
 
