@@ -8,8 +8,6 @@ import 'vue-slider-component/dist-css/vue-slider-component.css';
 import 'vue-slider-component/theme/material.css'
 import 'vue-swatches/dist/vue-swatches.css';
 
-window.global = window;
-
 export default ({ Vue, router }) => {
   Vue.use(VueMaterial);
   Vue.component('v-swatches', VSwatches);

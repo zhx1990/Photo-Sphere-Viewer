@@ -20,7 +20,6 @@
 </template>
 
 <script>
-  const axios = require('axios');
   const { marked } = require('marked');
   const { format, parseISO } = require('date-fns');
 
@@ -45,8 +44,15 @@
         if (cacheDate && (new Date() - new Date(cacheDate)) < 1000 * 3600) {
           return Promise.resolve(JSON.parse(localStorage.releasesCache));
         } else {
-          return axios('https://api.github.com/repos/mistic100/Photo-Sphere-Viewer/releases')
-            .then(function (data) {
+          return fetch('https://api.github.com/repos/mistic100/Photo-Sphere-Viewer/releases')
+            .then((response) => {
+              if (response.ok) {
+                return response.json();
+              } else {
+                throw new Error(response.statusText);
+              }
+            })
+            .then((data) => {
               localStorage.releasesCacheDate = new Date().toString();
               localStorage.releasesCache = JSON.stringify(data);
               return data;
