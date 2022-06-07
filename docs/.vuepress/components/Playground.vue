@@ -128,6 +128,9 @@
                 <md-input v-model="options.autorotateLat" :disabled="!imageData"/>
               </md-field>
             </div>
+            <div class="md-layout-item md-size-33 checkbox-field">
+              <md-checkbox class="md-primary" v-model="options.autorotateIdle" :disabled="!imageData">Autorotate on idle</md-checkbox>
+            </div>
           </div>
 
           <div class="md-layout md-gutter">
@@ -737,6 +740,9 @@
             Object.keys(this.options)
               .some(optName => {
                 if (!isEqual(this.options[optName], this.oldOptions[optName])) {
+                  if (optName === 'autorotateIdle') {
+                    this.psv.setOption('autorotateDelay',  this.options.autorotateIdle ? 2000 : null);
+                  }
                   this.psv.setOption(optName, this.options[optName]);
                   return true;
                 }

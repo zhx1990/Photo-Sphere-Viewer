@@ -211,12 +211,17 @@ export class EventsHandler extends AbstractService {
       return;
     }
 
-    if (this.config.keyboard[e.key] === ACTIONS.TOGGLE_AUTOROTATE) {
+    const action = this.config.keyboard[e.key];
+    if (action === ACTIONS.TOGGLE_AUTOROTATE) {
       this.psv.toggleAutorotate();
     }
-    else if (this.config.keyboard[e.key] && !this.state.keyHandler.time) {
+    else if (action && !this.state.keyHandler.time) {
+      if (action !== ACTIONS.ZOOM_IN && action !== ACTIONS.ZOOM_OUT) {
+        this.psv.__stopAll();
+      }
+
       /* eslint-disable */
-      switch (this.config.keyboard[e.key]) {
+      switch (action) {
         // @formatter:off
         case ACTIONS.ROTATE_LAT_UP: this.psv.dynamics.position.roll({latitude: false}); break;
         case ACTIONS.ROTATE_LAT_DOWN: this.psv.dynamics.position.roll({latitude: true});  break;
@@ -246,6 +251,7 @@ export class EventsHandler extends AbstractService {
     this.state.keyHandler.up(() => {
       this.psv.dynamics.position.stop();
       this.psv.dynamics.zoom.stop();
+      this.psv.resetIdleTimer();
     });
   }
 
@@ -533,8 +539,7 @@ export class EventsHandler extends AbstractService {
    * @private
    */
   __startMove(evt) {
-    this.psv.stopAutorotate();
-    this.psv.stopAnimation()
+    this.psv.__stopAll()
       .then(() => {
         this.state.mouseX = evt.clientX;
         this.state.mouseY = evt.clientY;
@@ -554,16 +559,19 @@ export class EventsHandler extends AbstractService {
    * @private
    */
   __startMoveZoom(evt) {
-    const p1 = { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
-    const p2 = { x: evt.touches[1].clientX, y: evt.touches[1].clientY };
+    this.psv.__stopAll()
+      .then(() => {
+        const p1 = { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
+        const p2 = { x: evt.touches[1].clientX, y: evt.touches[1].clientY };
 
-    this.state.pinchDist = distance(p1, p2);
-    this.state.mouseX = (p1.x + p2.x) / 2;
-    this.state.mouseY = (p1.y + p2.y) / 2;
-    this.state.startMouseX = this.state.mouseX;
-    this.state.startMouseY = this.state.mouseY;
-    this.state.moving = true;
-    this.state.zooming = true;
+        this.state.pinchDist = distance(p1, p2);
+        this.state.mouseX = (p1.x + p2.x) / 2;
+        this.state.mouseY = (p1.y + p2.y) / 2;
+        this.state.startMouseX = this.state.mouseX;
+        this.state.startMouseY = this.state.mouseY;
+        this.state.moving = true;
+        this.state.zooming = true;
+      });
   }
 
   /**
@@ -573,6 +581,8 @@ export class EventsHandler extends AbstractService {
    * @private
    */
   __stopMove(evt) {
+    this.psv.resetIdleTimer();
+
     if (!getClosest(evt.target, '.psv-container')) {
       this.state.moving = false;
       this.state.mouseHistory.length = 0;
@@ -604,6 +614,7 @@ export class EventsHandler extends AbstractService {
    * @private
    */
   __stopMoveZoom() {
+    this.psv.resetIdleTimer();
     this.state.mouseHistory.length = 0;
     this.state.moving = false;
     this.state.zooming = false;

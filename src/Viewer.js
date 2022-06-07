@@ -27,6 +27,7 @@ import {
   isAbortError,
   isExtendedPosition,
   isFullscreenEnabled,
+  isNil,
   logWarn,
   MultiDynamic,
   pluginInterop,
@@ -78,7 +79,7 @@ export class Viewer extends EventEmitter {
      * @property {boolean} autorotateEnabled - automatic rotation is enabled
      * @property {PSV.Animation} animationPromise - promise of the current animation
      * @property {Promise} loadingPromise - promise of the setPanorama method
-     * @property startTimeout - timeout id of the automatic rotation delay
+     * @property {number} idleTime - time of the last user action
      * @property {object} objectsObservers
      * @property {PSV.Size} size - size of the container
      * @property {PSV.PanoData} panoData - panorama metadata, if supported
@@ -95,7 +96,7 @@ export class Viewer extends EventEmitter {
       autorotateEnabled: false,
       animationPromise : null,
       loadingPromise   : null,
-      startTimeout     : null,
+      idleTime         : -1,
       objectsObservers : {},
       size             : {
         width : 0,
@@ -276,8 +277,8 @@ export class Viewer extends EventEmitter {
       }
 
       // Queue autorotate
-      if (this.config.autorotateDelay) {
-        this.prop.startTimeout = setTimeout(() => this.startAutorotate(), this.config.autorotateDelay);
+      if (!isNil(this.config.autorotateDelay)) {
+        this.prop.idleTime = performance.now();
       }
 
       this.prop.ready = true;
@@ -506,6 +507,7 @@ export class Viewer extends EventEmitter {
         throw err;
       }
       else {
+        this.resetIdleTimer();
         this.navbar.setCaption(this.config.caption);
         return true;
       }
@@ -570,6 +572,11 @@ export class Viewer extends EventEmitter {
    * @throws {PSV.PSVError} when the configuration is incorrect
    */
   setOptions(options) {
+    const rawConfig = {
+      ...this.config,
+      ...options,
+    };
+
     each(options, (value, key) => {
       if (DEPRECATED_OPTIONS[key]) {
         logWarn(DEPRECATED_OPTIONS[key]);
@@ -585,7 +592,7 @@ export class Viewer extends EventEmitter {
       }
 
       if (CONFIG_PARSERS[key]) {
-        this.config[key] = CONFIG_PARSERS[key](value, options);
+        this.config[key] = CONFIG_PARSERS[key](value, rawConfig);
       }
       else {
         this.config[key] = value;
@@ -625,6 +632,10 @@ export class Viewer extends EventEmitter {
           this.renderer.canvasContainer.style.background = this.config.canvasBackground;
           break;
 
+        case 'autorotateIdle':
+          this.resetIdleTimer();
+          break;
+
         default:
           break;
       }
@@ -648,11 +659,30 @@ export class Viewer extends EventEmitter {
   }
 
   /**
+   * @summary Restarts the idle timer (if `autorotateIdle=true`)
+   * @package
+   */
+  resetIdleTimer() {
+    this.prop.idleTime = this.config.autorotateIdle ? performance.now() : -1;
+  }
+
+  /**
+   * @summary Stops the idle timer
+   * @package
+   */
+  disableIdleTimer() {
+    this.prop.idleTime = -1;
+  }
+
+  /**
    * @summary Starts the automatic rotation
    * @fires PSV.autorotate
    */
   startAutorotate(refresh = false) {
     if (refresh && !this.isAutorotateEnabled()) {
+      return;
+    }
+    if (!refresh && this.isAutorotateEnabled()) {
       return;
     }
 
@@ -680,11 +710,6 @@ export class Viewer extends EventEmitter {
    * @fires PSV.autorotate
    */
   stopAutorotate() {
-    if (this.prop.startTimeout) {
-      clearTimeout(this.prop.startTimeout);
-      this.prop.startTimeout = null;
-    }
-
     if (this.isAutorotateEnabled()) {
       this.dynamics.position.stop();
 
@@ -807,6 +832,11 @@ export class Viewer extends EventEmitter {
           this.zoom(properties.zoom);
         }
       },
+    });
+
+    this.prop.animationPromise.then(() => {
+      this.prop.animationPromise = null;
+      this.resetIdleTimer();
     });
 
     return this.prop.animationPromise;
@@ -948,13 +978,15 @@ export class Viewer extends EventEmitter {
 
   /**
    * @summary Stops all current animations
+   * @returns {Promise}
    * @package
    */
   __stopAll() {
-    this.stopAutorotate();
-    this.stopAnimation();
-
     this.trigger(EVENTS.STOP_ALL);
+
+    this.disableIdleTimer();
+    this.stopAutorotate();
+    return this.stopAnimation();
   }
 
   /**

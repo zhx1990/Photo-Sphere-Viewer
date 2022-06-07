@@ -33,7 +33,7 @@
     mounted() {
       this.fetchReleases()
         .then(releases => {
-          this.changelog = releases.data.map(this.formatRelease);
+          this.changelog = releases.map(this.formatRelease);
           this.showLoader = false;
         });
     },

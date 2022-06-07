@@ -2,7 +2,7 @@ import { AbstractAdapter } from '../adapters/AbstractAdapter';
 import { EquirectangularAdapter } from '../adapters/equirectangular';
 import { AbstractPlugin } from '../plugins/AbstractPlugin';
 import { PSVError } from '../PSVError';
-import { bound, clone, deepmerge, each, logWarn, parseAngle, parseSpeed, pluginInterop } from '../utils';
+import { bound, clone, deepmerge, each, isNil, logWarn, parseAngle, parseSpeed, pluginInterop } from '../utils';
 import { ACTIONS, KEY_CODES } from './constants';
 
 /**
@@ -32,6 +32,7 @@ export const DEFAULTS = {
   moveSpeed          : 1,
   zoomSpeed          : 1,
   autorotateDelay    : null,
+  autorotateIdle     : false,
   autorotateSpeed    : '2rpm',
   autorotateLat      : null,
   moveInertia        : true,
@@ -182,6 +183,13 @@ export const CONFIG_PARSERS = {
   },
   autorotateSpeed: (autorotateSpeed) => {
     return parseSpeed(autorotateSpeed);
+  },
+  autorotateIdle : (autorotateIdle, config) => {
+    if (autorotateIdle && isNil(config.autorotateDelay)) {
+      logWarn('autorotateIdle requires a non null autorotateDelay');
+      return false;
+    }
+    return autorotateIdle;
   },
   fisheye        : (fisheye) => {
     // translate boolean fisheye to amount

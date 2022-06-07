@@ -22,7 +22,7 @@
     mounted() {
       this.fetchAnnouncements()
         .then(announcements => {
-          this.announcements = announcements.data.map(this.formatAnnouncement);
+          this.announcements = announcements.map(this.formatAnnouncement);
         });
     },
     methods: {

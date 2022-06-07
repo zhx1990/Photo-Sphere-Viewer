@@ -80,6 +80,7 @@ export class ZoomRangeButton extends AbstractButton {
     delete this.zoomValue;
 
     this.psv.off(EVENTS.ZOOM_UPDATED, this);
+    this.psv.off(EVENTS.READY, this);
 
     super.destroy();
   }

@@ -109,6 +109,14 @@ Initial latitude, between -π/2 and π/2.
 
 Delay after which the automatic rotation will begin, in milliseconds.
 
+#### `autorotateIdle`
+- type: `boolean`
+- default: `false`
+
+Restarts the automatic rotation if the user is idle for `autorotateDelay`.
+
+**Note:** the rotation won't restart of the user explicitly clicks on the navbar button.
+
 #### `autorotateSpeed`
 - type: `string`
 - default: `2rpm`
@@ -192,7 +200,7 @@ Requires two fingers to rotate the panorama. This allows standard touch-scroll n
 
 Allows to rotate the panorama sphere. Angles are in radians.
 
-**Note** : if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
+**Note:** if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
 
 ![pan-tilt-toll](/assets/pan-tilt-roll.png)
 
@@ -247,7 +255,7 @@ panoData: (image) => ({
 })
 ```
 
-**Note** : if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
+**Note:** if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
 
 ::: warning
 Only the default `equirectangular` adapter supports `panoData`, for other adapters you can only use [`sphereCorrection`](#spherecorrection) if the tilt/roll/pan needs to be corrected.

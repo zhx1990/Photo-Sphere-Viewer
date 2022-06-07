@@ -52,6 +52,10 @@ export class AutorotateButton extends AbstractButton {
    * @description Toggles autorotate
    */
   onClick() {
+    if (this.psv.isAutorotateEnabled()) {
+      this.psv.config.autorotateIdle = false;
+      this.psv.resetIdleTimer();
+    }
     this.psv.toggleAutorotate();
   }
 

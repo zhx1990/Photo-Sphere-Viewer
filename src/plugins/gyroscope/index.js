@@ -191,6 +191,8 @@ export class GyroscopePlugin extends AbstractPlugin {
       this.psv.config.moveInertia = this.prop.config_moveInertia;
 
       this.trigger(EVENTS.GYROSCOPE_UPDATED, false);
+
+      this.psv.resetIdleTimer();
     }
   }
 
