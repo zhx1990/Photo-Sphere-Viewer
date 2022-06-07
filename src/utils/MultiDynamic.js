@@ -1,4 +1,4 @@
-import { each } from './index';
+import { each } from './misc';
 
 /**
  * @summary Wrapper for multiple {@link PSV.utils.Dynamic} evolving together

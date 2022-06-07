@@ -1,5 +1,5 @@
 import { PSVError } from '../PSVError';
-import { bound, loop } from './index';
+import { bound, loop } from './math';
 
 /**
  * @summary Represents a variable that can dynamically change with time (using requestAnimationFrame)

@@ -1,4 +1,3 @@
-import { NavbarCaption } from '../components/NavbarCaption';
 import { EVENTS, IDS } from '../data/constants';
 import info from '../icons/info.svg';
 import { AbstractButton } from './AbstractButton';
@@ -103,7 +102,7 @@ export class DescriptionButton extends AbstractButton {
    */
   refreshUi(refresh = false) {
     if (refresh) {
-      const caption = this.psv.navbar.getButton(NavbarCaption.id, false);
+      const caption = this.psv.navbar.getButton('caption', false);
       const captionHidden = caption && !caption.isVisible();
       const hasDescription = !!this.psv.config.description;
 
