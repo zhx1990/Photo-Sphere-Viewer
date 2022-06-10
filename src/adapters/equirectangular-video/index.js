@@ -51,11 +51,12 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter {
   loadTexture(panorama) {
     return super.loadTexture(panorama)
       .then(({ texture }) => {
+        const video = texture.image;
         const panoData = {
-          fullWidth    : texture.image.width,
-          fullHeight   : texture.image.height,
-          croppedWidth : texture.image.width,
-          croppedHeight: texture.image.height,
+          fullWidth    : video.videoWidth,
+          fullHeight   : video.videoHeight,
+          croppedWidth : video.videoWidth,
+          croppedHeight: video.videoHeight,
           croppedX     : 0,
           croppedY     : 0,
           poseHeading  : 0,
