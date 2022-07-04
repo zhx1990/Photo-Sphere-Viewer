@@ -1,4 +1,4 @@
-## Issues guidelines
+**Issues guidelines**
 
 - **Indicate your Photo-Sphere-Viewer, three.js and web browser versions**
 - Please search in the [documentation](http://photo-sphere-viewer.js.org) before asking.

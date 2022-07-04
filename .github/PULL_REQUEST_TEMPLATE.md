@@ -1,5 +1,6 @@
 **Merge request checklist**
 
-- [ ] I read the [guidelines for contributing](https://github.com/mistic100/Photo-Sphere-Viewer/blob/master/.github/CONTRIBUTING.md)
-- [ ] I created my branch from `dev` and I am issuing the PR to `dev`
-- [ ] Unit tests are OK
+- [ ] I created my branch from `dev` and I am issuing the PR to `dev`.
+- [ ] All tests pass. If needed, new unit tests were added (only for utils).
+- [ ] If needed, the [types](https://github.com/mistic100/Photo-Sphere-Viewer/tree/dev/types) have been updated.
+- [ ] If needed, the [documentation](https://github.com/mistic100/Photo-Sphere-Viewer/tree/dev/docs) has been updated.
