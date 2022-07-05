@@ -61,6 +61,7 @@ export class CompassPlugin extends AbstractPlugin {
      * @private
      */
     this.prop = {
+      visible  : true,
       mouse    : null,
       mouseDown: false,
       markers  : [],
@@ -200,6 +201,22 @@ export class CompassPlugin extends AbstractPlugin {
       default:
         break;
     }
+  }
+
+  /**
+   * @summary Hides the compass
+   */
+  hide() {
+    this.container.style.display = 'none';
+    this.prop.visible = false;
+  }
+
+  /**
+   * @summary Shows the compass
+   */
+  show() {
+    this.container.style.display = '';
+    this.prop.visible = true;
   }
 
   /**

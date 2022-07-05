@@ -23,6 +23,16 @@ export class CompassPlugin extends AbstractPlugin {
   constructor(psv: Viewer, options: CompassPluginOptions);
 
   /**
+   * @summary Hides the compass
+   */
+  hide();
+
+  /**
+   * @summary Shows the compass
+   */
+  show();
+
+  /**
    * @summary Changes the hotspots on the compass
    */
   setHotspots(hotspots);

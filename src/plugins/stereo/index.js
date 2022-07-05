@@ -55,6 +55,13 @@ export class StereoPlugin extends AbstractPlugin {
     this.markers = null;
 
     /**
+     * @type {PSV.plugins.CompassPlugin}
+     * @readonly
+     * @private
+     */
+    this.compass = null;
+
+    /**
      * @member {Object}
      * @protected
      * @property {Promise<boolean>} isSupported - indicates of the gyroscope API is available
@@ -77,6 +84,7 @@ export class StereoPlugin extends AbstractPlugin {
     super.init();
 
     this.markers = this.psv.getPlugin('markers');
+    this.compass = this.psv.getPlugin('compass');
     this.gyroscope = this.psv.getPlugin('gyroscope');
 
     if (!this.gyroscope) {
@@ -97,6 +105,10 @@ export class StereoPlugin extends AbstractPlugin {
     this.psv.off(CONSTANTS.EVENTS.CLICK, this);
 
     this.stop();
+
+    delete this.markers;
+    delete this.compass;
+    delete this.gyroscope;
 
     super.destroy();
   }
@@ -149,6 +161,7 @@ export class StereoPlugin extends AbstractPlugin {
       this.psv.needsUpdate();
 
       this.markers?.hide();
+      this.compass?.hide();
       this.psv.navbar.hide();
       this.psv.panel.hide();
 
@@ -177,6 +190,7 @@ export class StereoPlugin extends AbstractPlugin {
       this.psv.needsUpdate();
 
       this.markers?.show();
+      this.compass?.show();
       this.psv.navbar.show();
 
       this.__unlockOrientation();
