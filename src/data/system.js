@@ -159,7 +159,7 @@ function getMaxCanvasWidth(maxWidth) {
     ctx.fillRect(0, 0, 1, 1);
 
     try {
-      if (ctx.getImageData(0, 0, 1, 1).data[0] === 255) {
+      if (ctx.getImageData(0, 0, 1, 1).data[0] > 0) {
         return canvas.width;
       }
     }
