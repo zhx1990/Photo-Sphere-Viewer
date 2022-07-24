@@ -300,17 +300,17 @@ export class Viewer extends EventEmitter {
     this.stopKeyboardControl();
     this.exitFullscreen();
 
+    each(this.plugins, plugin => plugin.destroy());
+    delete this.plugins;
+
+    this.children.slice().forEach(child => child.destroy());
+    this.children.length = 0;
+
     this.eventsHandler.destroy();
     this.renderer.destroy();
     this.textureLoader.destroy();
     this.dataHelper.destroy();
     this.adapter.destroy();
-
-    this.children.slice().forEach(child => child.destroy());
-    this.children.length = 0;
-
-    each(this.plugins, plugin => plugin.destroy());
-    delete this.plugins;
 
     this.parent.removeChild(this.container);
     delete this.parent[VIEWER_DATA];
@@ -324,6 +324,7 @@ export class Viewer extends EventEmitter {
     delete this.tooltip;
     delete this.notification;
     delete this.overlay;
+    delete this.dynamics;
 
     delete this.config;
   }
