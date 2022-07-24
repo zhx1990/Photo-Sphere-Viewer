@@ -9,6 +9,7 @@ import { AbstractPlugin, CONSTANTS, utils } from '../..';
  * @property {boolean} [usePanoData=false] - use panoData as visible range, you can also manually call `setRangesFromPanoData`
  */
 
+const EPS = 0.000001;
 
 /**
  * @summary Locks visible longitude and/or latitude
@@ -72,15 +73,28 @@ export class VisibleRangePlugin extends AbstractPlugin {
    */
   // eslint-disable-next-line consistent-return
   handleEvent(e) {
+    let sidesReached;
+    let rangedPosition;
+    let currentPosition;
+
     switch (e.type) {
       case CONSTANTS.CHANGE_EVENTS.GET_ANIMATE_POSITION:
       case CONSTANTS.CHANGE_EVENTS.GET_ROTATE_POSITION:
-        return this.applyRanges(e.value).rangedPosition;
+        currentPosition = e.value;
+        ({ rangedPosition } = this.applyRanges(currentPosition));
+
+        return rangedPosition;
 
       case CONSTANTS.EVENTS.POSITION_UPDATED:
-        const { sidesReached } = this.applyRanges(e.args[0]);
+        currentPosition = e.args[0];
+        ({ sidesReached, rangedPosition } = this.applyRanges(currentPosition));
+
         if ((sidesReached.left || sidesReached.right) && this.psv.isAutorotateEnabled()) {
           this.__reverseAutorotate(sidesReached.left, sidesReached.right);
+        }
+        else if (Math.abs(currentPosition.longitude - rangedPosition.longitude) > EPS
+          || Math.abs(currentPosition.latitude - rangedPosition.latitude) > EPS) {
+          this.psv.dynamics.position.setValue(rangedPosition);
         }
         break;
 
@@ -91,9 +105,11 @@ export class VisibleRangePlugin extends AbstractPlugin {
         break;
 
       case CONSTANTS.EVENTS.ZOOM_UPDATED:
-        const currentPosition = this.psv.getPosition();
-        const { rangedPosition } = this.applyRanges(currentPosition);
-        if (currentPosition.longitude !== rangedPosition.longitude || currentPosition.latitude !== rangedPosition.latitude) {
+        currentPosition = this.psv.getPosition();
+        ({ rangedPosition } = this.applyRanges(currentPosition));
+
+        if (Math.abs(currentPosition.longitude - rangedPosition.longitude) > EPS
+          || Math.abs(currentPosition.latitude - rangedPosition.latitude) > EPS) {
           this.psv.rotate(rangedPosition);
         }
         break;
