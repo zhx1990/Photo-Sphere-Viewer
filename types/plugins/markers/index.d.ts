@@ -43,7 +43,7 @@ export type MarkerProperties = Partial<ExtendedPosition> & {
   svgStyle?: Record<string, string>;
   anchor?: string;
   visible?: boolean;
-  tooltip?: string | { content: string, position?: string };
+  tooltip?: string | { content: string, position?: string, className?: string, trigger?: 'hover' | 'click' };
   content?: string;
   hideList?: boolean;
   data?: any;
@@ -118,6 +118,7 @@ export class Marker {
 }
 
 export const EVENTS: {
+  MARKER_VISIBILITY  : 'marker-visibility',
   GOTO_MARKER_DONE: 'goto-marker-done',
   LEAVE_MARKER: 'leave-marker',
   OVER_MARKER: 'over-marker',
@@ -229,6 +230,16 @@ export class MarkersPlugin extends AbstractPlugin {
   toggleMarker(markerId: string);
 
   /**
+   * @summary Forces the display of the tooltip
+   */
+  showMarkerTooltip(markerId: string);
+
+  /**
+   * @summary Hides the tooltip
+   */
+  hideMarkerTooltip(markerId: string);
+
+  /**
    * @summary Opens the panel with the content of the marker
    */
   showMarkerPanel(markerId: string);
@@ -252,6 +263,11 @@ export class MarkersPlugin extends AbstractPlugin {
    * @summary Updates the visibility and the position of all markers
    */
   renderMarkers();
+
+  /**
+   * @summary Triggered when the visibility of a marker changes
+   */
+  on(e: 'marker-visibility', cb: (e: Event, marker: Marker, visible: boolean) => void): this;
 
   /**
    * @summary Triggered when the animation to a marker is done

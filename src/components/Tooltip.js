@@ -57,6 +57,7 @@ export class Tooltip extends AbstractComponent {
       width : 0,
       height: 0,
       pos   : '',
+      config: null,
       data  : null,
     };
 
@@ -153,6 +154,8 @@ export class Tooltip extends AbstractComponent {
     this.prop.state = STATE.SHOWING;
 
     this.psv.trigger(EVENTS.SHOW_TOOLTIP, this.prop.data, this);
+
+    this.__waitImages();
   }
 
   /**
@@ -165,6 +168,8 @@ export class Tooltip extends AbstractComponent {
     if (this.prop.state !== STATE.SHOWING && this.prop.state !== STATE.READY) {
       throw new PSVError('Uninitialized tooltip cannot be moved');
     }
+
+    this.config = config;
 
     const t = this.container;
     const a = this.arrow;
@@ -251,7 +256,7 @@ export class Tooltip extends AbstractComponent {
           break;
 
         default:
-          // nothing
+        // nothing
       }
     }
   }
@@ -322,6 +327,35 @@ export class Tooltip extends AbstractComponent {
         break;
 
       // no default
+    }
+  }
+
+  /**
+   * @summary If the tooltip contains images, recompute its size once they are loaded
+   * @private
+   */
+  __waitImages() {
+    const images = this.content.querySelectorAll('img');
+
+    if (images.length > 0) {
+      const promises = [];
+
+      images.forEach((image) => {
+        promises.push(new Promise((resolve) => {
+          image.onload = resolve;
+          image.onerror = resolve;
+        }));
+      });
+
+      Promise.all(promises)
+        .then(() => {
+          if (this.prop.state === STATE.SHOWING || this.prop.state === STATE.READY) {
+            const rect = this.container.getBoundingClientRect();
+            this.prop.width = rect.right - rect.left;
+            this.prop.height = rect.bottom - rect.top;
+            this.move(this.config);
+          }
+        });
     }
   }
 

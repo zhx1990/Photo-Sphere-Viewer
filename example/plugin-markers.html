@@ -19,6 +19,23 @@
       border: 1px solid white;
       background: rgba(0, 0, 0, 0.4);
     }
+
+    .custom-tooltip {
+      max-width: none;
+      width: 300px;
+      padding: 0;
+      box-shadow: 0 0 0 3px white;
+    }
+
+    .custom-tooltip img {
+      width: 100%;
+      border-radius: 4px 4px 0 0;
+    }
+
+    .custom-tooltip h2, .custom-tooltip p {
+      margin: 1rem;
+      text-align: justify;
+    }
   </style>
 </head>
 <body>
@@ -128,16 +145,38 @@
             }
           }
 
-          // marker with content
+          // marker with content and tooltip
           a.push({
-            id       : 'lorem',
-            tooltip  : {
-              content : 'Lorem ipsum dolor ist amet et consecturo.',
-              position: 'bottom right',
-            },
+            id       : 'content',
+            tooltip  : 'Click me!',
             content  : document.getElementById('pin-content').innerHTML,
             latitude : 0.32,
             longitude: 0.11,
+            image    : 'assets/pin-blue.png',
+            width    : 32,
+            height   : 32,
+            anchor   : 'bottom center',
+          });
+
+          // marker with custom tooltip
+          a.push({
+            id       : 'custom-tooltip',
+            tooltip  : {
+              content  : `
+<img src="sphere_small.jpg">
+<article>
+  <h2>Lorem ipsum</h2>
+  <p>
+    Vivamus magna. Cras in mi at felis aliquet
+    congue. Ut a est eget ligula molestie gravida. Curabitur massa. Donec eleifend, libero at sagittis mollis,
+    tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretium ornare est.
+  </p>
+</article>`,
+              className: 'custom-tooltip',
+              trigger  : 'click',
+            },
+            latitude : 0.11,
+            longitude: -0.35,
             image    : 'assets/pin-blue.png',
             width    : 32,
             height   : 32,
@@ -409,6 +448,10 @@
 
   const markers = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
 
+  viewer.once('ready', () => {
+    markers.showMarkerTooltip('content');
+  });
+
   viewer.on('click', (e, data) => {
     if (!data.rightclick) {
       markers.addMarker({
@@ -461,6 +504,10 @@
 
   markers.on('goto-marker-done', (e, marker) => {
     console.log('goto-done', marker.id);
+  });
+
+  markers.on('marker-visibility', (e, marker, visible) => {
+    console.log('marker-visibility', marker.id, visible);
   });
 </script>
 </body>

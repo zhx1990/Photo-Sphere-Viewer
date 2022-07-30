@@ -8,6 +8,14 @@ import icon from './pin-list.svg';
  */
 export const EVENTS = {
   /**
+   * @event marker-visibility
+   * @memberof PSV.plugins.MarkersPlugin
+   * @summary Triggered when the visibility of a marker changes
+   * @param {PSV.plugins.MarkersPlugin.Marker} marker
+   * @param {boolean} visible
+   */
+  MARKER_VISIBILITY  : 'marker-visibility',
+  /**
    * @event goto-marker-done
    * @memberof PSV.plugins.MarkersPlugin
    * @summary Triggered when the animation to a marker is done
@@ -78,6 +86,18 @@ export const EVENTS = {
    * @summary Triggered when the markers are shown
    */
   SHOW_MARKERS       : 'show-markers',
+};
+
+/**
+ * @summary Types of tooltip events
+ * @memberOf PSV.plugins.MarkersPlugin
+ * @enum {string}
+ * @constant
+ * @private
+ */
+export const MARKER_TOOLTIP_TRIGGER = {
+  click: 'click',
+  hover: 'hover',
 };
 
 /**

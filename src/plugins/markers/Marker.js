@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { CONSTANTS, PSVError, utils } from '../..';
 import { getShortestArc, logWarn } from '../../utils';
-import { MARKER_DATA, SVG_NS } from './constants';
+import { MARKER_DATA, MARKER_TOOLTIP_TRIGGER, SVG_NS } from './constants';
 import { getPolygonCenter, getPolylineCenter } from './utils';
 
 /**
@@ -103,6 +103,8 @@ export class Marker {
      * @protected
      * @property {boolean} dynamicSize
      * @property {PSV.Point} anchor
+     * @property {boolean} visible - actually visible in the view
+     * @property {boolean} staticTooltip - the tooltip must always be shown
      * @property {PSV.Position} position - position in spherical coordinates
      * @property {PSV.Point} position2D - position in viewer coordinates
      * @property {external:THREE.Vector3[]} positions3D - positions in 3D space
@@ -111,14 +113,16 @@ export class Marker {
      * @property {*} def
      */
     this.props = {
-      dynamicSize: false,
-      anchor     : null,
-      position   : null,
-      position2D : null,
-      positions3D: null,
-      width      : null,
-      height     : null,
-      def        : null,
+      dynamicSize  : false,
+      anchor       : null,
+      visible      : false,
+      staticTooltip: false,
+      position     : null,
+      position2D   : null,
+      positions3D  : null,
+      width        : null,
+      height       : null,
+      def          : null,
     };
 
     /**
@@ -285,7 +289,7 @@ export class Marker {
     if (this.config.listContent) {
       return this.config.listContent;
     }
-    else if (this.config.tooltip?.content) {
+    else if (this.config.tooltip.content) {
       return this.config.tooltip.content;
     }
     else if (this.config.html) {
@@ -301,11 +305,10 @@ export class Marker {
    * @param {{clientX: number, clientY: number}} [mousePosition]
    */
   showTooltip(mousePosition) {
-    if (this.visible && this.config.tooltip?.content && this.props.position2D) {
+    if (this.props.visible && this.config.tooltip.content && this.props.position2D) {
       const config = {
-        content : this.config.tooltip.content,
-        position: this.config.tooltip.position,
-        data    : this,
+        ...this.config.tooltip,
+        data: this,
       };
 
       if (this.isPoly()) {
@@ -344,6 +347,15 @@ export class Marker {
   }
 
   /**
+   * @summary Recompute the position of the tooltip
+   */
+  refreshTooltip() {
+    if (this.tooltip) {
+      this.showTooltip();
+    }
+  }
+
+  /**
    * @summary Hides the tooltip of this marker
    */
   hideTooltip() {
@@ -368,6 +380,12 @@ export class Marker {
     utils.deepmerge(this.config, properties);
     if (typeof this.config.tooltip === 'string') {
       this.config.tooltip = { content: this.config.tooltip };
+    }
+    if (!this.config.tooltip) {
+      this.config.tooltip = {};
+    }
+    if (!this.config.tooltip.trigger) {
+      this.config.tooltip.trigger = MARKER_TOOLTIP_TRIGGER.hover;
     }
 
     this.data = this.config.data;
@@ -628,7 +646,7 @@ export class Marker {
 
     // compute x/y/z positions
     this.props.positions3D = this.props.def.map((coord) => {
-      return this.psv.dataHelper.sphericalCoordsToVector3({ longitude: coord[0], latitude : coord[1] });
+      return this.psv.dataHelper.sphericalCoordsToVector3({ longitude: coord[0], latitude: coord[1] });
     });
   }
 

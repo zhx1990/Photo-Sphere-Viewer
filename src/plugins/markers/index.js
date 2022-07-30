@@ -5,6 +5,7 @@ import {
   ID_PANEL_MARKER,
   ID_PANEL_MARKERS_LIST,
   MARKER_DATA,
+  MARKER_TOOLTIP_TRIGGER,
   MARKERS_LIST_TEMPLATE,
   SVG_NS
 } from './constants';
@@ -211,8 +212,12 @@ export class MarkersPlugin extends AbstractPlugin {
    * @summary Toggles the visibility of all tooltips
    */
   toggleAllTooltips() {
-    this.prop.showAllTooltips = !this.prop.showAllTooltips;
-    this.renderMarkers();
+    if (this.prop.showAllTooltips) {
+      this.hideAllTooltips();
+    }
+    else {
+      this.showAllTooltips();
+    }
   }
 
   /**
@@ -220,7 +225,10 @@ export class MarkersPlugin extends AbstractPlugin {
    */
   showAllTooltips() {
     this.prop.showAllTooltips = true;
-    this.renderMarkers();
+    utils.each(this.markers, (marker) => {
+      marker.props.staticTooltip = true;
+      marker.showTooltip();
+    });
   }
 
   /**
@@ -228,7 +236,10 @@ export class MarkersPlugin extends AbstractPlugin {
    */
   hideAllTooltips() {
     this.prop.showAllTooltips = false;
-    this.renderMarkers();
+    utils.each(this.markers, (marker) => {
+      marker.props.staticTooltip = false;
+      marker.hideTooltip();
+    });
   }
 
   /**
@@ -461,6 +472,26 @@ export class MarkersPlugin extends AbstractPlugin {
   }
 
   /**
+   * @summary Forces the display of the tooltip
+   * @param {string} markerId
+   */
+  showMarkerTooltip(markerId) {
+    const marker = this.getMarker(markerId);
+    marker.props.staticTooltip = true;
+    marker.showTooltip();
+  }
+
+  /**
+   * @summary Hides the tooltip
+   * @param {string} markerId
+   */
+  hideMarkerTooltip(markerId) {
+    const marker = this.getMarker(markerId);
+    marker.props.staticTooltip = false;
+    marker.hideTooltip();
+  }
+
+  /**
    * @summary Toggles a marker
    * @param {string} markerId
    * @param {boolean} [visible]
@@ -560,6 +591,7 @@ export class MarkersPlugin extends AbstractPlugin {
 
     utils.each(this.markers, (marker) => {
       let isVisible = this.prop.visible && marker.visible;
+      let visibilityChanged = false;
       let position = null;
 
       if (isVisible && marker.is3d()) {
@@ -602,17 +634,29 @@ export class MarkersPlugin extends AbstractPlugin {
         }
       }
 
+      visibilityChanged = marker.props.visible !== isVisible;
+      marker.props.visible = isVisible;
       marker.props.position2D = isVisible ? position : null;
 
       if (!marker.is3d()) {
         utils.toggleClass(marker.$el, 'psv-marker--visible', isVisible);
       }
 
-      if (isVisible && (this.prop.showAllTooltips || (marker === this.prop.hoveringMarker && !marker.isPoly()))) {
+      if (!isVisible) {
+        marker.hideTooltip();
+      }
+      else if (marker.props.staticTooltip) {
         marker.showTooltip();
       }
-      else if (!isVisible || marker !== this.prop.hoveringMarker) {
+      else if (marker.config.tooltip.trigger === MARKER_TOOLTIP_TRIGGER.click || (marker === this.prop.hoveringMarker && !marker.isPoly())) {
+        marker.refreshTooltip();
+      }
+      else if (marker !== this.prop.hoveringMarker) {
         marker.hideTooltip();
+      }
+
+      if (visibilityChanged) {
+        this.trigger(EVENTS.MARKER_VISIBILITY, marker, isVisible);
       }
     });
   }
@@ -803,7 +847,7 @@ export class MarkersPlugin extends AbstractPlugin {
 
       this.trigger(EVENTS.OVER_MARKER, marker);
 
-      if (!this.prop.showAllTooltips) {
+      if (!marker.props.staticTooltip && marker.config.tooltip.trigger === MARKER_TOOLTIP_TRIGGER.hover) {
         marker.showTooltip(e);
       }
     }
@@ -823,7 +867,7 @@ export class MarkersPlugin extends AbstractPlugin {
 
       this.prop.hoveringMarker = null;
 
-      if (!this.prop.showAllTooltips) {
+      if (!marker.props.staticTooltip && marker.config.tooltip.trigger === MARKER_TOOLTIP_TRIGGER.hover) {
         marker.hideTooltip();
       }
     }
@@ -855,14 +899,14 @@ export class MarkersPlugin extends AbstractPlugin {
         this.prop.hoveringMarker = marker;
       }
 
-      if (!this.prop.showAllTooltips) {
+      if (!marker.props.staticTooltip) {
         marker.showTooltip(e);
       }
     }
     else if (this.prop.hoveringMarker?.isPoly()) {
       this.trigger(EVENTS.LEAVE_MARKER, this.prop.hoveringMarker);
 
-      if (!this.prop.showAllTooltips) {
+      if (!this.prop.hoveringMarker.props.staticTooltip) {
         this.prop.hoveringMarker.hideTooltip();
       }
 
@@ -886,6 +930,18 @@ export class MarkersPlugin extends AbstractPlugin {
       marker = this.__getTargetMarker(data.target, true);
     }
 
+    if (this.prop.currentMarker && this.prop.currentMarker !== marker) {
+      this.trigger(EVENTS.UNSELECT_MARKER, this.prop.currentMarker);
+
+      this.psv.panel.hide(ID_PANEL_MARKER);
+
+      if (!this.prop.showAllTooltips && this.prop.currentMarker.config.tooltip.trigger === MARKER_TOOLTIP_TRIGGER.click) {
+        this.hideMarkerTooltip(this.prop.currentMarker);
+      }
+
+      this.prop.currentMarker = null;
+    }
+
     if (marker) {
       this.prop.currentMarker = marker;
 
@@ -904,15 +960,18 @@ export class MarkersPlugin extends AbstractPlugin {
 
       // the marker could have been deleted in an event handler
       if (this.markers[marker.id]) {
-        this.showMarkerPanel(marker.id);
+        if (marker.config.tooltip.trigger === MARKER_TOOLTIP_TRIGGER.click) {
+          if (marker.tooltip) {
+            this.hideMarkerTooltip(marker);
+          }
+          else {
+            this.showMarkerTooltip(marker);
+          }
+        }
+        else {
+          this.showMarkerPanel(marker.id);
+        }
       }
-    }
-    else if (this.prop.currentMarker) {
-      this.trigger(EVENTS.UNSELECT_MARKER, this.prop.currentMarker);
-
-      this.psv.panel.hide(ID_PANEL_MARKER);
-
-      this.prop.currentMarker = null;
     }
   }
 

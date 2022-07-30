@@ -148,9 +148,6 @@ scale: {
   // the marker is twice smaller on the minimum zoom level
   zoom: [0.5, 1]
 }
-
-// same thing
-scale: [0.5, 1]
 ```
 
 Scales depending on position, the array contains `[scale on center, scale on the side]` :
@@ -241,19 +238,31 @@ _(This option is ignored for polygons and polylines)._
 Initial visibility of the marker.
 
 #### `tooltip`
-- type: `string | {content: string, position: string}`
-- default: `{content: null, position: 'top center'}`
+- type: `string | {content: string, position: string, className: string, trigger: string}`
+- default: `{content: null, position: 'top center', className: null, trigger: 'hover'}`
 
-Tooltip content and position. Accepted positions are combinations of `top`, `center`, `bottom` and `left`, `center`, `right` with the exception of `center center`.
+Accepted positions are combinations of `top`, `center`, `bottom` and `left`, `center`, `right` with the exception of `center center`.
+
+Possible triggers are `hover` and `click`.
 
 ```js
-tooltip: 'This is a marker' // tooltip with default position
+tooltip: 'This is a marker' // tooltip with default position and style
 
 tooltip: { // tooltip with custom position
   content : 'This is marker',
-  position: 'bottom left'
+  position: 'bottom left',
+}
+
+tooltip: { // tooltip with a custom class shown on click
+  content: 'This is marker',
+  className: 'custom-tooltip',
+  trigger: 'click',
 }
 ```
+
+::: warning
+If `trigger` is set to `'click'` you won't be able to display a `content` in the side panel.
+:::
 
 #### `listContent`
 - type: `string`
@@ -353,8 +362,26 @@ markersPlugin.updateMarker({
 });
 ```
 
+#### `showMarkerTooltip(id)` | `hideMarkerTooltip(id)`
+
+Allows to always display a tooltip.
+
+#### `showAllTooltips()` | `hideAllTooltips()` | `toggleAllTooltips()`
+
+Allows to always display all tooltips.
+
 
 ## Events
+
+#### `marker-visibility(marker, visible)`
+
+Triggered when the visibility of a marker changes.
+
+```js
+markersPlugin.on('marker-visibility', (e, marker, visible) => {
+  console.log(`Marker ${marker.id} is ${visible ? 'visible' : 'not visible'}`);
+});
+```
 
 #### `over-marker(marker)` | `leave-marker(marker)`
 
