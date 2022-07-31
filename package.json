@@ -76,6 +76,7 @@
     "stylelint-config-standard-scss": "^5.0.0",
     "typescript": "^4.4.2",
     "vue-material": "^1.0.0-beta-15",
+    "vue-no-ssr": "^1.1.1",
     "vue-slider-component": "^3.2.14",
     "vue-swatches": "^2.1.1",
     "vuepress": "^1.8.2"

@@ -6,6 +6,13 @@ module.exports = {
   description: 'A JavaScript library to display Photo Sphere panoramas',
   head       : [
     ['link', { rel: 'icon', href: '/favicon.png' }],
+    ['script', { src: 'https://cdn.jsdelivr.net/npm/uevent@2/browser.js', defer: 'defer' }],
+    ['script', { src: 'https://cdn.jsdelivr.net/npm/three/build/three.min.js', defer: 'defer' }],
+    ['script', { src: 'https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.js', defer: 'defer' }],
+    ['link', {
+      rel : 'stylesheet',
+      href: 'https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.css'
+    }],
   ],
   themeConfig: {
     logo        : '/favicon.png',
@@ -116,10 +123,4 @@ module.exports = {
     }],
     ['@vuepress/back-to-top'],
   ],
-  alias      : {
-    'photo-sphere-viewer'                   : path.resolve(process.cwd(), 'dist/photo-sphere-viewer.js'),
-    'photo-sphere-viewer-markers'           : path.resolve(process.cwd(), 'dist/plugins/markers.js'),
-    'photo-sphere-viewer-stylesheet'        : path.resolve(process.cwd(), 'dist/photo-sphere-viewer.css'),
-    'photo-sphere-viewer-markers-stylesheet': path.resolve(process.cwd(), 'dist/plugins/markers.css'),
-  },
 };

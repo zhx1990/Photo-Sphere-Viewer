@@ -86,8 +86,6 @@
 </template>
 
 <script>
-  const { Viewer } = require('photo-sphere-viewer');
-
   export default {
     data   : () => ({
       psv      : null,
@@ -199,7 +197,7 @@
           this.psv.destroy();
         }
 
-        this.psv = new Viewer({
+        this.psv = new PhotoSphereViewer.Viewer({
           panorama  : this.imageData,
           container : 'viewer',
           loadingImg: 'https://photo-sphere-viewer.js.org/assets/photosphere-logo.gif',

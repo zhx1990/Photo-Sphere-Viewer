@@ -121,4 +121,6 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 Use this demo to find the best values for your image.
 
-<CropPlayground/>
+<no-ssr>
+  <CropPlayground/>
+</no-ssr>

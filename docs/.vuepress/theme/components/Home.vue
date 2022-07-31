@@ -84,7 +84,6 @@
 </template>
 
 <script>
-  const { Viewer } = require('photo-sphere-viewer');
   import NavLink from '@theme/components/NavLink.vue'
 
   export default {
@@ -110,7 +109,7 @@
     }),
 
     mounted() {
-      const viewer = new Viewer({
+      const viewer = new PhotoSphereViewer.Viewer({
         panorama       : 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg',
         container      : 'photosphere',
         defaultLat     : 0.1,

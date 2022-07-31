@@ -498,8 +498,6 @@
 </template>
 
 <script>
-  const { Viewer, DEFAULTS } = require('photo-sphere-viewer');
-  const { MarkersPlugin } = require('photo-sphere-viewer-markers');
   const { cloneDeep, omit, debounce, isEqual, pickBy, range } = require('lodash');
 
   const TEMP_ID = 'marker-temp';
@@ -515,7 +513,7 @@
         roll: 0
       },
       options         : {
-        ...omit(cloneDeep(DEFAULTS), ['panorama', 'panoData', 'sphereCorrection', 'container', 'plugins', 'navbar', 'loadingImg']),
+        ...omit(cloneDeep(PhotoSphereViewer.DEFAULTS), ['panorama', 'panoData', 'sphereCorrection', 'container', 'plugins', 'navbar', 'loadingImg']),
       },
       panoData        : {
         fullWidth    : null,
@@ -528,22 +526,22 @@
       navbar          : [
         {
           code   : 'autorotate',
-          label  : DEFAULTS.lang.autorotate,
+          label  : PhotoSphereViewer.DEFAULTS.lang.autorotate,
           enabled: true
         },
         {
           code   : 'zoom',
-          label  : DEFAULTS.lang.zoom,
+          label  : PhotoSphereViewer.DEFAULTS.lang.zoom,
           enabled: true
         },
         {
           code   : 'move',
-          label  : DEFAULTS.lang.move,
+          label  : PhotoSphereViewer.DEFAULTS.lang.move,
           enabled: true
         },
         {
           code   : 'download',
-          label  : DEFAULTS.lang.download,
+          label  : PhotoSphereViewer.DEFAULTS.lang.download,
           enabled: true
         },
         {
@@ -553,7 +551,7 @@
         },
         {
           code   : 'fullscreen',
-          label  : DEFAULTS.lang.fullscreen,
+          label  : PhotoSphereViewer.DEFAULTS.lang.fullscreen,
           enabled: true
         },
       ],
@@ -596,7 +594,7 @@
     },
 
     created() {
-      this.CLIPBOARD_AVAILABLE = false; // SSR rendering dissallow "window" usage here
+      this.CLIPBOARD_AVAILABLE = !!window.navigator.clipboard;
       this.PIN_RED_URL = 'https://photo-sphere-viewer.js.org/assets/pin-red.png';
       this.PIN_BLUE_URL = 'https://photo-sphere-viewer.js.org/assets/pin-blue.png';
       this.TARGET_URL = 'https://photo-sphere-viewer.js.org/assets/target.png';
@@ -605,32 +603,41 @@
     },
 
     mounted() {
-      this.CLIPBOARD_AVAILABLE = !!window.navigator.clipboard;
+      const markersJs = document.createElement('script');
+      markersJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/markers.js');
+      document.head.appendChild(markersJs);
+
+      const markersCss = document.createElement('link');
+      markersCss.setAttribute('rel', 'stylesheet');
+      markersCss.setAttribute('href', 'https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/plugins/markers.css');
+      document.head.appendChild(markersCss);
 
       this.oldOptions = cloneDeep(this.options);
 
       this._applyOptions = debounce(() => this.applyOptions(), 200);
 
-      this.psv = new Viewer({
-        container : 'viewer',
-        loadingImg: 'https://photo-sphere-viewer.js.org/assets/photosphere-logo.gif',
-        plugins   : [
-          [MarkersPlugin, {}],
-        ],
-      });
+      markersJs.onload = () => {
+        this.psv = new PhotoSphereViewer.Viewer({
+          container : 'viewer',
+          loadingImg: 'https://photo-sphere-viewer.js.org/assets/photosphere-logo.gif',
+          plugins   : [
+            [PhotoSphereViewer.MarkersPlugin, {}],
+          ],
+        });
 
-      this.applyNavbar();
+        this.applyNavbar();
 
-      this.markers = this.psv.getPlugin(MarkersPlugin);
+        this.markers = this.psv.getPlugin(PhotoSphereViewer.MarkersPlugin);
 
-      this.psv.on('click', (e, data) => this.onClick(data));
-      this.psv.on('dblclick', (e, data) => this.onDblClick(data));
-      this.markers.on('select-marker', (e, marker) => this.onSelectMarker(marker));
-      this.markers.on('set-markers', (e, markers) => {
-        this.markersList = cloneDeep(markers.filter(m => m.id !== TEMP_ID));
-      });
+        this.psv.on('click', (e, data) => this.onClick(data));
+        this.psv.on('dblclick', (e, data) => this.onDblClick(data));
+        this.markers.on('select-marker', (e, marker) => this.onSelectMarker(marker));
+        this.markers.on('set-markers', (e, markers) => {
+          this.markersList = cloneDeep(markers.filter(m => m.id !== TEMP_ID));
+        });
 
-      this.loadPsv();
+        this.loadPsv();
+      };
     },
 
     watch: {
