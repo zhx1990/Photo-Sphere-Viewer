@@ -1,4 +1,4 @@
-# GalleryPlugin
+# GalleryPlugin <Badge text="NEW"/>
 
 <ApiButton page="PSV.plugins.GalleryPlugin.html"/>
 

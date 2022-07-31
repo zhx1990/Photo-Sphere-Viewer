@@ -1,9 +1,41 @@
-# User demos
+---
+sidebar: auto
+---
 
-This sections contains various examples of Photo Sphere Viewer created my users or myself when providing support.
+# Demos
 
-### Want your demo here ?
+::: tip Want your demo here ?
+Create a JSFiddle by forking [PSV Home Demo](https://jsfiddle.net/mistic100/5r684etx/) and submit a pull request to add it to the documentation.
+:::
 
-Create a JSFiddle by forking [PSV Home Demo](https://jsfiddle.net/mistic100/5r684etx/) and submit a Pull Request to add it to the documentation, if it is interesting enough it will be added.
+::: tip Plugins
+Visit each [plugin page](../plugins/) to see an example.
+:::
 
-Alternatively open an issue withe your JSFiddle link and a short description and I will add it.
+## Basic
+
+:::: gallery
+
+::: item video="/assets/demos/base.webm" link="https://jsfiddle.net/mistic100/5r684etx/show"
+### Zero config
+Simple panorama with default options.
+:::
+
+::: item video="/assets/demos/fisheye.webm" link="https://jsfiddle.net/mistic100/wsL1x5k0/show"
+### Intro animation
+Use the `Animation` helper to create a cool intro.
+:::
+
+::::
+
+
+## Markers
+
+:::: gallery
+
+::: item image="/assets/demos/custom-marker.jpg" link="https://jsfiddle.net/mistic100/Lm3wzesb/show"
+### Custom tooltip
+Advanced styling of a marker's tooltip.
+:::
+
+::::

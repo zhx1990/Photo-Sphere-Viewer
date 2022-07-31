@@ -88,6 +88,8 @@ const viewer = new Viewer({
 </md-tab>
 </md-tabs>
 
+<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/5r684etx/embedded/result/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+
 
 The `panorama` must be an [equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection) of your photo. Other modes are supported through [adapters](./adapters/).
 

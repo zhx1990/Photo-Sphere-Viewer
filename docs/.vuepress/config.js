@@ -8,7 +8,10 @@ module.exports = {
     ['link', { rel: 'icon', href: '/favicon.png' }],
     ['script', { src: 'https://cdn.jsdelivr.net/npm/uevent@2/browser.js', defer: 'defer' }],
     ['script', { src: 'https://cdn.jsdelivr.net/npm/three/build/three.min.js', defer: 'defer' }],
-    ['script', { src: 'https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.js', defer: 'defer' }],
+    ['script', {
+      src  : 'https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.js',
+      defer: 'defer'
+    }],
     ['link', {
       rel : 'stylesheet',
       href: 'https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/photo-sphere-viewer.css'
@@ -104,17 +107,6 @@ module.exports = {
           ],
         },
       ],
-      '/demos/'  : [
-        {
-          title       : 'Demos',
-          sidebarDepth: 3,
-          collapsable : false,
-          children    : [
-            '',
-            'intro',
-          ],
-        },
-      ],
     },
   },
   plugins    : [
@@ -122,5 +114,6 @@ module.exports = {
       'ga': 'UA-28192323-3',
     }],
     ['@vuepress/back-to-top'],
+    require('./plugins/gallery'),
   ],
 };
