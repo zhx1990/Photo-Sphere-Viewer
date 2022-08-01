@@ -176,7 +176,7 @@ export class Tooltip extends AbstractComponent {
 
     // compute size
     const style = {
-      posClass : cleanPosition(config.position, 'top center', false),
+      posClass : config.position ? cleanPosition(config.position, false) : ['top', 'center'],
       width    : this.prop.width,
       height   : this.prop.height,
       top      : 0,

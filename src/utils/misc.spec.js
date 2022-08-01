@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { deepmerge, dasherize } from './misc';
+import { dasherize, deepEqual, deepmerge } from './misc';
 
 describe('utils:misc:deepmerge', () => {
   it('should merge basic plain objects', () => {
@@ -68,5 +68,70 @@ describe('utils:misc:dasherize', () => {
 
   it('should not change existing dash-case', () => {
     assert.strictEqual(dasherize('stroke-width'), 'stroke-width');
+  });
+});
+
+describe('utils:misc:deepEqual', () => {
+  it('should compare simple objects', () => {
+    assert.strictEqual(deepEqual(
+      { foo: 'bar' },
+      { foo: 'bar' },
+    ), true);
+
+    assert.strictEqual(deepEqual(
+      { foo: 'bar' },
+      { foo: 'foo' },
+    ), false);
+
+    assert.strictEqual(deepEqual(
+      { foo: 'bar' },
+      { foo: 'bar', baz: 'bar' },
+    ), false);
+  });
+
+  it('should compare nested objects', () => {
+    assert.strictEqual(deepEqual(
+      { foo: { bar: 'baz' } },
+      { foo: { bar: 'baz' } },
+    ), true);
+
+    assert.strictEqual(deepEqual(
+      { foo: { bar: 'baz' } },
+      { foo: { bar: 'foo' } },
+    ), false);
+
+    assert.strictEqual(deepEqual(
+      { foo: { bar: 'baz' } },
+      { foo: { bar: 'baz', baz: 'bar' } },
+    ), false);
+  });
+
+  it('should compare arrays', () => {
+    assert.strictEqual(deepEqual(
+      { foo: ['bar', 'baz'] },
+      { foo: ['bar', 'baz'] },
+    ), true);
+
+    assert.strictEqual(deepEqual(
+      { foo: ['bar', 'baz'] },
+      { foo: ['bar', 'bar'] },
+    ), false);
+  });
+
+  it('should compare standard types', () => {
+    assert.strictEqual(deepEqual(
+      { a: 'foo', b: false, c: -4 },
+      { a: 'foo', b: false, c: -4 },
+    ), true);
+
+    assert.strictEqual(deepEqual(
+      { a: 'foo', b: false, c: -4 },
+      { a: 'foo', b: 'false', c: -4 },
+    ), false);
+
+    assert.strictEqual(deepEqual(
+      { a: 'foo', b: false, c: -4 },
+      { a: 'foo', b: false, c: '-4' },
+    ), false);
   });
 });

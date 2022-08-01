@@ -1,6 +1,6 @@
 import assert from 'assert';
 
-import { parseAngle, parsePosition, parseSpeed, getXMPValue } from './psv';
+import { parseAngle, parsePosition, parseSpeed, getXMPValue, cleanPosition } from './psv';
 
 describe('utils:psv:parseAngle', () => {
   it('should normalize number', () => {
@@ -314,4 +314,26 @@ describe('utils:psv:getXMPValue', () => {
     ])
   });
 
+});
+
+describe('utils:psv:cleanPosition', () => {
+  it('should clean various formats', () => {
+    assert.deepStrictEqual(cleanPosition('top right'), ['top', 'right']);
+    assert.deepStrictEqual(cleanPosition('right top'), ['top', 'right']);
+    assert.deepStrictEqual(cleanPosition('top'), ['top', 'center']);
+    assert.deepStrictEqual(cleanPosition('left'), ['center', 'left']);
+    assert.deepStrictEqual(cleanPosition(['top', 'right']), ['top', 'right']);
+  });
+
+  it('should dissallow center', () => {
+    assert.deepStrictEqual(cleanPosition('top center', false), ['top', 'center']);
+
+    assert.throws(() => {
+      cleanPosition('center center', false);
+    });
+  });
+
+  it('should not fail on unparsable values', () => {
+    assert.deepStrictEqual(cleanPosition('foo bar'), ['center', 'center']);
+  });
 });

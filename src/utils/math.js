@@ -27,19 +27,6 @@ export function loop(value, max) {
 }
 
 /**
- * @summary Checks if a value is an integer
- * @memberOf PSV.utils
- * @param {*} value
- * @returns {boolean}
- */
-export function isInteger(value) {
-  if (Number.isInteger) {
-    return Number.isInteger(value);
-  }
-  return typeof value === 'number' && Number.isFinite(value) && Math.floor(value) === value;
-}
-
-/**
  * @summary Tests if a number is power of two
  * @memberOf PSV.utils
  * @param {number} x

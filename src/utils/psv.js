@@ -163,15 +163,10 @@ const TOP_MAP = { 0: 'top', 0.5: 'center', 1: 'bottom' };
  * @summary Parse a CSS-like position into an array of position keywords among top, bottom, left, right and center
  * @memberOf PSV.utils
  * @param {string | string[]} value
- * @param {string} defaultValue
  * @param {boolean} [allowCenter=true]
  * @return {string[]}
  */
-export function cleanPosition(value, defaultValue, allowCenter = true) {
-  if (!value) {
-    return defaultValue.split(' ');
-  }
-
+export function cleanPosition(value, allowCenter = true) {
   if (typeof value === 'string') {
     const tempPos = parsePosition(value);
 

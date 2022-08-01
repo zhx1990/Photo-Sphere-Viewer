@@ -685,7 +685,7 @@ export class MarkersPlugin extends AbstractPlugin {
    * @private
    */
   __updateMarkerSize(marker) {
-    utils.addClasses(marker.$el, 'psv-marker--transparent');
+    marker.$el.classList.add('psv-marker--transparent');
 
     let transform;
     if (marker.isSvg()) {
@@ -701,7 +701,7 @@ export class MarkersPlugin extends AbstractPlugin {
     marker.props.width = rect.width;
     marker.props.height = rect.height;
 
-    utils.removeClasses(marker.$el, 'psv-marker--transparent');
+    marker.$el.classList.remove('psv-marker--transparent');
 
     if (transform) {
       if (marker.isSvg()) {

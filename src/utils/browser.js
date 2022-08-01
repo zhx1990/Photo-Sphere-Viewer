@@ -9,7 +9,7 @@ export function toggleClass(element, className, active) {
   if (active === undefined) {
     element.classList.toggle(className);
   }
-  else if (active && !element.classList.contains(className)) {
+  else if (active) {
     element.classList.add(className);
   }
   else if (!active) {
@@ -24,11 +24,7 @@ export function toggleClass(element, className, active) {
  * @param {string} className
  */
 export function addClasses(element, className) {
-  if (className) {
-    className.split(' ').forEach((name) => {
-      toggleClass(element, name, true);
-    });
-  }
+  element.classList.add(...className.split(' '));
 }
 
 /**
@@ -38,11 +34,7 @@ export function addClasses(element, className) {
  * @param {string} className
  */
 export function removeClasses(element, className) {
-  if (className) {
-    className.split(' ').forEach((name) => {
-      toggleClass(element, name, false);
-    });
-  }
+  element.classList.remove(...className.split(' '));
 }
 
 /**

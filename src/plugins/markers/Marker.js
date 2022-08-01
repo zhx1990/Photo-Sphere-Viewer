@@ -394,7 +394,7 @@ export class Marker {
     if (!this.is3d()) {
       // reset CSS class
       if (this.isNormal()) {
-        this.$el.setAttribute('class', 'psv-marker psv-marker--normal');
+        this.$el.className = 'psv-marker psv-marker--normal';
       }
       else {
         this.$el.setAttribute('class', 'psv-marker psv-marker--svg');
@@ -406,10 +406,10 @@ export class Marker {
       }
 
       if (this.config.tooltip) {
-        utils.addClasses(this.$el, 'psv-marker--has-tooltip');
+        this.$el.classList.add('psv-marker--has-tooltip');
       }
       if (this.config.content) {
-        utils.addClasses(this.$el, 'psv-marler--has-content');
+        this.$el.classList.add('psv-marler--has-content');
       }
 
       // apply style
