@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhotoSphereViewer - little planet demo</title>
+
+  <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="photosphere"></div>
+
+<script src="../node_modules/three/build/three.js"></script>
+<script src="../node_modules/uevent/browser.js"></script>
+<script src="../dist/photo-sphere-viewer.js"></script>
+<script src="../dist/adapters/little-planet.js"></script>
+
+
+<script>
+  const panos = [
+    {
+      url    : 'sphere.jpg',
+      caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    },
+    {
+      url    : 'test-sphere.jpg',
+      caption: 'Test sphere',
+    },
+  ];
+
+  const viewer = new PhotoSphereViewer.Viewer({
+    container : 'photosphere',
+    adapter   : PhotoSphereViewer.LittlePlanetAdapter,
+    panorama  : panos[0].url,
+    caption   : panos[0].caption,
+    loadingImg: 'assets/photosphere-logo.gif',
+    navbar    : [
+      'autorotate', 'zoom', 'move', 'download',
+      {
+        title    : 'Change image',
+        className: 'custom-button',
+        content  : '🔄',
+        onClick  : (() => {
+          let i = 0;
+          return () => {
+            i = 1 - i;
+            viewer.setPanorama(panos[i].url, {
+              longitude  : 0,
+              latitude   : 0,
+              zoom       : 50,
+              caption    : panos[i].caption,
+              description: panos[i].description,
+            });
+          };
+        })(),
+      },
+      {
+        title    : 'Random position',
+        className: 'custom-button',
+        content  : '🔀',
+        onClick  : () => {
+          viewer.animate({
+            longitude: (Math.random() - 0.5) * 3 / 2 * Math.PI,
+            latitude : (Math.random() - 0.5) * 3 / 4 * Math.PI,
+            zoom     : Math.random() * 60 + 20,
+            speed    : 1500,
+          });
+        },
+      },
+      'caption', 'fullscreen',
+    ],
+  });
+</script>
+</body>
+</html>

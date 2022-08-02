@@ -79,6 +79,7 @@ export class Viewer extends EventEmitter {
      * @property {boolean} autorotateEnabled - automatic rotation is enabled
      * @property {PSV.Animation} animationPromise - promise of the current animation
      * @property {Promise} loadingPromise - promise of the setPanorama method
+     * @property {boolean} littlePlanet - special tweaks for LittlePlanetAdapter
      * @property {number} idleTime - time of the last user action
      * @property {object} objectsObservers
      * @property {PSV.Size} size - size of the container
@@ -96,6 +97,7 @@ export class Viewer extends EventEmitter {
       autorotateEnabled: false,
       animationPromise : null,
       loadingPromise   : null,
+      littlePlanet     : false,
       idleTime         : -1,
       objectsObservers : {},
       size             : {
@@ -236,7 +238,9 @@ export class Viewer extends EventEmitter {
 
       position: new MultiDynamic({
         longitude: new Dynamic(null, this.config.defaultLong, 0, 2 * Math.PI, true),
-        latitude : new Dynamic(null, this.config.defaultLat, -Math.PI / 2, Math.PI / 2),
+        latitude : this.prop.littlePlanet
+          ? new Dynamic(null, this.config.defaultLat, 0, Math.PI * 2, true)
+          : new Dynamic(null, this.config.defaultLat, -Math.PI / 2, Math.PI / 2),
       }, (position) => {
         this.dataHelper.sphericalCoordsToVector3(position, this.prop.direction);
         this.trigger(EVENTS.POSITION_UPDATED, position);

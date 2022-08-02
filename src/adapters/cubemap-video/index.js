@@ -154,7 +154,9 @@ uniform sampler2D mapped;
 uniform vec2 faceWH;
 uniform vec2 vidWH;
 uniform float contCorrect;
+
 const float PI = 3.1415926535897932384626433832795;
+
 void main() {
   vec2 corner = vUv - mod(vUv, faceWH) + vec2(0, contCorrect / vidWH.y);
   vec2 faceWHadj = faceWH - vec2(0, contCorrect * 2. / vidWH.y);

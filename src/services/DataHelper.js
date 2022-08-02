@@ -227,7 +227,7 @@ export class DataHelper extends AbstractService {
     else {
       return {
         longitude: parseAngle(position.longitude),
-        latitude : parseAngle(position.latitude, true),
+        latitude : parseAngle(position.latitude, !this.prop.littlePlanet),
       };
     }
   }
