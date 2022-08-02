@@ -44,7 +44,7 @@
         if (cacheDate && (new Date() - new Date(cacheDate)) < 1000 * 3600) {
           return Promise.resolve(JSON.parse(localStorage.releasesCache));
         } else {
-          return fetch('https://api.github.com/repos/mistic100/Photo-Sphere-Viewer/releases')
+          return fetch('/.netlify/functions/releases')
             .then((response) => {
               if (response.ok) {
                 return response.json();
@@ -61,7 +61,7 @@
       },
       formatRelease(release) {
         // Convert markdown to html
-        let desc = marked.parse(release.body, { breaks: true });
+        let desc = marked.parse(release.description, { breaks: true });
 
         // Remove some escaping done by marked.js
         desc = desc.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
@@ -74,9 +74,9 @@
 
         return {
           id   : release.id,
-          url  : release.html_url,
+          url  : release.url,
           title: release.name,
-          date : format(parseISO(release.published_at), 'PPP'),
+          date : format(parseISO(release.publishedAt), 'PPP'),
           desc : desc,
         };
       }
