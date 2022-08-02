@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { MathUtils } from 'three';
 import {
   ACTIONS,
   CTRLZOOM_TIMEOUT,
@@ -15,7 +15,17 @@ import {
 import { SYSTEM } from '../data/system';
 import gestureIcon from '../icons/gesture.svg';
 import mousewheelIcon from '../icons/mousewheel.svg';
-import { clone, distance, each, getClosest, getPosition, isEmpty, isFullscreenEnabled, normalizeWheel, throttle } from '../utils';
+import {
+  clone,
+  distance,
+  each,
+  getClosest,
+  getPosition,
+  isEmpty,
+  isFullscreenEnabled,
+  normalizeWheel,
+  throttle
+} from '../utils';
 import { Animation } from '../utils/Animation';
 import { PressHandler } from '../utils/PressHandler';
 import { AbstractService } from './AbstractService';
@@ -732,8 +742,8 @@ export class EventsHandler extends AbstractService {
       const y = evt.clientY;
 
       const rotation = {
-        longitude: (x - this.state.mouseX) / this.prop.size.width * this.config.moveSpeed * THREE.MathUtils.degToRad(this.prop.hFov),
-        latitude : (y - this.state.mouseY) / this.prop.size.height * this.config.moveSpeed * THREE.MathUtils.degToRad(this.prop.vFov),
+        longitude: (x - this.state.mouseX) / this.prop.size.width * this.config.moveSpeed * MathUtils.degToRad(this.prop.hFov),
+        latitude : (y - this.state.mouseY) / this.prop.size.height * this.config.moveSpeed * MathUtils.degToRad(this.prop.vFov),
       };
 
       const currentPosition = this.psv.getPosition();

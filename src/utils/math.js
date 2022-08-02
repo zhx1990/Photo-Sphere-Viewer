@@ -1,13 +1,10 @@
+import { MathUtils } from 'three';
+
 /**
- * @summary Ensures that a number is in a given interval
- * @memberOf PSV.utils
- * @param {number} x
- * @param {number} min
- * @param {number} max
- * @returns {number}
+ * @deprecated use THREE.MathUtils.clamp
  */
 export function bound(x, min, max) {
-  return Math.max(min, Math.min(max, x));
+  return MathUtils.clamp(x, min, max);
 }
 
 /**
@@ -27,13 +24,10 @@ export function loop(value, max) {
 }
 
 /**
- * @summary Tests if a number is power of two
- * @memberOf PSV.utils
- * @param {number} x
- * @return {boolean}
+ * @deprecated Use THREE.MathUtils.isPowerOfTwo
  */
 export function isPowerOfTwo(x) {
-  return (Math.log(x) / Math.log(2)) % 1 === 0;
+  return MathUtils.isPowerOfTwo(x);
 }
 
 /**

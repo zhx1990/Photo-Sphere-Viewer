@@ -1,4 +1,4 @@
-import { bound } from './math';
+import { MathUtils } from 'three';
 import { each } from './misc';
 
 /**
@@ -54,7 +54,7 @@ export class DynamicXD {
     this.speedMult = speedMult;
     this.forEach((_) => {
       if (_.name in positions) {
-        _.target = bound(positions[_.name], _.min, _.max);
+        _.target = MathUtils.clamp(positions[_.name], _.min, _.max);
       }
     });
   }
@@ -72,7 +72,7 @@ export class DynamicXD {
     this.speedMult = speedMult;
     this.forEach((_) => {
       if (_.name in steps) {
-        _.target = bound(_.target + steps[_.name], _.min, _.max);
+        _.target = MathUtils.clamp(_.target + steps[_.name], _.min, _.max);
       }
     });
   }
@@ -109,7 +109,7 @@ export class DynamicXD {
     const hasChanges = this.reduce((changes, _) => {
       let changed = false;
       if (_.name in values) {
-        const next = bound(values[_.name], _.min, _.max);
+        const next = MathUtils.clamp(values[_.name], _.min, _.max);
         changed = next !== _.current;
         _.current = next;
       }
@@ -167,7 +167,7 @@ export class DynamicXD {
         }
 
         if (next !== null) {
-          next = bound(next, _.min, _.max);
+          next = MathUtils.clamp(next, _.min, _.max);
           if (next !== _.current) {
             _.current = next;
             return true;

@@ -1,12 +1,12 @@
-import * as THREE from 'three';
+import { Euler, MathUtils, Vector2, Vector3 } from 'three';
 import { MESH_USER_DATA, SPHERE_RADIUS } from '../data/constants';
 import { PSVError } from '../PSVError';
 import { applyEulerInverse, parseAngle, parseSpeed } from '../utils';
 import { AbstractService } from './AbstractService';
 
-const vector2 = new THREE.Vector2();
-const vector3 = new THREE.Vector3();
-const eulerZero = new THREE.Euler(0, 0, 0, 'ZXY');
+const vector2 = new Vector2();
+const vector3 = new Vector3();
+const eulerZero = new Euler(0, 0, 0, 'ZXY');
 
 /**
  * @summary Collections of data converters for the current viewer
@@ -47,7 +47,7 @@ export class DataHelper extends AbstractService {
    * @returns {number}
    */
   vFovToHFov(vFov) {
-    return THREE.MathUtils.radToDeg(2 * Math.atan(Math.tan(THREE.MathUtils.degToRad(vFov) / 2) * this.prop.aspect));
+    return MathUtils.radToDeg(2 * Math.atan(Math.tan(MathUtils.degToRad(vFov) / 2) * this.prop.aspect));
   }
 
   /**
@@ -137,7 +137,7 @@ export class DataHelper extends AbstractService {
    */
   sphericalCoordsToVector3(position, vector) {
     if (!vector) {
-      vector = new THREE.Vector3();
+      vector = new Vector3();
     }
     vector.x = SPHERE_RADIUS * -Math.cos(position.latitude) * Math.sin(position.longitude);
     vector.y = SPHERE_RADIUS * Math.sin(position.latitude);
@@ -252,9 +252,9 @@ export class DataHelper extends AbstractService {
    */
   cleanPanoramaPose(panoData) {
     return {
-      pan : THREE.MathUtils.degToRad(panoData?.poseHeading || 0),
-      tilt: THREE.MathUtils.degToRad(panoData?.posePitch || 0),
-      roll: THREE.MathUtils.degToRad(panoData?.poseRoll || 0),
+      pan : MathUtils.degToRad(panoData?.poseHeading || 0),
+      tilt: MathUtils.degToRad(panoData?.posePitch || 0),
+      roll: MathUtils.degToRad(panoData?.poseRoll || 0),
     };
   }
 

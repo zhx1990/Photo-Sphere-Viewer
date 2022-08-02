@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { BoxGeometry, Mesh, MeshBasicMaterial, Vector2 } from 'three';
 import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
 
 
@@ -152,15 +152,15 @@ export class CubemapAdapter extends AbstractAdapter {
    */
   createMesh(scale = 1) {
     const cubeSize = CONSTANTS.SPHERE_RADIUS * 2 * scale;
-    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)
+    const geometry = new BoxGeometry(cubeSize, cubeSize, cubeSize)
       .scale(1, 1, -1);
 
     const materials = [];
     for (let i = 0; i < 6; i++) {
-      materials.push(new THREE.MeshBasicMaterial());
+      materials.push(new MeshBasicMaterial());
     }
 
-    return new THREE.Mesh(geometry, materials);
+    return new Mesh(geometry, materials);
   }
 
   /**
@@ -171,7 +171,7 @@ export class CubemapAdapter extends AbstractAdapter {
 
     for (let i = 0; i < 6; i++) {
       if (this.config.flipTopBottom && (i === 2 || i === 3)) {
-        texture[i].center = new THREE.Vector2(0.5, 0.5);
+        texture[i].center = new Vector2(0.5, 0.5);
         texture[i].rotation = Math.PI;
       }
 

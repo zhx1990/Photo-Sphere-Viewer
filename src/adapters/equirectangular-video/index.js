@@ -1,5 +1,5 @@
-import * as THREE from 'three';
-import { CONSTANTS, PSVError, utils } from '../..';
+import { MathUtils, Mesh, MeshBasicMaterial, SphereGeometry } from 'three';
+import { CONSTANTS, PSVError } from '../..';
 import { AbstractVideoAdapter } from '../shared/AbstractVideoAdapter';
 
 /**
@@ -35,7 +35,7 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter {
       ...options,
     });
 
-    if (!utils.isPowerOfTwo(this.config.resolution)) {
+    if (!MathUtils.isPowerOfTwo(this.config.resolution)) {
       throw new PSVError('EquirectangularVideoAdapter resolution must be power of two');
     }
 
@@ -72,7 +72,7 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter {
    * @override
    */
   createMesh(scale = 1) {
-    const geometry = new THREE.SphereGeometry(
+    const geometry = new SphereGeometry(
       CONSTANTS.SPHERE_RADIUS * scale,
       this.SPHERE_SEGMENTS,
       this.SPHERE_HORIZONTAL_SEGMENTS,
@@ -80,9 +80,9 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter {
     )
       .scale(-1, 1, 1);
 
-    const material = new THREE.MeshBasicMaterial();
+    const material = new MeshBasicMaterial();
 
-    return new THREE.Mesh(geometry, material);
+    return new Mesh(geometry, material);
   }
 
   /**

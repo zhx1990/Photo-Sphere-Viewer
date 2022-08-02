@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { SplineCurve, Vector2 } from 'three';
 import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from '../..';
 import { EVENTS } from './constants';
 import { PauseOverlay } from './PauseOverlay';
@@ -442,7 +442,7 @@ export class VideoPlugin extends AbstractPlugin {
     ];
 
     // apply offsets to avoid crossing the origin
-    const workVectors = [new THREE.Vector2(workPoints[0][0], workPoints[0][1])];
+    const workVectors = [new Vector2(workPoints[0][0], workPoints[0][1])];
 
     let k = 0;
     for (let i = 1; i <= 3; i++) {
@@ -458,10 +458,10 @@ export class VideoPlugin extends AbstractPlugin {
         workVectors[0].x -= k * 2 * Math.PI;
         k = 0;
       }
-      workVectors.push(new THREE.Vector2(workPoints[i][0] + k * 2 * Math.PI, workPoints[i][1]));
+      workVectors.push(new Vector2(workPoints[i][0] + k * 2 * Math.PI, workPoints[i][1]));
     }
 
-    this.autorotate.curve = new THREE.SplineCurve(workVectors);
+    this.autorotate.curve = new SplineCurve(workVectors);
     this.autorotate.start = keypoints[k1];
     this.autorotate.end = keypoints[k2];
 

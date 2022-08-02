@@ -1,8 +1,8 @@
-import * as THREE from 'three';
-import { Animation } from '../utils/Animation';
+import { Group, PerspectiveCamera, Raycaster, Scene, Vector3, WebGLRenderer } from 'three';
 import { EVENTS, MESH_USER_DATA, SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { each, isExtendedPosition } from '../utils';
+import { Animation } from '../utils/Animation';
 import { AbstractService } from './AbstractService';
 
 /**
@@ -23,7 +23,7 @@ export class Renderer extends AbstractService {
      * @readonly
      * @protected
      */
-    this.renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+    this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
     this.renderer.setPixelRatio(SYSTEM.pixelRatio);
     this.renderer.domElement.className = 'psv-canvas';
 
@@ -32,14 +32,14 @@ export class Renderer extends AbstractService {
      * @readonly
      * @protected
      */
-    this.scene = new THREE.Scene();
+    this.scene = new Scene();
 
     /**
      * @member {external:THREE.PerspectiveCamera}
      * @readonly
      * @protected
      */
-    this.camera = new THREE.PerspectiveCamera(50, 16 / 9, 1, 2 * SPHERE_RADIUS);
+    this.camera = new PerspectiveCamera(50, 16 / 9, 1, 2 * SPHERE_RADIUS);
 
     /**
      * @member {external:THREE.Mesh}
@@ -54,7 +54,7 @@ export class Renderer extends AbstractService {
      * @readonly
      * @private
      */
-    this.meshContainer = new THREE.Group();
+    this.meshContainer = new Group();
     this.meshContainer.add(this.mesh);
     this.scene.add(this.meshContainer);
 
@@ -63,7 +63,7 @@ export class Renderer extends AbstractService {
      * @readonly
      * @protected
      */
-    this.raycaster = new THREE.Raycaster();
+    this.raycaster = new Raycaster();
 
     /**
      * @member {number}
@@ -297,7 +297,7 @@ export class Renderer extends AbstractService {
     const zoomProvided = 'zoom' in options;
 
     // create temp group and new mesh, half size to be in "front" of the first one
-    const group = new THREE.Group();
+    const group = new Group();
     const mesh = this.psv.adapter.createMesh(0.5);
     this.psv.adapter.setTexture(mesh, textureData, true);
     this.psv.adapter.setTextureOpacity(mesh, 0);
@@ -310,11 +310,11 @@ export class Renderer extends AbstractService {
       const currentPosition = this.psv.getPosition();
 
       // Longitude rotation along the vertical axis
-      const verticalAxis = new THREE.Vector3(0, 1, 0);
+      const verticalAxis = new Vector3(0, 1, 0);
       group.rotateOnWorldAxis(verticalAxis, cleanPosition.longitude - currentPosition.longitude);
 
       // Latitude rotation along the camera horizontal axis
-      const horizontalAxis = new THREE.Vector3(0, 1, 0).cross(this.camera.getWorldDirection(new THREE.Vector3())).normalize();
+      const horizontalAxis = new Vector3(0, 1, 0).cross(this.camera.getWorldDirection(new Vector3())).normalize();
       group.rotateOnWorldAxis(horizontalAxis, cleanPosition.latitude - currentPosition.latitude);
     }
 
@@ -396,7 +396,7 @@ export class Renderer extends AbstractService {
         }
       }
 
-      if (item.dispose && !(item instanceof THREE.Scene)) {
+      if (item.dispose && !(item instanceof Scene)) {
         item.dispose();
       }
 

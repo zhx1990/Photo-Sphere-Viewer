@@ -1,8 +1,9 @@
+import { MathUtils } from 'three';
 import { AbstractAdapter } from '../adapters/AbstractAdapter';
 import { EquirectangularAdapter } from '../adapters/equirectangular';
 import { AbstractPlugin } from '../plugins/AbstractPlugin';
 import { PSVError } from '../PSVError';
-import { bound, clone, deepmerge, each, isNil, logWarn, parseAngle, parseSpeed, pluginInterop } from '../utils';
+import { clone, deepmerge, each, isNil, logWarn, parseAngle, parseSpeed, pluginInterop } from '../utils';
 import { ACTIONS, KEY_CODES } from './constants';
 
 /**
@@ -144,7 +145,7 @@ export const CONFIG_PARSERS = {
       minFov = config.maxFov;
     }
     // minFov between 1 and 179
-    return bound(minFov, 1, 179);
+    return MathUtils.clamp(minFov, 1, 179);
   },
   maxFov         : (maxFov, config) => {
     // minFov and maxFov must be ordered
@@ -152,7 +153,7 @@ export const CONFIG_PARSERS = {
       maxFov = config.minFov;
     }
     // maxFov between 1 and 179
-    return bound(maxFov, 1, 179);
+    return MathUtils.clamp(maxFov, 1, 179);
   },
   lang           : (lang) => {
     if (Array.isArray(lang.twoFingers)) {

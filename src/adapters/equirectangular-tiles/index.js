@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { Frustum, ImageLoader, MathUtils, Matrix4, Mesh, MeshBasicMaterial, SphereGeometry, Vector3 } from 'three';
 import { CONSTANTS, EquirectangularAdapter, PSVError, utils } from '../..';
 import { Queue } from '../shared/Queue';
 import { Task } from '../shared/Task';
@@ -80,9 +80,9 @@ function tileId(tile) {
   return `${tile.col}x${tile.row}`;
 }
 
-const frustum = new THREE.Frustum();
-const projScreenMatrix = new THREE.Matrix4();
-const vertexPosition = new THREE.Vector3();
+const frustum = new Frustum();
+const projScreenMatrix = new Matrix4();
+const vertexPosition = new Vector3();
 
 
 /**
@@ -115,7 +115,7 @@ export class EquirectangularTilesAdapter extends EquirectangularAdapter {
       ...options,
     };
 
-    if (!utils.isPowerOfTwo(this.config.resolution)) {
+    if (!MathUtils.isPowerOfTwo(this.config.resolution)) {
       throw new PSVError('EquirectangularAdapter resolution must be power of two');
     }
 
@@ -160,7 +160,7 @@ export class EquirectangularTilesAdapter extends EquirectangularAdapter {
      * @member {external:THREE.ImageLoader}
      * @private
      */
-    this.loader = new THREE.ImageLoader();
+    this.loader = new ImageLoader();
     if (this.psv.config.withCredentials) {
       this.loader.setWithCredentials(true);
     }
@@ -250,7 +250,7 @@ export class EquirectangularTilesAdapter extends EquirectangularAdapter {
     if (panorama.rows > this.SPHERE_HORIZONTAL_SEGMENTS) {
       return Promise.reject(new PSVError(`Panorama rows must not be greater than ${this.SPHERE_HORIZONTAL_SEGMENTS}.`));
     }
-    if (!utils.isPowerOfTwo(panorama.cols) || !utils.isPowerOfTwo(panorama.rows)) {
+    if (!MathUtils.isPowerOfTwo(panorama.cols) || !MathUtils.isPowerOfTwo(panorama.rows)) {
       return Promise.reject(new PSVError('Panorama cols and rows must be powers of 2.'));
     }
 
@@ -283,7 +283,7 @@ export class EquirectangularTilesAdapter extends EquirectangularAdapter {
    * @override
    */
   createMesh(scale = 1) {
-    const geometry = new THREE.SphereGeometry(
+    const geometry = new SphereGeometry(
       CONSTANTS.SPHERE_RADIUS * scale,
       this.SPHERE_SEGMENTS,
       this.SPHERE_HORIZONTAL_SEGMENTS,
@@ -310,7 +310,7 @@ export class EquirectangularTilesAdapter extends EquirectangularAdapter {
 
     geometry.setAttribute(ATTR_ORIGINAL_UV, geometry.getAttribute(ATTR_UV).clone());
 
-    return new THREE.Mesh(geometry, []);
+    return new Mesh(geometry, []);
   }
 
   /**
@@ -348,10 +348,10 @@ export class EquirectangularTilesAdapter extends EquirectangularAdapter {
   __setTexture(mesh, texture) {
     let material;
     if (texture) {
-      material = new THREE.MeshBasicMaterial({ map: texture });
+      material = new MeshBasicMaterial({ map: texture });
     }
     else {
-      material = new THREE.MeshBasicMaterial({ opacity: 0, transparent: true });
+      material = new MeshBasicMaterial({ opacity: 0, transparent: true });
     }
 
     for (let i = 0; i < this.NB_GROUPS; i++) {
@@ -587,7 +587,7 @@ export class EquirectangularTilesAdapter extends EquirectangularAdapter {
     })
       .then((image) => {
         if (!task.isCancelled()) {
-          const material = new THREE.MeshBasicMaterial({ map: utils.createTexture(image) });
+          const material = new MeshBasicMaterial({ map: utils.createTexture(image) });
           this.__swapMaterial(tile.col, tile.row, material);
           this.psv.needsUpdate();
         }

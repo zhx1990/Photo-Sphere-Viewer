@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { VideoTexture } from 'three';
 import { AbstractAdapter, CONSTANTS, PSVError } from '../..';
 
 /**
@@ -91,7 +91,7 @@ export class AbstractVideoAdapter extends AbstractAdapter {
 
     return this.__videoLoadPromise(video)
       .then(() => {
-        const texture = new THREE.VideoTexture(video);
+        const texture = new VideoTexture(video);
         return { panorama, texture };
       });
   }

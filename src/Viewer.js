@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { Cache, MathUtils, Vector3 } from 'three';
 import { EventEmitter } from 'uevent';
 import { Loader } from './components/Loader';
 import { Navbar } from './components/Navbar';
@@ -36,7 +36,7 @@ import {
   toggleClass
 } from './utils';
 
-THREE.Cache.enabled = true;
+Cache.enabled = true;
 
 /**
  * @summary Main class
@@ -89,7 +89,7 @@ export class Viewer extends EventEmitter {
       uiRefresh        : false,
       needsUpdate      : false,
       fullscreen       : false,
-      direction        : new THREE.Vector3(0, 0, SPHERE_RADIUS),
+      direction        : new Vector3(0, 0, SPHERE_RADIUS),
       vFov             : null,
       hFov             : null,
       aspect           : null,
@@ -996,7 +996,7 @@ export class Viewer extends EventEmitter {
    */
   __updateSpeeds() {
     this.dynamics.zoom.setSpeed(this.config.zoomSpeed * 50);
-    this.dynamics.position.setSpeed(THREE.MathUtils.degToRad(this.config.moveSpeed * 50));
+    this.dynamics.position.setSpeed(MathUtils.degToRad(this.config.moveSpeed * 50));
   }
 
 }

@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { ObjectLoader } from 'three';
 import arrowGeometryJson from './arrow.json';
 import arrowIconSvg from './arrow.svg';
 import arrowOutlineGeometryJson from './arrow_outline.json';
@@ -121,7 +121,7 @@ export const DEFAULT_ARROW = {
  * @private
  */
 export const { ARROW_GEOM, ARROW_OUTLINE_GEOM } = (() => {
-  const loader = new THREE.ObjectLoader();
+  const loader = new ObjectLoader();
   const geometries = loader.parseGeometries([arrowGeometryJson, arrowOutlineGeometryJson]);
   const arrow = geometries[arrowGeometryJson.uuid];
   const arrowOutline = geometries[arrowOutlineGeometryJson.uuid];

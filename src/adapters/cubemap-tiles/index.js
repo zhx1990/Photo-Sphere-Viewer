@@ -1,4 +1,14 @@
-import * as THREE from 'three';
+import {
+  BoxGeometry,
+  Frustum,
+  ImageLoader,
+  MathUtils,
+  Matrix4,
+  Mesh,
+  MeshBasicMaterial,
+  Vector2,
+  Vector3
+} from 'three';
 import { CONSTANTS, PSVError, utils } from '../..';
 import { CUBE_HASHMAP, CubemapAdapter } from '../cubemap';
 import { Queue } from '../shared/Queue';
@@ -60,9 +70,9 @@ function tileId(tile) {
   return `${tile.face}:${tile.col}x${tile.row}`;
 }
 
-const frustum = new THREE.Frustum();
-const projScreenMatrix = new THREE.Matrix4();
-const vertexPosition = new THREE.Vector3();
+const frustum = new Frustum();
+const projScreenMatrix = new Matrix4();
+const vertexPosition = new Vector3();
 
 /**
  * @summary Adapter for tiled cubemaps
@@ -121,7 +131,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
      * @member {external:THREE.ImageLoader}
      * @private
      */
-    this.loader = new THREE.ImageLoader();
+    this.loader = new ImageLoader();
     if (this.psv.config.withCredentials) {
       this.loader.setWithCredentials(true);
     }
@@ -208,7 +218,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     if (panorama.nbTiles > CUBE_SEGMENTS) {
       return Promise.reject(new PSVError(`Panorama nbTiles must not be greater than ${CUBE_SEGMENTS}.`));
     }
-    if (!utils.isPowerOfTwo(panorama.nbTiles)) {
+    if (!MathUtils.isPowerOfTwo(panorama.nbTiles)) {
       return Promise.reject(new PSVError('Panorama nbTiles must be power of 2.'));
     }
 
@@ -229,7 +239,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
    */
   createMesh(scale = 1) {
     const cubeSize = CONSTANTS.SPHERE_RADIUS * 2 * scale;
-    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize, CUBE_SEGMENTS, CUBE_SEGMENTS, CUBE_SEGMENTS)
+    const geometry = new BoxGeometry(cubeSize, cubeSize, cubeSize, CUBE_SEGMENTS, CUBE_SEGMENTS, CUBE_SEGMENTS)
       .scale(1, 1, -1)
       .toNonIndexed();
 
@@ -240,7 +250,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
 
     geometry.setAttribute(ATTR_ORIGINAL_UV, geometry.getAttribute(ATTR_UV).clone());
 
-    return new THREE.Mesh(geometry, []);
+    return new Mesh(geometry, []);
   }
 
   /**
@@ -278,14 +288,14 @@ export class CubemapTilesAdapter extends CubemapAdapter {
       let material;
       if (texture) {
         if (this.config.flipTopBottom && (i === 2 || i === 3)) {
-          texture[i].center = new THREE.Vector2(0.5, 0.5);
+          texture[i].center = new Vector2(0.5, 0.5);
           texture[i].rotation = Math.PI;
         }
 
-        material = new THREE.MeshBasicMaterial({ map: texture[i] });
+        material = new MeshBasicMaterial({ map: texture[i] });
       }
       else {
-        material = new THREE.MeshBasicMaterial({ opacity: 0, transparent: true });
+        material = new MeshBasicMaterial({ opacity: 0, transparent: true });
       }
 
       for (let j = 0; j < NB_GROUPS_BY_FACE; j++) {
@@ -445,7 +455,7 @@ export class CubemapTilesAdapter extends CubemapAdapter {
     })
       .then((image) => {
         if (!task.isCancelled()) {
-          const material = new THREE.MeshBasicMaterial({ map: utils.createTexture(image) });
+          const material = new MeshBasicMaterial({ map: utils.createTexture(image) });
           this.__swapMaterial(tile.face, tile.col, tile.row, material);
           this.psv.needsUpdate();
         }

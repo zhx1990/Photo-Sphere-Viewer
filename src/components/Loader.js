@@ -1,6 +1,7 @@
+import { MathUtils } from 'three';
 import { EVENTS } from '../data/constants';
 import { SYSTEM } from '../data/system';
-import { bound, getStyle } from '../utils';
+import { getStyle } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 
 /**
@@ -111,7 +112,7 @@ export class Loader extends AbstractComponent {
     context.arc(
       this.canvas.width / 2, this.canvas.height / 2,
       this.canvas.width / 2 - this.prop.tickness / 2,
-      -Math.PI / 2, bound(value, 0, 100) / 100 * 2 * Math.PI - Math.PI / 2
+      -Math.PI / 2, MathUtils.clamp(value, 0, 100) / 100 * 2 * Math.PI - Math.PI / 2
     );
     context.stroke();
 

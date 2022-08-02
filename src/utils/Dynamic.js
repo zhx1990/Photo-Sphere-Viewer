@@ -1,5 +1,6 @@
+import { MathUtils } from 'three';
 import { PSVError } from '../PSVError';
-import { bound, loop } from './math';
+import { loop } from './math';
 
 /**
  * @summary Represents a variable that can dynamically change with time (using requestAnimationFrame)
@@ -104,7 +105,7 @@ export class Dynamic {
    */
   goto(position, speedMult = 1) {
     this.mode = Dynamic.POSITION;
-    this.target = this.loopValue ? loop(position, this.max) : bound(position, this.min, this.max);
+    this.target = this.loopValue ? loop(position, this.max) : MathUtils.clamp(position, this.min, this.max);
     this.speedMult = speedMult;
   }
 
@@ -143,7 +144,7 @@ export class Dynamic {
    * @param {number} value
    */
   setValue(value) {
-    this.target = this.loopValue ? loop(value, this.max) : bound(value, this.min, this.max);
+    this.target = this.loopValue ? loop(value, this.max) : MathUtils.clamp(value, this.min, this.max);
     this.mode = Dynamic.STOP;
     if (this.target !== this.current) {
       this.current = this.target;
@@ -195,7 +196,7 @@ export class Dynamic {
 
     // apply value
     if (next !== null) {
-      next = this.loopValue ? loop(next, this.max) : bound(next, this.min, this.max);
+      next = this.loopValue ? loop(next, this.max) : MathUtils.clamp(next, this.min, this.max);
       if (next !== this.current) {
         this.current = next;
         if (this.fn) {

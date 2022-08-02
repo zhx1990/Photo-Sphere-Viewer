@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { Object3D, Vector3 } from 'three';
 import { AbstractPlugin, CONSTANTS, DEFAULTS, registerButton, utils } from '../..';
 import { EVENTS } from './constants';
 import { DeviceOrientationControls } from './DeviceOrientationControls';
@@ -21,7 +21,7 @@ registerButton(GyroscopeButton, 'caption:right');
 export { EVENTS } from './constants';
 
 
-const direction = new THREE.Vector3();
+const direction = new Vector3();
 
 
 /**
@@ -163,7 +163,7 @@ export class GyroscopePlugin extends AbstractPlugin {
 
         // enable gyro controls
         if (!this.controls) {
-          this.controls = new DeviceOrientationControls(new THREE.Object3D());
+          this.controls = new DeviceOrientationControls(new Object3D());
         }
         else {
           this.controls.connect();

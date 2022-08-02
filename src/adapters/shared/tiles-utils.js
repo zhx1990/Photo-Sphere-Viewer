@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { CanvasTexture, LineSegments, Mesh, MeshBasicMaterial, SphereGeometry, WireframeGeometry } from 'three';
 import { SYSTEM, utils } from '../..';
 
 /**
@@ -22,8 +22,8 @@ export function buildErrorMaterial(width, height) {
   ctx.textBaseline = 'middle';
   ctx.fillText('⚠', canvas.width / 2, canvas.height / 2);
 
-  const texture = new THREE.CanvasTexture(canvas);
-  return new THREE.MeshBasicMaterial({ map: texture });
+  const texture = new CanvasTexture(canvas);
+  return new MeshBasicMaterial({ map: texture });
 }
 
 /**
@@ -63,8 +63,8 @@ export function createBaseTexture(img, blur, getHeight) {
  * @private
  */
 export function createWireFrame(geometry) {
-  const wireframe = new THREE.WireframeGeometry(geometry);
-  const line = new THREE.LineSegments(wireframe);
+  const wireframe = new WireframeGeometry(geometry);
+  const line = new LineSegments(wireframe);
   line.material.depthTest = false;
   line.material.opacity = 0.25;
   line.material.transparent = true;
@@ -78,9 +78,9 @@ export function createWireFrame(geometry) {
  * @private
  */
 export function createDot(x, y, z) {
-  const geom = new THREE.SphereGeometry(0.1);
-  const material = new THREE.MeshBasicMaterial({ color: 0xff0000 });
-  const mesh = new THREE.Mesh(geom, material);
+  const geom = new SphereGeometry(0.1);
+  const material = new MeshBasicMaterial({ color: 0xff0000 });
+  const mesh = new Mesh(geom, material);
   mesh.position.set(x, y, z);
   return mesh;
 }

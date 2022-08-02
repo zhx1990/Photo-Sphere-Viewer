@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { SplineCurve, Vector2 } from 'three';
 import { AbstractPlugin, CONSTANTS, PSVError, utils } from '../..';
 
 /**
@@ -297,7 +297,7 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
     }
 
     // apply offsets to avoid crossing the origin
-    const workVectors = [new THREE.Vector2(workPoints[0][0], workPoints[0][1])];
+    const workVectors = [new Vector2(workPoints[0][0], workPoints[0][1])];
 
     let k = 0;
     for (let i = 1; i <= 3; i++) {
@@ -313,10 +313,10 @@ export class AutorotateKeypointsPlugin extends AbstractPlugin {
         workVectors[0].x -= k * 2 * Math.PI;
         k = 0;
       }
-      workVectors.push(new THREE.Vector2(workPoints[i][0] + k * 2 * Math.PI, workPoints[i][1]));
+      workVectors.push(new Vector2(workPoints[i][0] + k * 2 * Math.PI, workPoints[i][1]));
     }
 
-    const curve = new THREE.SplineCurve(workVectors)
+    const curve = new SplineCurve(workVectors)
       .getPoints(NUM_STEPS * 3)
       .map(p => ([p.x, p.y]));
 

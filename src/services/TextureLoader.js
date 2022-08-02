@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { FileLoader } from 'three';
 import { AbstractService } from './AbstractService';
 
 /**
@@ -19,7 +19,7 @@ export class TextureLoader extends AbstractService {
      * @type {external:THREE:FileLoader}
      * @private
      */
-    this.loader = new THREE.FileLoader();
+    this.loader = new FileLoader();
     this.loader.setResponseType('blob');
     if (this.config.withCredentials) {
       this.loader.setWithCredentials(true);

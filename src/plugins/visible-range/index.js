@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { MathUtils } from 'three';
 import { AbstractPlugin, CONSTANTS, utils } from '../..';
 
 
@@ -227,7 +227,7 @@ export class VisibleRangePlugin extends AbstractPlugin {
 
     if (this.config.longitudeRange) {
       range = utils.clone(this.config.longitudeRange);
-      offset = THREE.MathUtils.degToRad(this.psv.prop.hFov) / 2;
+      offset = MathUtils.degToRad(this.psv.prop.hFov) / 2;
 
       range[0] = utils.parseAngle(range[0] + offset);
       range[1] = utils.parseAngle(range[1] - offset);
@@ -256,7 +256,7 @@ export class VisibleRangePlugin extends AbstractPlugin {
 
     if (this.config.latitudeRange) {
       range = utils.clone(this.config.latitudeRange);
-      offset = THREE.MathUtils.degToRad(this.psv.prop.vFov) / 2;
+      offset = MathUtils.degToRad(this.psv.prop.vFov) / 2;
 
       range[0] = utils.parseAngle(Math.min(range[0] + offset, range[1]), true);
       range[1] = utils.parseAngle(Math.max(range[1] - offset, range[0]), true);

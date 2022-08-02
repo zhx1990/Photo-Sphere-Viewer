@@ -1,8 +1,8 @@
-import * as THREE from 'three';
+import { MathUtils, Mesh, MeshBasicMaterial, SphereGeometry } from 'three';
 import { SPHERE_RADIUS } from '../../data/constants';
 import { SYSTEM } from '../../data/system';
 import { PSVError } from '../../PSVError';
-import { createTexture, firstNonNull, getXMPValue, isPowerOfTwo, logWarn } from '../../utils';
+import { createTexture, firstNonNull, getXMPValue, logWarn } from '../../utils';
 import { AbstractAdapter } from '../AbstractAdapter';
 
 
@@ -38,7 +38,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
       ...options,
     };
 
-    if (!isPowerOfTwo(this.config.resolution)) {
+    if (!MathUtils.isPowerOfTwo(this.config.resolution)) {
       throw new PSVError('EquirectangularAdapter resolution must be power of two');
     }
 
@@ -206,7 +206,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
    */
   createMesh(scale = 1) {
     // The middle of the panorama is placed at longitude=0
-    const geometry = new THREE.SphereGeometry(
+    const geometry = new SphereGeometry(
       SPHERE_RADIUS * scale,
       this.SPHERE_SEGMENTS,
       this.SPHERE_HORIZONTAL_SEGMENTS,
@@ -214,9 +214,9 @@ export class EquirectangularAdapter extends AbstractAdapter {
     )
       .scale(-1, 1, 1);
 
-    const material = new THREE.MeshBasicMaterial();
+    const material = new MeshBasicMaterial();
 
-    return new THREE.Mesh(geometry, material);
+    return new Mesh(geometry, material);
   }
 
   /**

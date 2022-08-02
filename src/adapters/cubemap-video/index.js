@@ -1,4 +1,4 @@
-import * as THREE from 'three';
+import { BoxGeometry, Mesh, ShaderMaterial, Vector2 } from 'three';
 import { CONSTANTS } from '../..';
 import { AbstractVideoAdapter } from '../shared/AbstractVideoAdapter';
 
@@ -50,7 +50,7 @@ export class CubemapVideoAdapter extends AbstractVideoAdapter {
    */
   createMesh(scale = 1) {
     const cubeSize = CONSTANTS.SPHERE_RADIUS * 2 * scale;
-    const geometry = new THREE.BoxGeometry(cubeSize, cubeSize, cubeSize)
+    const geometry = new BoxGeometry(cubeSize, cubeSize, cubeSize)
       .scale(1, 1, -1)
       .toNonIndexed();
 
@@ -135,12 +135,12 @@ export class CubemapVideoAdapter extends AbstractVideoAdapter {
     uvs.setXY(35, c, A);
 
     // shamelessly copied from https://github.com/videojs/videojs-vr
-    const material = new THREE.ShaderMaterial({
+    const material = new ShaderMaterial({
       uniforms      : {
         mapped     : { value: null },
         contCorrect: { value: 1 },
-        faceWH     : { value: new THREE.Vector2(1 / 3, 1 / 2) },
-        vidWH      : { value: new THREE.Vector2(1, 1) },
+        faceWH     : { value: new Vector2(1 / 3, 1 / 2) },
+        vidWH      : { value: new Vector2(1, 1) },
       },
       vertexShader  : `
 varying vec2 vUv;
@@ -165,7 +165,7 @@ void main() {
 }`,
     });
 
-    return new THREE.Mesh(geometry, material);
+    return new Mesh(geometry, material);
   }
 
   /**
