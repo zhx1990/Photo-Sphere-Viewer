@@ -10,6 +10,8 @@ permissions:
 
 jobs:
   comment:
+    if: github.repository == 'mistic100/Photo-Sphere-Viewer'
+
     runs-on: ubuntu-latest
 
     steps:

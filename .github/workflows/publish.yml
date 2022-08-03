@@ -7,12 +7,13 @@ on:
 
 jobs:
   publish:
+    if: github.repository == 'mistic100/Photo-Sphere-Viewer'
+
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v2
-      - name: publish
-        uses: pascalgn/npm-publish-action@master
+      - uses: pascalgn/npm-publish-action@master
         with:
           tag_name: "%s"
           tag_message: "%s"
