@@ -3,6 +3,7 @@ name: stale
 on:
   schedule:
     - cron: '0 5 * * *'
+  workflow_dispatch: {}
 
 permissions:
   issues: write
@@ -17,9 +18,7 @@ jobs:
     steps:
       - uses: actions/stale@v5
         with:
-          any-of-labels:
-            - invalid
-            - 'info requested'
+          any-of-labels: 'invalid,info requested'
           stale-issue-label: wontfix
           days-before-stale: 7
           days-before-close: 7
