@@ -184,12 +184,12 @@ export class VisibleRangePlugin extends AbstractPlugin {
    */
   getPanoLatitudeRange() {
     const p = this.psv.prop.panoData;
-    if (p.croppedHeight === p.fullHeight && p.croppedY === 0) {
+    if (p.croppedHeight === p.fullHeight) {
       return null;
     }
     else {
       const latitude = y => Math.PI * (1 - y / p.fullHeight) - (Math.PI / 2);
-      return [latitude(p.croppedY), latitude(p.croppedY + p.croppedHeight)];
+      return [latitude(p.croppedY + p.croppedHeight), latitude(p.croppedY)];
     }
   }
 
@@ -200,7 +200,7 @@ export class VisibleRangePlugin extends AbstractPlugin {
    */
   getPanoLongitudeRange() {
     const p = this.psv.prop.panoData;
-    if (p.croppedWidth === p.fullWidth && p.croppedX === 0) {
+    if (p.croppedWidth === p.fullWidth) {
       return null;
     }
     else {
@@ -258,8 +258,13 @@ export class VisibleRangePlugin extends AbstractPlugin {
       range = utils.clone(this.config.latitudeRange);
       offset = MathUtils.degToRad(this.psv.prop.vFov) / 2;
 
-      range[0] = utils.parseAngle(Math.min(range[0] + offset, range[1]), true);
-      range[1] = utils.parseAngle(Math.max(range[1] - offset, range[0]), true);
+      range[0] = utils.parseAngle(range[0] + offset, true);
+      range[1] = utils.parseAngle(range[1] - offset, true);
+
+      // for very a narrow images, lock the latitude to the center
+      if (range[0] > range[1]) {
+        range[0] = range[1] = (range[0] + range[1]) / 2;
+      }
 
       if (position.latitude < range[0]) {
         rangedPosition.latitude = range[0];
