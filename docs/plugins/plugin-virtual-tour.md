@@ -83,7 +83,7 @@ If the [Gallery plugin](./plugin-gallery.md) is loaded, it will be configured wi
 
 ## Example
 
-<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/y0svuLpt/embedded/result,js,html/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/y0svuLpt/embedded/result,js/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 
 ## Nodes options

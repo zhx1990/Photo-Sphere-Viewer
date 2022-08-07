@@ -16,12 +16,32 @@ Visit each [plugin page](../plugins/) to see an example.
 
 :::: gallery
 
-::: item video="/assets/demos/base.webm" link="https://jsfiddle.net/mistic100/5r684etx/show"
+::: item image="/assets/demos/default.jpg" link="https://jsfiddle.net/mistic100/5r684etx/show"
 ### Zero config
 Simple panorama with default options.
 :::
 
-::: item video="/assets/demos/fisheye.webm" link="https://jsfiddle.net/mistic100/wsL1x5k0/show"
+::: item image="/assets/demos/description.jpg" link="https://jsfiddle.net/mistic100/cLp08us4/show"
+### Description
+&laquo; i &raquo; button will display the `description` in the side panel.
+:::
+
+::: item image="/assets/demos/navbar.jpg" link="https://jsfiddle.net/mistic100/j63dqub9/show"
+### Custom navbar
+Customize the navbar with default and custom buttons.
+:::
+
+::: item image="/assets/demos/fisheye.jpg" link="https://jsfiddle.net/mistic100/95asmzve/show"
+### Fisheye
+Display the panorama with a fisheye effect.
+:::
+
+::: item video="/assets/demos/autorotate.webm" link="https://jsfiddle.net/mistic100/wpvtyz1j/show"
+### Autorotate
+Automatically performs a rotation if the user is innactive.
+:::
+
+::: item video="/assets/demos/animation.webm" link="https://jsfiddle.net/mistic100/wsL1x5k0/show"
 ### Intro animation
 Use the `Animation` helper to create a cool intro.
 :::

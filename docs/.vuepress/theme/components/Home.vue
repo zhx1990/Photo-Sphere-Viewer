@@ -189,7 +189,7 @@
 
       .hero-content
         background rgba(0, 0, 0, 0.5)
-        padding 0.01px
+        padding 1px
         border-radius 20px
         margin 1rem
 

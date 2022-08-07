@@ -29,7 +29,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ## Example
 
-<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/efpdoak2/embedded/result,js,html/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/efpdoak2/embedded/result,js/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 ::: tip
 The north is always at longitude=0, if you need to change where is the north you can use `panoData.poseHeading` or `sphereCorrection.pan` option.

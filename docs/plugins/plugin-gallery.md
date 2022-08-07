@@ -43,7 +43,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ## Example
 
-<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/6hj7rbew/embedded/result,js,html/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
+<iframe style="width: 100%; height: 500px;" src="//jsfiddle.net/mistic100/6hj7rbew/embedded/result,js/dark" allowfullscreen="allowfullscreen" frameborder="0"></iframe>
 
 
 ## Configuration
