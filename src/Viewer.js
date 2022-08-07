@@ -463,12 +463,11 @@ export class Viewer extends EventEmitter {
 
     // apply default parameters on first load
     if (!this.prop.ready) {
-      if (!('sphereCorrection' in options)) {
-        options.sphereCorrection = this.config.sphereCorrection;
-      }
-      if (!('panoData' in options)) {
-        options.panoData = this.config.panoData;
-      }
+      ['sphereCorrection', 'panoData', 'overlay', 'overlayOpacity'].forEach((opt) => {
+        if (!(opt in options)) {
+          options[opt] = this.config[opt];
+        }
+      });
     }
 
     if (options.transition === undefined || options.transition === true) {
@@ -516,6 +515,7 @@ export class Viewer extends EventEmitter {
       }
       else {
         this.resetIdleTimer();
+        this.setOverlay(options.overlay, options.overlayOpacity);
         this.navbar.setCaption(this.config.caption);
         return true;
       }
@@ -574,6 +574,40 @@ export class Viewer extends EventEmitter {
   }
 
   /**
+   * @summary Loads a new overlay
+   * @param {*} path - URL of the new overlay file
+   * @param {number} [opacity=1]
+   * @returns {Promise}
+   */
+  setOverlay(path, opacity = 1) {
+    if (!this.adapter.constructor.supportsOverlay) {
+      return Promise.reject(new PSVError(`${this.adapter.constructor.id} adapter does not supports overlay`));
+    }
+
+    if (!path) {
+      this.renderer.setOverlay(null, 0);
+      return Promise.resolve();
+    }
+    else {
+      return this.adapter.loadTexture(path, (image) => {
+        const p = this.prop.panoData;
+        const r = image.width / p.croppedWidth;
+        return {
+          fullWidth    : r * p.fullWidth,
+          fullHeight   : r * p.fullHeight,
+          croppedWidth : r * p.croppedWidth,
+          croppedHeight: r * p.croppedHeight,
+          croppedX     : r * p.croppedX,
+          croppedY     : r * p.croppedY,
+        };
+      }, false)
+        .then((textureData) => {
+          this.renderer.setOverlay(textureData, opacity);
+        });
+    }
+  }
+
+  /**
    * @summary Update options
    * @param {PSV.Options} options
    * @fires PSV.config-changed
@@ -607,6 +641,11 @@ export class Viewer extends EventEmitter {
       }
 
       switch (key) {
+        case 'overlay':
+        case 'overlayOpacity':
+          this.setOverlay(this.config.overlay, this.config.overlayOpacity);
+          break;
+
         case 'caption':
         case 'description':
           this.navbar.setCaption(this.config.caption);

@@ -82,6 +82,8 @@ export type PanoramaOptions = (ExtendedPosition | {}) & {
   zoom?: number;
   sphereCorrection?: SphereCorrection;
   panoData?: PanoData | PanoDataProvider;
+  overlay?: any;
+  overlayOpacity?: number;
 };
 
 /**

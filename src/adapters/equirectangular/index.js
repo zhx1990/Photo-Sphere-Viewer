@@ -1,4 +1,4 @@
-import { MathUtils, Mesh, MeshBasicMaterial, SphereGeometry } from 'three';
+import { MathUtils, Mesh, SphereGeometry, Texture } from 'three';
 import { SPHERE_RADIUS } from '../../data/constants';
 import { SYSTEM } from '../../data/system';
 import { PSVError } from '../../PSVError';
@@ -21,6 +21,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
 
   static id = 'equirectangular';
   static supportsDownload = true;
+  static supportsOverlay = true;
 
   /**
    * @param {PSV.Viewer} psv
@@ -64,9 +65,10 @@ export class EquirectangularAdapter extends AbstractAdapter {
    * @override
    * @param {string} panorama
    * @param {PSV.PanoData | PSV.PanoDataProvider} [newPanoData]
+   * @param {boolean} [useXmpPanoData]
    * @returns {Promise.<PSV.TextureData>}
    */
-  loadTexture(panorama, newPanoData) {
+  loadTexture(panorama, newPanoData, useXmpPanoData = this.psv.config.useXmpData) {
     if (typeof panorama !== 'string') {
       if (Array.isArray(panorama) || typeof panorama === 'object' && !!panorama.left) {
         logWarn('Cubemap support now requires an additional adapter, see https://photo-sphere-viewer.js.org/guide/adapters');
@@ -75,11 +77,11 @@ export class EquirectangularAdapter extends AbstractAdapter {
     }
 
     return (
-      !this.psv.config.useXmpData
-        ? this.psv.textureLoader.loadImage(panorama, p => this.psv.loader.setProgress(p))
-          .then(img => ({ img: img, xmpPanoData: null }))
-        : this.__loadXMP(panorama, p => this.psv.loader.setProgress(p))
+      useXmpPanoData
+        ? this.__loadXMP(panorama, p => this.psv.loader.setProgress(p))
           .then(xmpPanoData => this.psv.textureLoader.loadImage(panorama).then(img => ({ img, xmpPanoData })))
+        : this.psv.textureLoader.loadImage(panorama, p => this.psv.loader.setProgress(p))
+          .then(img => ({ img: img, xmpPanoData: null }))
     )
       .then(({ img, xmpPanoData }) => {
         if (typeof newPanoData === 'function') {
@@ -214,7 +216,7 @@ export class EquirectangularAdapter extends AbstractAdapter {
     )
       .scale(-1, 1, 1);
 
-    const material = new MeshBasicMaterial();
+    const material = AbstractAdapter.createOverlayMaterial();
 
     return new Mesh(geometry, material);
   }
@@ -223,15 +225,28 @@ export class EquirectangularAdapter extends AbstractAdapter {
    * @override
    */
   setTexture(mesh, textureData) {
-    mesh.material.map?.dispose();
-    mesh.material.map = textureData.texture;
+    this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.panorama, textureData.texture);
+    this.setOverlay(mesh, null);
+  }
+
+  /**
+   * @override
+   */
+  setOverlay(mesh, textureData, opacity) {
+    this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity, opacity);
+    if (!textureData) {
+      this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlay, new Texture());
+    }
+    else {
+      this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlay, textureData.texture);
+    }
   }
 
   /**
    * @override
    */
   setTextureOpacity(mesh, opacity) {
-    mesh.material.opacity = opacity;
+    this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.globalOpacity, opacity);
     mesh.material.transparent = opacity < 1;
   }
 
@@ -240,6 +255,19 @@ export class EquirectangularAdapter extends AbstractAdapter {
    */
   disposeTexture(textureData) {
     textureData.texture?.dispose();
+  }
+
+  /**
+   * @param {external:THREE.Mesh} mesh
+   * @param {string} uniform
+   * @param {*} value
+   * @private
+   */
+  __setUniform(mesh, uniform, value) {
+    if (mesh.material.uniforms[uniform].value instanceof Texture) {
+      mesh.material.uniforms[uniform].value.dispose();
+    }
+    mesh.material.uniforms[uniform].value = value;
   }
 
 }

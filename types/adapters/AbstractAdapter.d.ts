@@ -18,6 +18,11 @@ export abstract class AbstractAdapter<T> {
    */
   static supportsDownload: boolean;
 
+  /**
+   * @summary Indicated if the adapter can display an additional transparent image above the panorama
+   */
+  static supportsOverlay: boolean;
+
   constructor(parent: Viewer);
 
   /**
@@ -38,7 +43,7 @@ export abstract class AbstractAdapter<T> {
   /**
    * @summary Loads the panorama texture(s)
    */
-  loadTexture(panorama: T, newPanoData?: PanoData | PanoDataProvider): Promise<TextureData>;
+  loadTexture(panorama: T, newPanoData?: PanoData | PanoDataProvider, useXmpPanoData?: boolean): Promise<TextureData>;
 
   /**
    * @summary Creates the cube mesh
@@ -60,6 +65,11 @@ export abstract class AbstractAdapter<T> {
    * @summary Cleanup a loaded texture, used on load abort
    */
   disposeTexture(textureData: TextureData);
+
+  /**
+   * @summary Applies the overlay to the mesh
+   */
+  setOverlay(mesh: Mesh, textureData: TextureData, opacity: number);
 
 }
 

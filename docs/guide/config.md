@@ -194,6 +194,21 @@ Requires two fingers to rotate the panorama. This allows standard touch-scroll n
 
 ## Advanced options
 
+#### `overlay`
+- type: `*`
+
+Path to an additional transparent panorama which will be displayed on top of the main one. The overlay can also be changed with the `setOverlay()` method or within the options of the `setPanorama()` method.
+
+::: warning Adapters
+Only the default [equirectangular](./adapters/equirectangular.md) and the [cubemap](./adapters/cubemap.md) adapters support this feature.
+:::
+
+#### `overlayOpacity`
+- type: `number`
+- default: `1`
+
+Opacity of the `overlay`.
+
 #### `sphereCorrection`
 - type: `{ pan: double, tilt: double, roll: double }`
 - default: `{ pan:0, tilt:0, roll: 0 }`

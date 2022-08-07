@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PhotoSphereViewer - overlay demo</title>
+
+  <link rel="stylesheet" href="../dist/photo-sphere-viewer.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="photosphere"></div>
+
+<script src="../node_modules/three/build/three.js"></script>
+<script src="../node_modules/uevent/browser.js"></script>
+<script src="../dist/photo-sphere-viewer.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/randomcolor@0.6.2/randomColor.min.js"></script>
+
+<script>
+  const viewer = new PhotoSphereViewer.Viewer({
+    container     : 'photosphere',
+    panorama      : 'sphere.jpg',
+    overlay       : 'https://photo-sphere-viewer-data.netlify.app/assets/sphere-overlay.png',
+    overlayOpacity: 0.8,
+    caption       : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    loadingImg    : 'assets/photosphere-logo.gif',
+    navbar        : [
+      {
+        content  : 'Remove overlay',
+        className: 'custom-button',
+        onClick  : () => {
+          viewer.setOverlay(null);
+        },
+      },
+      {
+        content  : 'Set overlay',
+        className: 'custom-button',
+        onClick  : () => {
+          setOverlay();
+        },
+      },
+    ],
+  });
+
+  function setOverlay() {
+    viewer.textureLoader.loadImage('https://photo-sphere-viewer-data.netlify.app/assets/sphere-overlay.png')
+      .then(image => {
+        const canvas = document.createElement('canvas');
+        canvas.width = image.width;
+        canvas.height = image.height;
+        const ctx = canvas.getContext('2d');
+
+        ctx.drawImage(image, 0, 0);
+
+        ctx.globalCompositeOperation = 'source-in';
+        ctx.fillStyle = randomColor({ luminosity: 'bright' });
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        viewer.setOverlay(canvas.toDataURL(), 0.8);
+      });
+  }
+</script>
+</body>
+</html>

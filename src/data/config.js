@@ -14,6 +14,8 @@ import { ACTIONS, KEY_CODES } from './constants';
  */
 export const DEFAULTS = {
   panorama           : null,
+  overlay            : null,
+  overlayOpacity     : 1,
   container          : null,
   adapter            : null,
   plugins            : [],
@@ -129,6 +131,9 @@ export const CONFIG_PARSERS = {
       throw new PSVError('Un undefined value with given for adapter.');
     }
     return adapter;
+  },
+  overlayOpacity : (overlayOpacity) => {
+    return MathUtils.clamp(overlayOpacity, 0, 1);
   },
   defaultLong    : (defaultLong) => {
     // defaultLat is between 0 and PI

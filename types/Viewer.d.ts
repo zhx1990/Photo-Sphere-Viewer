@@ -33,6 +33,8 @@ export type ViewerOptions = {
   container: HTMLElement | string;
   panorama?: any;
   adapter?: AdapterConstructor<any> | [AdapterConstructor<any>, any];
+  overlay?: any;
+  overlayOpacity?: number;
   caption?: string;
   description?: string;
   downloadUrl?: string;
@@ -195,6 +197,11 @@ export class Viewer extends EventEmitter {
    * @returns resolves false if the loading was aborted by another call
    */
   setPanorama(panorama: any, options?: PanoramaOptions): Promise<boolean>;
+
+  /**
+   * @summary Loads a new overlay
+   */
+  setOverlay(path: any, opacity?: number): Promise<unknown>;
 
   /**
    * @summary Update options

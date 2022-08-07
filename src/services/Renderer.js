@@ -250,6 +250,17 @@ export class Renderer extends AbstractService {
   }
 
   /**
+   * @summary Applies the overlay to the mesh
+   * @param {PSV.TextureData} textureData
+   * @param {number} opacity
+   * @package
+   */
+  setOverlay(textureData, opacity) {
+    this.psv.adapter.setOverlay(this.mesh, textureData, opacity);
+    this.psv.needsUpdate();
+  }
+
+  /**
    * @summary Apply a panorama data pose to a Mesh
    * @param {PSV.PanoData} [panoData]
    * @param {external:THREE.Mesh} [mesh=this.mesh]

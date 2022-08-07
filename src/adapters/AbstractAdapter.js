@@ -1,8 +1,10 @@
+import { ShaderMaterial, Texture } from 'three';
 import { PSVError } from '../PSVError';
 
 /**
  * @namespace PSV.adapters
  */
+
 
 /**
  * @summary Base adapters class
@@ -26,6 +28,12 @@ export class AbstractAdapter {
    * @static
    */
   static supportsDownload = false;
+
+  /**
+   * @summary Indicated if the adapter can display an additional transparent image above the panorama
+   * @type {boolean}
+   */
+  static supportsOverlay = false;
 
   /**
    * @param {PSV.Viewer} psv
@@ -69,9 +77,10 @@ export class AbstractAdapter {
    * @summary Loads the panorama texture(s)
    * @param {*} panorama
    * @param {PSV.PanoData | PSV.PanoDataProvider} [newPanoData]
+   * @param {boolean} [useXmpPanoData]
    * @returns {Promise.<PSV.TextureData>}
    */
-  loadTexture(panorama, newPanoData) { // eslint-disable-line no-unused-vars
+  loadTexture(panorama, newPanoData, useXmpPanoData) { // eslint-disable-line no-unused-vars
     throw new PSVError('loadTexture not implemented');
   }
 
@@ -113,6 +122,66 @@ export class AbstractAdapter {
    */
   disposeTexture(textureData) { // eslint-disable-line no-unused-vars
     throw new PSVError('disposeTexture not implemented');
+  }
+
+  /**
+   * @abstract
+   * @summary Applies the overlay to the mesh
+   * @param {external:THREE.Mesh} mesh
+   * @param {PSV.TextureData} textureData
+   * @param {number} opacity
+   */
+  setOverlay(mesh, textureData, opacity) { // eslint-disable-line no-unused-vars
+    throw new PSVError('setOverlay not implemented');
+  }
+
+  /**
+   * @internal
+   */
+  static OVERLAY_UNIFORMS = {
+    panorama      : 'panorama',
+    overlay       : 'overlay',
+    globalOpacity : 'globalOpacity',
+    overlayOpacity: 'overlayOpacity',
+  };
+
+  /**
+   * @internal
+   */
+  static createOverlayMaterial() {
+    return new ShaderMaterial({
+      uniforms: {
+        [AbstractAdapter.OVERLAY_UNIFORMS.panorama]      : { value: new Texture() },
+        [AbstractAdapter.OVERLAY_UNIFORMS.overlay]       : { value: new Texture() },
+        [AbstractAdapter.OVERLAY_UNIFORMS.globalOpacity] : { value: 1.0 },
+        [AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity]: { value: 1.0 },
+      },
+
+      vertexShader: `
+varying vec2 vUv;
+
+void main() {
+  vUv = uv;
+  gl_Position = projectionMatrix *  modelViewMatrix * vec4( position, 1.0 );
+}`,
+
+      fragmentShader: `
+uniform sampler2D ${AbstractAdapter.OVERLAY_UNIFORMS.panorama};
+uniform sampler2D ${AbstractAdapter.OVERLAY_UNIFORMS.overlay};
+uniform float ${AbstractAdapter.OVERLAY_UNIFORMS.globalOpacity};
+uniform float ${AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity};
+
+varying vec2 vUv;
+
+void main() {
+  vec4 tColor1 = texture2D( ${AbstractAdapter.OVERLAY_UNIFORMS.panorama}, vUv );
+  vec4 tColor2 = texture2D( ${AbstractAdapter.OVERLAY_UNIFORMS.overlay}, vUv );
+  gl_FragColor = vec4( 
+    mix( tColor1.rgb, tColor2.rgb, tColor2.a * ${AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity} ), 
+    ${AbstractAdapter.OVERLAY_UNIFORMS.globalOpacity}
+  );
+}`,
+    });
   }
 
 }

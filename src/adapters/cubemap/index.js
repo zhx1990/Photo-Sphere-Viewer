@@ -1,4 +1,4 @@
-import { BoxGeometry, Mesh, MeshBasicMaterial, Vector2 } from 'three';
+import { BoxGeometry, Mesh, Texture, Vector2 } from 'three';
 import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '../..';
 
 
@@ -34,6 +34,7 @@ export class CubemapAdapter extends AbstractAdapter {
 
   static id = 'cubemap';
   static supportsDownload = false;
+  static supportsOverlay = true;
 
   /**
    * @param {PSV.Viewer} psv
@@ -157,7 +158,7 @@ export class CubemapAdapter extends AbstractAdapter {
 
     const materials = [];
     for (let i = 0; i < 6; i++) {
-      materials.push(new MeshBasicMaterial());
+      materials.push(AbstractAdapter.createOverlayMaterial());
     }
 
     return new Mesh(geometry, materials);
@@ -175,8 +176,24 @@ export class CubemapAdapter extends AbstractAdapter {
         texture[i].rotation = Math.PI;
       }
 
-      mesh.material[i].map?.dispose();
-      mesh.material[i].map = texture[i];
+      this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.panorama, texture[i]);
+    }
+
+    this.setOverlay(mesh, null);
+  }
+
+  /**
+   * @override
+   */
+  setOverlay(mesh, textureData, opacity) {
+    for (let i = 0; i < 6; i++) {
+      this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity, opacity);
+      if (!textureData) {
+        this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlay, new Texture());
+      }
+      else {
+        this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlay, textureData.texture[i]);
+      }
     }
   }
 
@@ -185,7 +202,7 @@ export class CubemapAdapter extends AbstractAdapter {
    */
   setTextureOpacity(mesh, opacity) {
     for (let i = 0; i < 6; i++) {
-      mesh.material[i].opacity = opacity;
+      this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.globalOpacity, opacity);
       mesh.material[i].transparent = opacity < 1;
     }
   }
@@ -195,6 +212,20 @@ export class CubemapAdapter extends AbstractAdapter {
    */
   disposeTexture(textureData) {
     textureData.texture?.forEach(texture => texture.dispose());
+  }
+
+  /**
+   * @param {external:THREE.Mesh} mesh
+   * @param {number} index
+   * @param {string} uniform
+   * @param {*} value
+   * @private
+   */
+  __setUniform(mesh, index, uniform, value) {
+    if (mesh.material[index].uniforms[uniform].value instanceof Texture) {
+      mesh.material[index].uniforms[uniform].value.dispose();
+    }
+    mesh.material[index].uniforms[uniform].value = value;
   }
 
 }
