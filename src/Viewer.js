@@ -483,6 +483,9 @@ export class Viewer extends EventEmitter {
     if (options.description === undefined) {
       options.description = this.config.description;
     }
+    if (!options.panoData && typeof this.config.panoData === 'function') {
+      options.panoData = this.config.panoData;
+    }
 
     const positionProvided = isExtendedPosition(options);
     const zoomProvided = 'zoom' in options;

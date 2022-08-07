@@ -263,7 +263,8 @@ export class VisibleRangePlugin extends AbstractPlugin {
 
       // for very a narrow images, lock the latitude to the center
       if (range[0] > range[1]) {
-        range[0] = range[1] = (range[0] + range[1]) / 2;
+        range[0] = (range[0] + range[1]) / 2;
+        range[1] = range[0];
       }
 
       if (position.latitude < range[0]) {
