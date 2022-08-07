@@ -67,7 +67,7 @@ export class CustomButton extends AbstractButton {
    */
   onClick() {
     if (this.config.onClick) {
-      this.config.onClick.apply(this.psv);
+      this.config.onClick.call(this.psv, this.psv);
     }
   }
 

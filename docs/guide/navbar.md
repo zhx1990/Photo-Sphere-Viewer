@@ -34,8 +34,8 @@ You can also add as many custom buttons you want. A custom button is an object w
 
 Content of the button. Preferably a square image or SVG icon.
 
-#### `onClick` (required)
-- type : `function`
+#### `onClick(viewer)` (required)
+- type : `function(Viewer)`
 
 Function called when the button is clicked.
 
@@ -87,7 +87,7 @@ new PhotoSphereViewer.Viewer({
       content: '<svg...>',
       title: 'Hello world',
       className: 'custom-button',
-      onClick: () => {
+      onClick: (viewer) => {
         alert('Hello from custom button');
       },
     },
