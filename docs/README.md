@@ -19,7 +19,6 @@ features:
    details: Display texts, images and even dynamic areas directly on your photos.
  - title: Videos
    details: Photo Sphere Viewer also supports video, both equirectangular and cubemaps.
-footer: Licensed under MIT License, documentation under CC BY 3.0
 ---
 
 <Announcements/>
@@ -28,3 +27,9 @@ footer: Licensed under MIT License, documentation under CC BY 3.0
 I forked the original Photo Sphere Viewer [by Jérémy Heleine](http://jeremyheleine.me) to provide a better code architecture and a bunch of new features.
 :::
 
+
+::: slot footer
+Licensed under MIT License, documentation under CC BY 3.0
+
+<a href="https://www.netlify.com"> <img src="https://www.netlify.com/v3/img/components/netlify-color-accent.svg" alt="Deploys by Netlify" /> </a>
+:::
