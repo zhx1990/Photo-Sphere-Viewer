@@ -814,17 +814,17 @@ export class EventsHandler extends AbstractService {
     let previous = null;
 
     for (let i = 0; i < this.state.mouseHistory.length;) {
-      if (this.state.mouseHistory[0][i] < now - INERTIA_WINDOW) {
+      if (this.state.mouseHistory[i][0] < now - INERTIA_WINDOW) {
         this.state.mouseHistory.splice(i, 1);
       }
-      else if (previous && this.state.mouseHistory[0][i] - previous > INERTIA_WINDOW / 10) {
+      else if (previous && this.state.mouseHistory[i][0] - previous > INERTIA_WINDOW / 10) {
         this.state.mouseHistory.splice(0, i);
         i = 0;
-        previous = this.state.mouseHistory[0][i];
+        previous = this.state.mouseHistory[i][0];
       }
       else {
+        previous = this.state.mouseHistory[i][0];
         i++;
-        previous = this.state.mouseHistory[0][i];
       }
     }
   }
