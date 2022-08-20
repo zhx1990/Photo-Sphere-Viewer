@@ -19,20 +19,12 @@
 
 <script>
   const viewer = new PhotoSphereViewer.Viewer({
-    container : 'photosphere',
-    panorama  : 'sphere_cropped.jpg',
-    caption   : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
-    loadingImg: 'assets/photosphere-logo.gif',
+    container     : 'photosphere',
+    panorama      : 'https://photo-sphere-viewer-data.netlify.app/assets/sphere-cropped.jpg', // this file has XMP data
+    caption       : 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    loadingImg    : 'assets/photosphere-logo.gif',
     defaultZoomLvl: 30,
-    panoData  : {
-      fullWidth: 6000,
-      fullHeight: 3000,
-      croppedX: 500,
-      croppedY: 1000,
-      croppedWidth: 5000,
-      croppedHeight: 1000,
-    },
-    navbar    : [
+    navbar        : [
       'autorotate',
       {
         content  : 'Clear range',
@@ -60,7 +52,7 @@
       'caption',
       'fullscreen',
     ],
-    plugins   : [
+    plugins       : [
       [PhotoSphereViewer.VisibleRangePlugin, {
         usePanoData: true,
       }],
