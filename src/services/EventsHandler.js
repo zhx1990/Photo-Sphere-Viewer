@@ -1,4 +1,4 @@
-import { MathUtils } from 'three';
+import { MathUtils, SplineCurve, Vector2 } from 'three';
 import {
   ACTIONS,
   CTRLZOOM_TIMEOUT,
@@ -636,22 +636,37 @@ export class EventsHandler extends AbstractService {
    * @private
    */
   __stopMoveInertia(evt) {
-    const direction = {
-      x: evt.clientX - this.state.mouseHistory[0][1],
-      y: evt.clientY - this.state.mouseHistory[0][2],
-    };
+    // get direction at end of movement
+    const curve = new SplineCurve(this.state.mouseHistory.map(([, x, y]) => new Vector2(x, y)));
+    const direction = curve.getTangent(1);
 
-    const norm = Math.sqrt(direction.x * direction.x + direction.y * direction.y);
+    // average speed
+    const speed = this.state.mouseHistory.slice(1).reduce(({ total, prev }, curr) => {
+      return {
+        total: total + Math.sqrt(Math.pow(curr[1] - prev[1], 2) + Math.pow(curr[2] - prev[2], 2)) / (curr[0] - [prev[0]]),
+        prev : curr,
+      };
+    }, {
+      total: 0,
+      prev : this.state.mouseHistory[0],
+    }).total / this.state.mouseHistory.length;
+
+    const current = {
+      clientX: evt.clientX,
+      clientY: evt.clientY,
+    };
 
     this.prop.animationPromise = new Animation({
       properties: {
-        clientX: { start: evt.clientX, end: evt.clientX + direction.x },
-        clientY: { start: evt.clientY, end: evt.clientY + direction.y },
+        speed: { start: speed, end: 0 },
       },
-      duration  : norm * INERTIA_WINDOW / 100,
-      easing    : 'outCirc',
+      duration  : 1000,
+      easing    : 'outQuad',
       onTick    : (properties) => {
-        this.__move(properties, false);
+        // 3 is a magic number
+        current.clientX += properties.speed * direction.x * 3 * SYSTEM.pixelRatio;
+        current.clientY += properties.speed * direction.y * 3 * SYSTEM.pixelRatio;
+        this.__move(current, false);
       },
     });
 
@@ -809,7 +824,20 @@ export class EventsHandler extends AbstractService {
    */
   __logMouseMove(evt) {
     const now = Date.now();
-    this.state.mouseHistory.push([now, evt.clientX, evt.clientY]);
+
+    const last = this.state.mouseHistory.length ? this.state.mouseHistory[this.state.mouseHistory.length - 1] : [0, -1, -1];
+
+    // avoid duplicates
+    if (last[1] === evt.clientX && last[2] === evt.clientY) {
+      last[0] = now;
+    }
+    else if (now === last[0]) {
+      last[1] = evt.clientX;
+      last[2] = evt.clientY;
+    }
+    else {
+      this.state.mouseHistory.push([now, evt.clientX, evt.clientY]);
+    }
 
     let previous = null;
 
