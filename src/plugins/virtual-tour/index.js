@@ -418,7 +418,10 @@ export class VirtualTourPlugin extends AbstractPlugin {
             description     : node.description,
           },
         })),
-        id => this.setCurrentNode(id)
+        (id) => {
+          this.setCurrentNode(id);
+          this.gallery.hide();
+        }
       );
     }
   }
