@@ -152,7 +152,8 @@ export class Marker {
       this.$el = document.createElementNS(SVG_NS, 'polyline');
     }
     else if (this.isSvg()) {
-      this.$el = document.createElementNS(SVG_NS, this.type);
+      const svgType = this.type === 'square' ? 'rect' : this.type;
+      this.$el = document.createElementNS(SVG_NS, svgType);
     }
 
     if (!this.is3d()) {

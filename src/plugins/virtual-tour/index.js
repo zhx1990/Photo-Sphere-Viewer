@@ -28,8 +28,8 @@ import {
 } from './constants';
 import { NodesListButton } from './NodesListButton';
 import { ServerSideDatasource } from './ServerSideDatasource';
-import { bearing, distance, setMeshColor } from './utils';
 import './style.scss';
+import { bearing, distance, setMeshColor } from './utils';
 
 
 /**
@@ -255,7 +255,13 @@ export class VirtualTourPlugin extends AbstractPlugin {
     this.gallery = this.psv.getPlugin('gallery');
 
     if (!this.is3D() && !this.markers) {
-      throw new PSVError('Tour plugin requires the Markers plugin in markers mode');
+      throw new PSVError('VirtualTour plugin requires the Markers plugin in markers mode.');
+    }
+
+    if (this.markers?.config.markers) {
+      utils.logWarn('No default markers can be configured on Markers plugin when using VirtualTour plugin. '
+        + 'Consider defining `markers` on each tour node.');
+      delete this.markers.config.markers;
     }
 
     this.datasource = this.isServerSide() ? new ServerSideDatasource(this) : new ClientSideDatasource(this);
@@ -592,7 +598,9 @@ export class VirtualTourPlugin extends AbstractPlugin {
           ...link.markerStyle,
           id      : `tour-link-${link.nodeId}`,
           tooltip : link.name,
+          visible : true,
           hideList: true,
+          content : null,
           data    : { [LINK_DATA]: link },
           ...position,
         }, false);

@@ -25,7 +25,7 @@ export type VirtualTourNodeLink = {
   nodeId: string;
   name?: string;
   position?: [number, number, number?];
-  markerStyle?: MarkerProperties;
+  markerStyle?: Omit<MarkerProperties, 'id' | 'longitude' | 'latitude' | 'polygonPx' | 'polygonRad' | 'polylinePx' | 'polylineRad' | 'tooltip' | 'content' | 'hideList' | 'visible' | 'data'>;
   arrowStyle?: VirtualTourArrowStyle;
 };
 

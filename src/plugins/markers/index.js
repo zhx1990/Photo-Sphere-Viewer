@@ -127,12 +127,12 @@ export class MarkersPlugin extends AbstractPlugin {
     this.psv.on(CONSTANTS.EVENTS.RENDER, this);
     this.psv.on(CONSTANTS.EVENTS.CONFIG_CHANGED, this);
 
-    if (this.config.markers) {
-      this.psv.once(CONSTANTS.EVENTS.READY, () => {
+    this.psv.once(CONSTANTS.EVENTS.READY, () => {
+      if (this.config.markers) {
         this.setMarkers(this.config.markers);
         delete this.config.markers;
-      });
-    }
+      }
+    });
   }
 
   /**
