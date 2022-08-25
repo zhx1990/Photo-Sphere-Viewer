@@ -1,6 +1,5 @@
 import { EASINGS } from '../data/constants';
 import { each } from './misc';
-import { logWarn } from './psv';
 
 /**
  * @callback OnTick
@@ -120,14 +119,9 @@ export class Animation {
   /**
    * @summary Promise chaining
    * @param {Function} [onFulfilled] - Called when the animation is complete (true) or cancelled (false)
-   * @param {Function} [onRejected] - deprecated
    * @returns {Promise}
    */
-  then(onFulfilled = null, onRejected = null) {
-    if (onRejected) {
-      logWarn('Animation#then does not accept a rejection handler anymore');
-    }
-
+  then(onFulfilled) {
     if (this.__resolved || this.__cancelled) {
       return Promise.resolve(this.__resolved)
         .then(onFulfilled);
@@ -156,29 +150,6 @@ export class Animation {
         this.__animationFrame = null;
       }
     }
-  }
-
-  /**
-   * @deprecated not supported anymore
-   */
-  catch() {
-    logWarn('Animation#catch is not supported anymore');
-    return this.then();
-  }
-
-  /**
-   * @deprecated not supported anymore
-   */
-  finally(onFinally) {
-    logWarn('Animation#finally is not supported anymore');
-    return this.then(onFinally);
-  }
-
-  /**
-   * @deprecated not supported anymore
-   */
-  static resolve() {
-    logWarn('Animation.resolve is not supported anymore');
   }
 
 }

@@ -559,13 +559,13 @@ export class Viewer extends EventEmitter {
           this.loader.hide();
 
           this.prop.transitionAnimation = this.renderer.transition(textureData, options);
-          return this.prop.transitionAnimation
-            .then((completed) => {
-              this.prop.transitionAnimation = null;
-              if (!completed) {
-                throw getAbortError();
-              }
-            });
+          return this.prop.transitionAnimation;
+        })
+        .then((completed) => {
+          this.prop.transitionAnimation = null;
+          if (!completed) {
+            throw getAbortError();
+          }
         })
         .then(done, done);
     }

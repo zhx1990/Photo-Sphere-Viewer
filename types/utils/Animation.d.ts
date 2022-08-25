@@ -20,24 +20,4 @@ export class Animation<T> implements PromiseLike<boolean> {
 
   cancel();
 
-  /**
-   * @deprecated does not accept a rejection handler anymore
-   */
-  then(onFulfilled?: (() => void | Animation<any> | PromiseLike<void>) | undefined | null, onRejected?: (() => void | Animation<any> | PromiseLike<void>) | undefined | null): Animation<unknown>;
-
-  /**
-   * @deprecated not supported anymore
-   */
-  catch(onRejected?: (() => void | Animation<any> | PromiseLike<void>) | undefined | null): Animation<unknown>;
-
-  /**
-   * @deprecated not supported anymore
-   */
-  finally(onFinally?: (() => void | Animation<any> | PromiseLike<void>) | undefined | null): Animation<unknown>;
-
-  /**
-   * @deprecated not supported anymore
-   */
-  static resolve(): Animation<unknown>;
-
 }
