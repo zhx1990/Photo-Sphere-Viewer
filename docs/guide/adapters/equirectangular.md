@@ -54,7 +54,7 @@ The data can also contains angular values:
   - Pose Pitch
   - Pose Roll
 
-![XMP_pano_pixels](/assets/XMP_pano_pixels.png)
+![XMP_pano_pixels](../../images/XMP_pano_pixels.png)
 
 More information on [Google documentation](https://developers.google.com/streetview/spherical-metadata).
 

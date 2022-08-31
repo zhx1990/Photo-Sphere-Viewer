@@ -71,16 +71,16 @@
       <md-button class="md-raised md-dense md-primary" :disabled="loading" v-on:click="apply">Apply</md-button>
     </div>
 
-    <Tabs v-show="!loading" type="border-card">
-      <Tab label="Preview">
+    <md-tabs md-elevation="1" md-alignment="left" v-show="!loading">
+      <md-tab md-label="Preview">
         <div id="viewer"></div>
-      </Tab>
-      <Tab label="XMP Data">
+      </md-tab>
+      <md-tab md-label="XMP Data">
         <div class="language-xml" v-if="xmpData">
           <pre class="language-xml"><code>{{xmpData}}</code></pre>
         </div>
-      </Tab>
-    </Tabs>
+      </md-tab>
+    </md-tabs>
 
   </div>
 </template>

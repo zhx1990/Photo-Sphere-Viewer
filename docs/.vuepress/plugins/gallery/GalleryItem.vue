@@ -1,16 +1,12 @@
 <template>
   <a class="demo-gallery-item" :href="link">
-    <img v-if="image" :src="image">
-    <video v-if="video" :src="video" autoplay loop mute></video>
-    <div class="demo-gallery-item-content">
-      <slot></slot>
-    </div>
+    <slot></slot>
   </a>
 </template>
 
 <script>
   export default {
-    props: ['image', 'video', 'link'],
+    props: ['link'],
   };
 </script>
 
@@ -27,8 +23,10 @@
       box-shadow 0 0 20px rgba(0, 0, 0, 0.8)
       text-decoration none !important
 
-  .demo-gallery-item-content
-    h3, p
+    p:first-child
+      margin 0
+
+    h3, p:last-child
       margin 1rem
 
     .header-anchor

@@ -7,7 +7,6 @@
     <div class="hero-container">
       <div class="hero-background"
            :class="{loaded: loaded}"
-           :style="{backgroundImage: 'url('+$withBase('assets/home-bg.jpg')+')'}"
       ></div>
 
       <header class="hero">
@@ -45,7 +44,7 @@
       </header>
 
       <div class="hero-down" v-on:click="scrollDown">
-        <img :src="$withBase('assets/icons/down.svg')">
+        <img src="./down.svg">
       </div>
     </div>
 
@@ -152,6 +151,7 @@
       left 0
       width 100%
       height 100%
+      background-image url(./background.jpg)
       background-position  top center
       background-size cover
       opacity 1

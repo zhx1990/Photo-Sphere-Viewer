@@ -62,4 +62,4 @@ This adapter supports video files consisting of a grid of the six faces of the c
 
 The layout of a frame must be as follow:
 
-![cubemap-video](/assets/cubemap-video.png)
+![cubemap-video](../../images/cubemap-video.png)

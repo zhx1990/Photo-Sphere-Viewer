@@ -438,7 +438,7 @@
                 </div>
 
                 <md-button class="md-icon-button md-list-action">
-                  <md-icon md-src="assets/icons/edit.svg"></md-icon>
+                  <i class="md-icon md-icon-image" v-html="EDIT_SVG"></i>
                 </md-button>
               </md-list-item>
             </md-list>
@@ -499,6 +499,7 @@
 
 <script>
   const { cloneDeep, omit, debounce, isEqual, pickBy, range } = require('lodash');
+  import EDIT_SVG from '!raw-loader!./edit.svg';
 
   const TEMP_ID = 'marker-temp';
 
@@ -594,6 +595,7 @@
     },
 
     created() {
+      this.EDIT_SVG = EDIT_SVG;
       this.CLIPBOARD_AVAILABLE = !!window.navigator.clipboard;
       this.PIN_RED_URL = 'https://photo-sphere-viewer.js.org/assets/pin-red.png';
       this.PIN_BLUE_URL = 'https://photo-sphere-viewer.js.org/assets/pin-blue.png';

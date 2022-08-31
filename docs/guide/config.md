@@ -217,7 +217,7 @@ Allows to rotate the panorama sphere. Angles are in radians.
 
 **Note:** if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
 
-![pan-tilt-toll](/assets/pan-tilt-roll.png)
+![pan-tilt-toll](../images/pan-tilt-roll.png)
 
 #### `moveSpeed`
 - type: `double`
