@@ -109,13 +109,14 @@
 
     mounted() {
       const viewer = new PhotoSphereViewer.Viewer({
-        panorama       : 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg',
         container      : 'photosphere',
+        loadingTxt     : '',
         defaultLat     : 0.1,
         autorotateDelay: 500,
         mousewheel     : false,
         navbar         : false,
       });
+      viewer.setPanorama('https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg', { showLoader: false });
       viewer.once('ready', () => this.loaded = true);
     },
     methods: {
@@ -152,7 +153,7 @@
       width 100%
       height 100%
       background-image url(./background.jpg)
-      background-position  top center
+      background-position top center
       background-size cover
       opacity 1
       transition opacity .5s linear
@@ -294,9 +295,9 @@
         h2
           font-size 1.25rem
 
-  @keyframes float
-    0%, 100%
-      transform translateY(-3px)
-    50%
-      transform translateY(3px)
+    @keyframes float
+      0%, 100%
+        transform translateY(-3px)
+      50%
+        transform translateY(3px)
 </style>
