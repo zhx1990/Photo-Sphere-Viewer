@@ -1,6 +1,6 @@
 import { Event } from 'uevent';
 import { AbstractPlugin, Position, Viewer, ViewerOptions } from '../..';
-import { Marker, MarkerProperties } from '../markers';
+import { MarkerProperties } from '../markers';
 
 /**
  * @summary Definition of a single node in the tour
@@ -15,7 +15,7 @@ export type VirtualTourNode = {
   name?: string;
   caption?: string;
   description?: string;
-  markers?: Marker[];
+  markers?: MarkerProperties[];
 };
 
 /**
@@ -25,7 +25,7 @@ export type VirtualTourNodeLink = {
   nodeId: string;
   name?: string;
   position?: [number, number, number?];
-  markerStyle?: Omit<MarkerProperties, 'id' | 'longitude' | 'latitude' | 'polygonPx' | 'polygonRad' | 'polylinePx' | 'polylineRad' | 'tooltip' | 'content' | 'hideList' | 'visible' | 'data'>;
+  markerStyle?: VirtualTourMarkerStyle;
   arrowStyle?: VirtualTourArrowStyle;
 };
 
@@ -42,6 +42,11 @@ export type VirtualTourArrowStyle = {
   opacity?: number;
   scale?: [number, number];
 };
+
+/**
+ * @summary Style of the marker in markers mode
+ */
+export type VirtualTourMarkerStyle = Omit<MarkerProperties, 'id' | 'longitude' | 'latitude' | 'polygonPx' | 'polygonRad' | 'polylinePx' | 'polylineRad' | 'tooltip' | 'content' | 'hideList' | 'visible' | 'data'>;
 
 /**
  * @summary Data associated to the "node-changed" event
@@ -66,7 +71,7 @@ export type VirtualTourPluginPluginOptions = {
   preload?: boolean | ((node: VirtualTourNode, link: VirtualTourNodeLink) => boolean);
   rotateSpeed?: boolean | string | number;
   transition?: boolean | number;
-  markerStyle?: MarkerProperties;
+  markerStyle?: VirtualTourMarkerStyle;
   arrowStyle?: VirtualTourArrowStyle;
   markerLatOffset?: number;
   arrowPosition?: 'top' | 'bottom';
