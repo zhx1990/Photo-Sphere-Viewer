@@ -60,6 +60,12 @@ The list of items, see bellow.
 
 Displays the gallery when loading the first panorama. The user will be able to toggle the gallery with the navbar button.
 
+#### `thumbnailSize`
+- type: `{ width: number, height: number }`
+- default: `{ width: 200, height: 100 }`
+
+Size of the thumbnails.
+
 ### Items
 
 #### `id` (required)

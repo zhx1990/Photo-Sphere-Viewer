@@ -1,6 +1,5 @@
 @import '../../styles/vars';
 
-$psv-gallery-height: 100px !default;
 $psv-gallery-padding: 15px !default;
 $psv-gallery-border: 1px solid $psv-caption-color !default;
 $psv-gallery-background: $psv-navbar-background !default;
@@ -14,21 +13,23 @@ $psv-gallery-thumb-hover-scale: 1.2 !default;
 .psv-gallery {
   position: absolute;
   left: 0;
-  bottom: calc(#{-$psv-gallery-height} - #{$psv-gallery-padding * 2} - 20px); // some slack if there is a scrollbar
+  bottom: 0;
   width: 100%;
   background: $psv-gallery-background;
   border-bottom: $psv-gallery-border;
   overflow-x: auto;
   overflow-y: hidden;
-  transition: bottom ease-in-out .1s;
+  transition: transform ease-in-out .1s;
+  transform: translateY(100%);
   z-index: $psv-navbar-zindex;
 
-  &--open {
-    bottom: 0;
+  @at-root .psv--has-navbar & {
+    bottom: $psv-navbar-height;
+    transform: translateY(calc(100% + #{$psv-navbar-height}));
+  }
 
-    @at-root .psv--has-navbar & {
-      bottom: $psv-navbar-height;
-    }
+  &--open {
+    transform: translateY(0) !important;
   }
 
   &-container {
@@ -40,10 +41,9 @@ $psv-gallery-thumb-hover-scale: 1.2 !default;
     flex: none;
     position: relative;
     margin-right: $psv-gallery-padding;
-    width: $psv-gallery-height * 2;
-    height: $psv-gallery-height;
     border-radius: $psv-gallery-item-radius;
     overflow: hidden;
+    cursor: pointer;
 
     &-title {
       position: absolute;

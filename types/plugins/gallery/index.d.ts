@@ -1,8 +1,9 @@
-import { AbstractPlugin, PanoramaOptions, Viewer } from '../..';
+import { AbstractPlugin, PanoramaOptions, Size, Viewer } from '../..';
 
 export type GalleryPluginOptions = {
   items?: GalleryPluginItem[];
   visibleOnLoad?: boolean;
+  thumbnailSize?: Size;
 };
 
 export type GalleryPluginItem = {

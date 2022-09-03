@@ -17,6 +17,7 @@ import './style.scss';
  * @typedef {Object} PSV.plugins.GalleryPlugin.Options
  * @property {PSV.plugins.GalleryPlugin.Item[]} [items]
  * @property {boolean} [visibleOnLoad=false] - Displays the gallery when loading the first panorama
+ * @property {PSV.Size} [thumbnailSize] - Size of thumbnails, default (200x100) is set with CSS
  */
 
 
@@ -53,6 +54,10 @@ export class GalleryPlugin extends AbstractPlugin {
     this.config = {
       items        : null,
       visibleOnLoad: false,
+      thumbnailSize: {
+        width : 200,
+        height: 100,
+      },
       ...options,
     };
 
