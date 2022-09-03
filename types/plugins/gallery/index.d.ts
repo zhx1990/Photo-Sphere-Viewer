@@ -19,9 +19,9 @@ export const EVENTS: {
 };
 
 /**
- * @summary Adds a compass on the viewer
+ * @summary Adds a gallery of multiple panoramas
  */
-export class CompassPlugin extends AbstractPlugin {
+export class GalleryPlugin extends AbstractPlugin {
 
   static EVENTS: typeof EVENTS;
 
