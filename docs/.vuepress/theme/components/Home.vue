@@ -128,6 +128,12 @@
 </script>
 
 <style lang="stylus">
+  @keyframes float
+    0%, 100%
+      transform translateY(-3px)
+    50%
+      transform translateY(3px)
+
   #photosphere
     width 100%
     height 100vh
@@ -294,10 +300,4 @@
       .feature
         h2
           font-size 1.25rem
-
-    @keyframes float
-      0%, 100%
-        transform translateY(-3px)
-      50%
-        transform translateY(3px)
 </style>

@@ -1,4 +1,4 @@
-# GalleryPlugin <Badge text="NEW"/>
+# GalleryPlugin <Badge text="4.7.0"/>
 
 <ApiButton page="PSV.plugins.GalleryPlugin.html"/>
 
@@ -116,7 +116,7 @@ The list of items, see bellow.
 
 Displays the gallery when loading the first panorama. The user will be able to toggle the gallery with the navbar button.
 
-#### `thumbnailSize`
+#### `thumbnailSize` <Badge text="4.7.1"/>
 - type: `{ width: number, height: number }`
 - default: `{ width: 200, height: 100 }`
 

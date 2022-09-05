@@ -1,4 +1,4 @@
-# Little planet
+# Little planet <Badge text="4.7.1"/>
 
 > Displays an [equirectangular](equirectangular.md) panorama with a little planet effect.
 
