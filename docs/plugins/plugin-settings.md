@@ -137,6 +137,24 @@ settings.addSetting({
 
 ## Configuration
 
+#### `persist` <Badge text="next" type="warning"/>
+- type: `boolean`
+- default: `true`
+
+Should the settings be persisted. The persistence storage can be configured.
+
+#### `storage` <Badge text="next" type="warning"/>
+- type:
+```ts
+{
+  get(settingId: string): boolean | string | Promise<boolean | string>;
+  set(settingId: string, value: boolean | string);
+}
+```
+- default: LocalStorage with key `psvSettings`
+
+Custom storage solution, for example LocalForage, NgRx, HTTP service, etc.
+
 #### `lang`
 - type: `object`
 - default:

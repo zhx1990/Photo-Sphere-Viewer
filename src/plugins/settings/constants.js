@@ -6,7 +6,7 @@ import switchOn from './switch-on.svg';
 /**
  * @summary Available events
  * @enum {string}
- * @memberof PSV.plugins.ResolutionPlugin
+ * @memberof PSV.plugins.SettingsPlugin
  * @constant
  */
 export const EVENTS = {
@@ -20,6 +20,27 @@ export const EVENTS = {
   SETTING_CHANGED: 'setting-changed',
 };
 
+/**
+ * @type {string}
+ * @memberof PSV.plugins.SettingsPlugin
+ * @constant
+ */
+export const TYPE_OPTIONS = 'options';
+
+/**
+ * @type {string}
+ * @memberof PSV.plugins.SettingsPlugin
+ * @constant
+ */
+export const TYPE_TOGGLE = 'toggle';
+
+/**
+ * @summary Key of settings in LocalStorage
+ * @type {string}
+ * @constant
+ * @private
+ */
+export const LOCAL_STORAGE_KEY = 'psvSettings';
 
 /**
  * @summary Panel identifier for settings content
@@ -38,17 +59,25 @@ export const ID_PANEL = 'settings';
 export const SETTING_DATA = 'settingId';
 
 /**
+ * @summary Identifier of the "back" list item
+ * @type {string}
+ * @constant
+ * @private
+ */
+export const ID_BACK = '__back';
+
+/**
  * @summary Setting item template, by type
  * @constant
  * @private
  */
 export const SETTINGS_TEMPLATE_ = {
-  options: (setting, optionsCurrent) => `
+  [TYPE_OPTIONS]: (setting, optionsCurrent) => `
       <span class="psv-settings-item-label">${setting.label}</span>
       <span class="psv-settings-item-value">${optionsCurrent(setting)}</span>
       <span class="psv-settings-item-icon">${chevron}</span>
     `,
-  toggle : setting => `
+  [TYPE_TOGGLE] : setting => `
       <span class="psv-settings-item-label">${setting.label}</span>
       <span class="psv-settings-item-value">${setting.active() ? switchOn : switchOff}</span>
     `,
@@ -87,7 +116,7 @@ export const SETTINGS_TEMPLATE = (settings, dataKey, optionsCurrent) => `
 export const SETTING_OPTIONS_TEMPLATE = (setting, dataKey, optionActive) => `
 <div class="psv-panel-menu psv-settings-menu">
   <ul class="psv-panel-menu-list">
-    <li class="psv-panel-menu-item psv-settings-item--header" data-${dataKey}="__back">
+    <li class="psv-panel-menu-item psv-settings-item--header" data-${dataKey}="${ID_BACK}">
       <span class="psv-settings-item-icon">${chevron}</span>
       <span class="psv-settings-item-label">${setting.label}</span>
     </li>

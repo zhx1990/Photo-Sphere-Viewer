@@ -1,11 +1,15 @@
 import { AbstractPlugin, DEFAULTS, PSVError, registerButton, utils } from '../..';
 import {
   EVENTS,
+  ID_BACK,
   ID_PANEL,
+  LOCAL_STORAGE_KEY,
   SETTING_DATA,
   SETTING_OPTIONS_TEMPLATE,
   SETTINGS_TEMPLATE,
-  SETTINGS_TEMPLATE_
+  SETTINGS_TEMPLATE_,
+  TYPE_OPTIONS,
+  TYPE_TOGGLE
 } from './constants';
 import { SettingsButton } from './SettingsButton';
 import './style.scss';
@@ -44,13 +48,44 @@ import './style.scss';
  * @property {string} label - label of the option
  */
 
+/**
+ * @typedef {Object} PSV.plugins.SettingsPlugin.Options
+ * @property {boolean} [persist=true] - should the settings be saved accross sessions
+ * @property {Object} [storage] - custom storage handler, defaults to LocalStorage
+ * @property {PSV.plugins.SettingsPlugin.StorageGetter} [storage.get]
+ * @property {PSV.plugins.SettingsPlugin.StorageSetter} [storage.set]
+ */
+
+/**
+ * @callback StorageGetter
+ * @memberOf PSV.plugins.SettingsPlugin
+ * @param {string} settingId
+ * @return {boolean | string | Promise<boolean | string>} - return `undefined` or `null` if the option does not exist
+ */
+
+/**
+ * @callback StorageSetter
+ * @memberOf PSV.plugins.SettingsPlugin
+ * @param {string} settingId
+ * @param {boolean | string} value
+ */
+
 
 // add settings button
 DEFAULTS.lang[SettingsButton.id] = 'Settings';
 registerButton(SettingsButton, 'fullscreen:left');
 
 
-export { EVENTS } from './constants';
+function getData() {
+  return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || {};
+}
+
+function setData(data) {
+  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(data));
+}
+
+
+export { EVENTS, TYPE_TOGGLE, TYPE_OPTIONS } from './constants';
 
 
 /**
@@ -63,12 +98,33 @@ export class SettingsPlugin extends AbstractPlugin {
   static id = 'settings';
 
   static EVENTS = EVENTS;
+  static TYPE_TOGGLE = TYPE_TOGGLE;
+  static TYPE_OPTIONS = TYPE_OPTIONS;
 
   /**
    * @param {PSV.Viewer} psv
+   * @param {PSV.plugins.SettingsPlugin.Options} options
    */
-  constructor(psv) {
+  constructor(psv, options) {
     super(psv);
+
+    /**
+     * @type {PSV.plugins.SettingsPlugin.Options}
+     */
+    this.config = {
+      persist: true,
+      storage: {
+        get(id) {
+          return getData()[id];
+        },
+        set(id, value) {
+          const data = getData();
+          data[id] = value;
+          setData(data);
+        },
+      },
+      ...options,
+    };
 
     /**
      * @type {PSV.plugins.SettingsPlugin.Setting[]}
@@ -122,6 +178,30 @@ export class SettingsPlugin extends AbstractPlugin {
     }
 
     this.updateBadge();
+
+    if (this.config.persist) {
+      Promise.resolve(this.config.storage.get(setting.id))
+        .then((value) => {
+          switch (setting.type) {
+            case TYPE_TOGGLE:
+              if (!utils.isNil(value) && value !== setting.active()) {
+                setting.toggle();
+                this.trigger(EVENTS.SETTING_CHANGED, setting.id, setting.active());
+              }
+              break;
+
+            case TYPE_OPTIONS:
+              if (!utils.isNil(value) && value !== setting.current()) {
+                setting.apply(value);
+                this.trigger(EVENTS.SETTING_CHANGED, setting.id, setting.current());
+              }
+              break;
+
+            default:
+            // noop
+          }
+        });
+    }
   }
 
   /**
@@ -169,10 +249,10 @@ export class SettingsPlugin extends AbstractPlugin {
       content     : SETTINGS_TEMPLATE(
         this.settings,
         utils.dasherize(SETTING_DATA),
-        (setting) => { // retrocompatibility with "current" returning a label
+        (setting) => {
           const current = setting.current();
           const option = setting.options().find(opt => opt.id === current);
-          return option?.label || current;
+          return option?.label;
         }
       ),
       noMargin    : true,
@@ -183,14 +263,11 @@ export class SettingsPlugin extends AbstractPlugin {
 
         if (setting) {
           switch (setting.type) {
-            case 'toggle':
-              setting.toggle();
-              this.trigger(EVENTS.SETTING_CHANGED, setting.id, setting.active());
-              this.showSettings();
-              this.updateBadge();
+            case TYPE_TOGGLE:
+              this.__toggleSetting(setting);
               break;
 
-            case 'options':
+            case TYPE_OPTIONS:
               this.__showOptions(setting);
               break;
 
@@ -215,8 +292,8 @@ export class SettingsPlugin extends AbstractPlugin {
       content     : SETTING_OPTIONS_TEMPLATE(
         setting,
         utils.dasherize(SETTING_DATA),
-        (option) => { // retrocompatibility with options having an "active" flag
-          return 'active' in option ? option.active : option.id === current;
+        (option) => {
+          return option.id === current;
         }
       ),
       noMargin    : true,
@@ -224,17 +301,51 @@ export class SettingsPlugin extends AbstractPlugin {
         const li = e.target ? utils.getClosest(e.target, 'li') : undefined;
         const optionId = li ? li.dataset[SETTING_DATA] : undefined;
 
-        if (optionId === '__back') {
+        if (optionId === ID_BACK) {
           this.showSettings();
         }
         else {
-          setting.apply(optionId);
-          this.trigger(EVENTS.SETTING_CHANGED, setting.id, setting.current());
-          this.hideSettings();
-          this.updateBadge();
+          this.__applyOption(setting, optionId);
         }
       },
     });
+  }
+
+  /**
+   * @param {PSV.plugins.SettingsPlugin.ToggleSetting} setting
+   * @private
+   */
+  __toggleSetting(setting) {
+    const newValue = !setting.active(); // in case "toggle" is async
+
+    setting.toggle();
+
+    this.trigger(EVENTS.SETTING_CHANGED, setting.id, newValue);
+
+    if (this.config.persist) {
+      this.config.storage.set(setting.id, newValue);
+    }
+
+    this.showSettings(); // re-render
+    this.updateBadge();
+  }
+
+  /**
+   * @param {PSV.plugins.SettingsPlugin.OptionsSetting} setting
+   * @param {string} optionId
+   * @private
+   */
+  __applyOption(setting, optionId) {
+    setting.apply(optionId);
+
+    this.trigger(EVENTS.SETTING_CHANGED, setting.id, optionId);
+
+    if (this.config.persist) {
+      this.config.storage.set(setting.id, optionId);
+    }
+
+    this.hideSettings();
+    this.updateBadge();
   }
 
   /**
