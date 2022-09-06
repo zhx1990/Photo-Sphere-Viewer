@@ -214,7 +214,7 @@ export class ResolutionPlugin extends AbstractPlugin {
     const resolution = this.resolutions.find(r => utils.deepEqual(this.psv.config.panorama, r.panorama));
     if (this.prop.resolution !== resolution?.id) {
       this.prop.resolution = resolution?.id;
-      this.settings?.updateBadge();
+      this.settings?.updateButton();
       this.trigger(EVENTS.RESOLUTION_CHANGED, this.prop.resolution);
     }
   }

@@ -1,17 +1,7 @@
-import { AbstractPlugin, DEFAULTS, PSVError, registerButton, utils } from '../..';
-import {
-  EVENTS,
-  ID_BACK,
-  ID_PANEL,
-  LOCAL_STORAGE_KEY,
-  SETTING_DATA,
-  SETTING_OPTIONS_TEMPLATE,
-  SETTINGS_TEMPLATE,
-  SETTINGS_TEMPLATE_,
-  TYPE_OPTIONS,
-  TYPE_TOGGLE
-} from './constants';
+import { AbstractPlugin, CONSTANTS, DEFAULTS, PSVError, registerButton, utils } from '../..';
+import { EVENTS, LOCAL_STORAGE_KEY, SETTINGS_TEMPLATE_, TYPE_OPTIONS, TYPE_TOGGLE } from './constants';
 import { SettingsButton } from './SettingsButton';
+import { SettingsComponent } from './SettingsComponent';
 import './style.scss';
 
 
@@ -127,6 +117,13 @@ export class SettingsPlugin extends AbstractPlugin {
     };
 
     /**
+     * @type {SettingsComponent}
+     * @private
+     * @readonly
+     */
+    this.component = new SettingsComponent(this);
+
+    /**
      * @type {PSV.plugins.SettingsPlugin.Setting[]}
      * @private
      */
@@ -139,17 +136,42 @@ export class SettingsPlugin extends AbstractPlugin {
   init() {
     super.init();
 
+    this.psv.on(CONSTANTS.EVENTS.CLICK, this);
+    this.psv.on(CONSTANTS.EVENTS.OPEN_PANEL, this);
+
     // buttons are initialized just after plugins
-    setTimeout(() => this.updateBadge());
+    setTimeout(() => this.updateButton());
   }
 
   /**
    * @package
    */
   destroy() {
+    this.psv.off(CONSTANTS.EVENTS.CLICK, this);
+    this.psv.off(CONSTANTS.EVENTS.OPEN_PANEL, this);
+
+    this.component.destroy();
+
+    delete this.component;
     this.settings.length = 0;
 
     super.destroy();
+  }
+
+  /**
+   * @private
+   */
+  handleEvent(e) {
+    /* eslint-disable */
+    switch (e.type) {
+      case CONSTANTS.EVENTS.CLICK:
+      case CONSTANTS.EVENTS.OPEN_PANEL:
+        if (this.component.isVisible()) {
+          this.hideSettings();
+        }
+        break;
+    }
+    /* eslint-enable */
   }
 
   /**
@@ -173,11 +195,11 @@ export class SettingsPlugin extends AbstractPlugin {
 
     this.settings.push(setting);
 
-    if (this.psv.panel.prop.contentId === ID_PANEL) {
-      this.showSettings();
+    if (this.component.isVisible()) {
+      this.component.show(); // re-render
     }
 
-    this.updateBadge();
+    this.updateButton();
 
     if (this.config.persist) {
       Promise.resolve(this.config.storage.get(setting.id))
@@ -200,6 +222,8 @@ export class SettingsPlugin extends AbstractPlugin {
             default:
             // noop
           }
+
+          this.updateButton();
         });
     }
   }
@@ -213,109 +237,54 @@ export class SettingsPlugin extends AbstractPlugin {
     if (idx !== -1) {
       this.settings.splice(idx, 1);
 
-      if (this.psv.panel.prop.contentId === ID_PANEL) {
-        this.showSettings();
+      if (this.component.isVisible()) {
+        this.component.show(); // re-render
       }
 
-      this.updateBadge();
+      this.updateButton();
     }
   }
 
   /**
-   * @summary Toggles the settings panel
+   * @summary Toggles the settings menu
    */
   toggleSettings() {
-    if (this.psv.panel.prop.contentId === ID_PANEL) {
-      this.hideSettings();
-    }
-    else {
-      this.showSettings();
-    }
+    this.component.toggle();
+    this.updateButton();
   }
 
   /**
-   * @summary Hides the settings panel
+   * @summary Hides the settings menu
    */
   hideSettings() {
-    this.psv.panel.hide(ID_PANEL);
+    this.component.hide();
+    this.updateButton();
   }
 
   /**
-   * @summary Shows the settings panel
+   * @summary Shows the settings menu
    */
   showSettings() {
-    this.psv.panel.show({
-      id          : ID_PANEL,
-      content     : SETTINGS_TEMPLATE(
-        this.settings,
-        utils.dasherize(SETTING_DATA),
-        (setting) => {
-          const current = setting.current();
-          const option = setting.options().find(opt => opt.id === current);
-          return option?.label;
-        }
-      ),
-      noMargin    : true,
-      clickHandler: (e) => {
-        const li = e.target ? utils.getClosest(e.target, 'li') : undefined;
-        const settingId = li ? li.dataset[SETTING_DATA] : undefined;
-        const setting = this.settings.find(s => s.id === settingId);
-
-        if (setting) {
-          switch (setting.type) {
-            case TYPE_TOGGLE:
-              this.__toggleSetting(setting);
-              break;
-
-            case TYPE_OPTIONS:
-              this.__showOptions(setting);
-              break;
-
-            default:
-            // noop
-          }
-        }
-      },
-    });
+    this.component.show();
+    this.updateButton();
   }
 
   /**
-   * @summary Shows setting options panel
-   * @param {PSV.plugins.SettingsPlugin.OptionsSetting} setting
-   * @private
+   * @summary Updates the badge in the button
    */
-  __showOptions(setting) {
-    const current = setting.current();
-
-    this.psv.panel.show({
-      id          : ID_PANEL,
-      content     : SETTING_OPTIONS_TEMPLATE(
-        setting,
-        utils.dasherize(SETTING_DATA),
-        (option) => {
-          return option.id === current;
-        }
-      ),
-      noMargin    : true,
-      clickHandler: (e) => {
-        const li = e.target ? utils.getClosest(e.target, 'li') : undefined;
-        const optionId = li ? li.dataset[SETTING_DATA] : undefined;
-
-        if (optionId === ID_BACK) {
-          this.showSettings();
-        }
-        else {
-          this.__applyOption(setting, optionId);
-        }
-      },
-    });
+  updateButton() {
+    const value = this.settings.find(s => s.badge)?.badge();
+    const button = this.psv.navbar.getButton(SettingsButton.id, false);
+    button?.toggleActive(this.component.isVisible());
+    button?.setBadge(value);
   }
 
   /**
+   * @summary Toggles a setting
    * @param {PSV.plugins.SettingsPlugin.ToggleSetting} setting
-   * @private
+   * @package
    */
-  __toggleSetting(setting) {
+  toggleSettingValue(setting) {
     const newValue = !setting.active(); // in case "toggle" is async
 
     setting.toggle();
@@ -326,16 +295,16 @@ export class SettingsPlugin extends AbstractPlugin {
       this.config.storage.set(setting.id, newValue);
     }
 
-    this.showSettings(); // re-render
-    this.updateBadge();
+    this.updateButton();
   }
 
   /**
+   * @summary Changes the value of an setting
    * @param {PSV.plugins.SettingsPlugin.OptionsSetting} setting
    * @param {string} optionId
-   * @private
+   * @package
    */
-  __applyOption(setting, optionId) {
+  applySettingOption(setting, optionId) {
     setting.apply(optionId);
 
     this.trigger(EVENTS.SETTING_CHANGED, setting.id, optionId);
@@ -344,16 +313,7 @@ export class SettingsPlugin extends AbstractPlugin {
       this.config.storage.set(setting.id, optionId);
     }
 
-    this.hideSettings();
-    this.updateBadge();
-  }
-
-  /**
-   * @summary Updates the badge in the button
-   */
-  updateBadge() {
-    const value = this.settings.find(s => s.badge)?.badge();
-    this.psv.navbar.getButton(SettingsButton.id, false)?.setBadge(value);
+    this.updateButton();
   }
 
 }
