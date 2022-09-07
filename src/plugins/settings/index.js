@@ -40,7 +40,7 @@ import './style.scss';
 
 /**
  * @typedef {Object} PSV.plugins.SettingsPlugin.Options
- * @property {boolean} [persist=true] - should the settings be saved accross sessions
+ * @property {boolean} [persist=false] - should the settings be saved accross sessions
  * @property {Object} [storage] - custom storage handler, defaults to LocalStorage
  * @property {PSV.plugins.SettingsPlugin.StorageGetter} [storage.get]
  * @property {PSV.plugins.SettingsPlugin.StorageSetter} [storage.set]
@@ -102,7 +102,7 @@ export class SettingsPlugin extends AbstractPlugin {
      * @type {PSV.plugins.SettingsPlugin.Options}
      */
     this.config = {
-      persist: true,
+      persist: false,
       storage: {
         get(id) {
           return getData()[id];

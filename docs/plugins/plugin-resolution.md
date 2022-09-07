@@ -98,7 +98,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 List of available resolutions. Each resolution consist of an object with the properties `id`, `label` and `panorama`.
 Cubemaps are supported.
 
-#### `defaultResolution` <Badge text="next" type="warning"/>
+#### `defaultResolution` <Badge text="4.7.2"/>
 - type: `string`
 
 The id of the default resolution to load. If not provided the first resolution will be used.

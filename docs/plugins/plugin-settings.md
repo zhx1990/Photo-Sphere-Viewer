@@ -137,13 +137,13 @@ settings.addSetting({
 
 ## Configuration
 
-#### `persist` <Badge text="next" type="warning"/>
+#### `persist` <Badge text="4.7.2"/>
 - type: `boolean`
-- default: `true`
+- default: `false`
 
 Should the settings be persisted. The persistence storage can be configured.
 
-#### `storage` <Badge text="next" type="warning"/>
+#### `storage` <Badge text="4.7.2"/>
 - type:
 ```ts
 {
