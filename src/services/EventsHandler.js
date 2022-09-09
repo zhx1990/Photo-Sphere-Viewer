@@ -757,8 +757,10 @@ export class EventsHandler extends AbstractService {
       const y = evt.clientY;
 
       const rotation = {
-        longitude: (x - this.state.mouseX) / this.prop.size.width * this.config.moveSpeed * MathUtils.degToRad(this.prop.hFov),
-        latitude : (y - this.state.mouseY) / this.prop.size.height * this.config.moveSpeed * MathUtils.degToRad(this.prop.vFov),
+        longitude: (x - this.state.mouseX) / this.prop.size.width * this.config.moveSpeed
+          * MathUtils.degToRad(this.prop.littlePlanet ? 90 : this.prop.hFov),
+        latitude : (y - this.state.mouseY) / this.prop.size.height * this.config.moveSpeed
+          * MathUtils.degToRad(this.prop.littlePlanet ? 90 : this.prop.vFov),
       };
 
       const currentPosition = this.psv.getPosition();
