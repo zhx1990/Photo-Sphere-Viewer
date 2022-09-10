@@ -748,6 +748,10 @@ export class Viewer extends EventEmitter {
       latitude: this.config.autorotateLat,
     }, Math.abs(this.config.autorotateSpeed / this.config.moveSpeed));
 
+    if (this.config.autorotateZoomLvl !== null) {
+      this.dynamics.zoom.goto(this.config.autorotateZoomLvl);
+    }
+
     this.prop.autorotateEnabled = true;
 
     if (!refresh) {
@@ -762,6 +766,7 @@ export class Viewer extends EventEmitter {
   stopAutorotate() {
     if (this.isAutorotateEnabled()) {
       this.dynamics.position.stop();
+      this.dynamics.zoom.stop();
 
       this.prop.autorotateEnabled = false;
 

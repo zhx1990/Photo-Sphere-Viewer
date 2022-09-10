@@ -129,22 +129,28 @@ Speed of the automatic rotation. Can be a negative value to reverse the rotation
 
 Latitude at which the automatic rotation is performed.
 
+#### `autorotateZoomLvl` <Badge text="4.7.3"/>
+- type: `number`
+- default: `null`
+
+Zoom level at which the automatic rotation is performed. If `null` the current zoom is kept.
+
 #### `lang`
 - type: `object`
 - default:
 ```js
 lang: {
-    autorotate: 'Automatic rotation',
-    zoom      : 'Zoom',
-    zoomOut   : 'Zoom out',
-    zoomIn    : 'Zoom in',
-    move      : 'Move',
-    download  : 'Download',
-    fullscreen: 'Fullscreen',
-    menu      : 'Menu',
-    twoFingers: 'Use two fingers to navigate',
-    ctrlZoom  : 'Use ctrl + scroll to zoom the image',
-    loadError : 'The panorama can\'t be loaded',
+  autorotate: 'Automatic rotation',
+  zoom      : 'Zoom',
+  zoomOut   : 'Zoom out',
+  zoomIn    : 'Zoom in',
+  move      : 'Move',
+  download  : 'Download',
+  fullscreen: 'Fullscreen',
+  menu      : 'Menu',
+  twoFingers: 'Use two fingers to navigate',
+  ctrlZoom  : 'Use ctrl + scroll to zoom the image',
+  loadError : 'The panorama can\'t be loaded',
 }
 ```
 
