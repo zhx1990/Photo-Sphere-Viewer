@@ -179,12 +179,6 @@ Enables panorama rotation with mouse click+move or with a finger swipe on touch 
 
 Requires to use the ctrl key to zoom the panorama. This allows to scroll on the page without interfering with the viewer. If enabled, an overlay asking the user to use ctrl + scroll is displayed when ctrl key is not pressed.
 
-#### `captureCursor`
-- type: `boolean`
-- default: `false`
-
-Rotate the panorama just by moving the cursor above the view instead of click+move.
-
 #### `touchmoveTwoFingers`
 - type: `boolean`
 - default: `false`

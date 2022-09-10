@@ -57,6 +57,9 @@ export type ViewerOptions = {
   moveInertia?: boolean;
   mousewheel?: boolean;
   mousemove?: boolean;
+  /**
+   * @deprecated
+   */
   captureCursor?: boolean;
   mousewheelCtrlKey?: boolean;
   touchmoveTwoFingers?: boolean;

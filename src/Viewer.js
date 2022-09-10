@@ -899,11 +899,8 @@ export class Viewer extends EventEmitter {
    */
   stopAnimation() {
     if (this.prop.animationPromise) {
-      return new Promise((resolve) => {
-        this.prop.animationPromise.then(resolve);
-        this.prop.animationPromise.cancel();
-        this.prop.animationPromise = null;
-      });
+      this.prop.animationPromise.cancel();
+      return this.prop.animationPromise;
     }
     else {
       return Promise.resolve();

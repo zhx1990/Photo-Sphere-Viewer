@@ -41,7 +41,6 @@ export const DEFAULTS = {
   moveInertia        : true,
   mousewheel         : true,
   mousemove          : true,
-  captureCursor      : false,
   mousewheelCtrlKey  : false,
   touchmoveTwoFingers: false,
   useXmpData         : true,
@@ -104,6 +103,7 @@ export const DEPRECATED_OPTIONS = {
   zoomButtonIncrement    : 'zoomButtonIncrement is deprecated, use zoomSpeed',
   mousewheelSpeed        : 'mousewheelSpeed is deprecated, use zoomSpeed',
   sphereCorrectionReorder: 'sphereCorrectionReorder is deprecated',
+  captureCursor          : 'captureCursor is deprecated',
 };
 
 /**
