@@ -8,6 +8,7 @@ import {
   INERTIA_WINDOW,
   KEY_CODES,
   LONGTOUCH_DELAY,
+  MESH_USER_DATA,
   MOVE_THRESHOLD,
   OBJECT_EVENTS,
   TWOFINGERSOVERLAY_DELAY
@@ -102,14 +103,14 @@ export class EventsHandler extends AbstractService {
    */
   init() {
     window.addEventListener('resize', this);
-    window.addEventListener('keydown', this);
+    window.addEventListener('keydown', this, { passive: false });
     window.addEventListener('keyup', this);
     this.psv.container.addEventListener('mousedown', this);
     window.addEventListener('mousemove', this, { passive: false });
     window.addEventListener('mouseup', this);
     this.psv.container.addEventListener('touchstart', this, { passive: false });
     window.addEventListener('touchmove', this, { passive: false });
-    window.addEventListener('touchend', this);
+    window.addEventListener('touchend', this, { passive: false });
     this.psv.container.addEventListener(SYSTEM.mouseWheelEvent, this, { passive: false });
 
     if (SYSTEM.fullscreenEvent) {
@@ -122,7 +123,7 @@ export class EventsHandler extends AbstractService {
    */
   destroy() {
     window.removeEventListener('resize', this);
-    window.removeEventListener('keydown', this, { passive: false });
+    window.removeEventListener('keydown', this);
     window.removeEventListener('keyup', this);
     this.psv.container.removeEventListener('mousedown', this);
     window.removeEventListener('mousemove', this);
@@ -385,6 +386,7 @@ export class EventsHandler extends AbstractService {
     this.__cancelLongTouch();
 
     if (this.state.mousedown || this.state.step === MOVING) {
+      evt.preventDefault();
       this.__cancelTwoFingersOverlay();
 
       if (evt.touches.length === 1) {
@@ -660,14 +662,14 @@ export class EventsHandler extends AbstractService {
       y: data.viewerY,
     });
 
-    const sphereIntersection = intersections.find(i => i.object.userData.psvSphere);
+    const sphereIntersection = intersections.find(i => i.object.userData[MESH_USER_DATA]);
 
     if (sphereIntersection) {
       const sphericalCoords = this.psv.dataHelper.vector3ToSphericalCoords(sphereIntersection.point);
       data.longitude = sphericalCoords.longitude;
       data.latitude = sphericalCoords.latitude;
 
-      data.objects = intersections.map(i => i.object).filter(o => !o.userData.psvSphere);
+      data.objects = intersections.map(i => i.object).filter(o => !o.userData[MESH_USER_DATA]);
 
       try {
         const textureCoords = this.psv.dataHelper.sphericalCoordsToTextureCoords(data);

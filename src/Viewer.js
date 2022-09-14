@@ -1016,7 +1016,7 @@ export class Viewer extends EventEmitter {
   /**
    * @summary Subscribes to events on objects in the scene
    * @param {string} userDataKey - only objects with the following `userData` will be emitted
-   * @param {EventListener} listener - must implement `handleEvent
+   * @param {EventListener} listener - must implement `handleEvent`
    * @return {function} call to stop the subscription
    * @package
    */
