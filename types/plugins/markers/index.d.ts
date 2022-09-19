@@ -1,4 +1,4 @@
-import { AbstractPlugin, Animation, ExtendedPosition, Viewer } from '../..';
+import { AbstractPlugin, ExtendedPosition, utils, Viewer } from '../..';
 import { Event } from 'uevent';
 
 export type MarkerType =
@@ -212,7 +212,7 @@ export class MarkersPlugin extends AbstractPlugin {
   /**
    * @summary Rotate the view to face the marker
    */
-  gotoMarker(markerId: string, speed: string | number): Animation<any>;
+  gotoMarker(markerId: string, speed: string | number): utils.Animation<any>;
 
   /**
    * @summary Hides a marker

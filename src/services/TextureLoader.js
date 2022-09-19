@@ -38,19 +38,6 @@ export class TextureLoader extends AbstractService {
   }
 
   /**
-   * @summary Loads the panorama texture(s)
-   * @param {*} panorama
-   * @param {PSV.PanoData | PSV.PanoDataProvider} [newPanoData]
-   * @returns {Promise.<PSV.TextureData>}
-   * @throws {PSV.PSVError} when the image cannot be loaded
-   * @package
-   * @deprecated
-   */
-  loadTexture(panorama, newPanoData) {
-    return this.psv.adapter.loadTexture(panorama, newPanoData);
-  }
-
-  /**
    * @summary Cancels current HTTP requests
    * @package
    */

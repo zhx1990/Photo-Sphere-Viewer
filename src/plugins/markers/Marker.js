@@ -422,14 +422,8 @@ export class Marker {
     this.props.anchor = utils.parsePosition(this.config.anchor);
 
     // clean scale
-    if (this.config.scale) {
-      if (typeof this.config.scale === 'number') {
-        utils.logWarn('Single value marker scale is deprecated, please use an array of two values.');
-        this.config.scale = { zoom: [0, this.config.scale] };
-      }
-      if (Array.isArray(this.config.scale)) {
-        this.config.scale = { zoom: this.config.scale };
-      }
+    if (this.config.scale && Array.isArray(this.config.scale)) {
+      this.config.scale = { zoom: this.config.scale };
     }
 
     if (this.isNormal()) {

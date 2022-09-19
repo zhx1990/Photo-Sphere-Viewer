@@ -85,11 +85,6 @@ export class MarkersPlugin extends AbstractPlugin {
       ...options,
     };
 
-    if (options?.listButton === false || options?.hideButton === false) {
-      utils.logWarn('MarkersPlugin: listButton and hideButton options are deprecated. '
-        + 'Please define the global navbar options according to your needs.');
-    }
-
     /**
      * @member {HTMLElement}
      * @readonly
@@ -441,7 +436,7 @@ export class MarkersPlugin extends AbstractPlugin {
    * @param {string} markerId
    * @param {string|number} [speed] - rotates smoothy, see {@link PSV.Viewer#animate}
    * @fires PSV.plugins.MarkersPlugin.goto-marker-done
-   * @return {PSV.Animation}  A promise that will be resolved when the animation finishes
+   * @return {PSV.utils.Animation}  A promise that will be resolved when the animation finishes
    */
   gotoMarker(markerId, speed) {
     const marker = this.getMarker(markerId);
