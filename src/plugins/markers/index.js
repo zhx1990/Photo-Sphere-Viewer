@@ -972,13 +972,8 @@ export class MarkersPlugin extends AbstractPlugin {
    */
   __refreshUi() {
     const nbMarkers = Object.values(this.markers).filter(m => !m.config.hideList).length;
-    const markersButton = this.psv.navbar.getButton(MarkersButton.id, false);
-    const markersListButton = this.psv.navbar.getButton(MarkersListButton.id, false);
 
     if (nbMarkers === 0) {
-      markersButton?.hide();
-      markersListButton?.hide();
-
       if (this.psv.panel.isVisible(ID_PANEL_MARKERS_LIST)) {
         this.psv.panel.hide();
       }
@@ -987,9 +982,7 @@ export class MarkersPlugin extends AbstractPlugin {
       }
     }
     else {
-      markersButton?.show();
-      markersListButton?.show();
-
+      // eslint-disable-next-line no-lonely-if
       if (this.psv.panel.isVisible(ID_PANEL_MARKERS_LIST)) {
         this.showMarkersList();
       }
@@ -997,6 +990,9 @@ export class MarkersPlugin extends AbstractPlugin {
         this.prop.currentMarker ? this.showMarkerPanel(this.prop.currentMarker) : this.psv.panel.hide();
       }
     }
+
+    this.psv.navbar.getButton(MarkersButton.id, false)?.toggle(nbMarkers > 0);
+    this.psv.navbar.getButton(MarkersListButton.id, false)?.toggle(nbMarkers > 0);
   }
 
   /**
