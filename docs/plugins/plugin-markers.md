@@ -133,7 +133,7 @@ const viewer = new PhotoSphereViewer.Viewer({
           },
           tooltip: {
             content: 'A dynamic polygon marker',
-            position: 'right bottom'
+            position: 'bottom right'
           }
         },
         {
@@ -427,7 +427,7 @@ Initial visibility of the marker.
 - type: `string | {content: string, position: string, className: string, trigger: string}`
 - default: `{content: null, position: 'top center', className: null, trigger: 'hover'}`
 
-Accepted positions are combinations of `top`, `center`, `bottom` and `left`, `center`, `right` with the exception of `center center`.
+Accepted positions are combinations of `top`, `center`, `bottom` and `left`, `center`, `right`.
 
 Possible triggers are `hover` and `click`.
 
@@ -435,7 +435,7 @@ Possible triggers are `hover` and `click`.
 tooltip: 'This is a marker' // tooltip with default position and style
 
 tooltip: { // tooltip with custom position
-  content : 'This is marker',
+  content: 'This is marker',
   position: 'bottom left',
 }
 

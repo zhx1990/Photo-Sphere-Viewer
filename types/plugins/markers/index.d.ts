@@ -36,7 +36,7 @@ export type MarkerProperties = Partial<ExtendedPosition> & {
   width?: number;
   height?: number;
   orientation?: 'front' | 'horizontal' | 'vertical-left' | 'vertical-right';
-  scale?: number | [number, number] | { zoom?: [number, number], longitude?: [number, number] };
+  scale?: [number, number] | { zoom?: [number, number], longitude?: [number, number] };
   opacity?: number;
   className?: string;
   style?: Record<string, string>;
