@@ -42,9 +42,11 @@ export type MarkerProperties = Partial<ExtendedPosition> & {
   style?: Record<string, string>;
   svgStyle?: Record<string, string>;
   anchor?: string;
+  zoomLvl?: number;
   visible?: boolean;
   tooltip?: string | { content: string, position?: string, className?: string, trigger?: 'hover' | 'click' };
   content?: string;
+  listContent?: string;
   hideList?: boolean;
   data?: any;
 };

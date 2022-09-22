@@ -832,7 +832,7 @@ export class Viewer extends EventEmitter {
     this.__stopAll();
 
     const positionProvided = isExtendedPosition(options);
-    const zoomProvided = 'zoom' in options;
+    const zoomProvided = options.zoom !== undefined;
 
     const animProperties = {};
     let duration;

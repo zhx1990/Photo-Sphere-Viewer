@@ -443,7 +443,8 @@ export class MarkersPlugin extends AbstractPlugin {
 
     return this.psv.animate({
       ...marker.props.position,
-      speed,
+      zoom : marker.config.zoomLvl,
+      speed: speed,
     })
       .then(() => {
         this.trigger(EVENTS.GOTO_MARKER_DONE, marker);
