@@ -9,3 +9,7 @@ updates:
     ignore:
       - dependency-name: '*'
         update-types: ['version-update:semver-patch']
+    commit-message:
+      prefix: 'deps'
+      prefix-development: 'deps-dev'
+      include: 'scope'
