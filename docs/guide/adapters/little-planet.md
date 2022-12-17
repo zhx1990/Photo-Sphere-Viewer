@@ -1,20 +1,21 @@
-# Little planet <Badge text="4.7.1"/>
+# Little planet
 
-> Displays an [equirectangular](equirectangular.md) panorama with a little planet effect.
+::: module
+Displays an [equirectangular](equirectangular.md) panorama with a little planet effect.
 
-This adapter is available in the core `photo-sphere-viewer` package in `dist/adapters/little-planet.js`.
+This adapter is available in the `@photo-sphere-viewer/little-planet-adapter` package.
+:::
 
-::: warning Compatibility
+::: warning
 This adapter is not complatible with some options and plugins, it is provided as it just for fun.
 :::
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
-  adapter: PhotoSphereViewer.LittlePlanetAdapter,
-  panorama: 'path/panorama.jpg',
+    adapter: PhotoSphereViewer.LittlePlanetAdapter,
+    panorama: 'path/panorama.jpg',
 });
 ```
-
 
 ## Example
 
@@ -22,22 +23,22 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ```yaml
 title: PSV Little Planet Demo
-resources:
-  - path: adapters/little-planet.js
-    imports: LittlePlanetAdapter
+packages:
+    - name: little-planet-adapter
+      imports: LittlePlanetAdapter
 ```
 
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
 const viewer = new PhotoSphereViewer.Viewer({
-  container: 'viewer',
-  adapter: PhotoSphereViewer.LittlePlanetAdapter,
-  panorama: baseUrl + 'sphere.jpg',
-  caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
-  loadingImg: baseUrl + 'loader.gif',
-  touchmoveTwoFingers: true,
-  mousewheelCtrlKey: true,
+    container: 'viewer',
+    adapter: PhotoSphereViewer.LittlePlanetAdapter,
+    panorama: baseUrl + 'sphere.jpg',
+    caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    loadingImg: baseUrl + 'loader.gif',
+    touchmoveTwoFingers: true,
+    mousewheelCtrlKey: true,
 });
 ```
 

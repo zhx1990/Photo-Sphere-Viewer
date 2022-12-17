@@ -1,0 +1,25 @@
+{
+  "name": "@photo-sphere-viewer/visible-range-plugin",
+  "version": "0.0.0",
+  "description": "Photo sphere Viewer plugin to lock the visible angles.",
+  "homepage": "https://photo-sphere-viewer.js.org/plugins/visible-range",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@photo-sphere-viewer/core": "0.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "lint": "eslint . --fix",
+    "publish-dist": "cd dist && npm publish --tag=$NPM_TAG --access=public"
+  },
+  "psv": {
+    "globalName": "PhotoSphereViewer.VisibleRangePlugin"
+  },
+  "typedoc": {
+    "displayName": "plugin: VisibleRange",
+    "readmeFile": "./.typedoc/README.md"
+  }
+}

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PhotoSphereViewer - virtual tour demo</title>
+
+        <link rel="stylesheet" href="/dist/core/index.css" />
+        <link rel="stylesheet" href="/dist/markers-plugin/index.css" />
+        <link rel="stylesheet" href="/dist/compass-plugin/index.css" />
+        <link rel="stylesheet" href="/dist/gallery-plugin/index.css" />
+        <link rel="stylesheet" href="/dist/virtual-tour-plugin/index.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="photosphere"></div>
+
+        <script src="/node_modules/three/build/three.js"></script>
+        <script src="/dist/core/index.js"></script>
+        <script src="/dist/markers-plugin/index.js"></script>
+        <script src="/dist/compass-plugin/index.js"></script>
+        <script src="/dist/gallery-plugin/index.js"></script>
+        <script src="/dist/virtual-tour-plugin/index.js"></script>
+
+        <script>
+            const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+            // links.position is used in manual mode
+            // links.gps or node.gps is used in GPS mode
+            const nodes = [
+                {
+                    id: '1',
+                    panorama: baseUrl + 'tour/key-biscayne-1.jpg',
+                    thumbnail: baseUrl + 'tour/key-biscayne-1-thumb.jpg',
+                    name: 'One',
+                    links: [{ nodeId: '2', position: { pitch: 0, yaw: '100deg' } }],
+                    markers: [
+                        {
+                            id: 'marker-1',
+                            image: baseUrl + 'pictos/pin-red.png',
+                            tooltip: 'Cape Florida Light, Key Biscayne',
+                            size: { width: 32, height: 32 },
+                            anchor: 'bottom center',
+                            position: { yaw: '105deg', pitch: '35deg' },
+                            data: { compass: 'red' },
+                        },
+                    ],
+                    gps: [-80.156479, 25.666725, 3],
+                    panoData: { poseHeading: 327 },
+                },
+                {
+                    id: '2',
+                    panorama: baseUrl + 'tour/key-biscayne-2.jpg',
+                    thumbnail: baseUrl + 'tour/key-biscayne-2-thumb.jpg',
+                    name: 'Two',
+                    links: [
+                        { nodeId: '3', position: { pitch: 0, yaw: '120deg' } },
+                        { nodeId: '1', position: { pitch: 0, yaw: '280deg' } },
+                    ],
+                    gps: [-80.156168, 25.666623, 3],
+                    panoData: { poseHeading: 318 },
+                },
+                {
+                    id: '3',
+                    panorama: baseUrl + 'tour/key-biscayne-3.jpg',
+                    thumbnail: baseUrl + 'tour/key-biscayne-3-thumb.jpg',
+                    name: 'Three',
+                    links: [
+                        { nodeId: '2', position: { pitch: 0, yaw: '310deg' } },
+                        { nodeId: '4', position: { pitch: 0, yaw: '220deg' } },
+                        { nodeId: '5', position: { pitch: 0, yaw: '270deg' } },
+                    ],
+                    gps: [-80.155932, 25.666498, 5],
+                    panoData: { poseHeading: 328 },
+                },
+                {
+                    id: '4',
+                    panorama: baseUrl + 'tour/key-biscayne-4.jpg',
+                    thumbnail: baseUrl + 'tour/key-biscayne-4-thumb.jpg',
+                    name: 'Four',
+                    links: [
+                        { nodeId: '3', position: { pitch: 0, yaw: '40deg' } },
+                        { nodeId: '5', position: { pitch: 0, yaw: '300deg' } },
+                    ],
+                    gps: [-80.156089, 25.666357, 3],
+                    panoData: { poseHeading: 78 },
+                },
+                {
+                    id: '5',
+                    panorama: baseUrl + 'tour/key-biscayne-5.jpg',
+                    thumbnail: baseUrl + 'tour/key-biscayne-5-thumb.jpg',
+                    name: 'Five',
+                    links: [
+                        { nodeId: '6', position: { pitch: 0, yaw: '280deg' } },
+                        { nodeId: '3', position: { pitch: 0, yaw: '70deg' } },
+                        { nodeId: '4', position: { pitch: 0, yaw: '150deg' } },
+                    ],
+                    gps: [-80.156292, 25.666446, 2],
+                    panoData: { poseHeading: 190 },
+                },
+                {
+                    id: '6',
+                    panorama: baseUrl + 'tour/key-biscayne-6.jpg',
+                    thumbnail: baseUrl + 'tour/key-biscayne-6-thumb.jpg',
+                    name: 'Six',
+                    links: [
+                        { nodeId: '7', position: { pitch: 0, yaw: '-60deg' } },
+                        { nodeId: '5', position: { pitch: 0, yaw: '130deg' } },
+                    ],
+                    gps: [-80.156465, 25.666496, 2],
+                    panoData: { poseHeading: 328 },
+                },
+                {
+                    id: '7',
+                    panorama: baseUrl + 'tour/key-biscayne-7.jpg',
+                    thumbnail: baseUrl + 'tour/key-biscayne-7-thumb.jpg',
+                    name: 'Seven',
+                    links: [{ nodeId: '6', position: { pitch: 0, yaw: '80deg' } }],
+                    gps: [-80.15707, 25.6665, 3],
+                    panoData: { poseHeading: 250 },
+                },
+            ];
+
+            const nodesById = {};
+            nodes.forEach((node) => (nodesById[node.id] = node));
+
+            const viewer = new PhotoSphereViewer.Viewer({
+                container: 'photosphere',
+                loadingImg: baseUrl + 'loader.gif',
+                caption: 'Cape Florida Light, Key Biscayne <b>&copy; Pixexid</b>',
+                defaultYaw: '100deg',
+                plugins: [
+                    PhotoSphereViewer.MarkersPlugin,
+                    PhotoSphereViewer.CompassPlugin,
+                    PhotoSphereViewer.GalleryPlugin,
+                    [PhotoSphereViewer.VirtualTourPlugin, {
+                        positionMode: 'gps',
+                        renderMode: '3d',
+                        startNodeId: nodes[1].id,
+                            preload: true,
+                            // transition   : false,
+                            // rotateSpeed  : false,
+                            arrowPosition: 'bottom',
+
+                            // client mode
+                            // dataMode: 'client',
+                            nodes: nodes,
+
+                            // server mode (mock)
+                            dataMode: 'server',
+                            getNode: (nodeId) => {
+                                console.log('GET node ' + nodeId);
+                                return Promise.resolve({
+                                    ...nodesById[nodeId],
+                                    links: nodesById[nodeId].links.map((link) => ({
+                                        ...link,
+                                        name: nodesById[link.nodeId].name,
+                                        gps: nodesById[link.nodeId].gps,
+                                })),
+                            });
+                        },
+                    }],
+                ],
+            });
+
+            const virtualTour = viewer.getPlugin(PhotoSphereViewer.VirtualTourPlugin);
+        </script>
+    </body>
+</html>

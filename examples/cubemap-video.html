@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PhotoSphereViewer - cubemap video demo</title>
+
+        <link rel="stylesheet" href="/dist/core/index.css" />
+        <link rel="stylesheet" href="/dist/settings-plugin/index.css" />
+        <link rel="stylesheet" href="/dist/video-plugin/index.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="photosphere"></div>
+
+        <script src="/node_modules/three/build/three.js"></script>
+        <script src="/dist/core/index.js"></script>
+        <script src="/dist/cubemap-video-adapter/index.js"></script>
+        <script src="/dist/settings-plugin/index.js"></script>
+        <script src="/dist/resolution-plugin/index.js"></script>
+        <script src="/dist/video-plugin/index.js"></script>
+
+        <script>
+            const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+            const viewer = new PhotoSphereViewer.Viewer({
+                container: 'photosphere',
+                adapter: [PhotoSphereViewer.CubemapVideoAdapter, {
+                    autoplay: false,
+                    muted: true,
+                    equiangular: true,
+                }],
+                caption: 'Dreams of Dalí <b>&copy; The Dalí Museum</b>',
+                plugins: [
+                    [PhotoSphereViewer.VideoPlugin, {
+                        progressbar: true,
+                        bigbutton: true,
+                    }],
+                    PhotoSphereViewer.SettingsPlugin,
+                    [PhotoSphereViewer.ResolutionPlugin, {
+                        defaultResolution: 'FHD',
+                        resolutions: [
+                            {
+                                    id: 'UHD',
+                                    label: 'Ultra high',
+                                    panorama: { source: baseUrl + 'cubemap-video/DreamOfDali_UHD.webm' },
+                                },
+                                {
+                                    id: 'FHD',
+                                    label: 'High',
+                                    panorama: { source: baseUrl + 'cubemap-video/DreamOfDali_FHD.webm' },
+                                },
+                                {
+                                    id: 'HD',
+                                    label: 'Standard',
+                                panorama: { source: baseUrl + 'cubemap-video/DreamOfDali_HD.webm' },
+                            },
+                        ],
+                    }],
+                ],
+                loadingImg: baseUrl + 'loader.gif',
+                navbar: 'video zoom move caption settings fullscreen',
+            });
+        </script>
+    </body>
+</html>

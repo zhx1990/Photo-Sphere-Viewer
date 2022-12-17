@@ -1,0 +1,29 @@
+{
+  "name": "@photo-sphere-viewer/video-plugin",
+  "version": "0.0.0",
+  "description": "Photo sphere Viewer plugin to add video controls.",
+  "homepage": "https://photo-sphere-viewer.js.org/plugins/video",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@photo-sphere-viewer/core": "0.0.0"
+  },
+  "optionalDependencies": {
+    "@photo-sphere-viewer/autorotate-plugin": "0.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "lint": "eslint . --fix && stylelint \"src/**/*.scss\" --fix",
+    "publish-dist": "cd dist && npm publish --tag=$NPM_TAG --access=public"
+  },
+  "psv": {
+    "globalName": "PhotoSphereViewer.VideoPlugin",
+    "style": true
+  },
+  "typedoc": {
+    "displayName": "plugin: Video",
+    "readmeFile": "./.typedoc/README.md"
+  }
+}

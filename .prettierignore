@@ -1,0 +1,5 @@
+node_modules
+.turbo
+dist
+/public
+packages/virtual-tour-plugin/src/models

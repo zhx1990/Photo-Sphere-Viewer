@@ -1,9 +1,8 @@
 # Notification
 
-<ApiButton page="PSV.components.Notification.html"/>
-
-> Display a small message above the navbar.
-
+::: module classes/Core.Notification.html"
+Display a small message above the navbar.
+:::
 
 ## Example
 
@@ -19,31 +18,25 @@ title: PSV Notification Demo
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
 const viewer = new PhotoSphereViewer.Viewer({
-  container: 'viewer',
-  panorama: baseUrl + 'sphere.jpg',
-  caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
-  loadingImg: baseUrl + 'loader.gif',
-  touchmoveTwoFingers: true,
-  mousewheelCtrlKey: true,
-  navbar: [
-    'zoom',
-    'caption',
-    'fullscreen',
-  ],
+    container: 'viewer',
+    panorama: baseUrl + 'sphere.jpg',
+    caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    loadingImg: baseUrl + 'loader.gif',
+    touchmoveTwoFingers: true,
+    mousewheelCtrlKey: true,
+    navbar: ['zoom', 'caption', 'fullscreen'],
 });
 
 let i = 1;
-setInterval(function() {
-  viewer.notification.show({
-    content: `Annoying notification #${i++}`,
-    timeout: 1000,
-  });
+setInterval(() => {
+    viewer.notification.show({
+        content: `Annoying notification #${i++}`,
+        timeout: 1000,
+    });
 }, 2000);
-
 ```
 
 :::
-
 
 ## Methods
 
@@ -51,8 +44,8 @@ setInterval(function() {
 
 Show the notification.
 
-| option | type | |
-|---|---|---|
+| option | type |   |
+| ------ | ---- | - |
 | `id` | `string` | Unique identifier of the notification, this will be used to `hide` the notification only if the content has not been replaced by something else. |
 | `content` (required) | `string` | HTML content of the notification. |
 | `timeout` | `number` | Auto-hide delay in milliseconds. |
@@ -64,7 +57,6 @@ Hide the notification, without condition if `id` is not provided, or only if the
 ### `isVisible([id]): boolean`
 
 Check if the notification is visible.
-
 
 ## Events
 

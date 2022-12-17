@@ -1,2 +1,14 @@
 /guide/adapters/tiles.html /guide/adapters/equirectangular-tiles.html
 /guide/cropped-panorama.html /guide/adapters/equirectangular.html#cropped-panorama
+/plugins/plugin-autorotate-keypoints.html /plugins/autorotate.html
+/plugins/plugin-autorotate.html /plugins/autorotate.html
+/plugins/plugin-compass.html /plugins/compass.html
+/plugins/plugin-gallery.html /plugins/gallery.html
+/plugins/plugin-gyroscope.html /plugins/gyroscope.html
+/plugins/plugin-markers.html /plugins/markers.html
+/plugins/plugin-resolution.html /plugins/resolution.html
+/plugins/plugin-settings.html /plugins/settings.html
+/plugins/plugin-stereo.html /plugins/stereo.html
+/plugins/plugin-video.html /plugins/video.html
+/plugins/plugin-virtual-tour.html /plugins/virtual-tour.html
+/plugins/plugin-visible-range.html /plugins/visible-range.html

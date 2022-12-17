@@ -1,0 +1,27 @@
+{
+  "name": "@photo-sphere-viewer/cubemap-tiles-adapter",
+  "version": "0.0.0",
+  "description": "Photo sphere Viewer adapter to display tiled cubemaps.",
+  "homepage": "https://photo-sphere-viewer.js.org/guide/adapters/cubemap-tiles",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@photo-sphere-viewer/core": "0.0.0",
+    "@photo-sphere-viewer/cubemap-adapter": "0.0.0",
+    "@photo-sphere-viewer/shared": "0.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "lint": "eslint . --fix",
+    "publish-dist": "cd dist && npm publish --tag=$NPM_TAG --access=public"
+  },
+  "psv": {
+    "globalName": "PhotoSphereViewer.CubemapTilesAdapter"
+  },
+  "typedoc": {
+    "displayName": "adapter: CubemapTiles",
+    "readmeFile": "./.typedoc/README.md"
+  }
+}

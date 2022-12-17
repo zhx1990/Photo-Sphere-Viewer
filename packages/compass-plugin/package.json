@@ -1,0 +1,29 @@
+{
+  "name": "@photo-sphere-viewer/compass-plugin",
+  "version": "0.0.0",
+  "description": "Photo sphere Viewer plugin to add a compass to represent which portion of the sphere is currently visible.",
+  "homepage": "https://photo-sphere-viewer.js.org/plugins/compass",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@photo-sphere-viewer/core": "0.0.0"
+  },
+  "optionalDependencies": {
+    "@photo-sphere-viewer/markers-plugin": "0.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "lint": "eslint . --fix && stylelint \"src/**/*.scss\" --fix",
+    "publish-dist": "cd dist && npm publish --tag=$NPM_TAG --access=public"
+  },
+  "psv": {
+    "globalName": "PhotoSphereViewer.CompassPlugin",
+    "style": true
+  },
+  "typedoc": {
+    "displayName": "plugin: Compass",
+    "readmeFile": "./.typedoc/README.md"
+  }
+}

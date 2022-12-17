@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PhotoSphereViewer - cubemap tiles demo</title>
+
+        <link rel="stylesheet" href="/dist/core/index.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="photosphere"></div>
+
+        <script src="/node_modules/three/build/three.js"></script>
+        <script src="/dist/core/index.js"></script>
+        <script src="/dist/cubemap-adapter/index.js"></script>
+        <script src="/dist/cubemap-tiles-adapter/index.js"></script>
+        <script src="/dist/gyroscope-plugin/index.js"></script>
+
+        <script>
+            const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+            const panos = [
+                {
+                    caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+                    minFov: 30,
+                    flipTopBottom: false,
+                    position: {
+                        yaw: 0,
+                        pitch: 0,
+                        zoom: 50,
+                    },
+                    config: {
+                        faceSize: 1500,
+                        nbTiles: 4,
+                        baseUrl: {
+                            left: baseUrl + 'cubemap/px.jpg',
+                            front: baseUrl + 'cubemap/nz.jpg',
+                            right: baseUrl + 'cubemap/nx.jpg',
+                            back: baseUrl + 'cubemap/pz.jpg',
+                            top: baseUrl + 'cubemap/py.jpg',
+                            bottom: baseUrl + 'cubemap/ny.jpg',
+                        },
+                        tileUrl: (face, col, row) => {
+                            if (face === 'front' && col === 2 && row === 2) {
+                                return 'error.jpg';
+                            }
+                            const num = row * 4 + col;
+                            return `${baseUrl}cubemap-tiles/${face}_${('00' + num).slice(-2)}.jpg`;
+                        },
+                    },
+                },
+                {
+                    caption: "Simon's Town <b>&copy;  Greg Zall (HDRI Haven)</b>",
+                    minFov: 10,
+                    flipTopBottom: true,
+                    position: {
+                        yaw: '52deg',
+                        pitch: 0,
+                        zoom: 70,
+                    },
+                    config: {
+                        faceSize: 4096,
+                        nbTiles: 8,
+                        baseUrl: {
+                            left: baseUrl + 'cubemap-tiles-24k/left_base.jpg',
+                            front: baseUrl + 'cubemap-tiles-24k/front_base.jpg',
+                            right: baseUrl + 'cubemap-tiles-24k/right_base.jpg',
+                            back: baseUrl + 'cubemap-tiles-24k/back_base.jpg',
+                            top: baseUrl + 'cubemap-tiles-24k/top_base.jpg',
+                            bottom: baseUrl + 'cubemap-tiles-24k/bottom_base.jpg',
+                        },
+                        tileUrl: (face, col, row) => {
+                            const num = row * 8 + col;
+                            return `${baseUrl}cubemap-tiles-24k/${face}_${('00' + num).slice(-2)}.jpg`;
+                        },
+                    },
+                },
+            ];
+
+            const viewer = new PhotoSphereViewer.Viewer({
+                container: 'photosphere',
+                adapter: [PhotoSphereViewer.CubemapTilesAdapter, {
+                    // flipTopBottom: true,
+                    showErrorTile: true,
+                    baseBlur: true,
+                }],
+                plugins: [PhotoSphereViewer.GyroscopePlugin],
+                loadingImg: baseUrl + 'loader.gif',
+                navbar: [
+                    'zoom',
+                    {
+                        id: 'custom',
+                        title: 'Change image',
+                        className: 'custom-button',
+                        content: '🔄',
+                        onClick: (() => {
+                            let i = 0;
+
+                            return () => {
+                                i = 1 - i;
+                                loadPanorama(panos[i]);
+                            };
+                        })(),
+                    },
+                    'caption',
+                    'gyroscope',
+                    'fullscreen',
+                ],
+            });
+
+            loadPanorama(panos[0]);
+
+            function loadPanorama(pano) {
+                viewer.adapter.config.flipTopBottom = pano.flipTopBottom; // this is internal API, subject to change
+
+                return viewer.setPanorama(pano.config, pano.position).then(() => {
+                    viewer.navbar.setCaption(pano.caption);
+                    viewer.setOption('minFov', pano.minFov);
+                });
+            }
+        </script>
+    </body>
+</html>

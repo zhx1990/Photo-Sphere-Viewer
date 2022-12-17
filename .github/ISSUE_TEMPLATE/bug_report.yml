@@ -1,0 +1,52 @@
+name: '🐞 Bug report'
+description: File a report to help us improve
+labels: ['bug']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        ## Thanks for taking the time to fill out this bug report
+
+        **Please use English or French**, I don't speak other languages.
+
+        Use [markdown codeblocks](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks) when posting code samples.
+
+        You can quickly create a demo by forking the [basic demo](https://photo-sphere-viewer.js.org/demos/basic/1-zero-config.html) to jsFiddle, Codepen or CodeSandbox.
+
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      placeholder: Provide a clear description of the bug, with tests cases and steps to reproduce.
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Online demo URL
+
+  - type: input
+    attributes:
+      label: Photo Sphere Viewer version
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: Plugins loaded
+
+  - type: input
+    attributes:
+      label: three.js version
+    validations:
+      required: true
+
+  - type: input
+    attributes:
+      label: OS & browser
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      placeholder: Add any other context about the problem here.

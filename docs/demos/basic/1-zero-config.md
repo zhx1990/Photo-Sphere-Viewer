@@ -1,6 +1,6 @@
 # Zero config
 
-Simple panorama with default options.
+Simple panorama with minimal options.
 
 ::: code-demo
 
@@ -12,9 +12,8 @@ title: PSV Basic Demo
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
 new PhotoSphereViewer.Viewer({
-  container: 'viewer',
-  panorama: baseUrl + 'sphere.jpg',
-  caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    container: 'viewer',
+    panorama: baseUrl + 'sphere.jpg',
 });
 ```
 

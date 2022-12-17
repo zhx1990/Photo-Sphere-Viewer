@@ -1,18 +1,13 @@
 {
-  "extends": [
-    "stylelint-config-standard-scss"
-  ],
-  "plugins": [
-    "stylelint-scss"
-  ],
+  "extends": ["stylelint-config-standard-scss"],
+  "plugins": ["stylelint-scss"],
   "rules": {
-    "max-empty-lines": 2,
-    "max-line-length": null,
+    "indentation": 4,
     "color-function-notation": "legacy",
     "alpha-value-notation": "number",
-    "number-leading-zero": "never",
     "scss/dollar-variable-empty-line-before": null,
     "string-quotes": "single",
-    "selector-class-pattern": null
+    "selector-class-pattern": null,
+    "declaration-colon-newline-after": null
   }
 }

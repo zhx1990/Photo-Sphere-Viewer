@@ -1,0 +1,429 @@
+import { Object3D, Texture } from 'three';
+import { AdapterConstructor } from './adapters/AbstractAdapter';
+import { ACTIONS } from './data/constants';
+import { PluginConstructor } from './plugins/AbstractPlugin';
+import { Viewer } from './Viewer';
+
+/**
+ * A wrapper around a Promise with an initial value before resolution
+ */
+export type InitialPromise<T> = { initial: T; promise: Promise<T> };
+
+/**
+ * Object defining a point
+ */
+export type Point = {
+    x: number;
+    y: number;
+};
+
+/**
+ * Object defining a size
+ */
+export type Size = {
+    width: number;
+    height: number;
+};
+
+/**
+ * Object defining a size in CSS
+ */
+export type CssSize = {
+    width: string;
+    height: string;
+};
+
+/**
+ * Object defining angular corrections to a sphere
+ */
+export type SphereCorrection = {
+    pan?: number;
+    tilt?: number;
+    roll?: number;
+};
+
+/**
+ * Object defining a spherical position (radians)
+ */
+export type Position = {
+    yaw: number;
+    pitch: number;
+};
+
+/**
+ * @deprecated
+ */
+export type PositionCompat = Position & {
+    /**
+     * @deprecated use `yaw`
+     */
+    longitude?: number;
+    /**
+     * @deprecated use `pitch`
+     */
+    latitude?: number;
+};
+
+/**
+ * Object defining a spherical position (radians or degrees)
+ */
+export type SphericalPosition = {
+    yaw: number | string;
+    pitch: number | string;
+};
+
+/**
+ * Object defining a position on the panorama image (pixels)
+ */
+export type PanoramaPosition = {
+    textureX: number;
+    textureY: number;
+};
+
+/**
+ * Object defining a spherical or panorama position
+ */
+export type ExtendedPosition = SphericalPosition | PanoramaPosition;
+
+/**
+ * Object defining options for {@link Viewer.animate}
+ */
+export type AnimateOptions = Partial<ExtendedPosition> & {
+    /**
+     * Animation speed or duration in milliseconds
+     */
+    speed: string | number;
+    /**
+     * New zoom level between 0 and 100
+     */
+    zoom?: number;
+};
+
+/**
+ * Crop information of an equirectangular panorama
+ */
+export type PanoData = {
+    fullWidth: number;
+    fullHeight: number;
+    croppedWidth: number;
+    croppedHeight: number;
+    croppedX: number;
+    croppedY: number;
+    poseHeading?: number;
+    posePitch?: number;
+    poseRoll?: number;
+};
+
+/**
+ * Function to compute panorama data once the image is loaded
+ */
+export type PanoDataProvider = (image: HTMLImageElement) => PanoData;
+
+/**
+ * Object defining options for {@link Viewer.setPanorama}
+ */
+export type PanoramaOptions = Partial<ExtendedPosition> & {
+    /**
+     * new navbar caption
+     */
+    caption?: string;
+    /**
+     * new ppanorama description
+     */
+    description?: string;
+    /**
+     * new zoom level between 0 and 100
+     */
+    zoom?: number;
+    /**
+     * duration of the transition between all and new panorama
+     * @default 1500
+     */
+    transition?: boolean | number;
+    /**
+     * show the loader while loading the new panorama
+     * @default true
+     */
+    showLoader?: boolean;
+    /**
+     * new sphere correction to apply to the panorama
+     */
+    sphereCorrection?: SphereCorrection;
+    /**
+     * new data used for this panorama
+     */
+    panoData?: PanoData | PanoDataProvider;
+    /**
+     * new overlay to apply to the panorama
+     */
+    overlay?: any;
+    /**
+     * new overlay opacity
+     */
+    overlayOpacity?: number;
+};
+
+/**
+ * Result of {@link AbstractAdapter.loadTexture}
+ */
+export type TextureData<T = Texture | Texture[] | Record<string, Texture>> = {
+    texture: T;
+    panoData?: PanoData;
+    panorama: any;
+};
+
+/**
+ * Data of {@link events.ClickEvent}
+ */
+export type ClickData = {
+    /**
+     * if it's a right click
+     */
+    rightclick: boolean;
+    /**
+     * position in the browser window
+     */
+    clientX: number;
+    /**
+     * position in the browser window
+     */
+    clientY: number;
+    /**
+     * position in the viewer
+     */
+    viewerX: number;
+    /**
+     * position in the viewer
+     */
+    viewerY: number;
+    /**
+     * position in spherical coordinates
+     */
+    yaw: number;
+    /**
+     * position in spherical coordinates
+     */
+    pitch: number;
+    /**
+     * position on the texture, if applicable
+     */
+    textureX?: number;
+    /**
+     * position on the texture, if applicable
+     */
+    textureY?: number;
+    /**
+     * Original element which received the click
+     */
+    target: HTMLElement;
+    /**
+     * List of THREE scenes objects under the mouse
+     */
+    objects: Object3D[];
+    /**
+     * clicked Marker
+     */
+    marker?: any;
+
+    /**
+     * @deprecated use `yaw`
+     */
+    longitude?: number;
+    /**
+     * @deprecated use `pitch`
+     */
+    latitude?: number;
+};
+
+/**
+ * Definition of a custom navbar button
+ */
+export type NavbarCustomButton = {
+    /**
+     * Unique identifier of the button, usefull when using the {@link Navbar.getButton} method
+     */
+    id?: string;
+    /**
+     * Tooltip displayed when the mouse is over the button
+     */
+    title?: string;
+    /**
+     * Content of the button. Preferably a square image or SVG icon
+     */
+    content: string;
+    /**
+     * CSS class added to the button
+     */
+    className?: string;
+    /**
+     * Function called when the button is clicked
+     */
+    onClick: (viewer: Viewer) => void;
+    /**
+     * initial state of the button
+     * @default false
+     */
+    disabled?: boolean;
+    /**
+     * initial visibility of the button
+     * @default true
+     */
+    visible?: boolean;
+    /**
+     * if the button can be moved to menu when the navbar is too small
+     * @default true
+     */
+    collapsable?: boolean;
+    /**
+     * if the button is accessible with the keyboard
+     * @default true
+     */
+    tabbable?: boolean;
+};
+
+/**
+ * Viewer configuration
+ * @link https://photo-sphere-viewer.js.org/guide/config.html
+ */
+export type ViewerConfig = {
+    container: HTMLElement | string;
+    panorama?: any;
+    overlay?: any;
+    /** @default 1 */
+    overlayOpacity?: number;
+    /** @default equirectangular */
+    adapter?: AdapterConstructor | [AdapterConstructor, any];
+    plugins?: Array<PluginConstructor | [PluginConstructor, any]>;
+    /** @default null */
+    caption?: string;
+    /** @default null */
+    description?: string;
+    /** @default null */
+    downloadUrl?: string;
+    /** @default null */
+    loadingImg?: string;
+    /** @default 'Loading...' */
+    loadingTxt?: string;
+    /** @default `container` size */
+    size?: CssSize;
+    /** @default false */
+    fisheye?: boolean | number;
+    /** @default 30 */
+    minFov?: number;
+    /** @default 90 */
+    maxFov?: number;
+    /** @default 50 */
+    defaultZoomLvl?: number;
+    /** @deprecated use `defaultYaw` */
+    defaultLong?: number;
+    /** @deprecated use `defaultPitch` */
+    defaultLat?: number;
+    /** @default 0 */
+    defaultYaw?: number | string;
+    /** @default 0 */
+    defaultPitch?: number | string;
+    /** @default `0,0,0` */
+    sphereCorrection?: SphereCorrection;
+    /** @default 1 */
+    moveSpeed?: number;
+    /** @default 1 */
+    zoomSpeed?: number;
+    /** @deprecated use the 'autorotate' plugin */
+    autorotateDelay?: number | null;
+    /** @deprecated use the 'autorotate' plugin */
+    autorotateIdle?: boolean;
+    /** @deprecated use the 'autorotate' plugin */
+    autorotateSpeed?: string | number;
+    /** @deprecated use the 'autorotate' plugin */
+    autorotateLat?: number;
+    /** @deprecated use the 'autorotate' plugin */
+    autorotateZoomLvl?: number;
+    /** @default true */
+    moveInertia?: boolean;
+    /** @default true */
+    mousewheel?: boolean;
+    /** @default true */
+    mousemove?: boolean;
+    /** @default false */
+    mousewheelCtrlKey?: boolean;
+    /** @default false */
+    touchmoveTwoFingers?: boolean;
+    /** @default true */
+    useXmpData?: boolean;
+    panoData?: PanoData | PanoDataProvider;
+    requestHeaders?: Record<string, string> | ((url: string) => Record<string, string>);
+    /** @default '#000' */
+    canvasBackground?: string;
+    /** @default false */
+    withCredentials?: boolean;
+    /** @default 'autorotate zoom move download description caption fullscreen' */
+    navbar?: boolean | string | Array<string | NavbarCustomButton>;
+    lang?: {
+        zoom: string;
+        zoomOut: string;
+        zoomIn: string;
+        moveUp: string;
+        moveDown: string;
+        moveLeft: string;
+        moveRight: string;
+        download: string;
+        fullscreen: string;
+        menu: string;
+        twoFingers: string;
+        ctrlZoom: string;
+        loadError: string;
+        [K: string]: string;
+    };
+    keyboard?: boolean | Record<string, ACTIONS>;
+};
+
+export type DeprecatedViewerConfig = 
+    | 'defaultLong' 
+    | 'defaultLat'
+    | 'autorotateDelay'
+    | 'autorotateIdle'
+    | 'autorotateSpeed'
+    | 'autorotateLat'
+    | 'autorotateZoomLvl';
+
+/**
+ * Viewer configuration after applying parsers
+ */
+export type ParsedViewerConfig = Omit<
+    ViewerConfig,
+    | 'adapter'
+    | 'plugins'
+    | 'defaultYaw'
+    | 'defaultPitch'
+    | 'fisheye'
+    | 'requestHeaders'
+    | 'navbar'
+    | 'keyboard'
+    | DeprecatedViewerConfig
+> & {
+    adapter?: [AdapterConstructor, any];
+    plugins?: Array<[PluginConstructor, any]>;
+    defaultYaw?: number;
+    defaultPitch?: number;
+    fisheye?: number;
+    requestHeaders?: (url: string) => Record<string, string>;
+    navbar?: Array<string | NavbarCustomButton>;
+    keyboard?: Record<string, ACTIONS>;
+};
+
+/**
+ * Readonly viewer configuration
+ */
+export type ReadonlyViewerConfig =
+    | 'panorama'
+    | 'panoData'
+    | 'overlay'
+    | 'overlayOpacity'
+    | 'container'
+    | 'adapter'
+    | 'plugins';
+
+/**
+ * Updatable viewer configuration
+ */
+export type UpdatableViewerConfig = Omit<ViewerConfig, ReadonlyViewerConfig | DeprecatedViewerConfig>;

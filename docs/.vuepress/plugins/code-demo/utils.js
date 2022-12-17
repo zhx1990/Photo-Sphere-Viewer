@@ -1,13 +1,24 @@
-// import { getParameters } from 'codesandbox/lib/api/define';
+import { getParameters } from 'codesandbox-import-utils/lib/api/define';
 
-const BASE_URL = 'https://cdn.jsdelivr.net/npm/photo-sphere-viewer@4/dist/';
+const ORG = '@photo-sphere-viewer/';
+const CDN_BASE = 'https://cdn.jsdelivr.net/npm/';
+const VERSION = 'alpha';
+const THREE_PATH = CDN_BASE + 'three/build/three.min.js';
+
+function fullname(name) {
+    return ORG + name;
+}
+
+function buildPath(name, type) {
+    return CDN_BASE + name + '@' + VERSION + '/index.' + type;
+}
 
 export function getFullJs(js) {
-  return js;
+    return js;
 }
 
 export function getFullCss(css) {
-  return `
+    return `
 html, body, #viewer {
   margin: 0;
   width: 100vw;
@@ -15,34 +26,40 @@ html, body, #viewer {
   font-family: sans-serif;
 }
 
-${css}
-`;
+${css}`.trim();
 }
 
 export function getFullHtml(html) {
-  return `
+    return `
 <div id="viewer"></div>
 
-${html}
-`;
+${html}`.trim();
 }
 
-export function getFullResources(resources) {
-  return [
-    { path: 'https://cdn.jsdelivr.net/npm/uevent@2/browser.js', type: 'js' },
-    { path: 'https://cdn.jsdelivr.net/npm/three/build/three.min.js', type: 'js' },
-    { path: BASE_URL + 'photo-sphere-viewer.js', type: 'js', imports: ['Viewer'] },
-    { path: BASE_URL + 'photo-sphere-viewer.css', type: 'css' },
-    ...resources.map(({ path, imports }) => ({
-      path   : BASE_URL + path,
-      imports: imports?.split(' '),
-      type   : path.match(/\.js$/) ? 'js' : 'css',
-    })),
-  ];
+export function getFullPackages(packages) {
+    return [
+        {
+            name: fullname('core'),
+            imports: 'Viewer',
+            style: true,
+        },
+        ...packages.map((pkg) => ({
+            ...pkg,
+            name: fullname(pkg.name),
+        })),
+    ];
 }
 
-export function getIframeContent({ title, html, js, css, resources }) {
-  return `
+export function getAllResources(packages) {
+    return [
+        THREE_PATH,
+        ...packages.map(({ name }) => buildPath(name, 'js')),
+        ...packages.filter(({ style }) => style).map(({ name }) => buildPath(name, 'css')),
+    ];
+}
+
+export function getIframeContent({ title, html, js, css, packages }) {
+    return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,70 +68,104 @@ export function getIframeContent({ title, html, js, css, resources }) {
 
   <title>${title}</title>
 
-${resources
-  .map(({ path, type }) => {
-    if (type === 'js') {
-      return `<script src="${path}"><\/script>`;
-    } else {
-      return `<link rel="stylesheet" href="${path}">`;
-    }
-  })
-  .join('\n')
-}
+${getAllResources(packages)
+    .map((path) => {
+        if (path.endsWith('.js')) {
+            return `<script src="${path}"><\/script>`;
+        } else {
+            return `<link rel="stylesheet" href="${path}">`;
+        }
+    })
+    .join('\n')}
 
   <style>
-  ${css}
+    ${css}
   </style>
 </head>
 
 <body>
-${html}
+  ${html}
 
-<script>
-${js}
-</script>
+  <script>
+  ${js}
+  </script>
 </body>
-
-</html>
-`;
+</html>`;
 }
 
-export function getJsFiddleResources(resources) {
-  return resources.map(({ path }) => path);
+export function getCodePenValue({ title, js, css, html, packages }) {
+    const resources = getAllResources(packages);
+
+    return JSON.stringify({
+        title: title,
+        js: js,
+        css: css,
+        html: html,
+        js_external: resources.filter((path) => path.endsWith('.js')),
+        css_external: resources.filter((path) => path.endsWith('.css')),
+    });
 }
 
-export function getCodePenValue({ title, js, css, html, resources }) {
-  return JSON.stringify({
-    title       : title,
-    js          : js,
-    css         : css,
-    html        : html,
-    js_external : resources.filter(({ type }) => type === 'js').map(({ path }) => path),
-    css_external: resources.filter(({ type }) => type === 'css').map(({ path }) => path),
-  });
-}
+export function getCodeSandboxValue({ title, js, css, html, packages }) {
+    return getParameters({
+        files: {
+            'package.json': {
+                content: {
+                    description: title,
+                    main: 'index.html',
+                    scripts: {
+                        start: 'parcel index.html --open',
+                        build: 'parcel build index.html',
+                    },
+                    dependencies: packages.reduce((deps, { name }) => {
+                        deps[name] = VERSION;
+                        return deps;
+                    }, {}),
+                    devDependencies: {
+                        'parcel-bundler': '^2.8.0',
+                        'typescript': '^4.8',
+                    },
+                },
+            },
+            'index.html': {
+                isBinary: false,
+                content: `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-// FIXME : proper config
-// export function getCodeSandboxValue({ title, js, css, html, resources }) {
-//   return getParameters({
-//     files: {
-//       'index.html'  : {
-//         isBinary: false,
-//         content : getIframeContent({ title, js, css, html, resources }),
-//       },
-//       'package.json': {
-//         content : {
-//           "description": title,
-//           "main": "index.html",
-//           "scripts": {
-//             "start": "parcel index.html --open",
-//             "build": "parcel build index.html"
-//           },
-//           "devDependencies": {
-//             "parcel-bundler": "^2.7"
-//           }
-//         },
-//       },
-//     },
-//   });
-// }
+  <title>${title}</title>
+</head>
+
+<body>
+    ${html}
+
+    <script src="src/index.ts"></script>
+</body>
+</html>`,
+            },
+            'src/index.ts': {
+                isBinary: false,
+                content: `
+import './styles.css';
+${packages
+    .filter(({ imports }) => imports)
+    .map(({ name, imports }) => `import { ${imports} } from '${name}';`)
+    .join('\n')}
+
+${js.replace(/PhotoSphereViewer\./g, '')}`.trim(),
+            },
+            'src/styles.css': {
+                isBinary: false,
+                content: `
+${packages
+    .filter(({ style }) => style)
+    .map(({ name }) => `@import '../node_modules/${name}/index.css';`)
+    .join('\n')}
+
+${css}`.trim(),
+            },
+        },
+    });
+}

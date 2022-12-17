@@ -1,0 +1,39 @@
+name: build
+
+on:
+  push:
+    branches:
+      - '*'
+    paths-ignore:
+      - 'docs/**'
+      - 'examples/**'
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '16'
+          cache: 'yarn'
+
+      - name: turbo cache
+        uses: actions/cache@v3
+        if: github.ref_name == 'main'
+        with:
+          path: .turbo
+          key: turbo-${{ github.sha }}
+          restore-keys: |
+            turbo-
+
+      - name: build
+        run: |
+          yarn install
+          yarn ci:build

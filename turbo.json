@@ -1,0 +1,34 @@
+{
+  "$schema": "https://turborepo.org/schema.json",
+  "globalDependencies": [
+    "build/**",
+    "tsconfig.json",
+    ".eslintrc.json",
+    ".stylelintrc.json"
+  ],
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["src/**"],
+      "outputs": ["dist/**"]
+    },
+    "lint": {
+      "inputs": ["src/**"],
+      "outputs": []
+    },
+    "test": {
+      "inputs": ["src/**"],
+      "outputs": []
+    },
+    "watch": {
+      "cache": false
+    },
+    "//#watch": {
+      "cache": false
+    },
+    "publish-dist": {
+      "dependsOn": ["^publish-dist"],
+      "cache": false
+    }
+  }
+}

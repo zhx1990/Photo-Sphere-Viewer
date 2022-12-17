@@ -4,26 +4,23 @@
 
 ## Presentation
 
-Many methods are available to control the viewer from your application. The full list of methods is available on the <ApiLink page="PSV.Viewer.html"/>.
+Many methods are available to control the viewer from your application. The full list of methods is available in the <ApiLink page="classes/Core.Viewer.html"/>.
 
 ::: tip Modular architecture
 Photo Sphere Viewer is internally splitted in multiple components, this has an impact on where are located each method. For example, the methods to control the navbar are in the `navbar` object.
 
-The important components are :
-  - `navbar`
-  - `hud`
-  - `panel`
+Read more about [reusable components](./components/).
 :::
 
 It is good practice to wait for the `ready` event before calling any method.
 
 ```js
-viewer.once('ready', () => {
+viewer.addEventListener('ready', () => {
   viewer.rotate({
-    x: 1500,
-    y: 1000
+    textureX: 1500,
+    textureY: 1000
   });
-});
+}, { once: true });
 ```
 
 ## Main methods
@@ -32,12 +29,12 @@ This section describes the most useful methods available.
 
 ### `animate(options): Animation`
 
-Rotate and zoom the view with a smooth animation. You can change the position (`longitude`, `latitude` or `x`, `y`) and the zoom level (`zoom`). The `speed` option is either a duration in milliseconds or a string containing the speed in revolutions per minute (`2rpm`). It returns a `PSV.Animation` which is a standard Promise with an additional `cancel` method.
+Rotate and zoom the view with a smooth animation. You can change the position (`yaw`, `pitch` or `textureX`, `textureY`) and the zoom level (`zoom`). The `speed` option is either a duration in milliseconds or a string containing the speed in revolutions per minute (`2rpm`). It returns a `Animation` object which is a standard Promise with an additional `cancel` method.
 
 ```js
 viewer.animate({
-  longitude: Math.PI / 2,
-  latitude: '20deg',
+  yaw: Math.PI / 2,
+  pitch: '20deg',
   zoom: 50,
   speed: '2rpm',
 })
@@ -61,16 +58,16 @@ Return the current zoom level between 0 and 100.
 Immediately rotate the view without animation.
 
 ```js
-// you can also use longitude and latitude
+// you can also use yaw and pitch
 viewer.rotate({
-  x: 1500,
-  y: 600,
+    textureX: 1500,
+    textureY: 600,
 });
 ```
 
 ### `setOption(option, value)`
 
-Update an option of the viewer. Some options cannot be changed : `panorama`, `panoData`, `container`, `adapter` and `plugins`.
+Update an option of the viewer. Some options cannot be changed : `panorama`, `panoData`, `container`, `overlay`, `overlayOpacity`, `adapter` and `plugins`.
 
 ```js
 viewer.setOption('fisheye', true);
@@ -82,14 +79,13 @@ Update multiple options at once.
 
 ```js
 viewer.setOptions({
-  fisheye: true,
-  autorotateSpeed: '-1rpm',
+    fisheye: true,
 });
 ```
 
 ### `setPanorama(panorama[, options]): Promise`
 
-Change the panorama image with an optional transition animation (enabled by default). See all options on the <ApiLink page="PSV.html#.PanoramaOptions"/>.
+Change the panorama image with an optional transition animation (enabled by default). See all options in the <ApiLink page="types/Core.PanoramaOptions.html"/>.
 
 ```js
 viewer.setPanorama('image.jpg')

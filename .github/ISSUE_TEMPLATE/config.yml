@@ -1,0 +1,5 @@
+blank_issues_enabled: false
+contact_links:
+  - name: '💬 Share something'
+    url: https://github.com/mistic100/Photo-Sphere-Viewer/discussions/new
+    about: General discussion outside bugs, features and support

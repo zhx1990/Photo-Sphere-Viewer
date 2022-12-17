@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PhotoSphereViewer - equirectangular video demo</title>
+
+        <link rel="stylesheet" href="/dist/core/index.css" />
+        <link rel="stylesheet" href="/dist/markers-plugin/index.css" />
+        <link rel="stylesheet" href="/dist/settings-plugin/index.css" />
+        <link rel="stylesheet" href="/dist/video-plugin/index.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="photosphere"></div>
+
+        <script src="/node_modules/three/build/three.js"></script>
+        <script src="/dist/core/index.js"></script>
+        <script src="/dist/equirectangular-video-adapter/index.js"></script>
+        <script src="/dist/autorotate-plugin/index.js"></script>
+        <script src="/dist/markers-plugin/index.js"></script>
+        <script src="/dist/settings-plugin/index.js"></script>
+        <script src="/dist/resolution-plugin/index.js"></script>
+        <script src="/dist/video-plugin/index.js"></script>
+
+        <script>
+            const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+            const viewer = new PhotoSphereViewer.Viewer({
+                container: 'photosphere',
+                adapter: [PhotoSphereViewer.EquirectangularVideoAdapter, {
+                    autoplay: false,
+                    muted: true,
+                }],
+                caption: 'Ayutthaya <b>&copy; meetle</b>',
+                plugins: [
+                    [PhotoSphereViewer.VideoPlugin, {
+                        progressbar: true,
+                        bigbutton: true,
+                        keypoints: [
+                                { time: 0, position: { yaw: 0, pitch: 0 } },
+                                { time: 5, position: { yaw: -Math.PI / 4, pitch: Math.PI / 8 } },
+                                { time: 10, position: { yaw: -Math.PI / 2, pitch: 0 } },
+                                { time: 15, position: { yaw: (-3 * Math.PI) / 4, pitch: -Math.PI / 8 } },
+                                { time: 20, position: { yaw: -Math.PI, pitch: 0 } },
+                                { time: 25, position: { yaw: (-5 * Math.PI) / 4, pitch: Math.PI / 8 } },
+                            { time: 30, position: { yaw: (-3 * Math.PI) / 2, pitch: 0 } },
+                            { time: 35, position: { yaw: (-7 * Math.PI) / 4, pitch: -Math.PI / 8 } },
+                        ],
+                    }],
+                    PhotoSphereViewer.AutorotatePlugin,
+                    PhotoSphereViewer.MarkersPlugin,
+                    PhotoSphereViewer.SettingsPlugin,
+                    [PhotoSphereViewer.ResolutionPlugin, {
+                        defaultResolution: 'FHD',
+                        resolutions: [
+                            {
+                                    id: 'UHD',
+                                    label: 'Ultra high',
+                                    panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_UHD.mp4' },
+                                },
+                                {
+                                    id: 'FHD',
+                                    label: 'High',
+                                    panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_FHD.mp4' },
+                                },
+                                {
+                                    id: 'HD',
+                                    label: 'Standard',
+                                    panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_HD.mp4' },
+                                },
+                                {
+                                    id: 'SD',
+                                    label: 'Low',
+                                panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_SD.mp4' },
+                            },
+                        ],
+                    }],
+                ],
+                loadingImg: baseUrl + 'loader.gif',
+                navbar: 'autorotate video zoom move caption settings fullscreen',
+            });
+        </script>
+    </body>
+</html>

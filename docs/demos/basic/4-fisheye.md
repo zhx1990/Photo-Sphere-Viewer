@@ -12,12 +12,12 @@ title: PSV Fisheye Demo
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
 new PhotoSphereViewer.Viewer({
-  container: 'viewer',
-  panorama: baseUrl + 'sphere.jpg',
-  caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
-  defaultLat: 0.6,
-  defaultZoomLvl: 20,
-  fisheye: true,
+    container: 'viewer',
+    panorama: baseUrl + 'sphere.jpg',
+    caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    defaultPitch: 0.6,
+    defaultZoomLvl: 20,
+    fisheye: true,
 });
 ```
 

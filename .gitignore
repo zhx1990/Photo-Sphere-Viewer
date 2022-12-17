@@ -1,9 +1,5 @@
 node_modules
-/.idea
-/*.iml
-/dist
-/public
-package-lock.json
-yarn.lock
 yarn-error.log
-/.netlify
+.turbo
+dist
+/public

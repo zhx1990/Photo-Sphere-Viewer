@@ -1,0 +1,26 @@
+{
+  "name": "@photo-sphere-viewer/stereo-plugin",
+  "version": "0.0.0",
+  "description": "Photo sphere Viewer plugin to add a stereo view on mobile devices.",
+  "homepage": "https://photo-sphere-viewer.js.org/plugins/stereo",
+  "license": "MIT",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@photo-sphere-viewer/core": "0.0.0",
+    "@photo-sphere-viewer/gyroscope-plugin": "0.0.0"
+  },
+  "scripts": {
+    "build": "tsup",
+    "watch": "tsup --watch",
+    "lint": "eslint . --fix",
+    "publish-dist": "cd dist && npm publish --tag=$NPM_TAG --access=public"
+  },
+  "psv": {
+    "globalName": "PhotoSphereViewer.StereoPlugin"
+  },
+  "typedoc": {
+    "displayName": "plugin: Stereo",
+    "readmeFile": "./.typedoc/README.md"
+  }
+}

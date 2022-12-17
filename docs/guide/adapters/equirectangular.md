@@ -1,6 +1,8 @@
 # Equirectangular
 
-> [Equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection) is one of the simplest way to create the texture of a sphere. It is the default projection used by most 360° cameras.
+::: module
+[Equirectangular projection](https://en.wikipedia.org/wiki/Equirectangular_projection) is one of the simplest way to create the texture of a sphere. It is the default projection used by most 360° cameras.
+:::
 
 ::: tip
 There is no need to declare the equirectangular adapter as it is the default one, unless you want to change its configuration.
@@ -8,56 +10,57 @@ There is no need to declare the equirectangular adapter as it is the default one
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
-  adapter: [PhotoSphereViewer.EquirectangularAdapter, {
-    resolution: 64, // default
-  }],
-  panorama: 'path/panorama.jpg',
+    adapter: [PhotoSphereViewer.EquirectangularAdapter, {
+        resolution: 64, // default
+    }],
+    panorama: 'path/panorama.jpg',
 });
 ```
-
 
 ## Configuration
 
 #### `resolution`
-- type: `number`
-- default: `64`
 
-The number of faces of the sphere geometry used to display the panorama, higher values can reduce deformations on straight lines at the cost of performances. 
+-   type: `number`
+-   default: `64`
+
+The number of faces of the sphere geometry used to display the panorama, higher values can reduce deformations on straight lines at the cost of performances.
 
 _Note: the actual number of faces is `resolution² / 2`._
-
 
 ## Cropped panorama
 
 **Photo Sphere Viewer** supports cropped panorama given the appropriate configuration is provided. Cropped panoramas are not covering the whole 360°×180° sphere area but only a smaller portion. For example you might have a image covering 360° horizontally but only 90° vertically, or a semi sphere (180°×180°)
 
 These incomplete panoramas are handled in two ways by Photo Sphere viewer:
-  - Read XMP metadata directly from the file with `useXmpData` option (this is the default)
-  - Provide the `panoData` configuration object/function
+
+-   Read XMP metadata directly from the file with `useXmpData` option (this is the default)
+-   Provide the `panoData` configuration object/function
 
 Use the [Playground](#playground) at the bottom of this page to find the best values for your panorama.
 
 ### Theory
 
 In both case the data contains six important values:
-  - Full panorama width
-  - Full panorama height
-  - Cropped area width
-  - Cropped area height
-  - Cropped area left
-  - Cropped area right
+
+-   Full panorama width
+-   Full panorama height
+-   Cropped area width
+-   Cropped area height
+-   Cropped area left
+-   Cropped area right
 
 The `Full panorama width` / `Full panorama height` ratio must always be 2:1. `Cropped area width` and `Cropped area height` are the actual size of your image. `Cropped area left` and `Cropped area right` are used to define the cropped area position.
 
 The data can also contains angular values:
-  - Pose Heading
-  - Pose Pitch
-  - Pose Roll
+
+-   Pose Heading
+-   Pose Pitch
+-   Pose Roll
 
 ![XMP_pano_pixels](../../images/XMP_pano_pixels.png)
 
 More information on [Google documentation](https://developers.google.com/streetview/spherical-metadata).
-
 
 ### Provide cropping data
 
@@ -100,22 +103,21 @@ You can also directly pass the values to Photo Sphere Viewer with the `panoData`
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
-  container: 'viewer',
-  panorama: 'path/to/panorama.jpg',
-  panoData: {
-    fullWidth: 6000,
-    fullHeight: 3000,
-    croppedWidth: 4000,
-    croppedHeight: 2000,
-    croppedX: 1000,
-    croppedY: 500,
-    poseHeading: 0, // 0 to 360
-    posePitch: 0, // -90 to 90
-    poseRoll: 0, // -180 to 180
-  }
+    container: 'viewer',
+    panorama: 'path/to/panorama.jpg',
+    panoData: {
+        fullWidth: 6000,
+        fullHeight: 3000,
+        croppedWidth: 4000,
+        croppedHeight: 2000,
+        croppedX: 1000,
+        croppedY: 500,
+        poseHeading: 0, // 0 to 360
+        posePitch: 0, // -90 to 90
+        poseRoll: 0, // -180 to 180
+    },
 });
 ```
-
 
 ### Playground
 

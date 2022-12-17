@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PhotoSphereViewer - visible range demo</title>
+
+        <link rel="stylesheet" href="/dist/core/index.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="photosphere"></div>
+
+        <script src="/node_modules/three/build/three.js"></script>
+        <script src="/dist/core/index.js"></script>
+        <script src="/dist/autorotate-plugin/index.js"></script>
+        <script src="/dist/visible-range-plugin/index.js"></script>
+
+        <script>
+            const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+            const viewer = new PhotoSphereViewer.Viewer({
+                container: 'photosphere',
+                panorama: baseUrl + 'sphere-cropped.jpg', // this file has XMP data
+                caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+                loadingImg: baseUrl + 'loader.gif',
+                defaultZoomLvl: 30,
+                navbar: [
+                    'autorotate',
+                    {
+                        content: 'Clear range',
+                        className: 'custom-button',
+                        onClick: () => {
+                            visibleRange.setHorizontalRange(null);
+                            visibleRange.setVerticalRange(null);
+                        },
+                    },
+                    {
+                        content: 'Set custom range',
+                        className: 'custom-button',
+                        onClick: () => {
+                            visibleRange.setHorizontalRange([-Math.PI / 2, Math.PI / 2]);
+                            visibleRange.setVerticalRange([-Math.PI / 3, Math.PI / 3]);
+                        },
+                    },
+                    {
+                        content: 'Set range from panoData',
+                        className: 'custom-button',
+                        onClick: () => {
+                            visibleRange.setRangesFromPanoData();
+                        },
+                    },
+                    'caption',
+                    'fullscreen',
+                ],
+                plugins: [
+                    PhotoSphereViewer.AutorotatePlugin,
+                    [PhotoSphereViewer.VisibleRangePlugin, {
+                        usePanoData: true,
+                    }],
+                ],
+            });
+
+            const visibleRange = viewer.getPlugin(PhotoSphereViewer.VisibleRangePlugin);
+        </script>
+    </body>
+</html>
