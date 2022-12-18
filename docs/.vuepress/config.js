@@ -30,8 +30,8 @@ module.exports = {
     head: [
         ['link', { rel: 'icon', href: '/favicon.png' }],
         ['script', { src: 'https://cdn.jsdelivr.net/npm/three/build/three.min.js', defer: 'defer' }],
-        ['script', { src: 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@alpha/index.js', defer: 'defer' }],
-        ['link', { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@alpha/index.css' }],
+        ['script', { src: 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.js', defer: 'defer' }],
+        ['link', { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.css' }],
     ],
     themeConfig: {
         logo: '/favicon.png',

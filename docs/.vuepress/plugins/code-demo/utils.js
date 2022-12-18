@@ -2,7 +2,7 @@ import { getParameters } from 'codesandbox-import-utils/lib/api/define';
 
 const ORG = '@photo-sphere-viewer/';
 const CDN_BASE = 'https://cdn.jsdelivr.net/npm/';
-const VERSION = 'alpha';
+const VERSION = '5';
 const THREE_PATH = CDN_BASE + 'three/build/three.min.js';
 
 function fullname(name) {

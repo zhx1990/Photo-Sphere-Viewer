@@ -716,12 +716,12 @@ export default {
 
     mounted() {
         const markersJs = document.createElement('script');
-        markersJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@alpha/index.js');
+        markersJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5/index.js');
         document.head.appendChild(markersJs);
 
         const markersCss = document.createElement('link');
         markersCss.setAttribute('rel', 'stylesheet');
-        markersCss.setAttribute('href', 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@alpha/index.css');
+        markersCss.setAttribute('href', 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5/index.css');
         document.head.appendChild(markersCss);
 
         this.oldOptions = cloneDeep(this.options);
