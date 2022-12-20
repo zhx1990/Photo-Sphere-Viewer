@@ -119,7 +119,7 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
         if (!adapter[0]) {
             throw new PSVError('An undefined value was given for adapter.');
         }
-        if (!adapter[0].id) {
+        if (!(adapter[0] as any).id) {
             throw new PSVError(`Adapter has no id.`);
         }
         return adapter;
@@ -215,7 +215,7 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
             if (!plugin[0]) {
                 throw new PSVError(`An undefined value was given for plugin ${i}.`);
             }
-            if (!plugin[0].id) {
+            if (!(plugin[0] as any).id) {
                 throw new PSVError(`Plugin ${i} has no id.`);
             }
             return plugin;

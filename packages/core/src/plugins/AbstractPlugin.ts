@@ -30,13 +30,13 @@ export abstract class AbstractPlugin<
     destroy() {}
 }
 
-export type PluginConstructor = (new (viewer: Viewer, config?: any) => AbstractPlugin<any>) & typeof AbstractPlugin;
+export type PluginConstructor = (new (viewer: Viewer, config?: any) => AbstractPlugin<any>);
 
 /**
  * Returns the plugin constructor from the imported object
  * @internal
  */
-export function pluginInterop(plugin: any): PluginConstructor {
+export function pluginInterop(plugin: any): PluginConstructor & typeof AbstractPlugin {
     if (plugin) {
         for (const [, p] of [['_', plugin], ...Object.entries(plugin)]) {
             if (p.prototype instanceof AbstractPlugin) {

@@ -143,13 +143,13 @@ void main() {
 }
 
 // prettier-ignore
-export type AdapterConstructor = (new (viewer: Viewer, config?: any) => AbstractAdapter<any, any>) & typeof AbstractAdapter;
+export type AdapterConstructor = (new (viewer: Viewer, config?: any) => AbstractAdapter<any, any>);
 
 /**
  * Returns the adapter constructor from the imported object
  * @internal
  */
-export function adapterInterop(adapter: any): AdapterConstructor {
+export function adapterInterop(adapter: any): AdapterConstructor & typeof AbstractAdapter {
     if (adapter) {
         for (const [, p] of [['_', adapter], ...Object.entries(adapter)]) {
             if (p.prototype instanceof AbstractAdapter) {
