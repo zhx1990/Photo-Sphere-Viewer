@@ -101,3 +101,32 @@ viewer.removeEventListener('position-updated', handler);
 :::
 
 ::::
+
+## TypeScript
+
+### Renamed types
+
+-   `ViewerOptions` → `ViewerConfig`
+-   `ViewerProps` → `ViewerState`
+-   `EquirectangularAdapterOptions` → `EquirectangularAdapterConfig`
+-   `EquirectangularTilesAdapterOptions` → `EquirectangularTilesAdapterConfig`
+-   `EquirectangularVideoAdapterOptions` → `EquirectangularVideoAdapterConfig`
+-   `CubemapAdapterOptions` → `CubemapAdapterConfig`
+-   `CubemapTilesAdapterOptions` → `CubemapTilesAdapterConfig`
+-   `CubemapVideoAdapterOptions` → `CubemapVideoAdapterConfig`
+-   `AutorotateKeypointsPluginOptions` → `AutorotatePluginConfig`
+-   `CompassPluginOptions` → `CompassPluginConfig`
+-   `GalleryPluginOptions` → `GalleryPluginConfig`
+-   `GyroscopePluginOptions` → `GyroscopePluginConfig`
+-   `MarkersPluginOptions` → `MarkersPluginConfig`
+-   `MarkerProperties` → `MarkerConfig`
+-   `ResolutionPluginOptions` → `ResolutionPluginConfig`
+-   `SettingsPluginOptions` → `SettingsPluginConfig`
+-   `VideoPluginOptions` → `VideoPluginConfig`
+-   `AutorotateKeypoint` (video plugin) → `VideoKeypoint`
+-   `VisibleRangePluginOptions` → `VisibleRangePluginConfig`
+
+### Deleted types
+
+-   `TooltipRenderer`
+-   `CubemapArray`
