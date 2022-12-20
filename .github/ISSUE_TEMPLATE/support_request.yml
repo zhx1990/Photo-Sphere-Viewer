@@ -24,9 +24,18 @@ body:
     attributes:
       label: Online demo URL
 
-  - type: input
+  - type: dropdown
     attributes:
       label: Photo Sphere Viewer version
+      options:
+        - '5.0.0'
+        - '4.8.1'
+        - '4.8.0'
+        - '4.7.3'
+        - '4.7.2'
+        - '4.7.1'
+        - '4.7.0'
+        - other
     validations:
       required: true
 
