@@ -49,7 +49,7 @@ export function getShortestArc(from: number, to: number): number {
 export function getAngle(position1: Position, position2: Position): number {
     // prettier-ignore
     return Math.acos(
-        Math.cos(position1.yaw)
+        Math.cos(position1.pitch)
         * Math.cos(position2.pitch) 
         * Math.cos(position1.yaw - position2.yaw) 
         + Math.sin(position1.pitch) 
