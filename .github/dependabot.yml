@@ -10,6 +10,5 @@ updates:
       - dependency-name: '*'
         update-types: ['version-update:semver-patch']
     commit-message:
-      prefix: 'deps'
-      prefix-development: 'deps-dev'
+      prefix: 'chore'
       include: 'scope'

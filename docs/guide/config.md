@@ -34,7 +34,7 @@ Path to the panorama. Must be a single URL for the default equirectangular adapt
 
 -   default: `equirectangular`
 
-Which [adapter](./adapters) used to load the panorama.
+Which [adapter](./adapters/) used to load the panorama.
 
 #### `plugins`
 

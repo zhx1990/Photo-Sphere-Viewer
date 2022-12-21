@@ -50,3 +50,21 @@ jobs:
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           NPM_TAG: ${{ steps.npm_tag.outputs.NPM_TAG || 'latest' }}
+
+      - uses: Akkjon/close-milestone@v2.0.2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          milestone_name: ${{ github.ref_name }}
+          crash_on_missing: false
+
+      - name: update issue templates
+        run: |
+          git fetch origin main --depth 1
+          git checkout main
+          node ./build/update-issue-templates.mjs ${{ github.ref_name }}
+          git stage .github/ISSUE_TEMPLATE
+          git config --global user.email "noreply@github.com"
+          git config --global user.name "github-actions"
+          git commit -m "chore: add ${{ github.ref_name }} to issue templates"
+          git push
