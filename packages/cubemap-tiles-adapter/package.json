@@ -8,8 +8,7 @@
   "types": "./src/index.ts",
   "dependencies": {
     "@photo-sphere-viewer/core": "0.0.0",
-    "@photo-sphere-viewer/cubemap-adapter": "0.0.0",
-    "@photo-sphere-viewer/shared": "0.0.0"
+    "@photo-sphere-viewer/cubemap-adapter": "0.0.0"
   },
   "scripts": {
     "build": "tsup",

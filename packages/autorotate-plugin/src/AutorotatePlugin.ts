@@ -5,7 +5,7 @@ import type { VideoPlugin } from '@photo-sphere-viewer/video-plugin';
 import { MathUtils, SplineCurve, Vector2 } from 'three';
 import { AutorotateEvent, AutorotatePluginEvents } from './events';
 import { AutorotateKeypoint, AutorotatePluginConfig } from './model';
-// import { debugCurve } from '@photo-sphere-viewer/shared';
+// import { debugCurve } from '../../shared/autorotate-utils';
 
 type ParsedAutorotatePluginConfig = Omit<
     AutorotatePluginConfig,

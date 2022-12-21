@@ -1,7 +1,7 @@
 import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { CONSTANTS, PSVError, utils } from '@photo-sphere-viewer/core';
-import { AbstractVideoAdapter } from '@photo-sphere-viewer/shared';
 import { MathUtils, Mesh, MeshBasicMaterial, SphereGeometry, VideoTexture } from 'three';
+import { AbstractVideoAdapter } from '../../shared/AbstractVideoAdapter';
 import { EquirectangularVideoAdapterConfig, EquirectangularVideoPanorama } from './model';
 
 type EquirectangularMesh = Mesh<SphereGeometry, MeshBasicMaterial>;

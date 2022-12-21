@@ -18,7 +18,7 @@ const externals = {
     '@photo-sphere-viewer/settings-plugin': 'PhotoSphereViewer.SettingsPlugin',
 };
 
-export default function createConfig(pkg) {
+export default function createConfig(pkg, entry = 'src/index.ts') {
     const banner = `/*!
  * ${pkg.psv.globalName} ${pkg.version}
 ${
@@ -30,7 +30,7 @@ ${
     return defineConfig((options) => {
         const dev = options.watch || options.define?.['config'] === 'dev';
         return {
-            entryPoints: ['src/index.ts'],
+            entryPoints: [entry],
             outDir: 'dist',
             format: dev ? ['iife'] : ['iife', 'esm'],
             globalName: pkg.psv.globalName,

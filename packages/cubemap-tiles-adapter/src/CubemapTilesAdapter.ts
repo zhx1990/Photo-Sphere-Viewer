@@ -1,7 +1,6 @@
 import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import { CubemapAdapter } from '@photo-sphere-viewer/cubemap-adapter';
-import { buildErrorMaterial, Queue, Task } from '@photo-sphere-viewer/shared';
 import {
     BoxGeometry,
     Frustum,
@@ -14,6 +13,8 @@ import {
     Vector2,
     Vector3,
 } from 'three';
+import { Queue, Task } from '../../shared/Queue';
+import { buildErrorMaterial } from '../../shared/tiles-utils';
 import { CubemapTilesAdapterConfig, CubemapTilesPanorama } from './model';
 
 type CubemapMesh = Mesh<BoxGeometry, MeshBasicMaterial[]>;

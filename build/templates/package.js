@@ -35,7 +35,6 @@ export const packageJson = (pkg) =>
             ];
         }
 
-        delete content.dependencies['@photo-sphere-viewer/shared'];
         delete content.devDependencies;
         delete content.psv;
         delete content.scripts;

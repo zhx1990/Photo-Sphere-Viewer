@@ -1,4 +1,4 @@
-import type { AbstractVideoAdapterConfig, AbstractVideoPanorama } from '@photo-sphere-viewer/shared';
+import type { AbstractVideoAdapterConfig, AbstractVideoPanorama } from '../../shared/AbstractVideoAdapter';
 
 /**
  * Configuration of a cubemap video

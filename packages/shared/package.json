@@ -9,14 +9,10 @@
   },
   "scripts": {
     "build:dev": "tsup --define.config dev",
-    "lint": "eslint . --fix && stylelint \"src/**/*.scss\" --fix",
-    "test": "mocha -r ts-node/register \"src/**/*.spec.ts\""
+    "lint": "eslint . --fix && stylelint \"*.scss\" --fix",
+    "test": "mocha -r ts-node/register \"*.spec.ts\""
   },
   "psv": {
     "globalName": "PhotoSphereViewer.Shared"
-  },
-  "typedoc": {
-    "displayName": "Shared",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

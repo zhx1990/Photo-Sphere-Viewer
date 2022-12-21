@@ -7,7 +7,7 @@ import { PauseOverlay } from './components/PauseOverlay';
 import { ProgressBar } from './components/ProgressBar';
 import { BufferEvent, PlayPauseEvent, ProgressEvent, VideoPluginEvents, VolumeChangeEvent } from './events';
 import { VideoKeypoint, VideoPluginConfig } from './model';
-// import { debugCurve } from '@photo-sphere-viewer/shared';
+// import { debugCurve } from '../../shared/autorotate-utils';
 
 const getConfig = utils.getConfigParser<VideoPluginConfig>({
     progressbar: true,

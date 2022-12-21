@@ -1,7 +1,7 @@
 import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { CONSTANTS, utils } from '@photo-sphere-viewer/core';
-import { AbstractVideoAdapter } from '@photo-sphere-viewer/shared';
 import { BoxGeometry, Mesh, ShaderMaterial, Vector2, VideoTexture } from 'three';
+import { AbstractVideoAdapter } from '../../shared/AbstractVideoAdapter';
 import { CubemapVideoAdapterConfig, CubemapVideoPanorama } from './model';
 
 type CubemapMesh = Mesh<BoxGeometry, ShaderMaterial>;

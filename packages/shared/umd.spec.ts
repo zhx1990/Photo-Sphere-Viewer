@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 import assert from 'assert';
-import pkg from '../package.json';
+import pkg from './package.json';
 
 /**
  * This test ensures that the custom UMD plugin is behaving correctly
@@ -45,9 +45,7 @@ describe('UMD', () => {
   var require_core = () => PhotoSphereViewer;
 
   // three
-  var require_three = () => THREE;
-
-  // src/index.ts`;
+  var require_three = () => THREE;`;
 
         const actual = output.split('\n').slice(0, expected.split('\n').length).join('\n');
 

@@ -29,9 +29,6 @@ function wrapUmd(fileContent, pkg, externals) {
     if (!deps.includes('three')) {
         deps.unshift('three');
     }
-    if (deps.includes('@photo-sphere-viewer/shared')) {
-        deps.splice(deps.indexOf('@photo-sphere-viewer/shared'), 1);
-    }
 
     const depsCommonJs = deps.map((dep) => `require('${dep}')`).join(', ');
     const depsAmd = deps.map((dep) => `'${dep}'`).join(', ');
