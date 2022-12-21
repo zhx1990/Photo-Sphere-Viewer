@@ -29,6 +29,7 @@ body:
     attributes:
       label: Photo Sphere Viewer version
       options:
+        - 5.0.1
         - 5.0.0
         - 4.8.1
         - 4.8.0
