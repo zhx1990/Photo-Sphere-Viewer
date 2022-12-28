@@ -35,7 +35,7 @@ import {
     UpdatableViewerConfig,
     ViewerConfig,
 } from './model';
-import type { AbstractPlugin } from './plugins/AbstractPlugin';
+import type { AbstractPlugin, PluginConstructor } from './plugins/AbstractPlugin';
 import { pluginInterop } from './plugins/AbstractPlugin';
 import { PSVError } from './PSVError';
 import { DataHelper } from './services/DataHelper';
@@ -222,8 +222,16 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
 
     /**
      * Returns the instance of a plugin if it exists
+     * @example By plugin identifier
+     * ```js
+     * viewer.getPlugin('markers')
+     * ```
+     * @example By plugin class with TypeScript support
+     * ```ts
+     * viewer.getPlugin<MarkersPlugin>(MarkersPlugin)
+     * ```
      */
-    getPlugin<T extends AbstractPlugin<any>>(pluginId: string | typeof AbstractPlugin): T {
+    getPlugin<T extends AbstractPlugin<any>>(pluginId: string | PluginConstructor): T {
         if (typeof pluginId === 'string') {
             return this.plugins[pluginId] as T;
         } else {
