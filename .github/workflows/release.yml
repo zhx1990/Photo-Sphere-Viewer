@@ -53,7 +53,7 @@ jobs:
 
       - uses: Akkjon/close-milestone@v2.0.2
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.PAT }}
         with:
           milestone_name: ${{ github.ref_name }}
           crash_on_missing: false
