@@ -234,7 +234,7 @@ Definition of the links of this node. See bellow.
 
 -   type: `number[]`
 
-GPS coordinates of this node as an array of two or three values (`[longitude, latitude, altitude]`).
+GPS coordinates of this node as an array of two or three values (`[longitude, latitude, altitude?]`).
 
 ::: warning Projection system
 Only the [ESPG:4326 projection](https://epsg.io/4326) is supported.
@@ -265,6 +265,8 @@ Thumbnail for the nodes list in the gallery.
 -   type: `MarkerConfig[]`
 
 Additional markers displayed on this node, requires the [Markers plugin](./markers.md).
+
+Since 5.0.2 the markers can be positioned with the classic `position` option (yaw + pitch) or, if `positionMode=gps`, with the `gps` option (longitude + latitude + altitude).
 
 #### `panoData`
 

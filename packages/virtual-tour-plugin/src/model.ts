@@ -2,6 +2,11 @@ import type { ExtendedPosition, PanoData, PanoDataProvider, SphereCorrection } f
 import type { MarkerConfig } from '@photo-sphere-viewer/markers-plugin';
 
 /**
+ * Definition of GPS coordinates (longitude, latitude, optional altitude)
+ */
+export type GpsPosition = [number, number, number?];
+
+/**
  * Style of the arrow in 3D mode
  */
 export type VirtualTourArrowStyle = {
@@ -102,9 +107,9 @@ export type VirtualTourNode = {
      */
     links?: VirtualTourLink[];
     /**
-     * GPS position (longitude, latitude, optional altitude)
+     * GPS position
      */
-    gps?: [number, number, number?];
+    gps?: GpsPosition;
     /**
      * thumbnail for the gallery
      */
@@ -112,7 +117,7 @@ export type VirtualTourNode = {
     /**
      * additional markers to use on this node
      */
-    markers?: MarkerConfig[];
+    markers?: (MarkerConfig & { gps?: GpsPosition })[];
 };
 
 export type VirtualTourPluginConfig = {

@@ -6,8 +6,7 @@ import type { events as markersEvents, MarkersPlugin } from '@photo-sphere-viewe
 import {
     AmbientLight,
     BackSide,
-    Group,
-    MathUtils,
+    Group, 
     Mesh,
     MeshBasicMaterial,
     MeshLambertMaterial,
@@ -19,7 +18,7 @@ import { ClientSideDatasource } from './datasources/ClientSideDatasource';
 import { ServerSideDatasource } from './datasources/ServerSideDatasource';
 import { NodeChangedEvent, VirtualTourEvents } from './events';
 import { VirtualTourLink, VirtualTourNode, VirtualTourPluginConfig } from './model';
-import { bearing, distance, setMeshColor } from './utils';
+import { gpsToSpherical, setMeshColor } from './utils';
 
 const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
     {
@@ -354,7 +353,12 @@ export class VirtualTourPlugin extends AbstractPlugin<VirtualTourEvents> {
 
                 if (node.markers) {
                     if (this.markers) {
-                        this.markers.setMarkers(node.markers);
+                        this.markers.setMarkers(node.markers.map(marker => {
+                            if (marker.gps && this.isGps) {
+                                marker.position = gpsToSpherical(node.gps, marker.gps);
+                            }
+                            return marker;
+                        }));
                     } else {
                         utils.logWarn(`Node ${node.id} markers ignored because the plugin is not loaded.`);
                     }
@@ -456,19 +460,7 @@ export class VirtualTourPlugin extends AbstractPlugin<VirtualTourEvents> {
      */
     private __getLinkPosition(node: VirtualTourNode, link: VirtualTourLink): Position {
         if (this.isGps) {
-            const p1: [number, number] = [MathUtils.degToRad(node.gps[0]), MathUtils.degToRad(node.gps[1])];
-            const p2: [number, number] = [MathUtils.degToRad(link.gps[0]), MathUtils.degToRad(link.gps[1])];
-            const h1 = node.gps[2] !== undefined ? node.gps[2] : link.gps[2] || 0;
-            const h2 = link.gps[2] !== undefined ? link.gps[2] : node.gps[2] || 0;
-
-            let pitch = 0;
-            if (h1 !== h2) {
-                pitch = Math.atan((h2 - h1) / distance(p1, p2));
-            }
-
-            const yaw = bearing(p1, p2);
-
-            return { yaw, pitch };
+            return gpsToSpherical(node.gps, link.gps);
         } else {
             return this.viewer.dataHelper.cleanPosition(link.position);
         }

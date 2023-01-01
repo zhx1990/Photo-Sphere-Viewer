@@ -25,6 +25,16 @@
         <script>
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
+            const markerLighthouse = {
+                id: 'marker-1',
+                image: baseUrl + 'pictos/pin-red.png',
+                tooltip: 'Cape Florida Light, Key Biscayne',
+                size: { width: 32, height: 32 },
+                anchor: 'bottom center',
+                gps: [-80.155973, 25.666601, 29 + 3],
+                data: { compass: 'red' },
+            };
+
             // links.position is used in manual mode
             // links.gps or node.gps is used in GPS mode
             const nodes = [
@@ -34,17 +44,10 @@
                     thumbnail: baseUrl + 'tour/key-biscayne-1-thumb.jpg',
                     name: 'One',
                     links: [{ nodeId: '2', position: { pitch: 0, yaw: '100deg' } }],
-                    markers: [
-                        {
-                            id: 'marker-1',
-                            image: baseUrl + 'pictos/pin-red.png',
-                            tooltip: 'Cape Florida Light, Key Biscayne',
-                            size: { width: 32, height: 32 },
-                            anchor: 'bottom center',
-                            position: { yaw: '105deg', pitch: '35deg' },
-                            data: { compass: 'red' },
-                        },
-                    ],
+                    markers: [{
+                        ...markerLighthouse,
+                        position: { yaw: '105deg', pitch: '35deg' }, // only use in manual mode
+                    }],
                     gps: [-80.156479, 25.666725, 3],
                     panoData: { poseHeading: 327 },
                 },
@@ -57,6 +60,10 @@
                         { nodeId: '3', position: { pitch: 0, yaw: '120deg' } },
                         { nodeId: '1', position: { pitch: 0, yaw: '280deg' } },
                     ],
+                    markers: [{
+                        ...markerLighthouse,
+                        position: { yaw: '100deg', pitch: '55deg' }, // only use in manual mode
+                    }],
                     gps: [-80.156168, 25.666623, 3],
                     panoData: { poseHeading: 318 },
                 },
@@ -95,7 +102,7 @@
                         { nodeId: '3', position: { pitch: 0, yaw: '70deg' } },
                         { nodeId: '4', position: { pitch: 0, yaw: '150deg' } },
                     ],
-                    gps: [-80.156292, 25.666446, 2],
+                    gps: [-80.156292, 25.666446, 3],
                     panoData: { poseHeading: 190 },
                 },
                 {
@@ -137,25 +144,25 @@
                         positionMode: 'gps',
                         renderMode: '3d',
                         startNodeId: nodes[1].id,
-                            preload: true,
-                            // transition   : false,
-                            // rotateSpeed  : false,
-                            arrowPosition: 'bottom',
+                        preload: true,
+                        // transition   : false,
+                        // rotateSpeed  : false,
+                        arrowPosition: 'bottom',
 
-                            // client mode
-                            // dataMode: 'client',
-                            nodes: nodes,
+                        // client mode
+                        // dataMode: 'client',
+                        nodes: nodes,
 
-                            // server mode (mock)
-                            dataMode: 'server',
-                            getNode: (nodeId) => {
-                                console.log('GET node ' + nodeId);
-                                return Promise.resolve({
-                                    ...nodesById[nodeId],
-                                    links: nodesById[nodeId].links.map((link) => ({
-                                        ...link,
-                                        name: nodesById[link.nodeId].name,
-                                        gps: nodesById[link.nodeId].gps,
+                        // server mode (mock)
+                        dataMode: 'server',
+                        getNode: (nodeId) => {
+                            console.log('GET node ' + nodeId);
+                            return Promise.resolve({
+                                ...nodesById[nodeId],
+                                links: nodesById[nodeId].links.map((link) => ({
+                                    ...link,
+                                    name: nodesById[link.nodeId].name,
+                                    gps: nodesById[link.nodeId].gps,
                                 })),
                             });
                         },
