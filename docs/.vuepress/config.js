@@ -60,7 +60,7 @@ module.exports = {
                     { text: 'v3', link: 'https://photo-sphere-viewer-3.netlify.app' },
                 ],
             },
-            { text: 'Changelog', link: '/changelog' },
+            { text: '❤️️ Sponsor', link: 'https://github.com/sponsors/mistic100' },
         ],
         sidebar: {
             '/guide/': [
@@ -101,6 +101,7 @@ module.exports = {
                             ],
                         },
                         'frameworks',
+                        'changelog',
                         'migration',
                     ],
                 },

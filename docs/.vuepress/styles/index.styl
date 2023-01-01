@@ -34,3 +34,26 @@
 .vue-slider-mark-step-ctive {
   background-color: lightness($accentColor, 90%);
 }
+
+.sponsors {
+  text-align: center;
+  margin-top: 2.5rem;
+}
+.sponsors a[title] {
+  display: inline-block;
+  position: relative;
+  margin: 0 0.5em;
+}
+.sponsors a[title]::after {
+  content: attr(title);
+  position: absolute;
+  bottom: -1.5em;
+  left: 0;
+  right: 0;
+}
+.sponsors .outbound {
+  display: none !important;
+}
+.sponsors img {
+  height: 50px;
+}

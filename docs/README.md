@@ -27,8 +27,14 @@ features:
 I forked the original Photo Sphere Viewer [by Jérémy Heleine](http://jeremyheleine.me) to provide a better code architecture and a bunch of new features.
 :::
 
+<div class="sponsors">
+
+## Sponsors
+
+[![Netlify](https://www.netlify.com/v3/img/components/full-logo-light.svg)](https://www.netlify.com)
+
+</div>
+
 ::: slot footer
 Licensed under MIT License, documentation under CC BY 3.0
-
-<a href="https://www.netlify.com"> <img src="https://www.netlify.com/v3/img/components/netlify-color-accent.svg" alt="Deploys by Netlify" /> </a>
 :::
