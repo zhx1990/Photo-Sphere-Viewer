@@ -54,6 +54,9 @@ export class GalleryPlugin extends AbstractPlugin<GalleryPluginEvents> {
 
         this.setItems(this.config.items);
         delete this.config.items;
+
+        // buttons are initialized just after plugins
+        setTimeout(() => this.__updateButton());
     }
 
     /**
@@ -136,7 +139,7 @@ export class GalleryPlugin extends AbstractPlugin<GalleryPluginEvents> {
 
         this.gallery.setItems(this.items);
 
-        this.viewer.navbar.getButton(GalleryButton.id, false)?.toggle(this.items.length > 0);
+        this.__updateButton();
     }
 
     /**
@@ -163,5 +166,9 @@ export class GalleryPlugin extends AbstractPlugin<GalleryPluginEvents> {
         if (this.config.hideOnClick) {
             this.hide();
         }
+    }
+
+    private __updateButton() {
+        this.viewer.navbar.getButton(GalleryButton.id, false)?.toggle(this.items.length > 0);
     }
 }
