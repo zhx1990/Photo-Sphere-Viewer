@@ -46,10 +46,33 @@ export class SettingsComponent extends AbstractComponent {
         }
     }
 
-    override show() {
+    override show(buttonPosition?: DOMRect) {
         this.__showSettings(false);
 
         this.container.classList.add('psv-settings--open');
+        this.container.style.right = '';
+        this.container.style.left = '';
+
+        if (buttonPosition) {
+            const viewerRect = this.viewer.container.getBoundingClientRect();
+            const buttonLeft = buttonPosition.left - viewerRect.left;
+            const buttonRight = viewerRect.right - buttonPosition.right;
+            const buttonWidth = buttonPosition.width;
+            const menuWidth = this.container.offsetWidth;
+
+            if (menuWidth >= buttonLeft + buttonWidth) {
+                this.container.style.left = '0px';
+            } else if (buttonLeft + menuWidth < viewerRect.width) {
+                this.container.style.left = `${buttonLeft}px`;
+            } else if (menuWidth >= buttonRight + buttonWidth) {
+                this.container.style.right = '0px';
+            } else {
+                this.container.style.right = `${buttonRight}px`;
+            }
+        } else {
+            this.container.style.right = '0px';
+        }
+
         this.state.visible = true;
     }
 

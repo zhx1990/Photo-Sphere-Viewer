@@ -14,14 +14,14 @@ $psv-settings-badge-text-color: white !default;
 
 .psv-settings {
     position: absolute;
-    bottom: $psv-navbar-height + $psv-settings-margin;
-    right: $psv-settings-margin;
+    bottom: $psv-navbar-height;
     background: $psv-settings-background;
     box-shadow: $psv-settings-shadow;
     color: $psv-settings-text-color;
     z-index: $psv-navbar-zindex;
     opacity: 0;
     transition: opacity 0.1s linear;
+    margin: $psv-settings-margin;
 
     &--open {
         opacity: 1;

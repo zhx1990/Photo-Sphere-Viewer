@@ -6,6 +6,10 @@
     position: relative;
     background: $psv-main-background;
     overflow: hidden;
+
+    * {
+        box-sizing: content-box;
+    }
 }
 
 .psv-canvas-container {

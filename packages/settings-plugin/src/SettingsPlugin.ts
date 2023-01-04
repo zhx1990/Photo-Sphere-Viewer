@@ -158,8 +158,11 @@ export class SettingsPlugin extends AbstractPlugin<SettingsPluginEvents> {
      * Toggles the settings menu
      */
     toggleSettings() {
-        this.component.toggle();
-        this.updateButton();
+        if (this.component.isVisible()) {
+            this.hideSettings();
+        } else {
+            this.showSettings();
+        }
     }
 
     /**
@@ -174,7 +177,9 @@ export class SettingsPlugin extends AbstractPlugin<SettingsPluginEvents> {
      * Shows the settings menu
      */
     showSettings() {
-        this.component.show();
+        const button = this.viewer.navbar.getButton(SettingsButton.id, false)
+        const buttonPosition = button?.container.getBoundingClientRect();
+        this.component.show(buttonPosition);
         this.updateButton();
     }
 
