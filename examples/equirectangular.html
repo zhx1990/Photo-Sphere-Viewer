@@ -104,6 +104,19 @@
                     'caption',
                     'fullscreen',
                 ],
+                keyboard: {
+                    ...PhotoSphereViewer.DEFAULTS.keyboard,
+                    'h': (viewer) => {
+                        if (viewer.panel.isVisible('help')) {
+                            viewer.panel.hide();
+                        } else {
+                            viewer.panel.show({
+                                id: 'help',
+                                content: 'Help content',
+                            });
+                        }
+                    },
+                },
             });
         </script>
     </body>

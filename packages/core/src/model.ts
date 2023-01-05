@@ -374,7 +374,7 @@ export type ViewerConfig = {
         loadError: string;
         [K: string]: string;
     };
-    keyboard?: boolean | Record<string, ACTIONS>;
+    keyboard?: boolean | Record<string, ACTIONS | ((viewer: Viewer) => void)>;
 };
 
 export type DeprecatedViewerConfig = 
@@ -408,7 +408,7 @@ export type ParsedViewerConfig = Omit<
     fisheye?: number;
     requestHeaders?: (url: string) => Record<string, string>;
     navbar?: Array<string | NavbarCustomButton>;
-    keyboard?: Record<string, ACTIONS>;
+    keyboard?: Record<string, ACTIONS | ((viewer: Viewer) => void)>;
 };
 
 /**

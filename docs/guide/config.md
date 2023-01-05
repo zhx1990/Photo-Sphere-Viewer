@@ -333,6 +333,25 @@ keyboard: {
 }
 ```
 
-Enable and configure keyboard navigation in fullscreen. It is a map defining key code->action. Set to `false` to disable.
+Enable and configure keyboard navigation in fullscreen. It is a map defining key code->action. Set to `false` to disable. (all the available actions are listed above)
 
-(all the available actions are listed above)
+Since 5.0.2 you can configure an arbitrary callback to any key.
+
+```js
+keyboard: {
+  'h': (viewer) => {
+      if (viewer.panel.isVisible('help')) {
+          viewer.panel.hide();
+      } else {
+          viewer.panel.show({
+              id: 'help',
+              content: 'Help content',
+          });
+      }
+  },
+},
+```
+
+::: tip More keyboard controls
+To enable the keyboard outside fullscreen view, call `startKeyboardControl()` after init. To make more complex interactions, listen to the `key-press` event.
+:::
