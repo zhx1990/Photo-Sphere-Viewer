@@ -6,7 +6,6 @@ import blankIcon from './icons/blank.svg';
 import { GalleryItem } from './model';
 
 export class GalleryComponent extends AbstractComponent {
-
     protected override readonly state = {
         visible: true,
         mousedown: false,

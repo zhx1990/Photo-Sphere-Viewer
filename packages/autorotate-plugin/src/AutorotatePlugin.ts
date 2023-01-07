@@ -23,39 +23,42 @@ type AutorotateKeypointInternal = {
     tooltip: { content: string; position?: string };
 };
 
-const getConfig = utils.getConfigParser<AutorotatePluginConfig, ParsedAutorotatePluginConfig>({
-    autostartDelay: 2000,
-    autostartOnIdle: true,
-    autorotateSpeed: utils.parseSpeed('2rpm'),
-    autorotatePitch: null,
-    autorotateZoomLvl: null,
-    keypoints: null,
-    startFromClosest: true,
-}, {
-    autostartOnIdle: (autostartOnIdle, { rawConfig }) => {
-        if (autostartOnIdle && utils.isNil(rawConfig.autostartDelay)) {
-            utils.logWarn('autostartOnIdle requires a non null autostartDelay');
-            return false;
-        }
-        return autostartOnIdle;
+const getConfig = utils.getConfigParser<AutorotatePluginConfig, ParsedAutorotatePluginConfig>(
+    {
+        autostartDelay: 2000,
+        autostartOnIdle: true,
+        autorotateSpeed: utils.parseSpeed('2rpm'),
+        autorotatePitch: null,
+        autorotateZoomLvl: null,
+        keypoints: null,
+        startFromClosest: true,
     },
-    autorotateSpeed: (autorotateSpeed) => {
-        return utils.parseSpeed(autorotateSpeed);
-    },
-    autorotatePitch: (autorotatePitch) => {
-        // autorotatePitch is between -PI/2 and PI/2
-        if (!utils.isNil(autorotatePitch)) {
-            return utils.parseAngle(autorotatePitch, true);
-        }
-        return null;
-    },
-    autorotateZoomLvl: (autorotateZoomLvl) => {
-        if (!utils.isNil(autorotateZoomLvl)) {
-            return MathUtils.clamp(autorotateZoomLvl, 0, 100);
-        }
-        return null;
-    },
-});
+    {
+        autostartOnIdle: (autostartOnIdle, { rawConfig }) => {
+            if (autostartOnIdle && utils.isNil(rawConfig.autostartDelay)) {
+                utils.logWarn('autostartOnIdle requires a non null autostartDelay');
+                return false;
+            }
+            return autostartOnIdle;
+        },
+        autorotateSpeed: (autorotateSpeed) => {
+            return utils.parseSpeed(autorotateSpeed);
+        },
+        autorotatePitch: (autorotatePitch) => {
+            // autorotatePitch is between -PI/2 and PI/2
+            if (!utils.isNil(autorotatePitch)) {
+                return utils.parseAngle(autorotatePitch, true);
+            }
+            return null;
+        },
+        autorotateZoomLvl: (autorotateZoomLvl) => {
+            if (!utils.isNil(autorotateZoomLvl)) {
+                return MathUtils.clamp(autorotateZoomLvl, 0, 100);
+            }
+            return null;
+        },
+    }
+);
 
 const NUM_STEPS = 16;
 
@@ -175,7 +178,6 @@ export class AutorotatePlugin extends AbstractPlugin<AutorotatePluginEvents> {
     setKeypoints(keypoints: AutorotateKeypoint[]) {
         if (!keypoints) {
             this.keypoints = null;
-
         } else {
             if (keypoints.length < 2) {
                 throw new PSVError('At least two points are required');
@@ -248,7 +250,6 @@ export class AutorotatePlugin extends AbstractPlugin<AutorotatePluginEvents> {
 
         if (!this.keypoints) {
             this.__animate();
-
         } else if (this.config.startFromClosest) {
             this.__shiftKeypoints();
         }
@@ -543,5 +544,4 @@ export class AutorotatePlugin extends AbstractPlugin<AutorotatePluginEvents> {
 
         return idx;
     }
-
 }

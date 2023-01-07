@@ -305,7 +305,10 @@ export class VisibleRangePlugin extends AbstractPlugin {
      */
     private __reverseAutorotate(left: boolean, right: boolean) {
         // reverse already ongoing
-        if ((left && this.autorotate.config.autorotateSpeed > 0) || (right && this.autorotate.config.autorotateSpeed < 0)) {
+        if (
+            (left && this.autorotate.config.autorotateSpeed > 0)
+            || (right && this.autorotate.config.autorotateSpeed < 0)
+        ) {
             return;
         }
 

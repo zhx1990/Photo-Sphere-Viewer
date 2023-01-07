@@ -387,8 +387,7 @@ export function getConfigParser<T extends Record<string, any>, U extends T = T>(
                     rawConfig: rawConfig,
                     defValue: defaults[key],
                 });
-            }
-            else if (!(key in defaults)) {
+            } else if (!(key in defaults)) {
                 logWarn(`Unknown option ${key as string}`);
                 continue;
             }

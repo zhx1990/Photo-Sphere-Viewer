@@ -13,8 +13,8 @@ const DIST_DIR = 'dist';
 const LICENSE_FILE = 'LICENSE';
 
 fs.readdirSync(PACKAGES_DIR)
-    .filter(name => name !== 'shared')
-    .forEach(name => {
+    .filter((name) => name !== 'shared')
+    .forEach((name) => {
         const source = path.join(PACKAGES_DIR, name, DIST_DIR);
         const destination = path.join(DIST_DIR, name);
 
@@ -22,8 +22,8 @@ fs.readdirSync(PACKAGES_DIR)
 
         fs.copySync(source, destination, {
             filter(name) {
-                return name === source || ['js', 'css', 'scss', 'ts', 'map', 'json'].some(ext => name.endsWith(ext));
-            }
+                return name === source || ['js', 'css', 'scss', 'ts', 'map', 'json'].some((ext) => name.endsWith(ext));
+            },
         });
     });
 

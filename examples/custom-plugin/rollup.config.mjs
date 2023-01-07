@@ -40,10 +40,10 @@ export default {
             baseContents: (pkg) => {
                 pkg = {
                     ...pkg,
-                    main: "index.js",
-                    module: "index.module.js",
-                    types: "index.d.ts",
-                    style: "index.css",
+                    main: 'index.js',
+                    module: 'index.module.js',
+                    types: 'index.d.ts',
+                    style: 'index.css',
                 };
                 delete pkg.scripts;
                 delete pkg.devDependencies;
@@ -51,7 +51,7 @@ export default {
             },
             // this is only necessary for this demo, to override the "file" dependency
             additionalDependencies: {
-                "@photo-sphere-viewer/core": "^5.0.0"
+                '@photo-sphere-viewer/core': '^5.0.0',
             },
         }),
     ],

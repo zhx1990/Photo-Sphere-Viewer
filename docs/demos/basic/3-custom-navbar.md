@@ -21,7 +21,7 @@ new PhotoSphereViewer.Viewer({
         {
             title: 'Change image',
             content: document.querySelector('#icon').innerText,
-            onClick (viewer) {
+            onClick(viewer) {
                 viewer.setPanorama(baseUrl + 'sphere-test.jpg', {
                     caption: '',
                     description: null,

@@ -51,7 +51,7 @@ import {
     getElement,
     getShortestArc,
     isAbortError,
-    isExtendedPosition, 
+    isExtendedPosition,
     logWarn,
     positionCompat,
     throttle,

@@ -149,7 +149,7 @@ export class VideoPlugin extends AbstractPlugin<VideoPluginEvents> {
         this.video.addEventListener('timeupdate', this as any);
     }
 
-    private  __onKeyPress(e: events.KeypressEvent) {
+    private __onKeyPress(e: events.KeypressEvent) {
         if (e.key === CONSTANTS.KEY_CODES.Space) {
             this.playPause();
             e.preventDefault();

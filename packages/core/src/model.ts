@@ -356,7 +356,7 @@ export type ViewerConfig = {
     canvasBackground?: string;
     /** @default false */
     withCredentials?: boolean;
-    /** @default 'autorotate zoom move download description caption fullscreen' */
+    /** @default 'zoom move download description caption fullscreen' */
     navbar?: boolean | string | Array<string | NavbarCustomButton>;
     lang?: {
         zoom: string;
@@ -377,8 +377,8 @@ export type ViewerConfig = {
     keyboard?: boolean | Record<string, ACTIONS | ((viewer: Viewer) => void)>;
 };
 
-export type DeprecatedViewerConfig = 
-    | 'defaultLong' 
+export type DeprecatedViewerConfig =
+    | 'defaultLong'
     | 'defaultLat'
     | 'autorotateDelay'
     | 'autorotateIdle'

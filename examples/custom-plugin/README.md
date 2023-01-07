@@ -3,6 +3,7 @@
 This is an example of how to implement, build and publish a custom plugin for Photo Sphere Viewer.
 
 Features :
+
 -   TypeScript
 -   SCSS
 -   custom button with SVG icon

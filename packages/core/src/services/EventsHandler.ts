@@ -168,11 +168,10 @@ export class EventsHandler extends AbstractService {
         }
 
         const action = this.config.keyboard[e.key];
-        
+
         if (typeof action === 'function') {
-              action(this.viewer);  
-        } 
-        else if (action && !this.keyHandler.pending) {
+            action(this.viewer);
+        } else if (action && !this.keyHandler.pending) {
             if (action !== ACTIONS.ZOOM_IN && action !== ACTIONS.ZOOM_OUT) {
                 this.viewer.stopAll();
             }

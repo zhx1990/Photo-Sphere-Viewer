@@ -339,8 +339,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
                     const v0 = this.state.facesByRow === 1
                         ? col * this.state.facesByCol * NB_VERTICES_BY_SMALL_FACE + 1
                         : this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-                        + (this.state.facesByRow - 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-                        + col * this.state.facesByCol * NB_VERTICES_BY_FACE + 4;
+                            + (this.state.facesByRow - 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
+                            + col * this.state.facesByCol * NB_VERTICES_BY_FACE + 4;
 
                     // bottom-right
                     const v1 = this.state.facesByRow === 1
@@ -354,17 +354,17 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
 
                     if (this.state.facesByCol >= this.SPHERE_SEGMENTS / 8) {
                         // bottom-center
-                        const v4 = v0 + this.state.facesByCol / 2 * NB_VERTICES_BY_FACE;
+                        const v4 = v0 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
 
                         verticesIndex.push(v4);
                     }
 
                     if (this.state.facesByRow >= this.SPHERE_HORIZONTAL_SEGMENTS / 4) {
                         // left-center
-                        const v6 = v0 - this.state.facesByRow / 2 * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+                        const v6 = v0 - (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
 
                         // right-center
-                        const v7 = v1 - this.state.facesByRow / 2 * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+                        const v7 = v1 - (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
 
                         verticesIndex.push(v6, v7);
                     }
@@ -372,11 +372,11 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
                     // top-left
                     const v0 = this.state.facesByRow === 1
                         ? -this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-                        + row * this.state.facesByRow * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-                        + col * this.state.facesByCol * NB_VERTICES_BY_SMALL_FACE + 1
+                            + row * this.state.facesByRow * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
+                            + col * this.state.facesByCol * NB_VERTICES_BY_SMALL_FACE + 1
                         : -this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-                        + row * this.state.facesByRow * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-                        + col * this.state.facesByCol * NB_VERTICES_BY_FACE + 1;
+                            + row * this.state.facesByRow * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
+                            + col * this.state.facesByCol * NB_VERTICES_BY_FACE + 1;
 
                     // top-right
                     const v1 = this.state.facesByRow === 1
@@ -390,17 +390,17 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
 
                     if (this.state.facesByCol >= this.SPHERE_SEGMENTS / 8) {
                         // top-center
-                        const v4 = v0 + this.state.facesByCol / 2 * NB_VERTICES_BY_FACE;
+                        const v4 = v0 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
 
                         verticesIndex.push(v4);
                     }
 
                     if (this.state.facesByRow >= this.SPHERE_HORIZONTAL_SEGMENTS / 4) {
                         // left-center
-                        const v6 = v0 + this.state.facesByRow / 2 * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+                        const v6 = v0 + (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
 
                         // right-center
-                        const v7 = v1 + this.state.facesByRow / 2 * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+                        const v7 = v1 + (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
 
                         verticesIndex.push(v6, v7);
                     }
@@ -423,26 +423,26 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
 
                     if (this.state.facesByCol >= this.SPHERE_SEGMENTS / 8) {
                         // top-center
-                        const v4 = v0 + this.state.facesByCol / 2 * NB_VERTICES_BY_FACE;
+                        const v4 = v0 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
 
                         // bottom-center
-                        const v5 = v1 + this.state.facesByCol / 2 * NB_VERTICES_BY_FACE;
+                        const v5 = v1 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
 
                         verticesIndex.push(v4, v5);
                     }
 
                     if (this.state.facesByRow >= this.SPHERE_HORIZONTAL_SEGMENTS / 4) {
                         // left-center
-                        const v6 = v0 + this.state.facesByRow / 2 * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+                        const v6 = v0 + (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
 
                         // right-center
-                        const v7 = v3 + this.state.facesByRow / 2 * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
+                        const v7 = v3 + (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
 
                         verticesIndex.push(v6, v7);
 
                         if (this.state.facesByCol >= this.SPHERE_SEGMENTS / 8) {
                             // center-center
-                            const v8 = v6 + this.state.facesByCol / 2 * NB_VERTICES_BY_FACE;
+                            const v8 = v6 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
 
                             verticesIndex.push(v8);
                         }

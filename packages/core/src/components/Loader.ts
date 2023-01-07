@@ -66,7 +66,7 @@ export class Loader extends AbstractComponent {
      * Sets the loader progression
      */
     setProgress(value: number) {
-        const angle = Math.min(value, 99.999) / 100 * Math.PI * 2;
+        const angle = (Math.min(value, 99.999) / 100) * Math.PI * 2;
         const halfSize = this.size / 2;
         const startX = halfSize;
         const startY = this.thickness / 2 + this.border;
@@ -101,9 +101,7 @@ export class Loader extends AbstractComponent {
             inner.innerHTML = this.viewer.config.loadingTxt;
         }
         if (inner) {
-            const size = Math.round(
-                Math.sqrt(2 * Math.pow((this.size / 2 - this.thickness / 2 - this.border), 2))
-            );
+            const size = Math.round(Math.sqrt(2 * Math.pow(this.size / 2 - this.thickness / 2 - this.border, 2)));
             inner.style.maxWidth = size + 'px';
             inner.style.maxHeight = size + 'px';
             this.loader.appendChild(inner);

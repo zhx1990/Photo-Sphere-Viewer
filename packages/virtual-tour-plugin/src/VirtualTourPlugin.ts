@@ -3,15 +3,7 @@ import type { Point, Position, Tooltip, Viewer } from '@photo-sphere-viewer/core
 import { AbstractPlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import type { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
 import type { events as markersEvents, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
-import {
-    AmbientLight,
-    BackSide,
-    Group, 
-    Mesh,
-    MeshBasicMaterial,
-    MeshLambertMaterial,
-    PointLight,
-} from 'three';
+import { AmbientLight, BackSide, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, PointLight } from 'three';
 import { ARROW_GEOM, ARROW_OUTLINE_GEOM, DEFAULT_ARROW, DEFAULT_MARKER, LINK_DATA } from './constants';
 import { AbstractDatasource } from './datasources/AbstractDataSource';
 import { ClientSideDatasource } from './datasources/ClientSideDatasource';
@@ -353,12 +345,14 @@ export class VirtualTourPlugin extends AbstractPlugin<VirtualTourEvents> {
 
                 if (node.markers) {
                     if (this.markers) {
-                        this.markers.setMarkers(node.markers.map(marker => {
-                            if (marker.gps && this.isGps) {
-                                marker.position = gpsToSpherical(node.gps, marker.gps);
-                            }
-                            return marker;
-                        }));
+                        this.markers.setMarkers(
+                            node.markers.map((marker) => {
+                                if (marker.gps && this.isGps) {
+                                    marker.position = gpsToSpherical(node.gps, marker.gps);
+                                }
+                                return marker;
+                            })
+                        );
                     } else {
                         utils.logWarn(`Node ${node.id} markers ignored because the plugin is not loaded.`);
                     }

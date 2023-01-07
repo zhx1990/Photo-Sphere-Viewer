@@ -177,7 +177,7 @@ export class SettingsPlugin extends AbstractPlugin<SettingsPluginEvents> {
      * Shows the settings menu
      */
     showSettings() {
-        const button = this.viewer.navbar.getButton(SettingsButton.id, false)
+        const button = this.viewer.navbar.getButton(SettingsButton.id, false);
         const buttonPosition = button?.container.getBoundingClientRect();
         this.component.show(buttonPosition);
         this.updateButton();

@@ -30,7 +30,7 @@ export abstract class AbstractPlugin<
     destroy() {}
 }
 
-export type PluginConstructor = (new (viewer: Viewer, config?: any) => AbstractPlugin<any>);
+export type PluginConstructor = new (viewer: Viewer, config?: any) => AbstractPlugin<any>;
 
 /**
  * Returns the plugin constructor from the imported object
