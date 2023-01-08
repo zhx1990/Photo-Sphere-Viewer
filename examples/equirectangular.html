@@ -104,8 +104,10 @@
                     'caption',
                     'fullscreen',
                 ],
-                keyboard: {
-                    ...PhotoSphereViewer.DEFAULTS.keyboard,
+                keyboard: 'always',
+                keyboardActions: {
+                    ...PhotoSphereViewer.DEFAULTS.keyboardActions,
+                    f: (viewer) => viewer.toggleFullscreen(),
                     h: (viewer) => {
                         if (viewer.panel.isVisible('help')) {
                             viewer.panel.hide();

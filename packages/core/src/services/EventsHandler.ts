@@ -172,10 +172,12 @@ export class EventsHandler extends AbstractService {
             return;
         }
 
-        const action = this.config.keyboard[e.key];
+        const action = this.config.keyboardActions[e.key];
 
         if (typeof action === 'function') {
             action(this.viewer);
+            e.preventDefault();
+            
         } else if (action && !this.keyHandler.pending) {
             if (action !== ACTIONS.ZOOM_IN && action !== ACTIONS.ZOOM_OUT) {
                 this.viewer.stopAll();
@@ -381,7 +383,7 @@ export class EventsHandler extends AbstractService {
     private __onFullscreenChange() {
         const fullscreen = this.viewer.isFullscreenEnabled();
 
-        if (this.config.keyboard) {
+        if (this.config.keyboard === 'fullscreen') {
             if (fullscreen) {
                 this.viewer.startKeyboardControl();
             } else {

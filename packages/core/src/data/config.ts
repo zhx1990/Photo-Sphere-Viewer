@@ -66,7 +66,8 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
         ctrlZoom: 'Use ctrl + scroll to zoom the image',
         loadError: "The panorama can't be loaded",
     },
-    keyboard: {
+    keyboard: 'fullscreen',
+    keyboardActions: {
         [KEY_CODES.ArrowUp]: ACTIONS.ROTATE_UP,
         [KEY_CODES.ArrowDown]: ACTIONS.ROTATE_DOWN,
         [KEY_CODES.ArrowRight]: ACTIONS.ROTATE_RIGHT,
@@ -175,12 +176,19 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
     },
     keyboard: (keyboard) => {
         if (!keyboard) {
-            return null;
+            return false;
         }
-        if (keyboard === true) {
-            return clone(DEFAULTS.keyboard);
+        if (typeof keyboard === 'object') {
+            logWarn(`Use keyboardActions to configure the keyboard actions, keyboard option must be either true, false, 'fullscreen' or 'always'`);
+            return 'fullscreen';
         }
-        return keyboard;
+        return keyboard === 'always' ? 'always' : 'fullscreen';
+    },
+    keyboardActions: (keyboardActions, { rawConfig }) => {
+        if (rawConfig.keyboard && typeof rawConfig.keyboard === 'object') {
+            return rawConfig.keyboard;
+        }
+        return keyboardActions;
     },
     autorotateLat: autorotateOpt,
     autorotateDelay: autorotateOpt,

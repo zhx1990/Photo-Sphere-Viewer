@@ -197,6 +197,10 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
             this.navbar.show();
         }
 
+        if (this.config.keyboard === 'always') {
+            this.startKeyboardControl();
+        }
+
         this.resetIdleTimer();
 
         this.state.ready = true;
@@ -526,6 +530,14 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                     this.dispatchEvent(new ZoomUpdatedEvent(this.getZoomLevel()));
                     break;
 
+                case 'keyboard':
+                    if (this.config.keyboard === 'always') {
+                        this.startKeyboardControl();
+                    } else {
+                        this.stopKeyboardControl();
+                    }
+                    break;
+
                 default:
                     break;
             }
@@ -749,14 +761,14 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
     }
 
     /**
-     * Enables the keyboard controls (done automatically when entering fullscreen)
+     * Enables the keyboard controls
      */
     startKeyboardControl() {
         this.state.keyboardEnabled = true;
     }
 
     /**
-     * Disables the keyboard controls (done automatically when exiting fullscreen)
+     * Disables the keyboard controls
      */
     stopKeyboardControl() {
         this.state.keyboardEnabled = false;

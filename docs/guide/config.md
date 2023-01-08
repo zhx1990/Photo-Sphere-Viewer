@@ -169,6 +169,17 @@ Enables zoom with the mouse wheel.
 
 Enables panorama rotation with mouse click+move or with a finger swipe on touch screens.
 
+#### `keyboard`
+
+-   type: `boolean | 'fullscreen' | 'always'`
+-   default: `'fullscreen'` (same as `true`)
+
+Enables keyboard controls when in fullscreen or always. The different keys can be configured with [`keyboardActions`](#keyboardactions).
+
+::: warning
+Keys are listened globally to the page, and thus can be in conflict with other components if configured to `'always'`.
+:::
+
 #### `mousewheelCtrlKey`
 
 -   type: `boolean`
@@ -315,13 +326,13 @@ Enabled smooth animation after a manual move.
 
 Use credentials for HTTP requests.
 
-#### `keyboard`
+#### `keyboardActions`
 
--   type: `boolean | object`
+-   type: `object`
 -   default:
 
 ```js
-keyboard: {
+keyboardActions: {
   'ArrowUp': 'ROTATE_UP',
   'ArrowDown': 'ROTATE_DOWN',
   'ArrowRight': 'ROTATE_RIGHT',
@@ -333,12 +344,13 @@ keyboard: {
 }
 ```
 
-Enable and configure keyboard navigation in fullscreen. It is a map defining key code->action. Set to `false` to disable. (all the available actions are listed above)
+Configure keyboard actions. It is a map defining key code->action. (all the available actions are listed above)
 
 Since 5.0.2 you can configure an arbitrary callback to any key.
 
 ```js
-keyboard: {
+keyboardActions: {
+  ...PhotoSphereViewer.DEFAULTS.keyboardActions,
   'h': (viewer) => {
       if (viewer.panel.isVisible('help')) {
           viewer.panel.hide();
@@ -349,9 +361,6 @@ keyboard: {
           });
       }
   },
+  'f': (viewer) => viewer.toggleFullscreen(),
 },
 ```
-
-::: tip More keyboard controls
-To enable the keyboard outside fullscreen view, call `startKeyboardControl()` after init. To make more complex interactions, listen to the `key-press` event.
-:::
