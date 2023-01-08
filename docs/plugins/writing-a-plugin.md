@@ -3,12 +3,12 @@
 [[toc]]
 
 ::: tip Full featured example
-You can find a complete example of plugin implementation in the [examples](https://github.com/mistic100/Photo-Sphere-Viewer/tree/dev/examples/custom-plugin) folder of the project.
+You can find a complete example of plugin implementation in the [examples](https://github.com/mistic100/Photo-Sphere-Viewer/main/dev/examples/custom-plugin) folder of the project.
 :::
 
 ## Syntax
 
-The recommended way to create your own plugin is as an ES6 class extending `AbstractPlugin` provided by `@photo-sphere-viewer/core` core package.
+The recommended way to create your own plugin is as an ES6 class extending `AbstractPlugin` provided by `@photo-sphere-viewer/core` package.
 
 **Requirements:**
 
@@ -81,10 +81,10 @@ export class CustomPlugin extends AbstractPlugin<CustomPluginEvents> {
 /**
  * Listen
  */
-viewer.getPlugin(PhotoSphereViewerCustomPlugin)
+viewer.getPlugin(CustomPlugin)
     .addEventListener(CustomPluginEvent.type, ({ value, target }) => {
         // value is typed boolean
-        // target is typed PhotoSphereViewerCustomPlugin
+        // target is typed CustomPlugin
     });
 ```
 
@@ -145,12 +145,13 @@ Photo Sphere Viewer buttons **must** extend `AbstractButton`, check the <ApiLink
 -   It **must** have a `static id` property.
 -   It **must** implement the `destroy` method which is used to cleanup the button when the viewer is unloaded.
 -   It **must** implement the `onClick` method to perform an action.
--   It **can** implement the `isSupported` method to inform the viewer if the action is possible depending on the environement.
+-   It **can** implement the `isSupported` method to inform the viewer if the action is possible depending on the environment.
 -   It **must** provide the button configuration to `super` :
     -   `className` : CSS class name applied to the button
     -   `icon` : SVG of the icon
-    -   `collapsable` : indicates the button can be collapsed in the menu on small screens
-    -   `tabbable` : indicates the button can be activated with the keyboard
+    -   `iconActive` : SVG of the icon when the button is active (defaults `icon`)
+    -   `collapsable` : indicates the button can be collapsed in the menu on small screens (defaults `false`)
+    -   `tabbable` : indicates the button can be activated with the keyboard (defaults `true`)
 
 ```js
 import { AbstractButton } from '@photo-sphere-viewer/core';

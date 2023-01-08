@@ -133,6 +133,15 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 const virtualTour = viewer.getPlugin(PhotoSphereViewer.VirtualTourPlugin);
 
+const markerLighthouse = {
+    id: 'marker-1',
+    image: baseUrl + 'pictos/pin-red.png',
+    tooltip: 'Cape Florida Light, Key Biscayne',
+    size: { width: 32, height: 32 },
+    anchor: 'bottom center',
+    gps: [-80.155973, 25.666601, 29 + 3],
+};
+
 virtualTour.setNodes([
     {
         id: '1',
@@ -140,16 +149,7 @@ virtualTour.setNodes([
         thumbnail: baseUrl + 'tour/key-biscayne-1-thumb.jpg',
         name: 'One',
         links: [{ nodeId: '2' }],
-        markers: [
-            {
-                id: 'marker-1',
-                image: baseUrl + 'pictos/pin-red.png',
-                tooltip: 'Cape Florida Light, Key Biscayne',
-                size: { width: 32, height: 32 },
-                anchor: 'bottom center',
-                position: { yaw: '105deg', pitch: '35deg' },
-            },
-        ],
+        markers: [markerLighthouse],
         gps: [-80.156479, 25.666725, 3],
         panoData: { poseHeading: 327 },
     },
@@ -159,6 +159,7 @@ virtualTour.setNodes([
         thumbnail: baseUrl + 'tour/key-biscayne-2-thumb.jpg',
         name: 'Two',
         links: [{ nodeId: '3' }, { nodeId: '1' }],
+        markers: [markerLighthouse],
         gps: [-80.156168, 25.666623, 3],
         panoData: { poseHeading: 318 },
     },
