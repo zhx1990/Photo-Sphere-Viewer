@@ -40,9 +40,12 @@ import { PressHandler } from '../utils/PressHandler';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
 
-const IDLE = 0;
-const MOVING = 1;
-const INERTIA = 2;
+const enum Step {
+    IDLE,
+    CLICK,
+    MOVING,
+    INERTIA
+}
 
 /**
  * Events handler
@@ -50,9 +53,7 @@ const INERTIA = 2;
  */
 export class EventsHandler extends AbstractService {
     private readonly data = {
-        step: IDLE,
-        /**  before moving past the threshold */
-        mousedown: false,
+        step: Step.IDLE,
         /** start x position of the click/touch */
         startMouseX: 0,
         /** start y position of the click/touch */
@@ -146,6 +147,10 @@ export class EventsHandler extends AbstractService {
         }
     }
 
+    private __isStep(...step: Step[]): boolean {
+        return step.indexOf(this.data.step) !== -1;
+    }
+
     /**
      * Handles keyboard events
      */
@@ -212,7 +217,7 @@ export class EventsHandler extends AbstractService {
      * Handles mouse down events
      */
     private __onMouseDown(evt: MouseEvent) {
-        this.data.mousedown = true;
+        this.data.step = Step.CLICK;
         this.data.startMouseX = evt.clientX;
         this.data.startMouseY = evt.clientY;
     }
@@ -221,7 +226,7 @@ export class EventsHandler extends AbstractService {
      *Handles mouse up events
      */
     private __onMouseUp(evt: MouseEvent) {
-        if (this.data.mousedown || this.data.step === MOVING) {
+        if (this.__isStep(Step.CLICK, Step.MOVING)) {
             this.__stopMove(evt.clientX, evt.clientY, evt.target, evt.button === 2);
         }
     }
@@ -230,7 +235,7 @@ export class EventsHandler extends AbstractService {
      * Handles mouse move events
      */
     private __onMouseMove(evt: MouseEvent) {
-        if (this.config.mousemove && (this.data.mousedown || this.data.step === MOVING)) {
+        if (this.config.mousemove && this.__isStep(Step.CLICK, Step.MOVING)) {
             evt.preventDefault();
             this.__doMove(evt.clientX, evt.clientY);
         }
@@ -243,7 +248,7 @@ export class EventsHandler extends AbstractService {
      */
     private __onTouchStart(evt: TouchEvent) {
         if (evt.touches.length === 1) {
-            this.data.mousedown = true;
+            this.data.step = Step.CLICK;
             this.data.startMouseX = evt.touches[0].clientX;
             this.data.startMouseY = evt.touches[0].clientY;
 
@@ -255,7 +260,7 @@ export class EventsHandler extends AbstractService {
                 }, LONGTOUCH_DELAY);
             }
         } else if (evt.touches.length === 2) {
-            this.data.mousedown = false;
+            this.data.step = Step.IDLE;
             this.__cancelLongTouch();
 
             if (this.config.mousemove) {
@@ -272,7 +277,7 @@ export class EventsHandler extends AbstractService {
     private __onTouchEnd(evt: TouchEvent) {
         this.__cancelLongTouch();
 
-        if (this.data.mousedown || this.data.step === MOVING) {
+        if (this.__isStep(Step.CLICK, Step.MOVING)) {
             evt.preventDefault();
             this.__cancelTwoFingersOverlay();
 
@@ -297,7 +302,7 @@ export class EventsHandler extends AbstractService {
 
         if (evt.touches.length === 1) {
             if (this.config.touchmoveTwoFingers) {
-                if (this.data.mousedown && !this.data.twofingersTimeout) {
+                if (this.__isStep(Step.CLICK) && !this.data.twofingersTimeout) {
                     this.data.twofingersTimeout = setTimeout(() => {
                         this.viewer.overlay.show({
                             id: IDS.TWO_FINGERS,
@@ -306,7 +311,7 @@ export class EventsHandler extends AbstractService {
                         });
                     }, TWOFINGERSOVERLAY_DELAY);
                 }
-            } else if (this.data.mousedown || this.data.step === MOVING) {
+            } else if (this.__isStep(Step.CLICK, Step.MOVING)) {
                 evt.preventDefault();
                 const touch = evt.touches[0];
                 this.__doMove(touch.clientX, touch.clientY);
@@ -391,8 +396,7 @@ export class EventsHandler extends AbstractService {
      * Resets all state variables
      */
     private __resetMove() {
-        this.data.step = IDLE;
-        this.data.mousedown = false;
+        this.data.step = Step.IDLE;
         this.data.mouseX = 0;
         this.data.mouseY = 0;
         this.data.startMouseX = 0;
@@ -410,7 +414,7 @@ export class EventsHandler extends AbstractService {
         const p1 = { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
         const p2 = { x: evt.touches[1].clientX, y: evt.touches[1].clientY };
 
-        this.data.step = MOVING;
+        this.data.step = Step.MOVING;
         this.data.pinchDist = distance(p1, p2);
         this.data.mouseX = (p1.x + p2.x) / 2;
         this.data.mouseY = (p1.y + p2.y) / 2;
@@ -422,7 +426,7 @@ export class EventsHandler extends AbstractService {
      * @description If the move threshold was not reached a click event is triggered, otherwise an animation is launched to simulate inertia
      */
     private __stopMove(clientX: number, clientY: number, target?: EventTarget, rightclick = false) {
-        if (this.data.step === MOVING) {
+        if (this.__isStep(Step.MOVING)) {
             if (this.config.moveInertia) {
                 this.__logMouseMove(clientX, clientY);
                 this.__stopMoveInertia(clientX, clientY);
@@ -430,7 +434,7 @@ export class EventsHandler extends AbstractService {
                 this.__resetMove();
                 this.viewer.resetIdleTimer();
             }
-        } else if (this.data.mousedown) {
+        } else if (this.__isStep(Step.CLICK)) {
             this.viewer.stopAnimation();
             this.__doClick(clientX, clientY, target, rightclick);
             this.__resetMove();
@@ -462,7 +466,7 @@ export class EventsHandler extends AbstractService {
             return;
         }
 
-        this.data.step = INERTIA;
+        this.data.step = Step.INERTIA;
 
         let currentClientX = clientX;
         let currentClientY = clientY;
@@ -599,17 +603,17 @@ export class EventsHandler extends AbstractService {
      */
     private __doMove(clientX: number, clientY: number) {
         if (
-            this.data.mousedown
+            this.__isStep(Step.CLICK)
             && (Math.abs(clientX - this.data.startMouseX) >= this.moveThreshold
                 || Math.abs(clientY - this.data.startMouseY) >= this.moveThreshold)
         ) {
             this.viewer.stopAll();
             this.__resetMove();
-            this.data.step = MOVING;
+            this.data.step = Step.MOVING;
             this.data.mouseX = clientX;
             this.data.mouseY = clientY;
             this.__logMouseMove(clientX, clientY);
-        } else if (this.data.step === MOVING) {
+        } else if (this.__isStep(Step.MOVING)) {
             this.__applyMove(clientX, clientY);
             this.__logMouseMove(clientX, clientY);
         }
@@ -644,7 +648,7 @@ export class EventsHandler extends AbstractService {
      * Perfoms combined move and zoom
      */
     private __doMoveZoom(evt: TouchEvent) {
-        if (this.data.step === MOVING) {
+        if (this.__isStep(Step.MOVING)) {
             evt.preventDefault();
 
             const p1 = { x: evt.touches[0].clientX, y: evt.touches[0].clientY };

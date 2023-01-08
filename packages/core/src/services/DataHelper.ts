@@ -173,6 +173,14 @@ export class DataHelper extends AbstractService {
     }
 
     /**
+     * Converts position on the viewer to spherical radians coordinates
+     */
+    viewerCoordsToSphericalCoords(viewerPoint: Point): Position {
+        const vector = this.viewerCoordsToVector3(viewerPoint);
+        return vector ? this.vector3ToSphericalCoords(vector) : null;
+    }
+
+    /**
      * Converts a Vector3 to position on the viewer
      */
     vector3ToViewerCoords(vector: Vector3): Point {
