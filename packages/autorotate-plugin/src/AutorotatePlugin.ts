@@ -304,23 +304,34 @@ export class AutorotatePlugin extends AbstractPlugin<AutorotatePluginEvents> {
      * Launches the standard animation
      */
     private __animate() {
-        this.viewer.dynamics.position.roll(
-            {
-                yaw: this.config.autorotateSpeed < 0,
-            },
-            Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
-        );
-
-        this.viewer.dynamics.position.goto(
-            {
-                pitch: this.config.autorotatePitch ?? this.viewer.config.defaultPitch,
-            },
-            Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
-        );
-
+        // do the zoom before the rotation
+        let p: PromiseLike<any>;
         if (!utils.isNil(this.config.autorotateZoomLvl)) {
-            this.viewer.dynamics.zoom.goto(this.config.autorotateZoomLvl);
+            p = this.viewer.animate({
+                zoom: this.config.autorotateZoomLvl,
+                // "2" is magic, and kinda related to the "PI/4" in animate()
+                speed: `${this.viewer.config.zoomSpeed * 2}rpm`,
+            });
         }
+        else {
+            p = Promise.resolve();
+        }
+
+        p.then(() => {
+            this.viewer.dynamics.position.roll(
+                {
+                    yaw: this.config.autorotateSpeed < 0,
+                },
+                Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
+            );
+
+            this.viewer.dynamics.position.goto(
+                {
+                    pitch: this.config.autorotatePitch ?? this.viewer.config.defaultPitch,
+                },
+                Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
+            );
+        });
     }
 
     /**

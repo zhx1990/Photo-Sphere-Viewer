@@ -3,7 +3,7 @@ home: true
 heroImage: logo.png
 heroText: Photo Sphere Viewer
 heroAlt: Photo Sphere Viewer
-tagline: A JavaScript library to display Photo Sphere panoramas
+tagline: A JavaScript library to display 360° sphere panoramas
 actionText: Get Started →
 actionLink: /guide/
 features:
