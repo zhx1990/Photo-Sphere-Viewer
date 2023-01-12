@@ -31,6 +31,8 @@
                     equiangular: true,
                 }],
                 caption: 'Dreams of Dalí <b>&copy; The Dalí Museum</b>',
+                loadingImg: baseUrl + 'loader.gif',
+                navbar: 'video zoom move caption settings fullscreen',
                 plugins: [
                     [PhotoSphereViewer.VideoPlugin, {
                         progressbar: true,
@@ -41,25 +43,23 @@
                         defaultResolution: 'FHD',
                         resolutions: [
                             {
-                                    id: 'UHD',
-                                    label: 'Ultra high',
-                                    panorama: { source: baseUrl + 'cubemap-video/DreamOfDali_UHD.webm' },
-                                },
-                                {
-                                    id: 'FHD',
-                                    label: 'High',
-                                    panorama: { source: baseUrl + 'cubemap-video/DreamOfDali_FHD.webm' },
-                                },
-                                {
-                                    id: 'HD',
-                                    label: 'Standard',
+                                id: 'UHD',
+                                label: 'Ultra high',
+                                panorama: { source: baseUrl + 'cubemap-video/DreamOfDali_UHD.webm' },
+                            },
+                            {
+                                id: 'FHD',
+                                label: 'High',
+                                panorama: { source: baseUrl + 'cubemap-video/DreamOfDali_FHD.webm' },
+                            },
+                            {
+                                id: 'HD',
+                                label: 'Standard',
                                 panorama: { source: baseUrl + 'cubemap-video/DreamOfDali_HD.webm' },
                             },
                         ],
                     }],
                 ],
-                loadingImg: baseUrl + 'loader.gif',
-                navbar: 'video zoom move caption settings fullscreen',
             });
         </script>
     </body>

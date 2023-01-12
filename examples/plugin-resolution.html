@@ -30,20 +30,23 @@
                         showBadge: true,
                         defaultResolution: 'SD',
                         resolutions: [
-                                {
-                                    id: 'SD',
-                                    label: 'Small',
-                                    panorama: baseUrl + 'sphere-small.jpg',
-                                },
-                                {
-                                    id: 'HD',
-                                    label: 'Normal',
+                            {
+                                id: 'SD',
+                                label: 'Small',
+                                panorama: baseUrl + 'sphere-small.jpg',
+                            },
+                            {
+                                id: 'HD',
+                                label: 'Normal',
                                 panorama: baseUrl + 'sphere.jpg',
                             },
                         ],
                     }],
                 ],
             });
+
+            const settings = viewer.getPlugin(PhotoSphereViewer.SettingsPlugin);
+            const resolution = viewer.getPlugin(PhotoSphereViewer.ResolutionPlugin);
         </script>
     </body>
 </html>

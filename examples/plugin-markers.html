@@ -133,284 +133,284 @@
                         markers: (() => {
                             const a = [];
 
-                                // marker with content and tooltip
-                                a.push({
-                                    id: 'content',
-                                    tooltip: 'Click me!',
-                                    content: document.getElementById('pin-content').innerHTML,
-                                    position: { yaw: 0.11, pitch: 0.32 },
-                                    image: baseUrl + 'pictos/pin-blue.png',
-                                    size: { width: 32, height: 32 },
-                                    anchor: 'bottom center',
-                                });
+                            // marker with content and tooltip
+                            a.push({
+                                id: 'content',
+                                tooltip: 'Click me!',
+                                content: document.getElementById('pin-content').innerHTML,
+                                position: { yaw: 0.11, pitch: 0.32 },
+                                image: baseUrl + 'pictos/pin-blue.png',
+                                size: { width: 32, height: 32 },
+                                anchor: 'bottom center',
+                            });
 
-                                // marker with custom tooltip
-                                a.push({
-                                    id: 'custom-tooltip',
-                                    tooltip: {
-                                        content: `
+                            // marker with custom tooltip
+                            a.push({
+                                id: 'custom-tooltip',
+                                tooltip: {
+                                    content: `
 <img src="${baseUrl}sphere-small.jpg">
 <article>
 <h2>Lorem ipsum</h2>
 <p>Vivamus magna. Cras in mi at felis aliquet congue. Ut a est eget ligula molestie gravida. Curabitur massa. Donec eleifend, libero at sagittis mollis,
 tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretium ornare est.</p>
 </article>`,
-                                        className: 'custom-tooltip',
-                                        trigger: 'click',
-                                    },
-                                    position: { yaw: -0.35, pitch: 0.11 },
-                                    zoomLvl: 100,
-                                    image: baseUrl + 'pictos/pin-blue.png',
-                                    size: { width: 32, height: 32 },
-                                    anchor: 'bottom center',
-                                    listContent: 'Lorem ipsum',
-                                });
+                                    className: 'custom-tooltip',
+                                    trigger: 'click',
+                                },
+                                position: { yaw: -0.35, pitch: 0.11 },
+                                zoomLvl: 100,
+                                image: baseUrl + 'pictos/pin-blue.png',
+                                size: { width: 32, height: 32 },
+                                anchor: 'bottom center',
+                                listContent: 'Lorem ipsum',
+                            });
 
-                                // big polygon to test the handling of points behind the camera
-                                a.push({
-                                    id: 'polygon-sky',
-                                    svgStyle: {
-                                        fill: 'rgba(0, 190, 255, 0.1)',
-                                    },
-                                    // prettier-ignore
-                                    polygon: [
-                                        [6.0848, 0.1806], [0.1022, 0.3166], [0.6333, 0.3836], [1.2396, 0.5112],
-                                        [1.7922, 0.5544], [2.7635, 0.7853], [3.3688, 0.4723], [3.6902, 0.6161],
-                                        [4.2981, 0.6942], [4.6605, 0.6618], [5.4694, 0.188], [5.7125, 0.1302],
-                                    ],
-                                    hideList: true,
-                                });
+                            // big polygon to test the handling of points behind the camera
+                            a.push({
+                                id: 'polygon-sky',
+                                svgStyle: {
+                                    fill: 'rgba(0, 190, 255, 0.1)',
+                                },
+                                // prettier-ignore
+                                polygon: [
+                                    [6.0848, 0.1806], [0.1022, 0.3166], [0.6333, 0.3836], [1.2396, 0.5112],
+                                    [1.7922, 0.5544], [2.7635, 0.7853], [3.3688, 0.4723], [3.6902, 0.6161],
+                                    [4.2981, 0.6942], [4.6605, 0.6618], [5.4694, 0.188], [5.7125, 0.1302],
+                                ],
+                                hideList: true,
+                            });
 
-                                // polygon with custom style
-                                a.push({
-                                    id: 'polygon-1',
-                                    // prettier-ignore
-                                    polygonPixels: [
-                                        [2941, 1413], [3042, 1402], [3041, 1555], [2854, 1559],
-                                        [2739, 1516], [2775, 1469], [2941, 1413],
-                                    ],
-                                    svgStyle: {
-                                        fill: 'rgba(255,0,0,0.2)',
-                                        stroke: 'rgba(255, 0, 50, 0.8)',
-                                        strokeWidth: '2px',
-                                    },
-                                    tooltip: {
-                                        content: 'Simple polygon',
-                                        position: 'bottom right',
-                                    },
-                                });
+                            // polygon with custom style
+                            a.push({
+                                id: 'polygon-1',
+                                // prettier-ignore
+                                polygonPixels: [
+                                    [2941, 1413], [3042, 1402], [3041, 1555], [2854, 1559],
+                                    [2739, 1516], [2775, 1469], [2941, 1413],
+                                ],
+                                svgStyle: {
+                                    fill: 'rgba(255,0,0,0.2)',
+                                    stroke: 'rgba(255, 0, 50, 0.8)',
+                                    strokeWidth: '2px',
+                                },
+                                tooltip: {
+                                    content: 'Simple polygon',
+                                    position: 'bottom right',
+                                },
+                            });
 
-                                a.push({
-                                    id: 'polygon-2',
-                                    // prettier-ignore
-                                    polygonPixels: [
-                                        [3042, 1402], [3222, 1419], [3433, 1463], [3480, 1505],
-                                        [3438, 1538], [3241, 1543], [3041, 1555],
-                                    ],
-                                    svgStyle: {
-                                        fill: 'url(#image)',
-                                        fillOpacity: '0.5',
-                                        stroke: 'rgba(255, 0, 50, 0.8)',
-                                        strokeWidth: '2px',
-                                    },
-                                    tooltip: {
-                                        content: 'Polygon with image background',
-                                        position: 'bottom right',
-                                    },
-                                });
+                            a.push({
+                                id: 'polygon-2',
+                                // prettier-ignore
+                                polygonPixels: [
+                                    [3042, 1402], [3222, 1419], [3433, 1463], [3480, 1505],
+                                    [3438, 1538], [3241, 1543], [3041, 1555],
+                                ],
+                                svgStyle: {
+                                    fill: 'url(#image)',
+                                    fillOpacity: '0.5',
+                                    stroke: 'rgba(255, 0, 50, 0.8)',
+                                    strokeWidth: '2px',
+                                },
+                                tooltip: {
+                                    content: 'Polygon with image background',
+                                    position: 'bottom right',
+                                },
+                            });
 
-                                // simple polyline
-                                a.push({
-                                    id: 'polyline',
-                                    // prettier-ignore
-                                    polylinePixels: [
-                                        2478, 1635, 2184, 1747, 1674, 1953, 1166, 1852, 
-                                        709, 1669, 301, 1519, 94, 1399, 34, 1356,
-                                    ],
-                                    svgStyle: {
-                                        stroke: 'rgba(80, 150, 50, 0.8)',
-                                        strokeLinecap: 'round',
-                                        strokeLinejoin: 'round',
-                                        strokeWidth: '20px',
-                                    },
-                                    tooltip: 'Polyline',
-                                });
+                            // simple polyline
+                            a.push({
+                                id: 'polyline',
+                                // prettier-ignore
+                                polylinePixels: [
+                                    2478, 1635, 2184, 1747, 1674, 1953, 1166, 1852,
+                                    709, 1669, 301, 1519, 94, 1399, 34, 1356,
+                                ],
+                                svgStyle: {
+                                    stroke: 'rgba(80, 150, 50, 0.8)',
+                                    strokeLinecap: 'round',
+                                    strokeLinejoin: 'round',
+                                    strokeWidth: '20px',
+                                },
+                                tooltip: 'Polyline',
+                            });
 
-                                // embedded images
-                                a.push({
-                                    id: 'imageLayer',
-                                    imageLayer: baseUrl + 'pictos/tent.png',
-                                    size: { width: 120, height: 94 },
-                                    position: { yaw: -0.45, pitch: -0.1 },
-                                    tooltip: 'Image embedded in the scene',
-                                });
+                            // embedded images
+                            a.push({
+                                id: 'imageLayer',
+                                imageLayer: baseUrl + 'pictos/tent.png',
+                                size: { width: 120, height: 94 },
+                                position: { yaw: -0.45, pitch: -0.1 },
+                                tooltip: 'Image embedded in the scene',
+                            });
 
-                                a.push({
-                                    id: 'imageLayerOrient',
-                                    imageLayer: baseUrl + 'pictos/target.png',
-                                    size: { width: 120, height: 120 },
-                                    position: { yaw: 0.37, pitch: -0.2 },
-                                    opacity: 0.8,
-                                    orientation: 'horizontal',
-                                    tooltip: 'Image embedded in the scene with "horizontal" orientation',
-                                });
+                            a.push({
+                                id: 'imageLayerOrient',
+                                imageLayer: baseUrl + 'pictos/target.png',
+                                size: { width: 120, height: 120 },
+                                position: { yaw: 0.37, pitch: -0.2 },
+                                opacity: 0.8,
+                                orientation: 'horizontal',
+                                tooltip: 'Image embedded in the scene with "horizontal" orientation',
+                            });
 
-                                // HTML & image markers
-                                a.push({
-                                    id: 'html-img-demo',
-                                    html: 'HTML & Image demo',
-                                    scale: [0.5, 1.5],
-                                    className: 'demo-label',
-                                    position: { yaw: 0.5, pitch: -0.42 },
-                                    hideList: true,
-                                });
+                            // HTML & image markers
+                            a.push({
+                                id: 'html-img-demo',
+                                html: 'HTML & Image demo',
+                                scale: [0.5, 1.5],
+                                className: 'demo-label',
+                                position: { yaw: 0.5, pitch: -0.42 },
+                                hideList: true,
+                            });
 
-                                a.push({
-                                    id: 'gif',
-                                    image: baseUrl + 'loader.gif',
-                                    size: { width: 100, height: 100 },
-                                    position: { yaw: 0.56, pitch: -0.32 },
-                                    listContent: 'An animated gif',
-                                });
+                            a.push({
+                                id: 'gif',
+                                image: baseUrl + 'loader.gif',
+                                size: { width: 100, height: 100 },
+                                position: { yaw: 0.56, pitch: -0.32 },
+                                listContent: 'An animated gif',
+                            });
 
-                                a.push({
-                                    id: 'text',
-                                    html: `<code>HTML</code> content <img src="${baseUrl}pictos/pin-blue.png" style="height: 24px; vertical-align: top;"/>`,
-                                    anchor: 'bottom right',
-                                    style: {
-                                        color: 'white',
-                                        fontSize: '20px',
-                                        fontFamily: 'Helvetica, sans-serif',
-                                        textAlign: 'center',
-                                    },
-                                    position: { yaw: 0.45, pitch: -0.38 },
-                                });
+                            a.push({
+                                id: 'text',
+                                html: `<code>HTML</code> content <img src="${baseUrl}pictos/pin-blue.png" style="height: 24px; vertical-align: top;"/>`,
+                                anchor: 'bottom right',
+                                style: {
+                                    color: 'white',
+                                    fontSize: '20px',
+                                    fontFamily: 'Helvetica, sans-serif',
+                                    textAlign: 'center',
+                                },
+                                position: { yaw: 0.45, pitch: -0.38 },
+                            });
 
-                                // SVG markers
-                                a.push({
-                                    id: 'svg-demo',
-                                    html: 'SVG marker demo',
-                                    scale: [0.5, 1.5],
-                                    className: 'demo-label',
-                                    position: { yaw: -0.5, pitch: -0.42 },
-                                    hideList: true,
-                                });
+                            // SVG markers
+                            a.push({
+                                id: 'svg-demo',
+                                html: 'SVG marker demo',
+                                scale: [0.5, 1.5],
+                                className: 'demo-label',
+                                position: { yaw: -0.5, pitch: -0.42 },
+                                hideList: true,
+                            });
 
-                                a.push({
-                                    id: 'circle',
-                                    tooltip: 'A circle of radius 30',
-                                    circle: 30,
-                                    svgStyle: {
-                                        fill: 'rgba(255,255,0,0.3)',
-                                        stroke: 'yellow',
-                                        strokeWidth: '2px',
-                                    },
-                                    position: { yaw: -0.5, pitch: -0.32 },
-                                    anchor: 'bottom right',
-                                });
+                            a.push({
+                                id: 'circle',
+                                tooltip: 'A circle of radius 30',
+                                circle: 30,
+                                svgStyle: {
+                                    fill: 'rgba(255,255,0,0.3)',
+                                    stroke: 'yellow',
+                                    strokeWidth: '2px',
+                                },
+                                position: { yaw: -0.5, pitch: -0.32 },
+                                anchor: 'bottom right',
+                            });
 
-                                a.push({
-                                    id: 'ellipse',
-                                    tooltip: 'An ellipse of radius 60/30',
-                                    ellipse: [60, 30],
-                                    svgStyle: {
-                                        fill: 'rgba(255,255,0,0.3)',
-                                        stroke: 'yellow',
-                                        strokeWidth: '2px',
-                                    },
-                                    position: { yaw: -0.5, pitch: -0.32 },
-                                    anchor: 'bottom left',
-                                });
+                            a.push({
+                                id: 'ellipse',
+                                tooltip: 'An ellipse of radius 60/30',
+                                ellipse: [60, 30],
+                                svgStyle: {
+                                    fill: 'rgba(255,255,0,0.3)',
+                                    stroke: 'yellow',
+                                    strokeWidth: '2px',
+                                },
+                                position: { yaw: -0.5, pitch: -0.32 },
+                                anchor: 'bottom left',
+                            });
 
-                                a.push({
-                                    id: 'rect',
-                                    tooltip: 'A square a side 60',
-                                    rect: [60, 60],
-                                    svgStyle: {
-                                        fill: 'rgba(255,255,0,0.3)',
-                                        stroke: 'yellow',
-                                        strokeWidth: '2px',
-                                    },
-                                    position: { yaw: -0.5, pitch: -0.32 },
-                                    anchor: 'top right',
-                                });
+                            a.push({
+                                id: 'rect',
+                                tooltip: 'A square a side 60',
+                                rect: [60, 60],
+                                svgStyle: {
+                                    fill: 'rgba(255,255,0,0.3)',
+                                    stroke: 'yellow',
+                                    strokeWidth: '2px',
+                                },
+                                position: { yaw: -0.5, pitch: -0.32 },
+                                anchor: 'top right',
+                            });
 
-                                a.push({
-                                    id: 'path',
-                                    tooltip: 'A custom path',
-                                    path: 'M 0 0 L 60 60 L 60 0 L 0 60 L 0 0',
-                                    svgStyle: {
-                                        fill: 'rgba(255,255,0,0.3)',
-                                        stroke: 'yellow',
-                                        strokeWidth: '2px',
-                                    },
-                                    position: { yaw: -0.5, pitch: -0.32 },
-                                    anchor: 'top left',
-                                });
+                            a.push({
+                                id: 'path',
+                                tooltip: 'A custom path',
+                                path: 'M 0 0 L 60 60 L 60 0 L 0 60 L 0 0',
+                                svgStyle: {
+                                    fill: 'rgba(255,255,0,0.3)',
+                                    stroke: 'yellow',
+                                    strokeWidth: '2px',
+                                },
+                                position: { yaw: -0.5, pitch: -0.32 },
+                                anchor: 'top left',
+                            });
 
-                                // Scalling markers
-                                a.push({
-                                    id: 'scale-demo',
-                                    html: 'Marker scale demo',
-                                    scale: [0.5, 1.5],
-                                    className: 'demo-label',
-                                    position: { yaw: 0, pitch: -0.47 },
-                                    hideList: true,
-                                });
+                            // Scalling markers
+                            a.push({
+                                id: 'scale-demo',
+                                html: 'Marker scale demo',
+                                scale: [0.5, 1.5],
+                                className: 'demo-label',
+                                position: { yaw: 0, pitch: -0.47 },
+                                hideList: true,
+                            });
 
-                                a.push({
-                                    id: 'scale-0',
-                                    tooltip: 'No scale',
-                                    scale: false,
-                                    circle: 20,
-                                    svgStyle: {
-                                        fill: 'rgba(0, 0, 0, 0.5)',
-                                    },
-                                    position: { yaw: -0.1, pitch: -0.4 },
-                                });
+                            a.push({
+                                id: 'scale-0',
+                                tooltip: 'No scale',
+                                scale: false,
+                                circle: 20,
+                                svgStyle: {
+                                    fill: 'rgba(0, 0, 0, 0.5)',
+                                },
+                                position: { yaw: -0.1, pitch: -0.4 },
+                            });
 
-                                a.push({
-                                    id: 'scale-1',
-                                    tooltip: '<code>zoom [0.5, 1.5]</code>',
-                                    scale: {
-                                        zoom: [0.5, 1.5],
-                                    },
-                                    circle: 20,
-                                    svgStyle: {
-                                        fill: 'rgba(0, 0, 0, 0.5)',
-                                    },
-                                    position: { yaw: 0, pitch: -0.4 },
-                                });
+                            a.push({
+                                id: 'scale-1',
+                                tooltip: '<code>zoom [0.5, 1.5]</code>',
+                                scale: {
+                                    zoom: [0.5, 1.5],
+                                },
+                                circle: 20,
+                                svgStyle: {
+                                    fill: 'rgba(0, 0, 0, 0.5)',
+                                },
+                                position: { yaw: 0, pitch: -0.4 },
+                            });
 
-                                a.push({
-                                    id: 'scale-2',
-                                    tooltip: '<code>yaw [1, 2]</code>',
-                                    scale: {
-                                        yaw: [1, 2],
-                                    },
-                                    circle: 20,
-                                    svgStyle: {
-                                        fill: 'rgba(0, 0, 0, 0.5)',
-                                    },
-                                    position: { yaw: 0.1, pitch: -0.4 },
-                                });
+                            a.push({
+                                id: 'scale-2',
+                                tooltip: '<code>yaw [1, 2]</code>',
+                                scale: {
+                                    yaw: [1, 2],
+                                },
+                                circle: 20,
+                                svgStyle: {
+                                    fill: 'rgba(0, 0, 0, 0.5)',
+                                },
+                                position: { yaw: 0.1, pitch: -0.4 },
+                            });
 
-                                // add markers all hover the sphere
-                                for (let i = 0, k = 1; i < Math.PI * 2; i += Math.PI / 4) {
-                                    for (let j = -Math.PI / 2 + Math.PI / 4; j < Math.PI / 2; j += Math.PI / 4, k++) {
-                                        a.push({
-                                            id: '#' + k,
-                                            tooltip: '#' + k,
-                                            position: { yaw: i, pitch: j },
-                                            image: baseUrl + 'pictos/pin-red.png',
-                                            size: { width: 32, height: 32 },
-                                            anchor: 'bottom center',
-                                            data: {
-                                                deletable: true,
-                                            },
-                                        });
-                                    }
+                            // add markers all hover the sphere
+                            for (let i = 0, k = 1; i < Math.PI * 2; i += Math.PI / 4) {
+                                for (let j = -Math.PI / 2 + Math.PI / 4; j < Math.PI / 2; j += Math.PI / 4, k++) {
+                                    a.push({
+                                        id: '#' + k,
+                                        tooltip: '#' + k,
+                                        position: { yaw: i, pitch: j },
+                                        image: baseUrl + 'pictos/pin-red.png',
+                                        size: { width: 32, height: 32 },
+                                        anchor: 'bottom center',
+                                        data: {
+                                            deletable: true,
+                                        },
+                                    });
                                 }
+                            }
 
                             return a;
                         })(),
