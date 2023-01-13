@@ -1,8 +1,7 @@
 import type { Navbar } from '../components/Navbar';
-import icon from '../icons/fullscreen-in.svg';
-import iconActive from '../icons/fullscreen-out.svg';
 import { FullscreenEvent } from '../events';
 import { AbstractButton } from './AbstractButton';
+import { ICONS } from '../data/constants';
 
 export class FullscreenButton extends AbstractButton {
     static override readonly id = 'fullscreen';
@@ -13,8 +12,8 @@ export class FullscreenButton extends AbstractButton {
             hoverScale: true,
             collapsable: false,
             tabbable: true,
-            icon: icon,
-            iconActive: iconActive,
+            icon: ICONS.fullscreenIn,
+            iconActive: ICONS.fullscreenOut,
         });
 
         this.viewer.addEventListener(FullscreenEvent.type, this);

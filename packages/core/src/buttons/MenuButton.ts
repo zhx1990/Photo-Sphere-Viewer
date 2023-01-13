@@ -1,15 +1,14 @@
 import type { Navbar } from '../components/Navbar';
-import { IDS } from '../data/constants';
-import icon from '../icons/menu.svg';
-import { getClosest } from '../utils';
+import { ICONS, IDS } from '../data/constants';
 import { HidePanelEvent, ShowPanelEvent } from '../events';
+import { getClosest } from '../utils';
 import { AbstractButton } from './AbstractButton';
 
 const BUTTON_DATA = 'psvButton';
 
 const MENU_TEMPLATE = (buttons: AbstractButton[], title: string) => `
 <div class="psv-panel-menu psv-panel-menu--stripped">
-  <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
+  <h1 class="psv-panel-menu-title">${ICONS.menu} ${title}</h1>
   <ul class="psv-panel-menu-list">
     ${buttons.map((button) => `
     <li data-psv-button="${button.id}" class="psv-panel-menu-item" tabindex="0">
@@ -30,7 +29,7 @@ export class MenuButton extends AbstractButton {
             hoverScale: true,
             collapsable: false,
             tabbable: true,
-            icon: icon,
+            icon: ICONS.menu,
         });
 
         this.viewer.addEventListener(ShowPanelEvent.type, this);

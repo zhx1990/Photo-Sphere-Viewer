@@ -41,42 +41,23 @@
         position: absolute;
         top: -1px;
         right: 0;
-        width: $psv-panel-close-button-size;
-        height: $psv-panel-close-button-size;
+        width: math.div($psv-panel-close-button-size, 5) * 3;
+        height: math.div($psv-panel-close-button-size, 5) * 3;
+        padding: math.div($psv-panel-close-button-size, 5);
         background: transparent;
+        color: $psv-panel-close-button-color;
         transition: background $psv-panel-close-button-animate-delay ease-in-out;
         cursor: pointer;
 
-        &::before,
-        &::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: $psv-panel-close-button-size * 0.125;
-            width: $psv-panel-close-button-size * 0.75;
-            height: 2px;
-            background-color: $psv-panel-close-button-color;
-            transition: $psv-panel-close-button-animate-delay ease-in-out;
-            transition-property: width, left, transform;
-        }
-
-        &::before {
-            transform: rotate(45deg);
-        }
-
-        &::after {
-            transform: rotate(-45deg);
+        svg {
+            transition: transform $psv-panel-close-button-animate-delay ease-in-out;
         }
 
         &:hover {
             background: $psv-panel-close-button-background;
 
-            &::before {
-                transform: rotate(45deg) scaleX(-1);
-            }
-
-            &::after {
-                transform: rotate(-45deg) scaleX(-1);
+            svg {
+                transform: scale(-1);
             }
         }
     }
@@ -163,6 +144,7 @@
         font: $psv-panel-title-font;
         margin: $psv-panel-title-margin $psv-panel-title-margin * 0.5;
 
+        /* stylelint-disable-next-line no-descending-specificity */
         svg {
             width: $psv-panel-title-icon-size;
             height: $psv-panel-title-icon-size;
@@ -203,6 +185,7 @@
                 max-height: 100%;
             }
 
+            /* stylelint-disable-next-line no-descending-specificity */
             svg {
                 width: 100%;
                 height: 100%;

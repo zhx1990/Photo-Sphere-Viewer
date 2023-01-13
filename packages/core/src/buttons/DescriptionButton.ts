@@ -1,6 +1,5 @@
 import type { Navbar } from '../components/Navbar';
-import { IDS } from '../data/constants';
-import icon from '../icons/info.svg';
+import { ICONS, IDS } from '../data/constants';
 import {
     ConfigChangedEvent,
     HideNotificationEvent,
@@ -27,7 +26,7 @@ export class DescriptionButton extends AbstractButton {
             hoverScale: true,
             collapsable: false,
             tabbable: true,
-            icon: icon,
+            icon: ICONS.info,
         });
 
         this.viewer.addEventListener(HideNotificationEvent.type, this);

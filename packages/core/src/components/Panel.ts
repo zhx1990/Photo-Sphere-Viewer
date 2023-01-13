@@ -1,4 +1,4 @@
-import { KEY_CODES } from '../data/constants';
+import { ICONS, KEY_CODES } from '../data/constants';
 import { PSVError } from '../PSVError';
 import { toggleClass } from '../utils';
 import type { Viewer } from '../Viewer';
@@ -70,6 +70,7 @@ export class Panel extends AbstractComponent {
 
         const closeBtn = document.createElement('div');
         closeBtn.className = 'psv-panel-close-button';
+        closeBtn.innerHTML = ICONS.close;
         this.container.appendChild(closeBtn);
 
         this.content = document.createElement('div');

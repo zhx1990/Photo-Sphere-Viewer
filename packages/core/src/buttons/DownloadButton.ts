@@ -1,6 +1,6 @@
 import { AbstractAdapter } from '../adapters/AbstractAdapter';
 import type { Navbar } from '../components/Navbar';
-import icon from '../icons/download.svg';
+import { ICONS } from '../data/constants';
 import { ConfigChangedEvent } from '../events';
 import { AbstractButton } from './AbstractButton';
 
@@ -13,7 +13,7 @@ export class DownloadButton extends AbstractButton {
             hoverScale: true,
             collapsable: true,
             tabbable: true,
-            icon: icon,
+            icon: ICONS.download,
         });
 
         this.viewer.addEventListener(ConfigChangedEvent.type, this);

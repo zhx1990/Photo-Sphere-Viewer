@@ -1,7 +1,6 @@
 import type { Navbar } from '../components/Navbar';
-import { KEY_CODES } from '../data/constants';
+import { ICONS, KEY_CODES } from '../data/constants';
 import { SYSTEM } from '../data/system';
-import icon from '../icons/arrow.svg';
 import { PressHandler } from '../utils/PressHandler';
 import { AbstractButton } from './AbstractButton';
 
@@ -22,7 +21,7 @@ function getIcon(value: MoveButtonDirection): string {
         default: angle = 0; break;
     }
 
-    return icon.replace('rotate(0', `rotate(${angle}`);
+    return ICONS.arrow.replace('rotate(0', `rotate(${angle}`);
 }
 
 export abstract class AbstractMoveButton extends AbstractButton {

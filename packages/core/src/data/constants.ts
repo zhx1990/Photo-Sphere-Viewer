@@ -1,3 +1,13 @@
+import arrow from '../icons/arrow.svg';
+import close from '../icons/close.svg';
+import download from '../icons/download.svg';
+import fullscreenIn from '../icons/fullscreen-in.svg';
+import fullscreenOut from '../icons/fullscreen-out.svg';
+import info from '../icons/info.svg';
+import menu from '../icons/menu.svg';
+import zoomIn from '../icons/zoom-in.svg';
+import zoomOut from '../icons/zoom-out.svg';
+
 /**
  * Default duration of the transition between panoramas
  */
@@ -89,6 +99,21 @@ export const KEY_CODES = {
     Delete: 'Delete',
     Plus: '+',
     Minus: '-',
+};
+
+/**
+ * Collection of SVG icons
+ */
+export const ICONS = {
+    arrow,
+    close,
+    download,
+    fullscreenIn,
+    fullscreenOut,
+    info,
+    menu,
+    zoomIn,
+    zoomOut
 };
 
 // @formatter:off

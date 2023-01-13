@@ -1,5 +1,5 @@
 import type { Viewer } from '@photo-sphere-viewer/core';
-import { AbstractComponent, utils } from '@photo-sphere-viewer/core';
+import { AbstractComponent, utils, CONSTANTS } from '@photo-sphere-viewer/core';
 import { ACTIVE_CLASS, GALLERY_ITEM_DATA, GALLERY_ITEM_DATA_KEY, ITEMS_TEMPLATE } from './constants';
 import type { GalleryPlugin } from './GalleryPlugin';
 import blankIcon from './icons/blank.svg';
@@ -26,6 +26,7 @@ export class GalleryComponent extends AbstractComponent {
 
         const closeBtn = document.createElement('div');
         closeBtn.className = 'psv-panel-close-button';
+        closeBtn.innerHTML = CONSTANTS.ICONS.close;
         this.container.appendChild(closeBtn);
 
         this.items = document.createElement('div');
