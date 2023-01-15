@@ -62,6 +62,7 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
         download: 'Download',
         fullscreen: 'Fullscreen',
         menu: 'Menu',
+        close: 'Close',
         twoFingers: 'Use two fingers to navigate',
         ctrlZoom: 'Use ctrl + scroll to zoom the image',
         loadError: "The panorama can't be loaded",

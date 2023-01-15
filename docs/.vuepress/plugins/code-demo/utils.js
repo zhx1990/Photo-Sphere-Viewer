@@ -9,8 +9,8 @@ function fullname(name) {
     return ORG + name;
 }
 
-function buildPath(name, type) {
-    return CDN_BASE + name + '@' + VERSION + '/index.' + type;
+function buildPath(name, version, type) {
+    return CDN_BASE + name + '@' + (version || VERSION) + '/index.' + type;
 }
 
 export function getFullJs(js) {
@@ -36,10 +36,11 @@ export function getFullHtml(html) {
 ${html}`.trim();
 }
 
-export function getFullPackages(packages) {
+export function getFullPackages(coreVersion, packages) {
     return [
         {
             name: fullname('core'),
+            version: coreVersion,
             imports: 'Viewer',
             style: true,
         },
@@ -53,8 +54,8 @@ export function getFullPackages(packages) {
 export function getAllResources(packages) {
     return [
         THREE_PATH,
-        ...packages.map(({ name }) => buildPath(name, 'js')),
-        ...packages.filter(({ style }) => style).map(({ name }) => buildPath(name, 'css')),
+        ...packages.map(({ name, version }) => buildPath(name, version, 'js')),
+        ...packages.filter(({ style }) => style).map(({ name, version }) => buildPath(name, version, 'css')),
     ];
 }
 
@@ -117,8 +118,8 @@ export function getCodeSandboxValue({ title, js, css, html, packages }) {
                         start: 'parcel index.html --open',
                         build: 'parcel build index.html',
                     },
-                    dependencies: packages.reduce((deps, { name }) => {
-                        deps[name] = VERSION;
+                    dependencies: packages.reduce((deps, { name, version }) => {
+                        deps[name] = version || VERSION;
                         return deps;
                     }, {}),
                     devDependencies: {

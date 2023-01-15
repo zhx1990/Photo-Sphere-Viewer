@@ -27,10 +27,10 @@
                 caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
                 loadingImg: baseUrl + 'loader.gif',
                 plugins: [
-                [PhotoSphereViewer.MarkersPlugin, {
-                    markers: (() => {
-                        const m = [];
-                        for (let i = 0, l = Math.random() * 2 + 2; i < l; i++) {
+                    [PhotoSphereViewer.MarkersPlugin, {
+                        markers: (() => {
+                            const m = [];
+                            for (let i = 0, l = Math.random() * 2 + 2; i < l; i++) {
                                 m.push({
                                     id: `#${i}`,
                                     position: {

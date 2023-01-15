@@ -51,6 +51,7 @@ export default {
     components: { ServiceButton },
     props: {
         title: { type: String, default: '' },
+        version: { type: String, default: '' },
         rawHtml: { type: String, default: '' },
         rawJs: { type: String, default: '' },
         rawCss: { type: String, default: '' },
@@ -72,7 +73,7 @@ export default {
             return getFullCss(decodeURIComponent(this.rawCss));
         },
         packages() {
-            return getFullPackages(JSON.parse(decodeURIComponent(this.rawPackages)));
+            return getFullPackages(this.version, JSON.parse(decodeURIComponent(this.rawPackages)));
         },
         srcdoc() {
             return getIframeContent({

@@ -117,14 +117,14 @@ The north is always at yaw=0, if you need to change where is the north you can u
 -   type: `string`
 -   default: `'120px'`
 
-The size of the compass, can be declared in `px`, `rem`, `vh`, etc.
+The size of the widget, can be declared in `px`, `rem`, `vh`, etc.
 
 #### `position`
 
 -   type: `string`
 -   default: `'top left'`
 
-Accepted positions are combinations of `top`, `center`, `bottom` and `left`, `center`, `right`.
+Position of the widget, accepted positions are combinations of `top`, `center`, `bottom` and `left`, `center`, `right`.
 
 #### `navigation`
 
@@ -135,10 +135,10 @@ Allows to click on the compass to rotate the viewer.
 
 #### `hotspots`
 
--   type: `Hotspot[]`
+-   type: `CompassHotspot[]`
 -   default: `null`
 
-Small dots visible on the compass. Each spot consist of a position (either `yaw`/`pitch` or `textureX`/`textureY`) and an optional `color` which overrides the global `hotspotColor`.
+Small dots visible on the compass. Each spot consists of a position (either `yaw`/`pitch` or `textureX`/`textureY`) and an optional `color` which overrides the global `hotspotColor`.
 
 ::: tip
 [Markers](./markers.md) can be displayed on the compass by defining their `compass` data, which can be `true` or a specific color.
@@ -205,4 +205,4 @@ compassPlugin.setHotspots([
 
 #### `clearHotspots()`
 
-Removes all hotspots
+Removes all hotspots.

@@ -369,6 +369,7 @@ export type ViewerConfig = {
         download: string;
         fullscreen: string;
         menu: string;
+        close: string;
         twoFingers: string;
         ctrlZoom: string;
         loadError: string;

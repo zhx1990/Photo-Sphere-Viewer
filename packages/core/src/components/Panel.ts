@@ -71,6 +71,7 @@ export class Panel extends AbstractComponent {
         const closeBtn = document.createElement('div');
         closeBtn.className = 'psv-panel-close-button';
         closeBtn.innerHTML = ICONS.close;
+        closeBtn.title = viewer.config.lang.close;
         this.container.appendChild(closeBtn);
 
         this.content = document.createElement('div');

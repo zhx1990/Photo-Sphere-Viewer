@@ -6,7 +6,6 @@ import type { StereoPlugin } from './StereoPlugin';
 
 export class StereoButton extends AbstractButton {
     static override readonly id = 'stereo';
-    static icon = stereo;
 
     private readonly plugin: StereoPlugin;
 

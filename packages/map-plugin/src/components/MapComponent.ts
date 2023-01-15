@@ -1,0 +1,556 @@
+import type { Point, Tooltip, Viewer } from '@photo-sphere-viewer/core';
+import { AbstractComponent, SYSTEM, utils } from '@photo-sphere-viewer/core';
+import type { Marker, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import { MathUtils } from 'three';
+import { HOTSPOT_MARKER_ID, MARKER_DATA_KEY } from '../constants';
+import { SelectHotspot } from '../events';
+import type { MapPlugin } from '../MapPlugin';
+import { MapHotspot } from '../model';
+import { getImageHtml, loadImage, projectPoint, unprojectPoint } from '../utils';
+import { MapCloseButton } from './MapCloseButton';
+import { MapMaximizeButton } from './MapMaximizeButton';
+import { MapResetButton } from './MapResetButton';
+import { MapZoomToolbar } from './MapZoomToolbar';
+
+export class MapComponent extends AbstractComponent {
+    protected override readonly state = {
+        visible: true,
+        maximized: false,
+        collapsed: false,
+
+        zoom: this.config.defaultZoom,
+        offset: { x: 0, y: 0 } as Point,
+
+        mouseX: null as number,
+        mouseY: null as number,
+        mousedown: false,
+
+        hotspotPos: {} as Record<string, Point>,
+        hotspotId: null as string,
+        hotspotTooltip: null as Tooltip,
+        markers: [] as MapHotspot[],
+
+        forceRender: false,
+        needsUpdate: false,
+        renderLoop: null as ReturnType<typeof requestAnimationFrame>,
+
+        images: {} as Record<string, { loading: boolean; value: HTMLImageElement }>,
+    };
+
+    private readonly canvas: HTMLCanvasElement;
+    private readonly compass?: HTMLElement;
+    private readonly zoomToolbar: MapZoomToolbar;
+
+    get config() {
+        return this.plugin.config;
+    }
+
+    get maximized() {
+        return this.state.maximized;
+    }
+
+    get collapsed() {
+        return this.state.collapsed;
+    }
+
+    constructor(viewer: Viewer, private plugin: MapPlugin) {
+        super(viewer, {
+            className: `psv-map psv-map--${plugin.config.position.join('-')}`,
+        });
+
+        this.container.style.width = plugin.config.size;
+        this.container.style.height = plugin.config.size;
+
+        // map + compass container
+        const canvasContainer = document.createElement('div');
+        canvasContainer.className = 'psv-map__container';
+
+        canvasContainer.addEventListener('mousedown', this);
+        canvasContainer.addEventListener('touchstart', this);
+        window.addEventListener('mousemove', this);
+        window.addEventListener('touchmove', this);
+        window.addEventListener('mouseup', this);
+        window.addEventListener('touchend', this);
+        canvasContainer.addEventListener('wheel', this);
+
+        // map canvas
+        this.canvas = document.createElement('canvas');
+        canvasContainer.appendChild(this.canvas);
+
+        // compass
+        if (plugin.config.compassImage) {
+            this.compass = document.createElement('div');
+            this.compass.className = 'psv-map__compass';
+            this.compass.innerHTML = getImageHtml(plugin.config.compassImage);
+
+            canvasContainer.appendChild(this.compass);
+        }
+
+        this.container.appendChild(canvasContainer);
+
+        this.container.addEventListener('transitionstart', this);
+        this.container.addEventListener('transitionend', this);
+
+        // sub-components
+        new MapMaximizeButton(this);
+        new MapResetButton(this);
+        new MapCloseButton(this);
+        this.zoomToolbar = new MapZoomToolbar(this);
+
+        // render loop
+        const render = () => {
+            if (this.isVisible() && (this.state.needsUpdate || this.state.forceRender)) {
+                this.render();
+                this.state.needsUpdate = false;
+            }
+            this.state.renderLoop = requestAnimationFrame(render);
+        };
+        render();
+
+        this.hide();
+    }
+
+    override destroy(): void {
+        window.removeEventListener('touchmove', this);
+        window.removeEventListener('mousemove', this);
+        window.removeEventListener('touchend', this);
+        window.removeEventListener('mouseup', this);
+
+        cancelAnimationFrame(this.state.renderLoop);
+
+        super.destroy();
+    }
+
+    handleEvent(e: Event) {
+        switch (e.type) {
+            case 'mousedown':
+            case 'touchstart': {
+                const mouse = (e as TouchEvent).changedTouches?.[0] || (e as MouseEvent);
+                this.state.mouseX = mouse.clientX;
+                this.state.mouseY = mouse.clientY;
+                this.state.mousedown = true;
+                e.stopPropagation();
+                break;
+            }
+            case 'mousemove':
+            case 'touchmove': {
+                const mouse = (e as TouchEvent).changedTouches?.[0] || (e as MouseEvent);
+                if (this.state.mousedown) {
+                    this.__move(mouse.clientX, mouse.clientY);
+                    e.stopPropagation();
+                } else {
+                    this.__handleHotspots(mouse.clientX, mouse.clientY);
+                }
+                break;
+            }
+            case 'mouseup':
+            case 'touchend': {
+                const mouse = (e as TouchEvent).changedTouches?.[0] || (e as MouseEvent);
+                if (this.state.mousedown) {
+                    this.state.mousedown = false;
+                    e.stopPropagation();
+                }
+                this.__clickHotspot(mouse.clientX, mouse.clientY);
+                break;
+            }
+            case 'wheel': {
+                const event = e as WheelEvent;
+                const delta = event.deltaY / Math.abs(event.deltaY);
+                this.zoom(-delta / 10);
+                e.stopPropagation();
+                e.preventDefault();
+                break;
+            }
+            case 'transitionstart':
+                this.state.forceRender = true;
+                break;
+            case 'transitionend':
+                if (!this.state.maximized && this.compass) {
+                    this.compass.style.display = '';
+                }
+                this.state.forceRender = false;
+                this.update();
+                break;
+            default:
+                break;
+        }
+    }
+
+    override show(): void {
+        super.show();
+        this.update();
+    }
+
+    /**
+     * Flag for render
+     */
+    update() {
+        this.state.needsUpdate = true;
+    }
+
+    /**
+     * Clears the map image and offset
+     */
+    reload() {
+        delete this.state.images[this.config.imageUrl];
+        this.recenter();
+    }
+
+    /**
+     * Clears the offset and zoom level
+     */
+    reset() {
+        this.state.zoom = this.config.defaultZoom;
+        this.recenter();
+    }
+
+    /**
+     * Clears the offset
+     */
+    recenter() {
+        this.state.offset.x = 0;
+        this.state.offset.y = 0;
+        this.update();
+    }
+
+    /**
+     * Switch collapsed mode
+     */
+    toggleCollapse() {
+        this.state.collapsed = !this.state.collapsed;
+
+        utils.toggleClass(this.container, 'psv-map--collapsed', this.state.collapsed);
+
+        if (this.state.maximized) {
+            this.toggleMaximized();
+        }
+
+        if (!this.state.collapsed) {
+            this.reset();
+        }
+    }
+
+    /**
+     * Switch maximized mode
+     */
+    toggleMaximized() {
+        this.state.maximized = !this.state.maximized;
+
+        utils.toggleClass(this.container, 'psv-map--maximized', this.state.maximized);
+
+        if (this.state.maximized && this.compass) {
+            this.compass.style.display = 'none';
+        }
+    }
+
+    /**
+     * Changes the zoom level
+     */
+    zoom(d: number) {
+        this.state.zoom = MathUtils.clamp(this.state.zoom + d, this.config.minZoom, this.config.maxZoom);
+        this.update();
+    }
+
+    /**
+     * Updates the markers
+     */
+    setMarkers(markers: Marker[]) {
+        this.state.markers = markers
+            .filter((marker) => marker.data[MARKER_DATA_KEY])
+            .map((marker) => {
+                const markerData = marker.data[MARKER_DATA_KEY];
+
+                let hotspot: MapHotspot;
+                if ('distance' in markerData) {
+                    hotspot = {
+                        yaw: marker.state.position.yaw,
+                        distance: markerData['distance'],
+                    };
+                } else if ('x' in markerData && 'y' in markerData) {
+                    hotspot = {
+                        x: markerData.x,
+                        y: markerData.y,
+                    };
+                } else {
+                    utils.logWarn(`Marker ${marker.id} "map" data is missing position (distance or x+y)`);
+                    return null;
+                }
+
+                hotspot.id = HOTSPOT_MARKER_ID + marker.id;
+                hotspot.image = markerData['image'];
+                hotspot.tooltip = marker.config.tooltip?.content;
+
+                return hotspot;
+            })
+            .filter((h) => h);
+
+        this.update();
+    }
+
+    private render() {
+        // load the map image
+        const mapImage = this.__loadImage(this.config.imageUrl);
+        if (!mapImage) {
+            return;
+        }
+
+        // clear hotspots status
+        this.state.hotspotPos = {};
+        this.__resetHotspot();
+
+        const yaw = this.viewer.getPosition().yaw;
+        const zoom = Math.exp(this.state.zoom);
+        const center = this.config.center;
+        const offset = this.state.offset;
+        const rotation = this.config.rotation;
+
+        // update UI
+        if (this.compass && !this.config.static) {
+            this.compass.style.transform = `rotate(${-MathUtils.radToDeg(yaw + this.config.rotation)}deg)`;
+        }
+        this.zoomToolbar.setText(zoom);
+
+        // clear canvas
+        this.canvas.width = this.container.clientWidth * SYSTEM.pixelRatio;
+        this.canvas.height = this.container.clientHeight * SYSTEM.pixelRatio;
+
+        const canvasPos = utils.getPosition(this.canvas);
+        const canvasW = this.canvas.width;
+        const canvasH = this.canvas.height;
+
+        const context = this.canvas.getContext('2d');
+        context.clearRect(0, 0, canvasW, canvasH);
+
+        // draw the map
+        const mapW = mapImage.width;
+        const mapH = mapImage.height;
+
+        context.save();
+        context.translate(canvasW / 2, canvasH / 2);
+        if (this.config.static) {
+            context.rotate(-rotation);
+        } else {
+            context.rotate(-yaw - rotation);
+        }
+        context.scale(zoom, zoom);
+        // prettier-ignore
+        context.drawImage(
+            mapImage,
+            0, 0,
+            mapW, mapH,
+            -center.x - offset.x, -center.y - offset.y,
+            mapW, mapH
+        );
+        context.restore();
+
+        // draw the hotspots
+        [...this.config.hotspots, ...this.state.markers].forEach((hotspot: MapHotspot) => {
+            const image = this.__loadImage(hotspot.image || this.config.spotImage);
+            if (!image) {
+                return;
+            }
+
+            const hotspotPos = { ...offset };
+            if ('yaw' in hotspot && 'distance' in hotspot) {
+                const angle = utils.parseAngle(hotspot.yaw) + rotation;
+                hotspotPos.x += Math.sin(-angle) * hotspot.distance;
+                hotspotPos.y += Math.cos(-angle) * hotspot.distance;
+            } else if ('x' in hotspot && 'y' in hotspot) {
+                hotspotPos.x += center.x - hotspot.x;
+                hotspotPos.y += center.y - hotspot.y;
+            } else {
+                utils.logWarn(`Hotspot ${hotspot['id']} is missing position (yaw+distance or x+y)`);
+                return;
+            }
+
+            const spotPos = projectPoint(hotspotPos, this.config.static ? rotation : yaw + rotation, zoom);
+
+            // save absolute position on the viewer
+            this.state.hotspotPos[hotspot.id] = {
+                x: canvasW / 2 - spotPos.x + canvasPos.x,
+                y: canvasH / 2 - spotPos.y + canvasPos.y,
+            };
+
+            // prettier-ignore
+            this.__drawImage(
+                context, 
+                image, 
+                this.config.spotSize, 
+                canvasW / 2 - spotPos.x, 
+                canvasH / 2 - spotPos.y,
+                0
+            );
+        });
+
+        // draw the pin
+        const pinImage = this.__loadImage(this.config.pinImage);
+        if (pinImage) {
+            const pinPos = projectPoint(offset, this.config.static ? rotation : yaw + rotation, zoom);
+
+            // prettier-ignore
+            this.__drawImage(
+                context,
+                pinImage,
+                this.config.pinSize,
+                canvasW / 2 - pinPos.x,
+                canvasH / 2 - pinPos.y,
+                this.config.static ? yaw : 0
+            );
+        }
+    }
+
+    /**
+     * Draw an image on the canvas
+     */
+    private __drawImage(
+        context: CanvasRenderingContext2D,
+        image: HTMLImageElement,
+        size: number,
+        x: number,
+        y: number,
+        angle: number
+    ) {
+        const w = image.width;
+        const h = image.height;
+
+        context.save();
+        context.translate(x, y);
+        context.rotate(angle);
+        // prettier-ignore
+        context.drawImage(
+            image,
+            0, 0,
+            w, h,
+            -size / 2, -((h / w) * size) / 2,
+            size, (h / w) * size
+        );
+        context.restore();
+    }
+
+    /**
+     * Applies mouse movement to the map
+     */
+    private __move(clientX: number, clientY: number) {
+        const yaw = this.viewer.getPosition().yaw;
+        const zoom = Math.exp(this.state.zoom);
+
+        const move = unprojectPoint(
+            {
+                x: this.state.mouseX - clientX,
+                y: this.state.mouseY - clientY,
+            },
+            this.config.static ? this.config.rotation : yaw + this.config.rotation,
+            zoom
+        );
+
+        this.state.offset.x += move.x;
+        this.state.offset.y += move.y;
+
+        this.update();
+
+        this.state.mouseX = clientX;
+        this.state.mouseY = clientY;
+    }
+
+    /**
+     * Finds the hotspot under the mouse
+     */
+    private __findHotspot(clientX: number, clientY: number): string {
+        const k = this.config.spotSize / 2;
+
+        let hotspotId: string = null;
+        for (const [id, { x, y }] of Object.entries(this.state.hotspotPos)) {
+            if (clientX > x - k && clientX < x + k && clientY > y - k && clientY < y + k) {
+                hotspotId = id;
+                break;
+            }
+        }
+
+        return hotspotId;
+    }
+
+    /**
+     * Updates current hotspot on mouse move and displays tooltip
+     */
+    private __handleHotspots(clientX: number, clientY: number) {
+        const hotspotId = this.__findHotspot(clientX, clientY);
+
+        if (this.state.hotspotId !== hotspotId) {
+            this.__resetHotspot();
+
+            if (hotspotId) {
+                let tooltip;
+                if (hotspotId.startsWith(HOTSPOT_MARKER_ID)) {
+                    tooltip = this.state.markers.find(({ id }) => id === hotspotId)?.tooltip;
+                } else {
+                    tooltip = this.config.hotspots.find(({ id }) => id === hotspotId)?.tooltip;
+                }
+
+                if (tooltip) {
+                    const hotspotPos = this.state.hotspotPos[hotspotId];
+                    const viewerPos = utils.getPosition(this.viewer.container);
+
+                    this.state.hotspotTooltip = this.viewer.createTooltip({
+                        content: tooltip,
+                        left: hotspotPos.x - viewerPos.x,
+                        top: hotspotPos.y - viewerPos.y,
+                        box: {
+                            width: this.config.spotSize,
+                            height: this.config.spotSize,
+                        },
+                    });
+                }
+            }
+
+            this.state.hotspotId = hotspotId;
+        }
+    }
+
+    /**
+     * Dispatch event when a hotspot is clicked
+     */
+    private __clickHotspot(clientX: number, clientY: number) {
+        const hotspotId = this.__findHotspot(clientX, clientY);
+
+        if (hotspotId) {
+            this.plugin.dispatchEvent(new SelectHotspot(hotspotId));
+
+            if (hotspotId.startsWith(HOTSPOT_MARKER_ID)) {
+                const markerId = hotspotId.substring(HOTSPOT_MARKER_ID.length);
+                this.viewer.getPlugin<MarkersPlugin>('markers').gotoMarker(markerId);
+            }
+        }
+
+        this.__resetHotspot();
+    }
+
+    private __resetHotspot() {
+        this.state.hotspotTooltip?.hide();
+        this.state.hotspotTooltip = null;
+        this.state.hotspotId = null;
+    }
+
+    private __loadImage(url: string): HTMLImageElement {
+        if (!this.state.images[url]) {
+            const image = loadImage(url);
+
+            this.state.images[url] = {
+                loading: true,
+                value: image,
+            };
+
+            image.onload = () => {
+                this.state.images[url].loading = false;
+                this.update();
+            };
+
+            return null;
+        }
+
+        if (this.state.images[url].loading) {
+            return null;
+        }
+
+        return this.state.images[url].value;
+    }
+}

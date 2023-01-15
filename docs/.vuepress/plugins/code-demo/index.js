@@ -15,6 +15,7 @@ module.exports = (options, ctx) => ({
                 if (nesting === 1) {
                     const config = {
                         title: '',
+                        version: '',
                         html: '',
                         js: '',
                         css: '',
@@ -27,9 +28,7 @@ module.exports = (options, ctx) => ({
                         }
                         if (type === 'fence') {
                             if (info === 'yaml' || info === 'yml') {
-                                const { title, packages } = parseYaml(content);
-                                config.title = title;
-                                config.packages = packages || [];
+                                Object.assign(config, parseYaml(content));
                             } else {
                                 config[info] = content;
                             }
@@ -37,6 +36,7 @@ module.exports = (options, ctx) => ({
                     }
 
                     return `<CodeDemo title="${config.title}"
+                            version="${config.version}"
                             rawHtml="${encodeURIComponent(config.html)}"
                             rawJs="${encodeURIComponent(config.js)}"
                             rawCss="${encodeURIComponent(config.css)}"
