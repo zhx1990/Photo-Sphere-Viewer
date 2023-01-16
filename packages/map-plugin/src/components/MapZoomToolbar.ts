@@ -19,31 +19,59 @@ export class MapZoomToolbar extends AbstractComponent {
         this.zoomIndicator = this.container.querySelector('.psv-map__toolbar-text');
 
         const zoomButtons = this.container.querySelectorAll('svg');
-        this.bindZoomButton(zoomButtons[0], -1);
-        this.bindZoomButton(zoomButtons[1], 1);
+        zoomButtons[0].dataset['delta'] = '-1';
+        zoomButtons[1].dataset['delta'] = '1';
+
+        this.container.addEventListener('mousedown', this);
+        window.addEventListener('mouseup', this);
+        this.container.addEventListener('touchstart', this);
+        window.addEventListener('touchend', this);
+    }
+
+    override destroy(): void {
+        window.removeEventListener('mouseup', this);
+        window.removeEventListener('touchend', this);
+
+        super.destroy();
+    }
+
+    handleEvent(e: Event) {
+        switch (e.type) {
+            case 'mousedown':
+            case 'touchstart': {
+                const button = utils.getClosest(e.target as HTMLElement, 'svg');
+                const delta: string = button?.dataset['delta'];
+                if (delta) {
+                    cancelAnimationFrame(this.animation);
+                    this.handler.down();
+                    this.time = performance.now();
+                    this.animateZoom(parseInt(delta, 10));
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+            }
+            case 'mouseup':
+            case 'touchend':
+                if (this.animation) {
+                    this.handler.up(() => {
+                        cancelAnimationFrame(this.animation);
+                        this.animation = null;
+                    });
+                    e.preventDefault();
+                    e.stopPropagation();
+                }
+                break;
+            default:
+                break;
+        }
     }
 
     setText(zoom: number) {
         this.zoomIndicator.innerText = `${Math.round(zoom * 100)}%`;
     }
 
-    private bindZoomButton(button: SVGElement, delta: 1 | -1) {
-        button.addEventListener('mousedown', () => {
-            cancelAnimationFrame(this.animation);
-            this.handler.down();
-            this.time = performance.now();
-            this.animateZoom(delta);
-        });
-
-        button.addEventListener('mouseup', () => {
-            this.handler.up(() => {
-                cancelAnimationFrame(this.animation);
-                this.animation = null;
-            });
-        });
-    }
-
-    private animateZoom(delta: 1 | -1) {
+    private animateZoom(delta: number) {
         this.animation = requestAnimationFrame((t) => {
             this.map.zoom((delta * (t - this.time)) / 1000);
             this.time = t;

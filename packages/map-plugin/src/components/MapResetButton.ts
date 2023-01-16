@@ -10,8 +10,9 @@ export class MapResetButton extends AbstractMapButton {
         this.container.innerHTML = reset;
         this.container.querySelector('svg').style.width = '80%';
 
-        this.container.addEventListener('click', () => {
+        this.container.addEventListener('click', (e) => {
             map.reset();
+            e.stopPropagation();
         });
     }
 }

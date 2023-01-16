@@ -1,5 +1,5 @@
 import type { Point, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractComponent, SYSTEM, utils } from '@photo-sphere-viewer/core';
+import { AbstractComponent, utils } from '@photo-sphere-viewer/core';
 import type { Marker, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { MathUtils } from 'three';
 import { HOTSPOT_MARKER_ID, MARKER_DATA_KEY } from '../constants';
@@ -55,7 +55,7 @@ export class MapComponent extends AbstractComponent {
 
     constructor(viewer: Viewer, private plugin: MapPlugin) {
         super(viewer, {
-            className: `psv-map psv-map--${plugin.config.position.join('-')}`,
+            className: `psv-map psv-map--${plugin.config.position.join('-')} psv--capture-event`,
         });
 
         this.container.style.width = plugin.config.size;
@@ -66,10 +66,10 @@ export class MapComponent extends AbstractComponent {
         canvasContainer.className = 'psv-map__container';
 
         canvasContainer.addEventListener('mousedown', this);
-        canvasContainer.addEventListener('touchstart', this);
         window.addEventListener('mousemove', this);
-        window.addEventListener('touchmove', this);
         window.addEventListener('mouseup', this);
+        canvasContainer.addEventListener('touchstart', this);
+        window.addEventListener('touchmove', this);
         window.addEventListener('touchend', this);
         canvasContainer.addEventListener('wheel', this);
 
@@ -256,7 +256,7 @@ export class MapComponent extends AbstractComponent {
      */
     setMarkers(markers: Marker[]) {
         this.state.markers = markers
-            .filter((marker) => marker.data[MARKER_DATA_KEY])
+            .filter((marker) => marker.data?.[MARKER_DATA_KEY])
             .map((marker) => {
                 const markerData = marker.data[MARKER_DATA_KEY];
 
@@ -311,8 +311,8 @@ export class MapComponent extends AbstractComponent {
         this.zoomToolbar.setText(zoom);
 
         // clear canvas
-        this.canvas.width = this.container.clientWidth * SYSTEM.pixelRatio;
-        this.canvas.height = this.container.clientHeight * SYSTEM.pixelRatio;
+        this.canvas.width = this.container.clientWidth;
+        this.canvas.height = this.container.clientHeight;
 
         const canvasPos = utils.getPosition(this.canvas);
         const canvasW = this.canvas.width;

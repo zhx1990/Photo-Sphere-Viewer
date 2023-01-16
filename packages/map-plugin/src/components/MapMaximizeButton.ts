@@ -19,9 +19,10 @@ export class MapMaximizeButton extends AbstractMapButton {
         this.container.style.transform = `${utils.getStyle(this.container, 'transform')} rotate(${ROTATION[map.config.position.join('-')]}deg)`;
         this.update();
 
-        this.container.addEventListener('click', () => {
+        this.container.addEventListener('click', (e) => {
             map.toggleMaximized();
             this.update();
+            e.stopPropagation();
         });
     }
 

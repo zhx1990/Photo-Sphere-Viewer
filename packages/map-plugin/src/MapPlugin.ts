@@ -24,7 +24,7 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         defaultZoom: 100,
         maxZoom: 200,
         minZoom: 20,
-        hotspots: null,
+        hotspots: [],
     },
     {
         position: (position, { defValue }) => {
@@ -65,6 +65,7 @@ export class MapPlugin extends AbstractPlugin<MapPluginEvents> {
         this.markers = this.viewer.getPlugin('markers');
 
         this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
+        this.viewer.addEventListener(events.SizeUpdatedEvent.type, this);
         this.viewer.addEventListener(events.ReadyEvent.type, this, { once: true });
 
         this.setHotspots(this.config.hotspots, false);
@@ -79,6 +80,7 @@ export class MapPlugin extends AbstractPlugin<MapPluginEvents> {
      */
     override destroy() {
         this.viewer.removeEventListener(events.PositionUpdatedEvent.type, this);
+        this.viewer.removeEventListener(events.SizeUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.ReadyEvent.type, this);
 
         if (this.markers) {
@@ -102,6 +104,11 @@ export class MapPlugin extends AbstractPlugin<MapPluginEvents> {
                 break;
             case events.PositionUpdatedEvent.type:
                 this.component.update();
+                break;
+            case events.SizeUpdatedEvent.type:
+                if (this.component.maximized) {
+                    this.component.update();
+                }
                 break;
             case 'set-markers':
                 this.component.setMarkers((e as markersEvents.SetMarkersEvent).markers);
@@ -166,7 +173,7 @@ export class MapPlugin extends AbstractPlugin<MapPluginEvents> {
             }
         });
 
-        this.config.hotspots = hotspots;
+        this.config.hotspots = hotspots || [];
 
         if (render) {
             this.component.update();
