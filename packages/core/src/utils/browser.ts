@@ -1,4 +1,5 @@
 import { Point } from '../model';
+import { distance } from './math';
 
 /**
  * Get an element in the page by an unknown selector
@@ -98,4 +99,30 @@ export function getPosition(el: HTMLElement): Point {
  */
 export function getStyle(elt: Element, prop: string): string {
     return (window.getComputedStyle(elt, null) as any)[prop];
+}
+
+/**
+ * Returns the distance between the first two fingers
+ */
+export function touchesDistance(e: TouchEvent): number {
+    if (e.touches.length < 2) {
+        return 0;
+    }
+    return distance(
+        { x: e.touches[0].clientX, y: e.touches[0].clientY },
+        { x: e.touches[1].clientX, y: e.touches[1].clientY }
+    );
+}
+
+/**
+ * Returns the center of the first two fingers
+ */
+export function touchesCenter(e: TouchEvent): Point {
+    if (e.touches.length < 2) {
+        return null;
+    }
+    return {
+        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
+        y: (e.touches[0].clientY + e.touches[1].clientY) / 2,
+    };
 }

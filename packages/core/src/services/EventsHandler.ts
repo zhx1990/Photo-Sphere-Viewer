@@ -35,6 +35,8 @@ import {
     isEmpty,
     positionCompat,
     throttle,
+    touchesCenter,
+    touchesDistance,
 } from '../utils';
 import { PressHandler } from '../utils/PressHandler';
 import type { Viewer } from '../Viewer';
@@ -177,7 +179,7 @@ export class EventsHandler extends AbstractService {
         if (typeof action === 'function') {
             action(this.viewer);
             e.preventDefault();
-            
+
         } else if (action && !this.keyHandler.pending) {
             if (action !== ACTIONS.ZOOM_IN && action !== ACTIONS.ZOOM_OUT) {
                 this.viewer.stopAll();
@@ -413,13 +415,9 @@ export class EventsHandler extends AbstractService {
         this.viewer.stopAll(); // TODO nom ?
         this.__resetMove();
 
-        const p1 = { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
-        const p2 = { x: evt.touches[1].clientX, y: evt.touches[1].clientY };
-
         this.data.step = Step.MOVING;
-        this.data.pinchDist = distance(p1, p2);
-        this.data.mouseX = (p1.x + p2.x) / 2;
-        this.data.mouseY = (p1.y + p2.y) / 2;
+        this.data.pinchDist = touchesDistance(evt);
+        ({ x: this.data.mouseX, y: this.data.mouseY } = touchesCenter(evt));
         this.__logMouseMove(this.data.mouseX, this.data.mouseY);
     }
 
@@ -653,15 +651,12 @@ export class EventsHandler extends AbstractService {
         if (this.__isStep(Step.MOVING)) {
             evt.preventDefault();
 
-            const p1 = { x: evt.touches[0].clientX, y: evt.touches[0].clientY };
-            const p2 = { x: evt.touches[1].clientX, y: evt.touches[1].clientY };
-
-            const p = distance(p1, p2);
+            const p = touchesDistance(evt);
+            const center = touchesCenter(evt);
             const delta = ((p - this.data.pinchDist) / SYSTEM.pixelRatio) * this.config.zoomSpeed;
 
             this.viewer.zoom(this.viewer.getZoomLevel() + delta);
-
-            this.__doMove((p1.x + p2.x) / 2, (p1.y + p2.y) / 2);
+            this.__doMove(center.x, center.y);
 
             this.data.pinchDist = p;
         }
@@ -691,7 +686,7 @@ export class EventsHandler extends AbstractService {
 
         let previous = null;
 
-        for (let i = 0; i < this.data.mouseHistory.length; ) {
+        for (let i = 0; i < this.data.mouseHistory.length;) {
             if (this.data.mouseHistory[i][0] < now - INERTIA_WINDOW) {
                 this.data.mouseHistory.splice(i, 1);
             } else if (previous && this.data.mouseHistory[i][0] - previous > INERTIA_WINDOW / 10) {

@@ -1,12 +1,12 @@
 import type { Point, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractComponent, utils } from '@photo-sphere-viewer/core';
+import { AbstractComponent, utils, SYSTEM } from '@photo-sphere-viewer/core';
 import type { Marker, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { MathUtils } from 'three';
 import { HOTSPOT_MARKER_ID, MARKER_DATA_KEY } from '../constants';
 import { SelectHotspot } from '../events';
 import type { MapPlugin } from '../MapPlugin';
 import { MapHotspot } from '../model';
-import { getImageHtml, loadImage, projectPoint, unprojectPoint } from '../utils';
+import { drawImageCentered, drawImageHighDpi, getImageHtml, loadImage, projectPoint, unprojectPoint } from '../utils';
 import { MapCloseButton } from './MapCloseButton';
 import { MapMaximizeButton } from './MapMaximizeButton';
 import { MapResetButton } from './MapResetButton';
@@ -24,6 +24,7 @@ export class MapComponent extends AbstractComponent {
         mouseX: null as number,
         mouseY: null as number,
         mousedown: false,
+        pinchDist: 0,
 
         hotspotPos: {} as Record<string, Point>,
         hotspotId: null as string,
@@ -123,23 +124,48 @@ export class MapComponent extends AbstractComponent {
 
     handleEvent(e: Event) {
         switch (e.type) {
-            case 'mousedown':
-            case 'touchstart': {
-                const mouse = (e as TouchEvent).changedTouches?.[0] || (e as MouseEvent);
-                this.state.mouseX = mouse.clientX;
-                this.state.mouseY = mouse.clientY;
+            case 'mousedown':{
+                const event = e as MouseEvent;
+                this.state.mouseX = event.clientX;
+                this.state.mouseY = event.clientY;
                 this.state.mousedown = true;
                 e.stopPropagation();
                 break;
             }
-            case 'mousemove':
-            case 'touchmove': {
-                const mouse = (e as TouchEvent).changedTouches?.[0] || (e as MouseEvent);
+            case 'touchstart': {
+                const event = e as TouchEvent;
+                if (event.touches.length === 1) {
+                    this.state.mouseX = event.touches[0].clientX;
+                    this.state.mouseY = event.touches[0].clientY;
+                    this.state.mousedown = true;
+                } else if (event.touches.length === 2) {
+                    this.state.pinchDist = utils.touchesDistance(event);
+                }
+                e.stopPropagation();
+                e.preventDefault();
+                break;
+            }
+            case 'mousemove':{
+                const event = e as MouseEvent;
                 if (this.state.mousedown) {
-                    this.__move(mouse.clientX, mouse.clientY);
+                    this.__move(event.clientX, event.clientY);
                     e.stopPropagation();
                 } else {
-                    this.__handleHotspots(mouse.clientX, mouse.clientY);
+                    this.__handleHotspots(event.clientX, event.clientY);
+                }
+                break;
+            }
+            case 'touchmove': {
+                const event = e as TouchEvent;
+                if (this.state.mousedown && event.touches.length === 1) {
+                    this.__move(event.touches[0].clientX, event.touches[0].clientY);
+                    e.stopPropagation();
+                } else if (this.state.mousedown && event.touches.length === 2) {
+                    const pinchDist = utils.touchesDistance(event);
+                    const delta = (pinchDist - this.state.pinchDist) / SYSTEM.pixelRatio;
+                    this.zoom(delta / 100);
+                    this.state.pinchDist = pinchDist;
+                    e.stopPropagation();
                 }
                 break;
             }
@@ -311,12 +337,14 @@ export class MapComponent extends AbstractComponent {
         this.zoomToolbar.setText(zoom);
 
         // clear canvas
-        this.canvas.width = this.container.clientWidth;
-        this.canvas.height = this.container.clientHeight;
+        this.canvas.width = this.container.clientWidth * SYSTEM.pixelRatio;
+        this.canvas.height = this.container.clientHeight * SYSTEM.pixelRatio;
 
         const canvasPos = utils.getPosition(this.canvas);
         const canvasW = this.canvas.width;
         const canvasH = this.canvas.height;
+        const canvasVirtualCenterX = canvasW / 2 / SYSTEM.pixelRatio;
+        const canvasVirtualCenterY = canvasH / 2 / SYSTEM.pixelRatio;
 
         const context = this.canvas.getContext('2d');
         context.clearRect(0, 0, canvasW, canvasH);
@@ -327,19 +355,16 @@ export class MapComponent extends AbstractComponent {
 
         context.save();
         context.translate(canvasW / 2, canvasH / 2);
-        if (this.config.static) {
-            context.rotate(-rotation);
-        } else {
-            context.rotate(-yaw - rotation);
-        }
+        context.rotate(this.config.static ? -rotation : -yaw - rotation);
         context.scale(zoom, zoom);
         // prettier-ignore
-        context.drawImage(
+        drawImageHighDpi(
+            context,
             mapImage,
-            0, 0,
-            mapW, mapH,
-            -center.x - offset.x, -center.y - offset.y,
-            mapW, mapH
+            -center.x - offset.x,
+            -center.y - offset.y,
+            mapW,
+            mapH
         );
         context.restore();
 
@@ -367,17 +392,17 @@ export class MapComponent extends AbstractComponent {
 
             // save absolute position on the viewer
             this.state.hotspotPos[hotspot.id] = {
-                x: canvasW / 2 - spotPos.x + canvasPos.x,
-                y: canvasH / 2 - spotPos.y + canvasPos.y,
+                x: canvasVirtualCenterX - spotPos.x + canvasPos.x,
+                y: canvasVirtualCenterY - spotPos.y + canvasPos.y,
             };
 
             // prettier-ignore
-            this.__drawImage(
-                context, 
-                image, 
-                this.config.spotSize, 
-                canvasW / 2 - spotPos.x, 
-                canvasH / 2 - spotPos.y,
+            drawImageCentered(
+                context,
+                image,
+                this.config.spotSize,
+                canvasVirtualCenterX - spotPos.x,
+                canvasVirtualCenterY - spotPos.y,
                 0
             );
         });
@@ -388,43 +413,15 @@ export class MapComponent extends AbstractComponent {
             const pinPos = projectPoint(offset, this.config.static ? rotation : yaw + rotation, zoom);
 
             // prettier-ignore
-            this.__drawImage(
+            drawImageCentered(
                 context,
                 pinImage,
                 this.config.pinSize,
-                canvasW / 2 - pinPos.x,
-                canvasH / 2 - pinPos.y,
+                canvasVirtualCenterX - pinPos.x,
+                canvasVirtualCenterY - pinPos.y,
                 this.config.static ? yaw : 0
             );
         }
-    }
-
-    /**
-     * Draw an image on the canvas
-     */
-    private __drawImage(
-        context: CanvasRenderingContext2D,
-        image: HTMLImageElement,
-        size: number,
-        x: number,
-        y: number,
-        angle: number
-    ) {
-        const w = image.width;
-        const h = image.height;
-
-        context.save();
-        context.translate(x, y);
-        context.rotate(angle);
-        // prettier-ignore
-        context.drawImage(
-            image,
-            0, 0,
-            w, h,
-            -size / 2, -((h / w) * size) / 2,
-            size, (h / w) * size
-        );
-        context.restore();
     }
 
     /**
@@ -518,6 +515,10 @@ export class MapComponent extends AbstractComponent {
             if (hotspotId.startsWith(HOTSPOT_MARKER_ID)) {
                 const markerId = hotspotId.substring(HOTSPOT_MARKER_ID.length);
                 this.viewer.getPlugin<MarkersPlugin>('markers').gotoMarker(markerId);
+            }
+
+            if (this.maximized) {
+                this.toggleMaximized();
             }
         }
 

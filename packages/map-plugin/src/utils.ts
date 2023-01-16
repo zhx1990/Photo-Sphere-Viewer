@@ -1,4 +1,4 @@
-import { Point } from '@photo-sphere-viewer/core';
+import { Point, SYSTEM } from '@photo-sphere-viewer/core';
 
 export function loadImage(src: string): HTMLImageElement {
     const image = document.createElement('img');
@@ -39,4 +39,53 @@ export function projectPoint(pt: Point, yaw: number, zoom: number): Point {
         x: (Math.cos(-yaw) * pt.x - Math.sin(-yaw) * pt.y) * zoom,
         y: (Math.sin(-yaw) * pt.x + Math.cos(-yaw) * pt.y) * zoom,
     };
+}
+
+/**
+ * Draw an image centered on a point, with a rotation, scaled
+ */
+export function drawImageCentered(
+    context: CanvasRenderingContext2D,
+    image: HTMLImageElement,
+    size: number,
+    x: number,
+    y: number,
+    angle: number
+) {
+    const w = image.width;
+    const h = image.height;
+
+    context.save();
+    context.translate(x * SYSTEM.pixelRatio, y * SYSTEM.pixelRatio);
+    context.rotate(angle);
+    // prettier-ignore
+    drawImageHighDpi(
+        context,
+        image,
+        -size / 2,
+        -((h / w) * size) / 2,
+        size,
+        (h / w) * size
+    );
+    context.restore();
+}
+
+/**
+ * Standard "drawImage" using devicePixelRatio
+ */
+export function drawImageHighDpi(
+    context: CanvasRenderingContext2D,
+    image: HTMLImageElement,
+    x: number,
+    y: number,
+    w: number,
+    h: number
+) {
+    context.drawImage(
+        image,
+        0, 0,
+        image.width, image.height,
+        x * SYSTEM.pixelRatio, y * SYSTEM.pixelRatio,
+        w * SYSTEM.pixelRatio, h * SYSTEM.pixelRatio
+    );
 }

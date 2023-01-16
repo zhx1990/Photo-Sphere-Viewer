@@ -39,7 +39,8 @@ $psv-map-transition: ease-in-out 0.3s !default;
         transition: all $psv-map-transition;
 
         svg,
-        img {
+        img,
+        canvas {
             width: 100%;
             height: 100%;
         }
