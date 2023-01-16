@@ -31,4 +31,7 @@ export default {
 
   .header-anchor
     display none
+
+  .icon.outbound
+    display: none;
 </style>
