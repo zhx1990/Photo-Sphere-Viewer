@@ -25,6 +25,7 @@ export class MapComponent extends AbstractComponent {
         mouseY: null as number,
         mousedown: false,
         pinchDist: 0,
+        pinchAngle: 0,
 
         hotspotPos: {} as Record<string, Point>,
         hotspotId: null as string,
@@ -124,7 +125,7 @@ export class MapComponent extends AbstractComponent {
 
     handleEvent(e: Event) {
         switch (e.type) {
-            case 'mousedown':{
+            case 'mousedown': {
                 const event = e as MouseEvent;
                 this.state.mouseX = event.clientX;
                 this.state.mouseY = event.clientY;
@@ -139,13 +140,17 @@ export class MapComponent extends AbstractComponent {
                     this.state.mouseY = event.touches[0].clientY;
                     this.state.mousedown = true;
                 } else if (event.touches.length === 2) {
-                    this.state.pinchDist = utils.touchesDistance(event);
+                    ({
+                        distance: this.state.pinchDist,
+                        angle: this.state.pinchAngle,
+                        center: { x: this.state.mouseX, y: this.state.mouseY },
+                    } = utils.getTouchData(event));
                 }
                 e.stopPropagation();
                 e.preventDefault();
                 break;
             }
-            case 'mousemove':{
+            case 'mousemove': {
                 const event = e as MouseEvent;
                 if (this.state.mousedown) {
                     this.__move(event.clientX, event.clientY);
@@ -161,10 +166,20 @@ export class MapComponent extends AbstractComponent {
                     this.__move(event.touches[0].clientX, event.touches[0].clientY);
                     e.stopPropagation();
                 } else if (this.state.mousedown && event.touches.length === 2) {
-                    const pinchDist = utils.touchesDistance(event);
-                    const delta = (pinchDist - this.state.pinchDist) / SYSTEM.pixelRatio;
+                    const touchData = utils.getTouchData(event);
+                    const delta = (touchData.distance - this.state.pinchDist) / SYSTEM.pixelRatio;
+
                     this.zoom(delta / 100);
-                    this.state.pinchDist = pinchDist;
+                    this.__move(touchData.center.x, touchData.center.y);
+
+                    if (this.state.maximized && !this.config.static) {
+                        this.viewer.dynamics.position.step({ yaw: this.state.pinchAngle - touchData.angle }, 0);
+                    }
+
+                    ({
+                        distance: this.state.pinchDist,
+                        angle: this.state.pinchAngle,
+                    } = touchData);
                     e.stopPropagation();
                 }
                 break;
@@ -329,10 +344,11 @@ export class MapComponent extends AbstractComponent {
         const center = this.config.center;
         const offset = this.state.offset;
         const rotation = this.config.rotation;
+        const yawAndRotation = this.config.static ? 0 : yaw + rotation;
 
         // update UI
         if (this.compass && !this.config.static) {
-            this.compass.style.transform = `rotate(${-MathUtils.radToDeg(yaw + this.config.rotation)}deg)`;
+            this.compass.style.transform = `rotate(${-MathUtils.radToDeg(yawAndRotation)}deg)`;
         }
         this.zoomToolbar.setText(zoom);
 
@@ -355,7 +371,7 @@ export class MapComponent extends AbstractComponent {
 
         context.save();
         context.translate(canvasW / 2, canvasH / 2);
-        context.rotate(this.config.static ? -rotation : -yaw - rotation);
+        context.rotate(-yawAndRotation);
         context.scale(zoom, zoom);
         // prettier-ignore
         drawImageHighDpi(
@@ -388,7 +404,7 @@ export class MapComponent extends AbstractComponent {
                 return;
             }
 
-            const spotPos = projectPoint(hotspotPos, this.config.static ? rotation : yaw + rotation, zoom);
+            const spotPos = projectPoint(hotspotPos, yawAndRotation, zoom);
 
             // save absolute position on the viewer
             this.state.hotspotPos[hotspot.id] = {
@@ -410,7 +426,7 @@ export class MapComponent extends AbstractComponent {
         // draw the pin
         const pinImage = this.__loadImage(this.config.pinImage);
         if (pinImage) {
-            const pinPos = projectPoint(offset, this.config.static ? rotation : yaw + rotation, zoom);
+            const pinPos = projectPoint(offset, yawAndRotation, zoom);
 
             // prettier-ignore
             drawImageCentered(
@@ -419,7 +435,7 @@ export class MapComponent extends AbstractComponent {
                 this.config.pinSize,
                 canvasVirtualCenterX - pinPos.x,
                 canvasVirtualCenterY - pinPos.y,
-                this.config.static ? yaw : 0
+                this.config.static ? yaw + rotation : 0
             );
         }
     }
@@ -436,7 +452,7 @@ export class MapComponent extends AbstractComponent {
                 x: this.state.mouseX - clientX,
                 y: this.state.mouseY - clientY,
             },
-            this.config.static ? this.config.rotation : yaw + this.config.rotation,
+            this.config.static ? 0 : yaw + this.config.rotation,
             zoom
         );
 

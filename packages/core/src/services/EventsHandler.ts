@@ -31,12 +31,11 @@ import {
     distance,
     getClosest,
     getPosition,
+    getTouchData,
     hasParent,
     isEmpty,
     positionCompat,
     throttle,
-    touchesCenter,
-    touchesDistance,
 } from '../utils';
 import { PressHandler } from '../utils/PressHandler';
 import type { Viewer } from '../Viewer';
@@ -415,9 +414,14 @@ export class EventsHandler extends AbstractService {
         this.viewer.stopAll(); // TODO nom ?
         this.__resetMove();
 
+        const touchData = getTouchData(evt);
+
         this.data.step = Step.MOVING;
-        this.data.pinchDist = touchesDistance(evt);
-        ({ x: this.data.mouseX, y: this.data.mouseY } = touchesCenter(evt));
+        ({
+            distance: this.data.pinchDist,
+            center: { x: this.data.mouseX, y: this.data.mouseY },
+        } = touchData);
+
         this.__logMouseMove(this.data.mouseX, this.data.mouseY);
     }
 
@@ -651,14 +655,13 @@ export class EventsHandler extends AbstractService {
         if (this.__isStep(Step.MOVING)) {
             evt.preventDefault();
 
-            const p = touchesDistance(evt);
-            const center = touchesCenter(evt);
-            const delta = ((p - this.data.pinchDist) / SYSTEM.pixelRatio) * this.config.zoomSpeed;
+            const touchData = getTouchData(evt);
+            const delta = ((touchData.distance - this.data.pinchDist) / SYSTEM.pixelRatio) * this.config.zoomSpeed;
 
             this.viewer.zoom(this.viewer.getZoomLevel() + delta);
-            this.__doMove(center.x, center.y);
+            this.__doMove(touchData.center.x, touchData.center.y);
 
-            this.data.pinchDist = p;
+            this.data.pinchDist = touchData.distance;
         }
     }
 

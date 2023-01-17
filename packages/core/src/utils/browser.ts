@@ -1,5 +1,5 @@
 import { Point } from '../model';
-import { distance } from './math';
+import { angle, distance } from './math';
 
 /**
  * Get an element in the page by an unknown selector
@@ -101,28 +101,26 @@ export function getStyle(elt: Element, prop: string): string {
     return (window.getComputedStyle(elt, null) as any)[prop];
 }
 
-/**
- * Returns the distance between the first two fingers
- */
-export function touchesDistance(e: TouchEvent): number {
-    if (e.touches.length < 2) {
-        return 0;
-    }
-    return distance(
-        { x: e.touches[0].clientX, y: e.touches[0].clientY },
-        { x: e.touches[1].clientX, y: e.touches[1].clientY }
-    );
-}
+export type TouchData = {
+    distance: number;
+    angle: number;
+    center: Point;
+};
 
 /**
- * Returns the center of the first two fingers
+ * Returns data about a touch event (first 2 fingers) : distance, angle, center
  */
-export function touchesCenter(e: TouchEvent): Point {
+export function getTouchData(e: TouchEvent): TouchData {
     if (e.touches.length < 2) {
         return null;
     }
+
+    const p1 = { x: e.touches[0].clientX, y: e.touches[0].clientY };
+    const p2 = { x: e.touches[1].clientX, y: e.touches[1].clientY };
+
     return {
-        x: (e.touches[0].clientX + e.touches[1].clientX) / 2,
-        y: (e.touches[0].clientY + e.touches[1].clientY) / 2,
-    };
+        distance: distance(p1, p2),
+        angle: angle(p1, p2),
+        center: { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 },
+    }
 }

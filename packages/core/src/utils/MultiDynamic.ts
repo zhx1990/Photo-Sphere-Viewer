@@ -40,8 +40,15 @@ export class MultiDynamic<T extends Record<string, Dynamic>> {
      * Increase/decrease the target positions
      */
     step(steps: Partial<Record<keyof T, number>>, speedMult = 1) {
-        for (const [name, step] of Object.entries(steps)) {
-            this.dynamics[name].step(step as number, speedMult);
+        if (speedMult === 0) {
+            this.setValue(Object.keys(steps).reduce((values, name: keyof T) => {
+                values[name] = steps[name] + this.dynamics[name].current;
+                return values;
+            }, {} as typeof steps));
+        } else {
+            for (const [name, step] of Object.entries(steps)) {
+                this.dynamics[name].step(step as number, speedMult);
+            }
         }
     }
 

@@ -74,10 +74,14 @@ export class Dynamic {
      * Increases/decreases the target position
      */
     step(step: number, speedMult = 1) {
-        if (this.mode !== DynamicMode.POSITION) {
-            this.target = this.current;
+        if (speedMult === 0) {
+            this.setValue(this.current + step);
+        } else {
+            if (this.mode !== DynamicMode.POSITION) {
+                this.target = this.current;
+            }
+            this.goto(this.target + step, speedMult);
         }
-        this.goto(this.target + step, speedMult);
     }
 
     /**
