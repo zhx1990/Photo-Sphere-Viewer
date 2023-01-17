@@ -143,6 +143,13 @@ The size of the widget, can be declared in `px`, `rem`, `vh`, etc.
 
 Position of the widget, accepted positions are combinations of `top`, `bottom` and `left`, `right`.
 
+#### `visibleOnLoad`
+
+-   type: `boolean`
+-   default: `true`
+
+Displays the map when loading the first panorama.
+
 #### `compassImage`
 
 -   type: `string`

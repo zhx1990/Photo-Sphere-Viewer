@@ -21,12 +21,11 @@ export class MapMaximizeButton extends AbstractMapButton {
 
         this.container.addEventListener('click', (e) => {
             map.toggleMaximized();
-            this.update();
             e.stopPropagation();
         });
     }
 
-    private update() {
+    update() {
         this.container.innerHTML = this.map.maximized ? minimize : maximize;
         this.container.title = this.map.maximized
             ? this.viewer.config.lang['mapMinimize']

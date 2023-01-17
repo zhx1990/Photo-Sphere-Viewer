@@ -45,6 +45,12 @@ export type MapPluginConfig = {
     position?: string | [string, string];
 
     /**
+     * Displays the map when loading the first panorama
+     * @default true
+     */
+    visibleOnLoad?: boolean;
+
+    /**
      * SVG or image URL drawn on top of the map (must be square)
      */
     compassImage?: string;
@@ -78,12 +84,6 @@ export type MapPluginConfig = {
     static?: boolean;
 
     /**
-     * Maximum zoom level
-     * @default 200
-     */
-    maxZoom?: number;
-
-    /**
      * Default zoom level
      * @default 100
      */
@@ -94,6 +94,12 @@ export type MapPluginConfig = {
      * @default 20
      */
     minZoom?: number;
+
+    /**
+     * Maximum zoom level
+     * @default 200
+     */
+    maxZoom?: number;
 
     /**
      * Points of interest on the map

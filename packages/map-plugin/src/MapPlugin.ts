@@ -10,20 +10,21 @@ import { MapHotspot, MapPluginConfig, ParsedMapPluginConfig } from './model';
 
 const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
     {
-        size: '200px',
-        position: ['bottom', 'left'],
         imageUrl: null,
         center: null,
         rotation: 0,
+        size: '200px',
+        position: ['bottom', 'left'],
+        visibleOnLoad: true,
+        compassImage: compass,
         pinImage: pin,
         pinSize: 40,
         spotImage: spot,
         spotSize: 20,
-        compassImage: compass,
         static: false,
         defaultZoom: 100,
-        maxZoom: 200,
         minZoom: 20,
+        maxZoom: 200,
         hotspots: [],
     },
     {

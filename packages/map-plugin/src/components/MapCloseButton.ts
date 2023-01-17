@@ -11,12 +11,11 @@ export class MapCloseButton extends AbstractMapButton {
 
         this.container.addEventListener('click', (e) => {
             map.toggleCollapse();
-            this.update();
             e.stopPropagation();
         });
     }
 
-    private update() {
+    update() {
         this.container.innerHTML = this.map.collapsed ? icon : CONSTANTS.ICONS.close;
         this.container.title = this.map.collapsed ? this.viewer.config.lang['map'] : this.viewer.config.lang.close;
     }

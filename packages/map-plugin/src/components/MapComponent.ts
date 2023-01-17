@@ -14,7 +14,7 @@ import { MapZoomToolbar } from './MapZoomToolbar';
 
 export class MapComponent extends AbstractComponent {
     protected override readonly state = {
-        visible: true,
+        visible: false,
         maximized: false,
         collapsed: false,
 
@@ -41,6 +41,9 @@ export class MapComponent extends AbstractComponent {
 
     private readonly canvas: HTMLCanvasElement;
     private readonly compass?: HTMLElement;
+    private readonly maximizeButton: MapMaximizeButton;
+    private readonly resetButton: MapResetButton;
+    private readonly closeButton: MapCloseButton;
     private readonly zoomToolbar: MapZoomToolbar;
 
     get config() {
@@ -94,22 +97,26 @@ export class MapComponent extends AbstractComponent {
         this.container.addEventListener('transitionend', this);
 
         // sub-components
-        new MapMaximizeButton(this);
-        new MapResetButton(this);
-        new MapCloseButton(this);
+        this.maximizeButton = new MapMaximizeButton(this);
+        this.resetButton = new MapResetButton(this);
+        this.closeButton = new MapCloseButton(this);
         this.zoomToolbar = new MapZoomToolbar(this);
 
         // render loop
-        const render = () => {
+        const renderLoop = () => {
             if (this.isVisible() && (this.state.needsUpdate || this.state.forceRender)) {
                 this.render();
                 this.state.needsUpdate = false;
             }
-            this.state.renderLoop = requestAnimationFrame(render);
+            this.state.renderLoop = requestAnimationFrame(renderLoop);
         };
-        render();
+        renderLoop();
 
         this.hide();
+
+        if (!this.config.visibleOnLoad) {
+            this.toggleCollapse();
+        }
     }
 
     override destroy(): void {
@@ -269,6 +276,8 @@ export class MapComponent extends AbstractComponent {
         if (!this.state.collapsed) {
             this.reset();
         }
+
+        this.closeButton.update();
     }
 
     /**
@@ -282,6 +291,8 @@ export class MapComponent extends AbstractComponent {
         if (this.state.maximized && this.compass) {
             this.compass.style.display = 'none';
         }
+
+        this.maximizeButton.update();
     }
 
     /**

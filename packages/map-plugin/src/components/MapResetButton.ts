@@ -15,4 +15,7 @@ export class MapResetButton extends AbstractMapButton {
             e.stopPropagation();
         });
     }
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    update() {}
 }
