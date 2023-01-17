@@ -5,9 +5,7 @@
 export abstract class TypedEvent<TTarget extends TypedEventTarget<any>> extends Event {
     static readonly type: string;
 
-    override get target(): TTarget {
-        return super.target as any;
-    }
+    override target: TTarget;
 
     constructor(type: string, cancelable = false) {
         super(type, { cancelable });

@@ -6,7 +6,7 @@ import type { AutorotatePlugin } from './AutorotatePlugin';
  */
 export class AutorotateEvent extends TypedEvent<AutorotatePlugin> {
     static override readonly type = 'autorotate';
-    override readonly type = 'autorotate';
+    override type: 'autorotate';
 
     /** @internal */
     constructor(public readonly autorotateEnabled: boolean) {

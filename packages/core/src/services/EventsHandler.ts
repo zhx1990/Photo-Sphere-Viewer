@@ -18,9 +18,9 @@ import {
     FullscreenEvent,
     KeypressEvent,
     ObjectEnterEvent,
-    ObjectEvent,
     ObjectHoverEvent,
     ObjectLeaveEvent,
+    ViewerEvents,
 } from '../events';
 import gestureIcon from '../icons/gesture.svg';
 import mousewheelIcon from '../icons/mousewheel.svg';
@@ -574,7 +574,7 @@ export class EventsHandler extends AbstractService {
             const emit = (
                 object: Mesh,
                 key: string,
-                evtCtor: new (event: MouseEvent, object: Mesh, point: Point, data: any) => ObjectEvent
+                evtCtor: new (event: MouseEvent, object: Mesh, point: Point, data: any) => ViewerEvents
             ) => {
                 this.viewer.dispatchEvent(new evtCtor(evt, object, viewerPoint, key));
             };

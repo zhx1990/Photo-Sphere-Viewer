@@ -6,7 +6,7 @@ import type { CustomPlugin } from './CustomPlugin';
  */
 export class CustomPluginEvent extends TypedEvent<CustomPlugin> {
     static override readonly type = 'custom-event';
-    override readonly type = 'custom-event';
+    override type: 'custom-event';
 
     constructor(public readonly value: boolean) {
         super(CustomPluginEvent.type);

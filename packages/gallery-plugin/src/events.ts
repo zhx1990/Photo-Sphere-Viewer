@@ -6,7 +6,7 @@ import type { GalleryPlugin } from './GalleryPlugin';
  */
 export class ShowGalleryEvent extends TypedEvent<GalleryPlugin> {
     static override readonly type = 'show-gallery';
-    override readonly type = 'show-gallery';
+    override type: 'show-gallery';
 
     constructor() {
         super(ShowGalleryEvent.type);
@@ -18,7 +18,7 @@ export class ShowGalleryEvent extends TypedEvent<GalleryPlugin> {
  */
 export class HideGalleryEvent extends TypedEvent<GalleryPlugin> {
     static override readonly type = 'hide-gallery';
-    override readonly type = 'hide-gallery';
+    override type: 'hide-gallery';
 
     constructor() {
         super(ShowGalleryEvent.type);

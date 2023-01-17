@@ -6,7 +6,7 @@ import type { StereoPlugin } from './StereoPlugin';
  */
 export class StereoUpdatedEvent extends TypedEvent<StereoPlugin> {
     static override readonly type = 'stereo-updated';
-    override readonly type = 'stereo-updated';
+    override type: 'stereo-updated';
 
     constructor(public readonly stereoEnabled: boolean) {
         super(StereoUpdatedEvent.type);

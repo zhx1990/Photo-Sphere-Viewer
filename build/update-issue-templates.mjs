@@ -20,7 +20,7 @@ if (!VERSION) {
     '.github/ISSUE_TEMPLATE/bug_report.yml',
     '.github/ISSUE_TEMPLATE/support_request.yml',
 ]
-    .forEach(filename => {
+    .forEach((filename) => {
         if (!fs.existsSync(filename)) {
             console.warn(`${filename} does not exists`);
             return;

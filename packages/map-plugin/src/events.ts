@@ -6,7 +6,7 @@ import type { MapPlugin } from './MapPlugin';
  */
 export class SelectHotspot extends TypedEvent<MapPlugin> {
     static override readonly type = 'select-hotspot';
-    override readonly type = 'select-hotspot';
+    override type: 'select-hotspot';
 
     constructor(public readonly hotspotId: string) {
         super(SelectHotspot.type);

@@ -11,7 +11,8 @@ const EXAMPLES_DIR = 'examples';
 const PACKAGES_DIR = 'packages';
 const DIST_DIR = 'dist';
 
-const packages = fs.readdirSync(path.join(rootDir, PACKAGES_DIR));
+const packages = fs.readdirSync(path.join(rootDir, PACKAGES_DIR))
+    .filter((name) => name !== 'shared');
 
 liveServer.start({
     open: true,
