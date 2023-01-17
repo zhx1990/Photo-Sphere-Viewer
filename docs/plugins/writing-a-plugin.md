@@ -54,7 +54,8 @@ When developping in TypeScript it is handy to be able to strongly type each even
  * Declare the events classes
  */
 export class CustomPluginEvent extends TypedEvent<CustomPlugin> {
-    static override readonly type = 'custom-event';
+    static override readonly type = 'custom-event'; // recommended for constant access
+    override readonly type = 'custom-event'; // required for typings
 
     constructor(public readonly value: boolean) {
         super(CustomPluginEvent.type);

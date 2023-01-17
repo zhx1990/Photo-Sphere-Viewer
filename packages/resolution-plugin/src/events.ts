@@ -6,6 +6,7 @@ import type { ResolutionPlugin } from './ResolutionPlugin';
  */
 export class ResolutionChangedEvent extends TypedEvent<ResolutionPlugin> {
     static override readonly type = 'resolution-changed';
+    override readonly type = 'resolution-changed';
 
     constructor(public readonly resolutionId: string) {
         super(ResolutionChangedEvent.type);

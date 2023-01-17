@@ -42,7 +42,6 @@ export class MapComponent extends AbstractComponent {
     private readonly canvas: HTMLCanvasElement;
     private readonly compass?: HTMLElement;
     private readonly maximizeButton: MapMaximizeButton;
-    private readonly resetButton: MapResetButton;
     private readonly closeButton: MapCloseButton;
     private readonly zoomToolbar: MapZoomToolbar;
 
@@ -97,8 +96,8 @@ export class MapComponent extends AbstractComponent {
         this.container.addEventListener('transitionend', this);
 
         // sub-components
+        new MapResetButton(this);
         this.maximizeButton = new MapMaximizeButton(this);
-        this.resetButton = new MapResetButton(this);
         this.closeButton = new MapCloseButton(this);
         this.zoomToolbar = new MapZoomToolbar(this);
 

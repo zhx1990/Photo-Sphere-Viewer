@@ -35,6 +35,4 @@ export abstract class AbstractMapButton extends AbstractComponent {
             className: `psv-map__button psv-map__button--${getButtonPosition(map.config.position, position).join('-')} ${className || ''}`,
         });
     }
-
-    abstract update(): void;
 }

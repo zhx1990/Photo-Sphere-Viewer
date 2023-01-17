@@ -6,6 +6,7 @@ import type { GyroscopePlugin } from './GyroscopePlugin';
  */
 export class GyroscopeUpdatedEvent extends TypedEvent<GyroscopePlugin> {
     static override readonly type = 'gyroscope-updated';
+    override readonly type = 'gyroscope-updated';
 
     constructor(public readonly gyroscopeEnabled: boolean) {
         super(GyroscopeUpdatedEvent.type);

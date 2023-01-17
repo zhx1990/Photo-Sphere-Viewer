@@ -14,6 +14,7 @@ export abstract class ViewerEvent extends TypedEvent<Viewer> {}
  */
 export class BeforeAnimateEvent extends ViewerEvent {
     static override readonly type = 'before-animate';
+    override readonly type = 'before-animate';
 
     /** @internal */
     constructor(
@@ -31,6 +32,7 @@ export class BeforeAnimateEvent extends ViewerEvent {
  */
 export class BeforeRenderEvent extends ViewerEvent {
     static override readonly type = 'before-render';
+    override readonly type = 'before-render';
 
     /** @internal */
     constructor(
@@ -48,6 +50,7 @@ export class BeforeRenderEvent extends ViewerEvent {
  */
 export class BeforeRotateEvent extends ViewerEvent {
     static override readonly type = 'before-rotate';
+    override readonly type = 'before-rotate';
 
     /** @internal */
     constructor(
@@ -63,6 +66,7 @@ export class BeforeRotateEvent extends ViewerEvent {
  */
 export class ClickEvent extends ViewerEvent {
     static override readonly type = 'click';
+    override readonly type = 'click';
 
     /** @internal */
     constructor(public readonly data: ClickData) {
@@ -75,6 +79,7 @@ export class ClickEvent extends ViewerEvent {
  */
 export class ConfigChangedEvent extends ViewerEvent {
     static override readonly type = 'config-changed';
+    override readonly type = 'config-changed';
 
     /** @internal */
     constructor(public readonly options: Array<keyof ViewerConfig>) {
@@ -94,6 +99,7 @@ export class ConfigChangedEvent extends ViewerEvent {
  */
 export class DoubleClickEvent extends ViewerEvent {
     static override readonly type = 'dblclick';
+    override readonly type = 'dblclick';
 
     /** @internal */
     constructor(public readonly data: ClickData) {
@@ -106,6 +112,7 @@ export class DoubleClickEvent extends ViewerEvent {
  */
 export class FullscreenEvent extends ViewerEvent {
     static override readonly type = 'fullscreen';
+    override readonly type = 'fullscreen';
 
     /** @internal */
     constructor(public readonly fullscreenEnabled: boolean) {
@@ -118,6 +125,7 @@ export class FullscreenEvent extends ViewerEvent {
  */
 export class HideNotificationEvent extends ViewerEvent {
     static override readonly type = 'hide-notification';
+    override readonly type = 'hide-notification';
 
     /** @internal */
     constructor(public readonly notificationId?: string) {
@@ -130,6 +138,7 @@ export class HideNotificationEvent extends ViewerEvent {
  */
 export class HideOverlayEvent extends ViewerEvent {
     static override readonly type = 'hide-overlay';
+    override readonly type = 'hide-overlay';
 
     /** @internal */
     constructor(public readonly overlayId?: string) {
@@ -142,6 +151,7 @@ export class HideOverlayEvent extends ViewerEvent {
  */
 export class HidePanelEvent extends ViewerEvent {
     static override readonly type = 'hide-panel';
+    override readonly type = 'hide-panel';
 
     /** @internal */
     constructor(public readonly panelId?: string) {
@@ -154,6 +164,7 @@ export class HidePanelEvent extends ViewerEvent {
  */
 export class HideTooltipEvent extends ViewerEvent {
     static override readonly type = 'hide-tooltip';
+    override readonly type = 'hide-tooltip';
 
     /** @internal */
     constructor(
@@ -169,6 +180,7 @@ export class HideTooltipEvent extends ViewerEvent {
  */
 export class KeypressEvent extends ViewerEvent {
     static override readonly type = 'key-press';
+    override readonly type = 'key-press';
 
     /** @internal */
     constructor(public readonly key: string) {
@@ -181,6 +193,7 @@ export class KeypressEvent extends ViewerEvent {
  */
 export class LoadProgressEvent extends ViewerEvent {
     static override readonly type = 'load-progress';
+    override readonly type = 'load-progress';
 
     /** @internal */
     constructor(public readonly progress: number) {
@@ -193,6 +206,7 @@ export class LoadProgressEvent extends ViewerEvent {
  */
 export class PanoramaLoadedEvent extends ViewerEvent {
     static override readonly type = 'panorama-loaded';
+    override readonly type = 'panorama-loaded';
 
     /** @internal */
     constructor(public readonly data: TextureData) {
@@ -205,6 +219,7 @@ export class PanoramaLoadedEvent extends ViewerEvent {
  */
 export class PositionUpdatedEvent extends ViewerEvent {
     static override readonly type = 'position-updated';
+    override readonly type = 'position-updated';
 
     /** @internal */
     constructor(public readonly position: PositionCompat) {
@@ -217,6 +232,7 @@ export class PositionUpdatedEvent extends ViewerEvent {
  */
 export class ReadyEvent extends ViewerEvent {
     static override readonly type = 'ready';
+    override readonly type = 'ready';
 
     /** @internal */
     constructor() {
@@ -229,6 +245,7 @@ export class ReadyEvent extends ViewerEvent {
  */
 export class RenderEvent extends ViewerEvent {
     static override readonly type = 'render';
+    override readonly type = 'render';
 
     /** @internal */
     constructor() {
@@ -241,6 +258,7 @@ export class RenderEvent extends ViewerEvent {
  */
 export class ShowNotificationEvent extends ViewerEvent {
     static override readonly type = 'show-notification';
+    override readonly type = 'show-notification';
 
     /** @internal */
     constructor(public readonly notificationId?: string) {
@@ -253,6 +271,7 @@ export class ShowNotificationEvent extends ViewerEvent {
  */
 export class ShowOverlayEvent extends ViewerEvent {
     static override readonly type = 'show-overlay';
+    override readonly type = 'show-overlay';
 
     /** @internal */
     constructor(public readonly overlayId?: string) {
@@ -265,6 +284,7 @@ export class ShowOverlayEvent extends ViewerEvent {
  */
 export class ShowPanelEvent extends ViewerEvent {
     static override readonly type = 'show-panel';
+    override readonly type = 'show-panel';
 
     /** @internal */
     constructor(public readonly panelId?: string) {
@@ -277,6 +297,7 @@ export class ShowPanelEvent extends ViewerEvent {
  */
 export class ShowTooltipEvent extends ViewerEvent {
     static override readonly type = 'show-tooltip';
+    override readonly type = 'show-tooltip';
 
     /** @internal */
     constructor(
@@ -294,6 +315,7 @@ export class ShowTooltipEvent extends ViewerEvent {
  */
 export class SizeUpdatedEvent extends ViewerEvent {
     static override readonly type = 'size-updated';
+    override readonly type = 'size-updated';
 
     /** @internal */
     constructor(public readonly size: Size) {
@@ -306,6 +328,7 @@ export class SizeUpdatedEvent extends ViewerEvent {
  */
 export class StopAllEvent extends ViewerEvent {
     static override readonly type = 'stop-all';
+    override readonly type = 'stop-all';
 
     /** @internal */
     constructor() {
@@ -318,6 +341,7 @@ export class StopAllEvent extends ViewerEvent {
  */
 export class ZoomUpdatedEvent extends ViewerEvent {
     static override readonly type = 'zoom-updated';
+    override readonly type = 'zoom-updated';
 
     /** @internal */
     constructor(public readonly zoomLevel: number) {
@@ -350,6 +374,7 @@ export abstract class ObjectEvent extends ViewerEvent {
  */
 export class ObjectEnterEvent extends ObjectEvent {
     static override readonly type = 'enter-object';
+    override readonly type = 'enter-object';
 
     /** @internal */
     constructor(originalEvent: MouseEvent, object: Mesh, viewerPoint: Point, userDataKey: string) {
@@ -364,6 +389,7 @@ export class ObjectEnterEvent extends ObjectEvent {
  */
 export class ObjectLeaveEvent extends ObjectEvent {
     static override readonly type = 'leave-object';
+    override readonly type = 'leave-object';
 
     /** @internal */
     constructor(originalEvent: MouseEvent, object: Mesh, viewerPoint: Point, userDataKey: string) {
@@ -378,6 +404,7 @@ export class ObjectLeaveEvent extends ObjectEvent {
  */
 export class ObjectHoverEvent extends ObjectEvent {
     static override readonly type = 'hover-object';
+    override readonly type = 'hover-object';
 
     /** @internal */
     constructor(originalEvent: MouseEvent, object: Mesh, viewerPoint: Point, userDataKey: string) {
@@ -406,6 +433,7 @@ export type ViewerEvents =
     | ShowNotificationEvent
     | ShowOverlayEvent
     | ShowPanelEvent
+    | ShowTooltipEvent
     | SizeUpdatedEvent
     | StopAllEvent
     | ZoomUpdatedEvent

@@ -7,6 +7,7 @@ import type { VirtualTourPlugin } from './VirtualTourPlugin';
  */
 export class NodeChangedEvent extends TypedEvent<VirtualTourPlugin> {
     static override readonly type = 'node-changed';
+    override readonly type = 'node-changed';
 
     constructor(
         public readonly node: VirtualTourNode,
