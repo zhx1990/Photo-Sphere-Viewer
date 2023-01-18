@@ -14,6 +14,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: data
+        id: data
+        run: |
+          echo "PREVIOUS_TAG=$(git tag --sort=-committerdate | sed -n '2 p')" >> $GITHUB_OUTPUT
+          echo "NPM_TAG=$(echo ${{ github.ref_name }} | cut -d '-' -f2 -s | cut -d '.' -f1 -s)" >> $GITHUB_OUTPUT
 
       - uses: actions/setup-node@v3
         with:
@@ -32,24 +40,22 @@ jobs:
           node ./build/prepare-package.mjs
           echo '📦 archive'
           (cd dist && zip -r photo-sphere-viewer-${{ github.ref_name }}.zip .)
+          echo '📄 changelog'
+          git log --pretty=format:"%s" node ${{ steps.data.outputs.PREVIOUS_TAG }}...${{ github.ref_name }} ./build/prepare-changelog.mjs ${{ steps.data.outputs.PREVIOUS_TAG }} ${{ github.ref_name }}
 
       - name: create release
         uses: softprops/action-gh-release@v1
         with:
           draft: true
+          body_fil: dist/changelog_${{ github.ref_name }}.md
           files: dist/photo-sphere-viewer-${{ github.ref_name }}.zip
-
-      - name: npm tag
-        id: npm_tag
-        run: |
-          echo "NPM_TAG=$(echo ${{ github.ref_name }} | cut -d '-' -f2 -s | cut -d '.' -f1 -s)" >> $GITHUB_OUTPUT
 
       - name: npm publish
         run: |
           yarn ci:publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
-          NPM_TAG: ${{ steps.npm_tag.outputs.NPM_TAG || 'latest' }}
+          NPM_TAG: ${{ steps.data.outputs.NPM_TAG || 'latest' }}
 
       - uses: Akkjon/close-milestone@v2.0.2
         env:
