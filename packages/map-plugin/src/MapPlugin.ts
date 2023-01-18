@@ -134,6 +134,42 @@ export class MapPlugin extends AbstractPlugin<MapPluginEvents> {
     }
 
     /**
+     * Closes the map
+     */
+    close() {
+        if (!this.component.collapsed) {
+            this.component.toggleCollapse();
+        }
+    }
+
+    /**
+     * Open the map
+     */
+    open() {
+        if (this.component.collapsed) {
+            this.component.toggleCollapse();
+        }
+    }
+
+    /**
+     * Minimizes the map
+     */
+    minimize() {
+        if (this.component.maximized) {
+            this.component.toggleMaximized();
+        }
+    }
+
+    /**
+     * Maximizes the map
+     */
+    maximize() {
+        if (!this.component.maximized) {
+            this.component.toggleMaximized();
+        }
+    }
+
+    /**
      * Changes the image of the map
      * @param rotation Also change the image rotation
      * @param center Also change the position on the map

@@ -290,6 +290,14 @@ Changes the position of the panorama on the map.
 mapPlugin.setCenter({ x: 500, y: 500 });
 ```
 
+#### `close()` | `open()`
+
+Switches between closed and opened mode.
+
+#### `maximize()` | `minimize()`
+
+Switches between maximized and minimized views. (Has no effect if the map is closed).
+
 ## Events
 
 #### `select-hotspot(hotspotId)`

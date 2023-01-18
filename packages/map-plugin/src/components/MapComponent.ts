@@ -264,13 +264,13 @@ export class MapComponent extends AbstractComponent {
      * Switch collapsed mode
      */
     toggleCollapse() {
-        this.state.collapsed = !this.state.collapsed;
-
-        utils.toggleClass(this.container, 'psv-map--collapsed', this.state.collapsed);
-
         if (this.state.maximized) {
             this.toggleMaximized();
         }
+
+        this.state.collapsed = !this.state.collapsed;
+
+        utils.toggleClass(this.container, 'psv-map--collapsed', this.state.collapsed);
 
         if (!this.state.collapsed) {
             this.reset();
@@ -283,6 +283,10 @@ export class MapComponent extends AbstractComponent {
      * Switch maximized mode
      */
     toggleMaximized() {
+        if (this.state.collapsed) {
+            return;
+        }
+
         this.state.maximized = !this.state.maximized;
 
         utils.toggleClass(this.container, 'psv-map--maximized', this.state.maximized);
