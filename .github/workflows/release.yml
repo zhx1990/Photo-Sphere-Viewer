@@ -41,7 +41,7 @@ jobs:
           echo '📦 archive'
           (cd dist && zip -r photo-sphere-viewer-${{ github.ref_name }}.zip .)
           echo '📄 changelog'
-          git log --pretty=format:"%s" node ${{ steps.data.outputs.PREVIOUS_TAG }}...${{ github.ref_name }} ./build/prepare-changelog.mjs ${{ steps.data.outputs.PREVIOUS_TAG }} ${{ github.ref_name }}
+          git log --pretty=format:"%s" ${{ steps.data.outputs.PREVIOUS_TAG }}...${{ github.ref_name }} | node ./build/prepare-changelog.mjs ${{ steps.data.outputs.PREVIOUS_TAG }} ${{ github.ref_name }}
 
       - name: create release
         uses: softprops/action-gh-release@v1
