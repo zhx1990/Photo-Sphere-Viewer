@@ -1,8 +1,8 @@
 import { AbstractComponent } from '../components/AbstractComponent';
 import type { Navbar } from '../components/Navbar';
 import { KEY_CODES } from '../data/constants';
-import { InitialPromise } from '../model';
-import { addClasses, getConfigParser, isPlainObject, toggleClass } from '../utils';
+import { ResolvableBoolean } from '../model';
+import { addClasses, getConfigParser, resolveBoolean, toggleClass } from '../utils';
 
 /**
  * Configuration for {@link AbstractButton}
@@ -166,26 +166,13 @@ export abstract class AbstractButton extends AbstractComponent {
      * @internal
      */
     checkSupported() {
-        const supportedOrObject = this.isSupported();
-        if (isPlainObject(supportedOrObject)) {
-            if (supportedOrObject.initial === false) {
-                this.state.supported = false;
-                this.hide();
+        resolveBoolean(this.isSupported(), (supported) => {
+            if (!this.state) {
+                return; // the component has been destroyed
             }
-
-            supportedOrObject.promise.then((supported) => {
-                if (!this.state) {
-                    return; // the component has been destroyed
-                }
-                this.state.supported = supported;
-                this.toggle(supported);
-            });
-        } else {
-            this.state.supported = supportedOrObject;
-            if (!supportedOrObject) {
-                this.hide();
-            }
-        }
+            this.state.supported = supported;
+            this.toggle(supported);
+        });
     }
 
     /**
@@ -199,7 +186,7 @@ export abstract class AbstractButton extends AbstractComponent {
     /**
      * Checks if the button can be displayed
      */
-    isSupported(): boolean | InitialPromise<boolean> {
+    isSupported(): boolean | ResolvableBoolean {
         return true;
     }
 

@@ -1,6 +1,7 @@
 import type { Navbar } from '../components/Navbar';
 import { ICONS, KEY_CODES } from '../data/constants';
 import { SYSTEM } from '../data/system';
+import { invertResolvableBoolean } from '../utils';
 import { PressHandler } from '../utils/PressHandler';
 import { AbstractButton } from './AbstractButton';
 
@@ -70,10 +71,7 @@ export abstract class AbstractMoveButton extends AbstractButton {
     }
 
     override isSupported() {
-        return {
-            initial: !SYSTEM.isTouchEnabled.initial,
-            promise: SYSTEM.isTouchEnabled.promise.then((enabled) => !enabled),
-        };
+        return invertResolvableBoolean(SYSTEM.isTouchEnabled);
     }
 
     private __onMouseDown() {

@@ -1,7 +1,7 @@
 import type { Navbar } from '../components/Navbar';
 import { SYSTEM } from '../data/system';
 import { ReadyEvent, ZoomUpdatedEvent } from '../events';
-import { getStyle, Slider, SliderDirection, SliderUpdateData } from '../utils';
+import { getStyle, invertResolvableBoolean, Slider, SliderDirection, SliderUpdateData } from '../utils';
 import { AbstractButton } from './AbstractButton';
 
 export class ZoomRangeButton extends AbstractButton {
@@ -63,10 +63,7 @@ export class ZoomRangeButton extends AbstractButton {
     }
 
     override isSupported() {
-        return {
-            initial: !SYSTEM.isTouchEnabled.initial,
-            promise: SYSTEM.isTouchEnabled.promise.then((enabled) => !enabled),
-        };
+        return invertResolvableBoolean(SYSTEM.isTouchEnabled);
     }
 
     override autoSize() {

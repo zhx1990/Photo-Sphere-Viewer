@@ -7,7 +7,7 @@ import { Viewer } from './Viewer';
 /**
  * A wrapper around a Promise with an initial value before resolution
  */
-export type InitialPromise<T> = { initial: T; promise: Promise<T> };
+export type ResolvableBoolean = { initial: boolean; promise: Promise<boolean> };
 
 /**
  * Object defining a point

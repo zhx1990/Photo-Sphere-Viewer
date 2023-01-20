@@ -1,8 +1,8 @@
 import { Euler, LinearFilter, MathUtils, Quaternion, Texture, Vector3 } from 'three';
-import { ExtendedPosition, Point, Position, PositionCompat } from '../model';
+import { ExtendedPosition, Point, Position, PositionCompat, ResolvableBoolean } from '../model';
 import { PSVError } from '../PSVError';
 import { wrap } from './math';
-import { clone } from './misc';
+import { clone, isPlainObject } from './misc';
 
 /**
  * @deprecated
@@ -18,6 +18,28 @@ export function positionCompat<T extends Position>(position: T): PositionCompat 
             logWarn('latitude is deprecated, use pitch instead');
             return this.pitch;
         },
+    };
+}
+
+/**
+ * Executes a callback with the value of a ResolvableBoolean
+ */
+export function resolveBoolean(value: boolean | ResolvableBoolean, cb: (val: boolean) => void) {
+    if (isPlainObject(value)) {
+        cb((value as ResolvableBoolean).initial);
+        (value as ResolvableBoolean).promise.then(cb);
+    } else {
+        cb(value as boolean);
+    }
+}
+
+/**
+ * Inverts the result of a ResolvableBoolean
+ */
+export function invertResolvableBoolean(value: ResolvableBoolean): ResolvableBoolean {
+    return {
+        initial: !value.initial,
+        promise: value.promise.then(res => !res),
     };
 }
 

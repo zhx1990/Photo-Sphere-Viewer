@@ -54,6 +54,7 @@ import {
     isExtendedPosition,
     logWarn,
     positionCompat,
+    resolveBoolean,
     throttle,
     toggleClass,
 } from './utils';
@@ -135,8 +136,9 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
         // init
         this.resize(this.config.size);
 
-        toggleClass(this.container, 'psv--is-touch', SYSTEM.isTouchEnabled.initial);
-        SYSTEM.isTouchEnabled.promise.then((enabled) => toggleClass(this.container, 'psv--is-touch', enabled));
+        resolveBoolean(SYSTEM.isTouchEnabled, (enabled) => {
+            toggleClass(this.container, 'psv--is-touch', enabled);
+        });
 
         // init plugins
         this.config.plugins.forEach(([plugin, opts]) => {

@@ -1,6 +1,6 @@
-import { VIEWER_DATA } from './constants';
-import { InitialPromise } from '../model';
+import { ResolvableBoolean } from '../model';
 import { PSVError } from '../PSVError';
+import { VIEWER_DATA } from './constants';
 
 const LOCALSTORAGE_TOUCH_SUPPORT = `${VIEWER_DATA}_touchSupport`;
 
@@ -31,7 +31,7 @@ export const SYSTEM = {
     /**
      * Device supports touch events
      */
-    isTouchEnabled: null as InitialPromise<boolean>,
+    isTouchEnabled: null as ResolvableBoolean,
 
     /**
      * @internal
@@ -103,7 +103,7 @@ function getWebGLCtx(): WebGLRenderingContext | null {
 /**
  * Detects if the user is using a touch screen
  */
-function isTouchEnabled(): InitialPromise<boolean> {
+function isTouchEnabled(): ResolvableBoolean {
     let initial = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     if (LOCALSTORAGE_TOUCH_SUPPORT in localStorage) {
         initial = localStorage[LOCALSTORAGE_TOUCH_SUPPORT] === 'true';
