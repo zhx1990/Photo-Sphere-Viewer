@@ -44,22 +44,32 @@ export function projectPoint(pt: Point, yaw: number, zoom: number): Point {
 }
 
 /**
- * Draw an image centered on a point, with a rotation, scaled
+ * Setup the canvas drop shadow
+ */
+export function canvasShadow(
+    context: CanvasRenderingContext2D,
+    offsetX: number,
+    offsetY: number,
+    blur: number,
+    color = 'black'
+) {
+    context.shadowOffsetX = offsetX * SYSTEM.pixelRatio;
+    context.shadowOffsetY = offsetY * SYSTEM.pixelRatio;
+    context.shadowBlur = blur * SYSTEM.pixelRatio;
+    context.shadowColor = color;
+}
+
+/**
+ * Draw an image centered
  */
 export function drawImageCentered(
     context: CanvasRenderingContext2D,
     image: HTMLImageElement,
-    size: number,
-    x: number,
-    y: number,
-    angle: number
+    size: number
 ) {
     const w = image.width;
     const h = image.height;
 
-    context.save();
-    context.translate(x * SYSTEM.pixelRatio, y * SYSTEM.pixelRatio);
-    context.rotate(angle);
     // prettier-ignore
     drawImageHighDpi(
         context,
@@ -69,7 +79,6 @@ export function drawImageCentered(
         size,
         (h / w) * size
     );
-    context.restore();
 }
 
 /**

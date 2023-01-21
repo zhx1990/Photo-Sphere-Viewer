@@ -10,7 +10,15 @@ export type MapHotspot = (Point | { yaw: number | string; distance: number }) & 
      */
     tooltip?: string;
     /**
-     * SVG or image URL used to override the default `spotImage`
+     * Override the default `spotSize`
+     */
+    size?: number;
+    /**
+     * Override the default `spotColor`
+     */
+    color?: string;
+    /**
+     * Override the default `spotImage`
      */
     image?: string;
 };
@@ -62,18 +70,24 @@ export type MapPluginConfig = {
 
     /**
      * Size of the central pin
-     * @default 40
+     * @default 35
      */
     pinSize?: number;
 
     /**
-     * SVG or image URL used for hotspots (must be square)
+     * Color of the hotspots when no image is provided
+     * @default 'white'
+     */
+    spotColor?: string;
+
+    /**
+     * SVG or image URL used for hotspots
      */
     spotImage?: string;
 
     /**
      * Size of the hotspots
-     * @default 20
+     * @default 15
      */
     spotSize?: number;
 

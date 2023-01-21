@@ -1,11 +1,10 @@
 import { AbstractConfigurablePlugin, events, Point, utils, Viewer } from '@photo-sphere-viewer/core';
-import type { events as markersEvents, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import type { events as markersEvents, Marker, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { MapComponent } from './components/MapComponent';
-import { HOTSPOT_GENERATED_ID } from './constants';
+import { HOTSPOT_GENERATED_ID, HOTSPOT_MARKER_ID, MARKER_DATA_KEY } from './constants';
 import { MapPluginEvents } from './events';
 import compass from './icons/compass.svg';
 import pin from './icons/pin.svg';
-import spot from './icons/spot.svg';
 import { MapHotspot, MapPluginConfig, ParsedMapPluginConfig, UpdatableMapPluginConfig } from './model';
 
 const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
@@ -18,9 +17,10 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         visibleOnLoad: true,
         compassImage: compass,
         pinImage: pin,
-        pinSize: 40,
-        spotImage: spot,
-        spotSize: 20,
+        pinSize: 35,
+        spotColor: 'white',
+        spotImage: null,
+        spotSize: 15,
         static: false,
         defaultZoom: 100,
         minZoom: 20,
@@ -121,7 +121,7 @@ export class MapPlugin extends AbstractConfigurablePlugin<
                 }
                 break;
             case 'set-markers':
-                this.component.setMarkers((e as markersEvents.SetMarkersEvent).markers);
+                this.component.setMarkers(this.__markersToHotspots((e as markersEvents.SetMarkersEvent).markers));
                 break;
             default:
                 break;
@@ -236,5 +236,29 @@ export class MapPlugin extends AbstractConfigurablePlugin<
      */
     clearHotspots() {
         this.setHotspots(null);
+    }
+
+    private __markersToHotspots(markers: Marker[]): MapHotspot[] {
+        return markers
+            .filter((marker) => marker.data?.[MARKER_DATA_KEY])
+            .map((marker) => {
+                const markerData: MapHotspot = marker.data[MARKER_DATA_KEY];
+
+                const hotspot: MapHotspot = {
+                    ...markerData,
+                    id: HOTSPOT_MARKER_ID + marker.id,
+                    tooltip: marker.config.tooltip?.content,
+                };
+
+                if ('distance' in markerData) {
+                    (hotspot as any).yaw = marker.state.position.yaw;
+                } else if (!('x' in markerData) || !('y' in markerData)) {
+                    utils.logWarn(`Marker ${marker.id} "map" data is missing position (distance or x+y)`);
+                    return null;
+                }
+
+                return hotspot;
+            })
+            .filter((h) => h);
     }
 }

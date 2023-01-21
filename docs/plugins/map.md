@@ -30,12 +30,11 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ```yaml
 title: PSV Map Demo
-version: 5.1.0-alpha.1
+version: 5.1.0-alpha.2
 packages:
     - name: map-plugin
       imports: MapPlugin
       style: true
-      version: 5.1.0-alpha.1
     - name: markers-plugin
       imports: MarkersPlugin
       style: true
@@ -64,6 +63,7 @@ const viewer = new PhotoSphereViewer.Viewer({
                     x: 450,
                     y: 450,
                     id: 'green-lake',
+                    color: 'green',
                     tooltip: 'Lac vert',
                 },
                 {
@@ -83,8 +83,9 @@ const viewer = new PhotoSphereViewer.Viewer({
                     anchor: 'bottom center',
                     data: {
                         map: {
-                            distance: 220, 
-                            image: document.querySelector('#blue-spot').innerText,
+                            distance: 220,
+                            size: 25,
+                            image: baseUrl + 'pictos/pin-blue.png',
                         },
                     },
                 },
@@ -92,14 +93,6 @@ const viewer = new PhotoSphereViewer.Viewer({
         }],
     ],
 });
-```
-
-```html
-<script type="text/template" id="blue-spot">
-    <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-        <circle cx="250" cy="250" r="190" fill="#0281d1"/>
-    </svg>
-</script>
 ```
 
 :::
@@ -175,15 +168,23 @@ SVG or image URL used for the central pin.
 #### `pinSize`
 
 -   type: `number`
--   default: `40`
+-   default: `35`
 -   updatable: yes
 
 Size of the central pin.
 
+#### `spotColor`
+
+-   type: `string`
+-   default: `white`
+-   updatable: yes
+
+Color used when no `spotImage` is defined. The spot is always a circle.
+
 #### `spotImage`
 
 -   type: `string`
--   default: default SVG
+-   default: `null`
 -   updatable: yes
 
 SVG or image URL used to represent hotspots.
@@ -191,7 +192,7 @@ SVG or image URL used to represent hotspots.
 #### `spotSize`
 
 -   type: `number`
--   default: `20`
+-   default: `15`
 -   updatable: yes
 
 Size of the hotspots.
@@ -234,19 +235,29 @@ Minimum zoom level of the map.
 -   default: `null`
 -   updatable: no, use `setHotspots()` method
 
-Small dots visible on the map. Each spot consists of a position (either `yaw`/`distance` or `x`/`y`) and optional `id`, `tooltip` and `image` (overrides the default `spotImage`).
+Small dots visible on the map. See bellow.
 
-`distance`, `x` and `y` are defined in pixels on the map image.
+### Hotspots
 
-```js
-hotspots: [
-    { id: '1', yaw: '0deg', distance: 120, tooltip: 'Hotspot one' },
-    { id: '2', x: 150, y: 310, image: 'blue-dot.png' },
-],
-```
+#### `id`
+
+-   type: `string`
+-   default: generated
+
+Useful to react to clicks with the `select-hotspot` event.
+
+#### `yaw`+`distance` or `x`+`y` (required)
+
+-   type: `number`
+
+Configure the position of the hotspot on the map, either with a angle and a distance (in pixels on the map image) or absolute x/y coordinates (also in pixels on the map image).
+
+#### `color` / `image` / `size`
+
+Allow to override the default `spotColor`, `spotImage` and `spotSize`.
 
 ::: tip
-[Markers](./markers.md) can be displayed on the map by defining their `map` data, which must be an object with either `distance` (`yaw` is know from the marker position) or `x`/`y`. It can also contains the `image` property.
+[Markers](./markers.md) can be displayed on the map by defining their `map` data, which must be an hotspot object (minus `yaw` which is know from the marker position).
 
 The marker tooltip is reused if defined. The viewer will be moved to face the marker if clicked on the map.
 

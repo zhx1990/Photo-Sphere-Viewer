@@ -1,12 +1,12 @@
 import type { Point, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractComponent, utils, SYSTEM } from '@photo-sphere-viewer/core';
-import type { Marker, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import { AbstractComponent, SYSTEM, utils } from '@photo-sphere-viewer/core';
+import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { MathUtils } from 'three';
-import { HOTSPOT_MARKER_ID, MARKER_DATA_KEY } from '../constants';
+import { HOTSPOT_MARKER_ID, MAP_SHADOW_BLUR, PIN_SHADOW_BLUR, PIN_SHADOW_OFFSET } from '../constants';
 import { SelectHotspot } from '../events';
 import type { MapPlugin } from '../MapPlugin';
 import { MapHotspot } from '../model';
-import { drawImageCentered, drawImageHighDpi, getImageHtml, loadImage, projectPoint, unprojectPoint } from '../utils';
+import { canvasShadow, drawImageCentered, drawImageHighDpi, getImageHtml, loadImage, projectPoint, unprojectPoint } from '../utils';
 import { MapCloseButton } from './MapCloseButton';
 import { MapMaximizeButton } from './MapMaximizeButton';
 import { MapResetButton } from './MapResetButton';
@@ -317,36 +317,8 @@ export class MapComponent extends AbstractComponent {
     /**
      * Updates the markers
      */
-    setMarkers(markers: Marker[]) {
-        this.state.markers = markers
-            .filter((marker) => marker.data?.[MARKER_DATA_KEY])
-            .map((marker) => {
-                const markerData = marker.data[MARKER_DATA_KEY];
-
-                let hotspot: MapHotspot;
-                if ('distance' in markerData) {
-                    hotspot = {
-                        yaw: marker.state.position.yaw,
-                        distance: markerData['distance'],
-                    };
-                } else if ('x' in markerData && 'y' in markerData) {
-                    hotspot = {
-                        x: markerData.x,
-                        y: markerData.y,
-                    };
-                } else {
-                    utils.logWarn(`Marker ${marker.id} "map" data is missing position (distance or x+y)`);
-                    return null;
-                }
-
-                hotspot.id = HOTSPOT_MARKER_ID + marker.id;
-                hotspot.image = markerData['image'];
-                hotspot.tooltip = marker.config.tooltip?.content;
-
-                return hotspot;
-            })
-            .filter((h) => h);
-
+    setMarkers(markers: MapHotspot[]) {
+        this.state.markers = markers;
         this.update();
     }
 
@@ -395,6 +367,7 @@ export class MapComponent extends AbstractComponent {
         context.translate(canvasW / 2, canvasH / 2);
         context.rotate(-yawAndRotation);
         context.scale(zoom, zoom);
+        canvasShadow(context, 0, 0, MAP_SHADOW_BLUR);
         // prettier-ignore
         drawImageHighDpi(
             context,
@@ -409,9 +382,6 @@ export class MapComponent extends AbstractComponent {
         // draw the hotspots
         [...this.config.hotspots, ...this.state.markers].forEach((hotspot: MapHotspot) => {
             const image = this.__loadImage(hotspot.image || this.config.spotImage);
-            if (!image) {
-                return;
-            }
 
             const hotspotPos = { ...offset };
             if ('yaw' in hotspot && 'distance' in hotspot) {
@@ -434,15 +404,22 @@ export class MapComponent extends AbstractComponent {
                 y: canvasVirtualCenterY - spotPos.y + canvasPos.y,
             };
 
-            // prettier-ignore
-            drawImageCentered(
-                context,
-                image,
-                this.config.spotSize,
-                canvasVirtualCenterX - spotPos.x,
-                canvasVirtualCenterY - spotPos.y,
-                0
-            );
+            const x = canvasVirtualCenterX - spotPos.x;
+            const y = canvasVirtualCenterY - spotPos.y;
+            const size = hotspot.size || this.config.spotSize;
+
+            context.save();
+            context.translate(x * SYSTEM.pixelRatio, y * SYSTEM.pixelRatio);
+            canvasShadow(context, PIN_SHADOW_OFFSET, PIN_SHADOW_OFFSET, PIN_SHADOW_BLUR);
+            if (image) {
+                drawImageCentered(context, image, size);
+            } else {
+                context.fillStyle = hotspot.color || this.config.spotColor;
+                context.beginPath();
+                context.arc(0, 0, size * SYSTEM.pixelRatio / 2, 0, 2 * Math.PI);
+                context.fill();
+            }
+            context.restore();
         });
 
         // draw the pin
@@ -450,15 +427,17 @@ export class MapComponent extends AbstractComponent {
         if (pinImage) {
             const pinPos = projectPoint(offset, yawAndRotation, zoom);
 
-            // prettier-ignore
-            drawImageCentered(
-                context,
-                pinImage,
-                this.config.pinSize,
-                canvasVirtualCenterX - pinPos.x,
-                canvasVirtualCenterY - pinPos.y,
-                this.config.static ? yaw + rotation : 0
-            );
+            const x = canvasVirtualCenterX - pinPos.x;
+            const y = canvasVirtualCenterY - pinPos.y;
+            const size = this.config.pinSize;
+            const angle = this.config.static ? yaw + rotation : 0;
+
+            context.save();
+            context.translate(x * SYSTEM.pixelRatio, y * SYSTEM.pixelRatio);
+            context.rotate(angle);
+            canvasShadow(context, PIN_SHADOW_OFFSET, PIN_SHADOW_OFFSET, PIN_SHADOW_BLUR);
+            drawImageCentered(context, pinImage, size);
+            context.restore();
         }
     }
 
@@ -570,6 +549,10 @@ export class MapComponent extends AbstractComponent {
     }
 
     private __loadImage(url: string): HTMLImageElement {
+        if (!url) {
+            return null;
+        }
+
         if (!this.state.images[url]) {
             const image = loadImage(url);
 

@@ -10,7 +10,7 @@ function fullname(name) {
 }
 
 function buildPath(name, version, type) {
-    return CDN_BASE + name + '@' + (version || VERSION) + '/index.' + type;
+    return CDN_BASE + name + '@' + version + '/index.' + type;
 }
 
 export function getFullJs(js) {
@@ -36,17 +36,18 @@ export function getFullHtml(html) {
 ${html}`.trim();
 }
 
-export function getFullPackages(coreVersion, packages) {
+export function getFullPackages(version, packages) {
     return [
         {
             name: fullname('core'),
-            version: coreVersion,
+            version: version || VERSION,
             imports: 'Viewer',
             style: true,
         },
         ...packages.map((pkg) => ({
             ...pkg,
             name: fullname(pkg.name),
+            version: version || VERSION,
         })),
     ];
 }
@@ -119,7 +120,7 @@ export function getCodeSandboxValue({ title, js, css, html, packages }) {
                         build: 'parcel build index.html',
                     },
                     dependencies: packages.reduce((deps, { name, version }) => {
-                        deps[name] = version || VERSION;
+                        deps[name] = version;
                         return deps;
                     }, {}),
                     devDependencies: {
