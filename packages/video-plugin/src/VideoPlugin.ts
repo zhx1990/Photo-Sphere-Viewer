@@ -2,7 +2,7 @@ import type { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
 import type { AbstractAdapter, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractConfigurablePlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
-import { SplineCurve, Texture, Vector2 } from 'three';
+import { MathUtils, SplineCurve, Texture, Vector2 } from 'three';
 import { PauseOverlay } from './components/PauseOverlay';
 import { ProgressBar } from './components/ProgressBar';
 import { BufferEvent, PlayPauseEvent, ProgressEvent, VideoPluginEvents, VolumeChangeEvent } from './events';
@@ -231,7 +231,7 @@ export class VideoPlugin extends AbstractConfigurablePlugin<
     setVolume(volume: number) {
         if (this.video) {
             this.video.muted = false;
-            this.video.volume = volume;
+            this.video.volume = MathUtils.clamp(volume, 0, 1);
         }
     }
 
