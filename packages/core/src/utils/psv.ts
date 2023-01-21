@@ -7,12 +7,12 @@ import { clone, isPlainObject } from './misc';
 /**
  * Executes a callback with the value of a ResolvableBoolean
  */
-export function resolveBoolean(value: boolean | ResolvableBoolean, cb: (val: boolean) => void) {
+export function resolveBoolean(value: boolean | ResolvableBoolean, cb: (val: boolean, init: boolean) => void) {
     if (isPlainObject(value)) {
-        cb((value as ResolvableBoolean).initial);
-        (value as ResolvableBoolean).promise.then(cb);
+        cb((value as ResolvableBoolean).initial, true);
+        (value as ResolvableBoolean).promise.then((res) => cb(res, false));
     } else {
-        cb(value as boolean);
+        cb(value as boolean, true);
     }
 }
 

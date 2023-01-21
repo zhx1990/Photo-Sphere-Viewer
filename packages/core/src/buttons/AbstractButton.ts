@@ -166,12 +166,16 @@ export abstract class AbstractButton extends AbstractComponent {
      * @internal
      */
     checkSupported() {
-        resolveBoolean(this.isSupported(), (supported) => {
+        resolveBoolean(this.isSupported(), (supported, init) => {
             if (!this.state) {
                 return; // the component has been destroyed
             }
             this.state.supported = supported;
-            this.toggle(supported);
+            if (!init) {
+                this.toggle(supported);
+            } else if (!supported) {
+                this.hide();
+            }
         });
     }
 
