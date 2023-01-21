@@ -13,29 +13,9 @@ const EPS = 0.000001;
 
 const getConfig = utils.getConfigParser<VisibleRangePluginConfig>(
     {
-        longitudeRange: null,
-        latitudeRange: null,
         verticalRange: null,
         horizontalRange: null,
         usePanoData: false,
-    },
-    {
-        horizontalRange(horizontalRange, { rawConfig }) {
-            if (!utils.isNil(rawConfig.longitudeRange)) {
-                utils.logWarn(`longitudeRange is deprecated, use horizontalRange instead`);
-                return rawConfig.longitudeRange;
-            } else {
-                return horizontalRange;
-            }
-        },
-        verticalRange(verticalRange, { rawConfig }) {
-            if (!utils.isNil(rawConfig.latitudeRange)) {
-                utils.logWarn(`latitudeRange is deprecated, use verticalRange instead`);
-                return rawConfig.latitudeRange;
-            } else {
-                return verticalRange;
-            }
-        },
     }
 );
 
@@ -138,22 +118,6 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
                 break;
             }
         }
-    }
-
-    /**
-     * @deprecated Use {@link setHorizontalRange}
-     */
-    setLongitudeRange(range: Range) {
-        utils.logWarn(`setLongitudeRange is deprecated, use setHorizontalRange instead`);
-        this.setHorizontalRange(range);
-    }
-
-    /**
-     * @deprecated Use {@link setVerticalRange}
-     */
-    setLatitudeRange(range: Range) {
-        utils.logWarn(`setLatitudeRange is deprecated, use setVerticalRange instead`);
-        this.setVerticalRange(range);
     }
 
     /**

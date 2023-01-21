@@ -4,7 +4,7 @@ import { EquirectangularAdapter } from '../adapters/EquirectangularAdapter';
 import { ParsedViewerConfig, ReadonlyViewerConfig, ViewerConfig } from '../model';
 import { pluginInterop } from '../plugins/AbstractPlugin';
 import { PSVError } from '../PSVError';
-import { clone, ConfigParsers, getConfigParser, isNil, logWarn, parseAngle } from '../utils';
+import { clone, ConfigParsers, getConfigParser, logWarn, parseAngle } from '../utils';
 import { ACTIONS, KEY_CODES } from './constants';
 
 /**
@@ -94,11 +94,6 @@ export const READONLY_OPTIONS: Record<ReadonlyViewerConfig, string> = {
     plugins: 'Cannot change plugins',
 };
 
-const autorotateOpt = (): void => {
-    logWarn('autorotate option is deprecated, use the "autorotate" plugin instead');
-    return null;
-};
-
 /**
  * Parsers/validators for each option
  * @internal
@@ -129,21 +124,13 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
     overlayOpacity: (overlayOpacity) => {
         return MathUtils.clamp(overlayOpacity, 0, 1);
     },
-    defaultLong() {
-        logWarn('defaultLong is deprecated, use defaultYaw instead');
-        return null;
-    },
-    defaultLat() {
-        logWarn('defaultLat is deprecated, use defaultPitch instead');
-        return null;
-    },
-    defaultYaw: (defaultYaw, { rawConfig }) => {
+    defaultYaw: (defaultYaw) => {
         // defaultYaw is between 0 and PI
-        return parseAngle(!isNil(rawConfig.defaultLong) ? rawConfig.defaultLong : defaultYaw);
+        return parseAngle(defaultYaw);
     },
-    defaultPitch: (defaultPitch, { rawConfig }) => {
+    defaultPitch: (defaultPitch) => {
         // defaultPitch is between -PI/2 and PI/2
-        return parseAngle(!isNil(rawConfig.defaultLat) ? rawConfig.defaultLat : defaultPitch, true);
+        return parseAngle(defaultPitch, true);
     },
     defaultZoomLvl: (defaultZoomLvl) => {
         return MathUtils.clamp(defaultZoomLvl, 0, 100);
@@ -191,11 +178,6 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
         }
         return keyboardActions;
     },
-    autorotateLat: autorotateOpt,
-    autorotateDelay: autorotateOpt,
-    autorotateZoomLvl: autorotateOpt,
-    autorotateSpeed: autorotateOpt,
-    autorotateIdle: autorotateOpt,
     fisheye: (fisheye) => {
         // translate boolean fisheye to amount
         if (fisheye === true) {

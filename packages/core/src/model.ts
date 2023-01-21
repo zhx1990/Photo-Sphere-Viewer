@@ -51,20 +51,6 @@ export type Position = {
 };
 
 /**
- * @deprecated
- */
-export type PositionCompat = Position & {
-    /**
-     * @deprecated use `yaw`
-     */
-    longitude?: number;
-    /**
-     * @deprecated use `pitch`
-     */
-    latitude?: number;
-};
-
-/**
  * Object defining a spherical position (radians or degrees)
  */
 export type SphericalPosition = {
@@ -224,15 +210,6 @@ export type ClickData = {
      * clicked Marker
      */
     marker?: any;
-
-    /**
-     * @deprecated use `yaw`
-     */
-    longitude?: number;
-    /**
-     * @deprecated use `pitch`
-     */
-    latitude?: number;
 };
 
 /**
@@ -314,10 +291,6 @@ export type ViewerConfig = {
     maxFov?: number;
     /** @default 50 */
     defaultZoomLvl?: number;
-    /** @deprecated use `defaultYaw` */
-    defaultLong?: number;
-    /** @deprecated use `defaultPitch` */
-    defaultLat?: number;
     /** @default 0 */
     defaultYaw?: number | string;
     /** @default 0 */
@@ -328,16 +301,6 @@ export type ViewerConfig = {
     moveSpeed?: number;
     /** @default 1 */
     zoomSpeed?: number;
-    /** @deprecated use the 'autorotate' plugin */
-    autorotateDelay?: number | null;
-    /** @deprecated use the 'autorotate' plugin */
-    autorotateIdle?: boolean;
-    /** @deprecated use the 'autorotate' plugin */
-    autorotateSpeed?: string | number;
-    /** @deprecated use the 'autorotate' plugin */
-    autorotateLat?: number;
-    /** @deprecated use the 'autorotate' plugin */
-    autorotateZoomLvl?: number;
     /** @default true */
     moveInertia?: boolean;
     /** @default true */
@@ -379,15 +342,6 @@ export type ViewerConfig = {
     keyboardActions?: Record<string, ACTIONS | ((viewer: Viewer) => void)>;
 };
 
-export type DeprecatedViewerConfig =
-    | 'defaultLong'
-    | 'defaultLat'
-    | 'autorotateDelay'
-    | 'autorotateIdle'
-    | 'autorotateSpeed'
-    | 'autorotateLat'
-    | 'autorotateZoomLvl';
-
 /**
  * Viewer configuration after applying parsers
  */
@@ -401,7 +355,6 @@ export type ParsedViewerConfig = Omit<
     | 'requestHeaders'
     | 'navbar'
     | 'keyboard'
-    | DeprecatedViewerConfig
 > & {
     adapter?: [AdapterConstructor, any];
     plugins?: Array<[PluginConstructor, any]>;
@@ -428,4 +381,4 @@ export type ReadonlyViewerConfig =
 /**
  * Updatable viewer configuration
  */
-export type UpdatableViewerConfig = Omit<ViewerConfig, ReadonlyViewerConfig | DeprecatedViewerConfig>;
+export type UpdatableViewerConfig = Omit<ViewerConfig, ReadonlyViewerConfig>;

@@ -2,14 +2,6 @@ export type Range = [number, number] | [string, string];
 
 export type VisibleRangePluginConfig = {
     /**
-     * @deprecated use `horizontalRange` instead
-     */
-    longitudeRange?: Range;
-    /**
-     * @deprecated use `verticalRange` instead
-     */
-    latitudeRange?: Range;
-    /**
      * horizontal range as two angles
      */
     horizontalRange?: Range;
@@ -24,4 +16,4 @@ export type VisibleRangePluginConfig = {
     usePanoData?: boolean;
 };
 
-export type UpdatableVisibleRangePluginConfig = Pick<VisibleRangePluginConfig, 'usePanoData'>;
+export type UpdatableVisibleRangePluginConfig = Omit<VisibleRangePluginConfig, 'horizontalRange' | 'verticalRange'>;

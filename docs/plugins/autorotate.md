@@ -40,7 +40,7 @@ const viewer = new PhotoSphereViewer.Viewer({
             keypoints: [
                 'existing-marker-id',
 
-                { longitude: Math.PI / 2, latitude: 0 },
+                { yaw: Math.PI / 2, pitch: 0 },
 
                 {
                     position: { yaw: Math.PI, pitch: Math.PI / 6 },

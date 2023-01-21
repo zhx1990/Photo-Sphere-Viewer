@@ -18,23 +18,7 @@ export enum MarkerType {
     circle = 'circle',
     ellipse = 'ellipse',
     path = 'path',
-
-    /** @deprecated */
-    polygonPx = 'polygonPx',
-    /** @deprecated */
-    polygonRad = 'polygonRad',
-    /** @deprecated */
-    polylinePx = 'polylinePx',
-    /** @deprecated */
-    polylineRad = 'polylineRad',
 }
-
-const POLY_MAPPING: Partial<Record<MarkerType, MarkerType>> = {
-    [MarkerType.polygonPx]: MarkerType.polygonPixels,
-    [MarkerType.polygonRad]: MarkerType.polygon,
-    [MarkerType.polylinePx]: MarkerType.polylinePixels,
-    [MarkerType.polylineRad]: MarkerType.polyline,
-};
 
 export class Marker {
     readonly type: MarkerType;
@@ -154,9 +138,7 @@ export class Marker {
      */
     isPolyPixels(): boolean {
         return this.type === MarkerType.polygonPixels
-            || this.type === MarkerType.polylinePixels
-            || this.type === MarkerType.polygonPx
-            || this.type === MarkerType.polylinePx;
+            || this.type === MarkerType.polylinePixels;
     }
 
     /**
@@ -164,9 +146,7 @@ export class Marker {
      */
     isPolyAngles(): boolean {
         return this.type === MarkerType.polygon
-            || this.type === MarkerType.polyline
-            || this.type === MarkerType.polygonRad
-            || this.type === MarkerType.polylineRad;
+            || this.type === MarkerType.polyline;
     }
 
     /**
@@ -174,9 +154,7 @@ export class Marker {
      */
     isPolygon(): boolean {
         return this.type === MarkerType.polygon
-            || this.type === MarkerType.polygonPixels
-            || this.type === MarkerType.polygonPx
-            || this.type === MarkerType.polygonRad;
+            || this.type === MarkerType.polygonPixels;
     }
 
     /**
@@ -184,9 +162,7 @@ export class Marker {
      */
     isPolyline(): boolean {
         return this.type === MarkerType.polyline
-            || this.type === MarkerType.polylinePixels
-            || this.type === MarkerType.polylinePx
-            || this.type === MarkerType.polylineRad;
+            || this.type === MarkerType.polylinePixels;
     }
 
     /**
@@ -532,10 +508,6 @@ export class Marker {
         const element = this.domElement;
 
         this.state.dynamicSize = true;
-
-        if (POLY_MAPPING[this.type]) {
-            utils.logWarn(`${this.type} is deprecated, use ${POLY_MAPPING[this.type]} instead`);
-        }
 
         // set style
         if (this.config.svgStyle) {

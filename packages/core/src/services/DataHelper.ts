@@ -10,7 +10,7 @@ import {
     SphericalPosition,
 } from '../model';
 import { PSVError } from '../PSVError';
-import { applyEulerInverse, logWarn, parseAngle, parseSpeed } from '../utils';
+import { applyEulerInverse, parseAngle, parseSpeed } from '../utils';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
 
@@ -205,17 +205,6 @@ export class DataHelper extends AbstractService {
      * Converts pixel position to angles if present and ensure boundaries
      */
     cleanPosition(position: ExtendedPosition): Position {
-        if ('x' in position && 'y' in position) {
-            logWarn('x/y position is deprecated, use textureX/textureY instead');
-            return this.textureCoordsToSphericalCoords({
-                textureX: position['x'] as any,
-                textureY: position['y'] as any,
-            });
-        }
-        if ('longitude' in position && 'latitude' in position) {
-            logWarn('longitude/latitude position is deprecated, use yaw/pitch instead');
-            return this.cleanPosition({ yaw: position['longitude'] as any, pitch: position['latitude'] as any });
-        }
         if (
             (position as PanoramaPosition).textureX !== undefined 
             && (position as PanoramaPosition).textureY !== undefined

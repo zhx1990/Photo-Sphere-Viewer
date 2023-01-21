@@ -44,8 +44,8 @@ const markersPlugin = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
 viewer.addEventListener('ready', () => {
     viewer
         .animate({
-            longitude: 0,
-            latitude: 0.5,
+            yaw: 0,
+            pitch: 0.5,
             speed: 1000,
         })
         .then(() => {

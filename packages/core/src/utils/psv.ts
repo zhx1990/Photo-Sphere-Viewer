@@ -1,25 +1,8 @@
 import { Euler, LinearFilter, MathUtils, Quaternion, Texture, Vector3 } from 'three';
-import { ExtendedPosition, Point, Position, PositionCompat, ResolvableBoolean } from '../model';
+import { ExtendedPosition, Point, ResolvableBoolean } from '../model';
 import { PSVError } from '../PSVError';
 import { wrap } from './math';
 import { clone, isPlainObject } from './misc';
-
-/**
- * @deprecated
- */
-export function positionCompat<T extends Position>(position: T): PositionCompat & T {
-    return {
-        ...position,
-        get longitude() {
-            logWarn('longitude is deprecated, use yaw instead');
-            return this.yaw;
-        },
-        get latitude() {
-            logWarn('latitude is deprecated, use pitch instead');
-            return this.pitch;
-        },
-    };
-}
 
 /**
  * Executes a callback with the value of a ResolvableBoolean
@@ -73,12 +56,7 @@ export function isExtendedPosition(object: any): object is ExtendedPosition {
     if (!object) {
         return false;
     }
-    return [
-        ['textureX', 'textureY'],
-        ['yaw', 'pitch'],
-        ['x', 'y'],
-        ['longitude', 'latitude'],
-    ].some(([key1, key2]) => {
+    return [['textureX', 'textureY'], ['yaw', 'pitch']].some(([key1, key2]) => {
         return object[key1] !== undefined && object[key2] !== undefined;
     });
 }

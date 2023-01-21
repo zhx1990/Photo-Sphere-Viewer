@@ -1,5 +1,5 @@
 import { MathUtils } from 'three';
-import { Dynamic, MultiDynamic, positionCompat } from '../utils';
+import { Dynamic, MultiDynamic } from '../utils';
 import type { Viewer } from '../Viewer';
 import { PositionUpdatedEvent, ZoomUpdatedEvent } from '../events';
 import { AbstractService } from './AbstractService';
@@ -22,7 +22,7 @@ export class ViewerDynamics extends AbstractService {
     readonly position = new MultiDynamic(
         (position) => {
             this.viewer.dataHelper.sphericalCoordsToVector3(position, this.viewer.state.direction);
-            this.viewer.dispatchEvent(new PositionUpdatedEvent(positionCompat(position)));
+            this.viewer.dispatchEvent(new PositionUpdatedEvent(position));
         },
         {
             yaw: new Dynamic(null, {

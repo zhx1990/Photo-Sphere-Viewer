@@ -34,7 +34,6 @@ import {
     getTouchData,
     hasParent,
     isEmpty,
-    positionCompat,
     throttle,
 } from '../utils';
 import { PressHandler } from '../utils/PressHandler';
@@ -534,7 +533,7 @@ export class EventsHandler extends AbstractService {
             }
 
             if (!this.data.dblclickTimeout) {
-                this.viewer.dispatchEvent(new ClickEvent(positionCompat(data)));
+                this.viewer.dispatchEvent(new ClickEvent(data));
 
                 this.data.dblclickData = clone(data);
                 this.data.dblclickTimeout = setTimeout(() => {
@@ -546,7 +545,7 @@ export class EventsHandler extends AbstractService {
                     Math.abs(this.data.dblclickData.clientX - data.clientX) < this.moveThreshold
                     && Math.abs(this.data.dblclickData.clientY - data.clientY) < this.moveThreshold
                 ) {
-                    this.viewer.dispatchEvent(new DoubleClickEvent(positionCompat(this.data.dblclickData)));
+                    this.viewer.dispatchEvent(new DoubleClickEvent(this.data.dblclickData));
                 }
 
                 clearTimeout(this.data.dblclickTimeout);

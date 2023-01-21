@@ -25,12 +25,10 @@ import { TypedEventTarget } from './lib/TypedEventTarget';
 import {
     AnimateOptions,
     CssSize,
-    DeprecatedViewerConfig,
     ExtendedPosition,
     PanoramaOptions,
     ParsedViewerConfig,
     Position,
-    PositionCompat,
     Size,
     UpdatableViewerConfig,
     ViewerConfig,
@@ -53,7 +51,6 @@ import {
     isAbortError,
     isExtendedPosition,
     logWarn,
-    positionCompat,
     resolveBoolean,
     throttle,
     toggleClass,
@@ -92,15 +89,6 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
     readonly children: AbstractComponent[] = [];
 
     private readonly onResize = throttle(() => this.navbar.autoSize(), 500);
-
-    /** @deprecated Use {@link createTooltip} instead */
-    readonly tooltip = {
-        /** @deprecated */
-        create: (config: TooltipConfig) => {
-            logWarn(`tooltip.create() is deprecated, use createTooltip() instead`);
-            return this.createTooltip(config);
-        },
-    };
 
     constructor(config: ViewerConfig) {
         super();
@@ -249,8 +237,8 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
     /**
      * Returns the current position of the camera
      */
-    getPosition(): PositionCompat {
-        return positionCompat(this.dataHelper.cleanPosition(this.dynamics.position.current));
+    getPosition(): Position {
+        return this.dataHelper.cleanPosition(this.dynamics.position.current);
     }
 
     /**
@@ -476,7 +464,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      * @throws {@link PSVError} if the configuration is invalid
      */
     setOptions(options: Partial<UpdatableViewerConfig>) {
-        const rawConfig: Omit<ViewerConfig, DeprecatedViewerConfig> = {
+        const rawConfig: ViewerConfig = {
             ...this.config,
             ...options,
         };

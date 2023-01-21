@@ -54,23 +54,6 @@ export type MarkerConfig = {
     polylinePixels?: [number, number][] | number[];
 
     /**
-     * @deprecated use `polygon` instead
-     */
-    polygonRad?: [number, number][] | [string, string][] | number[] | string[];
-    /**
-     * @deprecated use `polygonPixels` instead
-     */
-    polygonPx?: [number, number][] | number[];
-    /**
-     * @deprecated use `polyline` instead
-     */
-    polylineRad?: [number, number][] | [string, string][] | number[] | string[];
-    /**
-     * @deprecated use `polylinePixels` instead
-     */
-    polylinePx?: [number, number][] | number[];
-
-    /**
      * Unique identifier of the marker
      */
     id: string;

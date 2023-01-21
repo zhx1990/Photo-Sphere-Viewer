@@ -1,7 +1,7 @@
 import { Mesh } from 'three';
 import { Tooltip, TooltipConfig } from './components/Tooltip';
 import { TypedEvent } from './lib/TypedEventTarget';
-import { ClickData, Point, Position, PositionCompat, Size, TextureData, ViewerConfig } from './model';
+import { ClickData, Point, Position, Size, TextureData, ViewerConfig } from './model';
 import type { Viewer } from './Viewer';
 
 /**
@@ -222,7 +222,7 @@ export class PositionUpdatedEvent extends ViewerEvent {
     override type: 'position-updated';
 
     /** @internal */
-    constructor(public readonly position: PositionCompat) {
+    constructor(public readonly position: Position) {
         super(PositionUpdatedEvent.type);
     }
 }
