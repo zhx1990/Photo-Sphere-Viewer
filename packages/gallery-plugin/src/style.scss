@@ -122,6 +122,8 @@ $psv-gallery-thumb-hover-scale: 1.2 !default;
         &-container {
             flex-wrap: wrap;
             margin-right: -$psv-gallery-padding;
+            margin-top: $psv-panel-close-button-size;
+            padding-top: 0;
         }
 
         &-item {
