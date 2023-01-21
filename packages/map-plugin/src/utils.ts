@@ -20,7 +20,9 @@ export function loadImage(src: string): HTMLImageElement {
 }
 
 export function getImageHtml(src: string): string {
-    if (!src.includes('<svg')) {
+    if (!src) {
+        return '';
+    } else if (!src.includes('<svg')) {
         return `<img src="${src}">`;
     } else {
         return src;

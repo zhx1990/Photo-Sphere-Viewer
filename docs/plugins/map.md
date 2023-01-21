@@ -98,7 +98,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 <script type="text/template" id="blue-spot">
     <svg viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
         <circle cx="250" cy="250" r="190" fill="#0281d1"/>
-    </svg>            
+    </svg>
 </script>
 ```
 
@@ -113,12 +113,14 @@ The north of the compass is always toward the top of the map, before rotation.
 #### `imageUrl` (required)
 
 -   type: `string`
+-   updatable: no, use `setImage()` method
 
 URL of the image to use as map.
 
 #### `center` (required)
 
 -   type: `{ x: number, y: number }`
+-   updatable: no, use `setCenter()` method
 
 The position of the panorama on the map, in pixels.
 
@@ -126,6 +128,7 @@ The position of the panorama on the map, in pixels.
 
 -   type: `number | string`
 -   default: `0`
+-   updatable: yes
 
 Rotation to apply to the map to make it match with the panorama.
 
@@ -133,6 +136,7 @@ Rotation to apply to the map to make it match with the panorama.
 
 -   type: `string`
 -   default: `200px`
+-   updatable: yes
 
 The size of the widget, can be declared in `px`, `rem`, `vh`, etc.
 
@@ -140,6 +144,7 @@ The size of the widget, can be declared in `px`, `rem`, `vh`, etc.
 
 -   type: `string`
 -   default: `bottom left`
+-   updatable: yes
 
 Position of the widget, accepted positions are combinations of `top`, `bottom` and `left`, `right`.
 
@@ -147,6 +152,7 @@ Position of the widget, accepted positions are combinations of `top`, `bottom` a
 
 -   type: `boolean`
 -   default: `true`
+-   updatable: no
 
 Displays the map when loading the first panorama.
 
@@ -154,6 +160,7 @@ Displays the map when loading the first panorama.
 
 -   type: `string`
 -   default: default SVG
+-   updatable: yes
 
 SVG or image URL drawn on top of the map, can be `null` to disable.
 
@@ -161,6 +168,7 @@ SVG or image URL drawn on top of the map, can be `null` to disable.
 
 -   type: `string`
 -   default: default SVG
+-   updatable: yes
 
 SVG or image URL used for the central pin.
 
@@ -168,6 +176,7 @@ SVG or image URL used for the central pin.
 
 -   type: `number`
 -   default: `40`
+-   updatable: yes
 
 Size of the central pin.
 
@@ -175,6 +184,7 @@ Size of the central pin.
 
 -   type: `string`
 -   default: default SVG
+-   updatable: yes
 
 SVG or image URL used to represent hotspots.
 
@@ -182,6 +192,7 @@ SVG or image URL used to represent hotspots.
 
 -   type: `number`
 -   default: `20`
+-   updatable: yes
 
 Size of the hotspots.
 
@@ -189,6 +200,7 @@ Size of the hotspots.
 
 -   type: `boolean`
 -   default: `false`
+-   updatable: yes
 
 If `true` the map will not rotate, only the central pin will, to indicate where the panorama is oriented.
 
@@ -196,6 +208,7 @@ If `true` the map will not rotate, only the central pin will, to indicate where 
 
 -   type: `number`
 -   default: `100`
+-   updatable: no
 
 Default zoom level of the map.
 
@@ -203,6 +216,7 @@ Default zoom level of the map.
 
 -   type: `number`
 -   default: `200`
+-   updatable: yes
 
 Maximum zoom level of the map.
 
@@ -210,6 +224,7 @@ Maximum zoom level of the map.
 
 -   type: `number`
 -   default: `20`
+-   updatable: yes
 
 Minimum zoom level of the map.
 
@@ -217,6 +232,7 @@ Minimum zoom level of the map.
 
 -   type: `MapHotspot[]`
 -   default: `null`
+-   updatable: no, use `setHotspots()` method
 
 Small dots visible on the map. Each spot consists of a position (either `yaw`/`distance` or `x`/`y`) and optional `id`, `tooltip` and `image` (overrides the default `spotImage`).
 
@@ -224,7 +240,7 @@ Small dots visible on the map. Each spot consists of a position (either `yaw`/`d
 
 ```js
 hotspots: [
-    { id: '1', yaw: '0deg', distance: 120, tooltip: 'Hotspot one' }, 
+    { id: '1', yaw: '0deg', distance: 120, tooltip: 'Hotspot one' },
     { id: '2', x: 150, y: 310, image: 'blue-dot.png' },
 ],
 ```
@@ -240,7 +256,7 @@ markers: [
         id: 'marker-1',
         image: 'pin.png',
         position: { yaw: '15deg', pitch: 0 },
-        data: { 
+        data: {
             map: { distance: 120, image: 'pin.png' },
         },
     },
@@ -265,7 +281,7 @@ Changes the hotspots.
 
 ```js
 mapPlugin.setHotspots([
-    { id: '1', yaw: '0deg', distance: 120, tooltip: 'Hotspot one' }, 
+    { id: '1', yaw: '0deg', distance: 120, tooltip: 'Hotspot one' },
     { id: '2', x: 150, y: 310, image: 'blue-dot.png' },
 ]);
 ```

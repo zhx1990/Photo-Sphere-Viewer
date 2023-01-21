@@ -40,7 +40,8 @@ export class MapComponent extends AbstractComponent {
     };
 
     private readonly canvas: HTMLCanvasElement;
-    private readonly compass?: HTMLElement;
+    private readonly compass: HTMLElement;
+    private readonly resetButton: MapResetButton;
     private readonly maximizeButton: MapMaximizeButton;
     private readonly closeButton: MapCloseButton;
     private readonly zoomToolbar: MapZoomToolbar;
@@ -58,12 +59,7 @@ export class MapComponent extends AbstractComponent {
     }
 
     constructor(viewer: Viewer, private plugin: MapPlugin) {
-        super(viewer, {
-            className: `psv-map psv-map--${plugin.config.position.join('-')} psv--capture-event`,
-        });
-
-        this.container.style.width = plugin.config.size;
-        this.container.style.height = plugin.config.size;
+        super(viewer, {});
 
         // map + compass container
         const canvasContainer = document.createElement('div');
@@ -82,13 +78,9 @@ export class MapComponent extends AbstractComponent {
         canvasContainer.appendChild(this.canvas);
 
         // compass
-        if (plugin.config.compassImage) {
-            this.compass = document.createElement('div');
-            this.compass.className = 'psv-map__compass';
-            this.compass.innerHTML = getImageHtml(plugin.config.compassImage);
-
-            canvasContainer.appendChild(this.compass);
-        }
+        this.compass = document.createElement('div');
+        this.compass.className = 'psv-map__compass';
+        canvasContainer.appendChild(this.compass);
 
         this.container.appendChild(canvasContainer);
 
@@ -96,7 +88,7 @@ export class MapComponent extends AbstractComponent {
         this.container.addEventListener('transitionend', this);
 
         // sub-components
-        new MapResetButton(this);
+        this.resetButton = new MapResetButton(this);
         this.maximizeButton = new MapMaximizeButton(this);
         this.closeButton = new MapCloseButton(this);
         this.zoomToolbar = new MapZoomToolbar(this);
@@ -111,6 +103,7 @@ export class MapComponent extends AbstractComponent {
         };
         renderLoop();
 
+        this.applyConfig();
         this.hide();
 
         if (!this.config.visibleOnLoad) {
@@ -221,6 +214,21 @@ export class MapComponent extends AbstractComponent {
             default:
                 break;
         }
+    }
+
+    applyConfig() {
+        this.container.className = `psv-map psv-map--${this.config.position.join('-')} psv--capture-event`;
+
+        this.container.style.width = this.config.size;
+        this.container.style.height = this.config.size;
+
+        this.compass.innerHTML = getImageHtml(this.config.compassImage);
+
+        this.resetButton.applyConfig();
+        this.closeButton.applyConfig();
+        this.maximizeButton.applyConfig();
+
+        this.update();
     }
 
     override show(): void {

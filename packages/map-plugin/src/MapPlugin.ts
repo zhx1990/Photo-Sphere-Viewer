@@ -1,4 +1,4 @@
-import { AbstractPlugin, events, Point, utils, Viewer } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, events, Point, utils, Viewer } from '@photo-sphere-viewer/core';
 import type { events as markersEvents, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { MapComponent } from './components/MapComponent';
 import { HOTSPOT_GENERATED_ID } from './constants';
@@ -6,7 +6,7 @@ import { MapPluginEvents } from './events';
 import compass from './icons/compass.svg';
 import pin from './icons/pin.svg';
 import spot from './icons/spot.svg';
-import { MapHotspot, MapPluginConfig, ParsedMapPluginConfig } from './model';
+import { MapHotspot, MapPluginConfig, ParsedMapPluginConfig, UpdatableMapPluginConfig } from './model';
 
 const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
     {
@@ -41,18 +41,27 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
 /**
  * Adds a minimap on the viewer
  */
-export class MapPlugin extends AbstractPlugin<MapPluginEvents> {
+export class MapPlugin extends AbstractConfigurablePlugin<
+    MapPluginConfig,
+    ParsedMapPluginConfig,
+    UpdatableMapPluginConfig,
+    MapPluginEvents
+> {
     static override readonly id = 'map';
-
-    readonly config: ParsedMapPluginConfig;
+    static override readonly configParser = getConfig;
+    static override readonly readonlyOptions: Array<keyof MapPluginConfig> = [
+        'imageUrl',
+        'center',
+        'visibleOnLoad',
+        'hotspots',
+        'defaultZoom',
+    ];
 
     private markers?: MarkersPlugin;
     readonly component: MapComponent;
 
     constructor(viewer: Viewer, config: MapPluginConfig) {
-        super(viewer);
-
-        this.config = getConfig(config);
+        super(viewer, config);
 
         this.component = new MapComponent(this.viewer, this);
     }
@@ -117,6 +126,11 @@ export class MapPlugin extends AbstractPlugin<MapPluginEvents> {
             default:
                 break;
         }
+    }
+
+    override setOptions(options: Partial<UpdatableMapPluginConfig>) {
+        super.setOptions(options);
+        this.component.applyConfig();
     }
 
     /**

@@ -1,5 +1,5 @@
 import type { Point, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractPlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import { Vector3 } from 'three';
 import { ID_PANEL_MARKER, ID_PANEL_MARKERS_LIST, MARKERS_LIST_TEMPLATE, MARKER_DATA, SVG_NS } from './constants';
 import {
@@ -19,7 +19,7 @@ import {
 import { Marker } from './Marker';
 import { MarkersButton } from './MarkersButton';
 import { MarkersListButton } from './MarkersListButton';
-import { MarkerConfig, MarkersPluginConfig } from './model';
+import { MarkerConfig, MarkersPluginConfig, UpdatableMarkersPluginConfig } from './model';
 
 const getConfig = utils.getConfigParser<MarkersPluginConfig>({
     clickEventOnMarker: false,
@@ -30,10 +30,15 @@ const getConfig = utils.getConfigParser<MarkersPluginConfig>({
 /**
  * Displays various markers on the viewer
  */
-export class MarkersPlugin extends AbstractPlugin<MarkersPluginEvents> {
+export class MarkersPlugin extends AbstractConfigurablePlugin<
+    MarkersPluginConfig,
+    MarkersPluginConfig,
+    UpdatableMarkersPluginConfig,
+    MarkersPluginEvents
+> {
     static override readonly id = 'markers';
-
-    readonly config: MarkersPluginConfig;
+    static override readonly configParser = getConfig;
+    static override readonly readonlyOptions: Array<keyof MarkersPluginConfig> = ['markers'];
 
     private readonly markers: Record<string, Marker> = {};
 
@@ -48,9 +53,7 @@ export class MarkersPlugin extends AbstractPlugin<MarkersPluginEvents> {
     private readonly svgContainer: SVGElement;
 
     constructor(viewer: Viewer, config: MarkersPluginConfig) {
-        super(viewer);
-
-        this.config = getConfig(config);
+        super(viewer, config);
 
         this.container = document.createElement('div');
         this.container.className = 'psv-markers';

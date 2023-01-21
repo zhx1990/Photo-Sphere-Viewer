@@ -188,6 +188,7 @@ function randomPoints() {
 
 -   type: `integer`
 -   default: `2000`
+-   updatable: yes
 
 Delay after which the automatic rotation will begin, in milliseconds.
 
@@ -195,6 +196,7 @@ Delay after which the automatic rotation will begin, in milliseconds.
 
 -   type: `boolean`
 -   default: `true`
+-   updatable: yes
 
 Restarts the automatic rotation if the user is idle for `autostartDelay`.
 
@@ -204,6 +206,7 @@ Restarts the automatic rotation if the user is idle for `autostartDelay`.
 
 -   type: `string`
 -   default: `2rpm`
+-   updatable: yes
 
 Speed of the automatic rotation. Can be a negative value to reverse the rotation.
 
@@ -211,6 +214,7 @@ Speed of the automatic rotation. Can be a negative value to reverse the rotation
 
 -   type: `double | string`
 -   default: `defaultPitch`
+-   updatable: yes
 
 Vertical angle at which the automatic rotation is performed.
 
@@ -218,12 +222,14 @@ Vertical angle at which the automatic rotation is performed.
 
 -   type: `number`
 -   default: `null`
+-   updatable: yes
 
 Zoom level at which the automatic rotation is performed. If `null` the current zoom is kept.
 
 #### `keypoints`
 
 -   type: `AutorotateKeypoint[]`
+-   updatable: no, use `setKeypoints()` method
 
 Initial keypoints, does the same thing as calling `setKeypoints()` just after initialisation.
 
@@ -231,6 +237,7 @@ Initial keypoints, does the same thing as calling `setKeypoints()` just after in
 
 -   type: `boolean`
 -   default: `true`
+-   updatable: yes
 
 Start from the closest keypoint instead of the first keypoint of the array.
 

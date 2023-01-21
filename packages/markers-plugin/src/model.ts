@@ -173,3 +173,5 @@ export type MarkersPluginConfig = {
      */
     gotoMarkerSpeed?: string | number;
 };
+
+export type UpdatableMarkersPluginConfig = Omit<MarkersPluginConfig, 'markers'>;

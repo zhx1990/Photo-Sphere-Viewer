@@ -4,10 +4,8 @@ import { AbstractMapButton, ButtonPosition } from './AbstractMapButton';
 import type { MapComponent } from './MapComponent';
 
 export class MapCloseButton extends AbstractMapButton {
-    constructor(private map: MapComponent) {
-        super(map, ButtonPosition.DEFAULT, 'psv-map__button-close');
-
-        this.update();
+    constructor(map: MapComponent) {
+        super(map, ButtonPosition.DEFAULT);
 
         this.container.addEventListener('click', (e) => {
             map.toggleCollapse();
@@ -15,7 +13,12 @@ export class MapCloseButton extends AbstractMapButton {
         });
     }
 
-    update() {
+    override applyConfig(): void {
+        super.applyConfig();
+        this.container.classList.add('psv-map__button-close');
+    }
+
+    override update() {
         this.container.innerHTML = this.map.collapsed ? icon : CONSTANTS.ICONS.close;
         this.container.title = this.map.collapsed ? this.viewer.config.lang['map'] : this.viewer.config.lang.close;
     }

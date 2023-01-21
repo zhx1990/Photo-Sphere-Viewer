@@ -118,6 +118,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 #### `keypoints`
 
 -   type: `Array<{ position, time }>`
+-   updatable: no, use `setKeypoints()` method
 
 Defines timed keypoints that will be used by the autorotate button.
 
@@ -137,6 +138,7 @@ The usage of keypoints requires to load the [Autorotate plugin](./autorotate.md)
 
 -   type: `boolean`
 -   default: `true`
+-   updatable: no
 
 Displays a progressbar on top of the navbar.
 
@@ -144,6 +146,7 @@ Displays a progressbar on top of the navbar.
 
 -   type: `boolean`
 -   default: `true`
+-   updatable: no
 
 Displays a big "play" button in the center of the viewer.
 
@@ -194,6 +197,12 @@ const viewer = new PhotoSphereViewer.Viewer({
     ],
 });
 ```
+
+## Methods
+
+#### `setKeypoints(keypoints)`
+
+Changes the keypoints.
 
 ## Events
 

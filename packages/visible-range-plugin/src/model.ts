@@ -23,3 +23,5 @@ export type VisibleRangePluginConfig = {
      */
     usePanoData?: boolean;
 };
+
+export type UpdatableVisibleRangePluginConfig = Pick<VisibleRangePluginConfig, 'usePanoData'>;

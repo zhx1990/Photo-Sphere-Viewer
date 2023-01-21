@@ -58,3 +58,5 @@ export type CompassPluginConfig = {
 export type ParsedCompassPluginConfig = Omit<CompassPluginConfig, 'position'> & {
     position: [string, string];
 };
+
+export type UpdatableCompassPluginConfig = Omit<CompassPluginConfig, 'navigation'>;

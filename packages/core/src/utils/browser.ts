@@ -122,5 +122,5 @@ export function getTouchData(e: TouchEvent): TouchData {
         distance: distance(p1, p2),
         angle: angle(p1, p2),
         center: { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 },
-    }
+    };
 }

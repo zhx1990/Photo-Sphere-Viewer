@@ -29,10 +29,16 @@ function getButtonPosition(mapPosition: [string, string], direction: ButtonPosit
 }
 
 export abstract class AbstractMapButton extends AbstractComponent {
-    constructor(map: MapComponent, position: ButtonPosition, className?: string) {
-        super(map, {
-            // prettier-ignore
-            className: `psv-map__button psv-map__button--${getButtonPosition(map.config.position, position).join('-')} ${className || ''}`,
-        });
+    constructor(protected map: MapComponent, private position: ButtonPosition) {
+        super(map, {});
     }
+
+    applyConfig() {
+        // prettier-ignore
+        this.container.className = `psv-map__button psv-map__button--${getButtonPosition(this.map.config.position, this.position).join('-')}`;
+        this.update();
+    }
+
+    // eslint-disable-next-line @typescript-eslint/no-empty-function
+    update() {}
 }

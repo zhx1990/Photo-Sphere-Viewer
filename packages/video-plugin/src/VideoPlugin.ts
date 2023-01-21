@@ -1,6 +1,6 @@
 import type { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
 import type { AbstractAdapter, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractPlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { SplineCurve, Texture, Vector2 } from 'three';
 import { PauseOverlay } from './components/PauseOverlay';
@@ -18,10 +18,15 @@ const getConfig = utils.getConfigParser<VideoPluginConfig>({
 /**
  * Controls a video adapter
  */
-export class VideoPlugin extends AbstractPlugin<VideoPluginEvents> {
+export class VideoPlugin extends AbstractConfigurablePlugin<
+    VideoPluginConfig,
+    VideoPluginConfig,
+    never,
+    VideoPluginEvents
+> {
     static override readonly id = 'video';
-
-    readonly config: VideoPluginConfig;
+    static override readonly configParser = getConfig;
+    static override readonly readonlyOptions = Object.keys(getConfig.defaults);
 
     private readonly state = {
         curve: null as SplineCurve,
@@ -38,13 +43,11 @@ export class VideoPlugin extends AbstractPlugin<VideoPluginEvents> {
     private markers?: MarkersPlugin;
 
     constructor(viewer: Viewer, config: VideoPluginConfig) {
-        super(viewer);
+        super(viewer, config);
 
         if (!(this.viewer.adapter.constructor as typeof AbstractAdapter).id.includes('video')) {
             throw new PSVError('VideoPlugin can only be used with a video adapter.');
         }
-
-        this.config = getConfig(config);
 
         if (this.config.progressbar) {
             this.progressbar = new ProgressBar(this, viewer);

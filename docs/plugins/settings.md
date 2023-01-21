@@ -132,6 +132,7 @@ settings.addSetting({
 
 -   type: `boolean`
 -   default: `false`
+-   updatable: no
 
 Should the settings be persisted. The persistence storage can be configured.
 
@@ -147,6 +148,7 @@ Should the settings be persisted. The persistence storage can be configured.
 ```
 
 -   default: LocalStorage with key `psvSettings`
+-   updatable: no
 
 Custom storage solution, for example LocalForage, NgRx, HTTP service, etc.
 

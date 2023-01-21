@@ -111,3 +111,12 @@ export type ParsedMapPluginConfig = Omit<MapPluginConfig, 'position' | 'rotation
     position: [string, string];
     rotation: number;
 };
+
+export type UpdatableMapPluginConfig = Omit<
+    MapPluginConfig,
+    | 'imageUrl'
+    | 'center' 
+    | 'visibleOnLoad' 
+    | 'defaultZoom' 
+    | 'hotspots'
+>;

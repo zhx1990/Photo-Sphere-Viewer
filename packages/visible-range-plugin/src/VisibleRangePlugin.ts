@@ -1,8 +1,8 @@
 import type { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
 import type { Position, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractPlugin, events, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, events, utils } from '@photo-sphere-viewer/core';
 import { MathUtils } from 'three';
-import { Range, VisibleRangePluginConfig } from './model';
+import { Range, UpdatableVisibleRangePluginConfig, VisibleRangePluginConfig } from './model';
 
 type RangeResult = {
     rangedPosition: Position;
@@ -42,17 +42,22 @@ const getConfig = utils.getConfigParser<VisibleRangePluginConfig>(
 /**
  * Locks the visible angles
  */
-export class VisibleRangePlugin extends AbstractPlugin {
+export class VisibleRangePlugin extends AbstractConfigurablePlugin<
+    VisibleRangePluginConfig,
+    VisibleRangePluginConfig,
+    UpdatableVisibleRangePluginConfig
+> {
     static override readonly id = 'visible-range';
-
-    readonly config: VisibleRangePluginConfig;
+    static override readonly configParser = getConfig;
+    static override readonly readonlyOptions: Array<keyof VisibleRangePluginConfig> = [
+        'horizontalRange',
+        'verticalRange',
+    ];
 
     private autorotate?: AutorotatePlugin;
 
     constructor(viewer: Viewer, config: VisibleRangePluginConfig) {
-        super(viewer);
-
-        this.config = getConfig(config);
+        super(viewer, config);
     }
 
     /**

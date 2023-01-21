@@ -34,7 +34,7 @@ if (!VERSION) {
             return;
         }
 
-        const versions = item.attributes.options.filter(v => v !== OTHER_LABEL);
+        const versions = item.attributes.options.filter((v) => v !== OTHER_LABEL);
         if (versions.indexOf(VERSION) !== -1) {
             console.warn(`Version ${VERSION} already exists in ${filename}`);
             return;

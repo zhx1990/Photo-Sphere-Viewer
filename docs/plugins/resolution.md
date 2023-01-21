@@ -93,6 +93,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 #### `resolutions`
 
 -   type: `object[]`
+-   updatable: no, use `setResolutions()` method
 
 List of available resolutions. Each resolution consist of an object with the properties `id`, `label` and `panorama`.
 Cubemaps are supported.
@@ -100,6 +101,7 @@ Cubemaps are supported.
 #### `defaultResolution`
 
 -   type: `string`
+-   updatable: no
 
 The id of the default resolution to load. If not provided the first resolution will be used.
 
@@ -111,6 +113,7 @@ If a `panorama` is initially configured on the viewer, this setting is ignored.
 
 -   type: `boolean`
 -   default: `true`
+-   updatable: no
 
 Show the resolution id as a badge on the settings button.
 
@@ -126,6 +129,12 @@ lang: {
 ```
 
 _Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
+
+## Methods
+
+#### `setResolutions(resolutions, defaultResolution?)`
+
+Changes the available resolutions.
 
 ## Events
 

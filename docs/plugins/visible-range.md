@@ -102,6 +102,7 @@ visibleRangePlugin = viewer.getPlugin(PhotoSphereViewer.VisibleRangePlugin);
 
 -   type: `double[]|string[]`
 -   default: `null`
+-   updatable: no, use `setHorizontalRange()` plugin
 
 Visible horizontal range as two angles.
 
@@ -109,6 +110,7 @@ Visible horizontal range as two angles.
 
 -   type: `double[]|string[]`
 -   default: `null`
+-   updatable: no, use `setVerticalRange()` plugin
 
 Visible vertical range as two angles.
 
@@ -116,6 +118,7 @@ Visible vertical range as two angles.
 
 -   type: `boolean`
 -   default: `false`
+-   updatable: yes
 
 Use cropped panorama data as visible range immediately after load.
 

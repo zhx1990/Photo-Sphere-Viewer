@@ -1,9 +1,9 @@
 import type { Position, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractPlugin, events, SYSTEM, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, events, SYSTEM, utils } from '@photo-sphere-viewer/core';
 import type { events as markersEvents, Marker, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { MathUtils } from 'three';
 import compass from './compass.svg';
-import { CompassHotspot, CompassPluginConfig, ParsedCompassPluginConfig } from './model';
+import { CompassHotspot, CompassPluginConfig, ParsedCompassPluginConfig, UpdatableCompassPluginConfig } from './model';
 
 const getConfig = utils.getConfigParser<CompassPluginConfig, ParsedCompassPluginConfig>(
     {
@@ -28,10 +28,14 @@ const HOTSPOT_SIZE_RATIO = 1 / 40;
 /**
  * Adds a compass on the viewer
  */
-export class CompassPlugin extends AbstractPlugin {
+export class CompassPlugin extends AbstractConfigurablePlugin<
+    CompassPluginConfig,
+    ParsedCompassPluginConfig,
+    UpdatableCompassPluginConfig
+> {
     static override readonly id = 'compass';
-
-    readonly config: ParsedCompassPluginConfig;
+    static override readonly configParser = getConfig;
+    static override readonly readonlyOptions: Array<keyof CompassPluginConfig> = ['navigation'];
 
     private readonly state = {
         visible: true,
@@ -43,28 +47,18 @@ export class CompassPlugin extends AbstractPlugin {
     private markers?: MarkersPlugin;
     private readonly container: HTMLElement;
     private readonly canvas: HTMLCanvasElement;
+    private readonly background: HTMLElement;
 
     constructor(viewer: Viewer, config: CompassPluginConfig) {
-        super(viewer);
-
-        this.config = getConfig(config);
+        super(viewer, config);
 
         this.container = document.createElement('div');
-        this.container.className = `psv-compass psv-compass--${this.config.position.join('-')}`;
-        this.container.innerHTML = this.config.backgroundSvg;
-
-        this.container.style.width = this.config.size;
-        this.container.style.height = this.config.size;
-        if (this.config.position[0] === 'center') {
-            this.container.style.marginTop = `calc(-${this.config.size} / 2)`;
-        }
-        if (this.config.position[1] === 'center') {
-            this.container.style.marginLeft = `calc(-${this.config.size} / 2)`;
-        }
-
+        this.background = document.createElement('div');
         this.canvas = document.createElement('canvas');
-
+        this.container.appendChild(this.background);
         this.container.appendChild(this.canvas);
+
+        this.__applyConfig();
 
         if (this.config.navigation) {
             this.container.addEventListener('mouseenter', this);
@@ -88,9 +82,6 @@ export class CompassPlugin extends AbstractPlugin {
 
         this.viewer.container.appendChild(this.container);
 
-        this.canvas.width = this.container.clientWidth * SYSTEM.pixelRatio;
-        this.canvas.height = this.container.clientWidth * SYSTEM.pixelRatio;
-
         this.viewer.addEventListener(events.RenderEvent.type, this);
 
         if (this.markers) {
@@ -113,6 +104,13 @@ export class CompassPlugin extends AbstractPlugin {
         delete this.markers;
 
         super.destroy();
+    }
+
+    override setOptions(options: Partial<UpdatableCompassPluginConfig>) {
+        super.setOptions(options);
+
+        this.__applyConfig();
+        this.__update();
     }
 
     /**
@@ -167,6 +165,21 @@ export class CompassPlugin extends AbstractPlugin {
         }
     }
 
+    private __applyConfig() {
+        this.container.className = `psv-compass psv-compass--${this.config.position.join('-')}`;
+        this.background.innerHTML = this.config.backgroundSvg;
+
+        this.container.style.width = this.config.size;
+        this.container.style.height = this.config.size;
+
+        if (this.config.position[0] === 'center') {
+            this.container.style.marginTop = `calc(-${this.config.size} / 2)`;
+        }
+        if (this.config.position[1] === 'center') {
+            this.container.style.marginLeft = `calc(-${this.config.size} / 2)`;
+        }
+    }
+
     /**
      * Hides the compass
      */
@@ -202,6 +215,9 @@ export class CompassPlugin extends AbstractPlugin {
      * Updates the compass for current zoom and position
      */
     private __update() {
+        this.canvas.width = this.container.clientWidth * SYSTEM.pixelRatio;
+        this.canvas.height = this.container.clientWidth * SYSTEM.pixelRatio;
+
         const context = this.canvas.getContext('2d');
         context.clearRect(0, 0, this.canvas.width, this.canvas.height);
 

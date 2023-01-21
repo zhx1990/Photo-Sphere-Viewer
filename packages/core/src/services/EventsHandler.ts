@@ -45,7 +45,7 @@ const enum Step {
     IDLE,
     CLICK,
     MOVING,
-    INERTIA
+    INERTIA,
 }
 
 /**
@@ -178,7 +178,6 @@ export class EventsHandler extends AbstractService {
         if (typeof action === 'function') {
             action(this.viewer);
             e.preventDefault();
-
         } else if (action && !this.keyHandler.pending) {
             if (action !== ACTIONS.ZOOM_IN && action !== ACTIONS.ZOOM_OUT) {
                 this.viewer.stopAll();
@@ -689,7 +688,7 @@ export class EventsHandler extends AbstractService {
 
         let previous = null;
 
-        for (let i = 0; i < this.data.mouseHistory.length;) {
+        for (let i = 0; i < this.data.mouseHistory.length; ) {
             if (this.data.mouseHistory[i][0] < now - INERTIA_WINDOW) {
                 this.data.mouseHistory.splice(i, 1);
             } else if (previous && this.data.mouseHistory[i][0] - previous > INERTIA_WINDOW / 10) {

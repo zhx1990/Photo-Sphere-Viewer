@@ -1,4 +1,3 @@
-import { utils } from '@photo-sphere-viewer/core';
 import maximize from '../icons/maximize.svg';
 import minimize from '../icons/minimize.svg';
 import { AbstractMapButton, ButtonPosition } from './AbstractMapButton';
@@ -12,12 +11,8 @@ const ROTATION: Record<string, number> = {
 };
 
 export class MapMaximizeButton extends AbstractMapButton {
-    constructor(private map: MapComponent) {
+    constructor(map: MapComponent) {
         super(map, ButtonPosition.DIAGONAL);
-
-        // prettier-ignore
-        this.container.style.transform = `${utils.getStyle(this.container, 'transform')} rotate(${ROTATION[map.config.position.join('-')]}deg)`;
-        this.update();
 
         this.container.addEventListener('click', (e) => {
             map.toggleMaximized();
@@ -25,8 +20,9 @@ export class MapMaximizeButton extends AbstractMapButton {
         });
     }
 
-    update() {
+    override update() {
         this.container.innerHTML = this.map.maximized ? minimize : maximize;
+        this.container.querySelector('svg').style.transform = `rotate3d(0, 0, 1, ${ROTATION[this.map.config.position.join('-')]}deg)`;
         this.container.title = this.map.maximized
             ? this.viewer.config.lang['mapMinimize']
             : this.viewer.config.lang['mapMaximize'];

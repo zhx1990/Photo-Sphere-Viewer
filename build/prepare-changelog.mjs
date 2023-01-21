@@ -33,7 +33,8 @@ stdin.on('error', (e) => {
 stdin.on('end', () => {
     const content = `[Full changelog](https://github.com/mistic100/Photo-Sphere-Viewer/compare/${FROM_TAG}...${TO_TAG})
 
-${log.trim()
+${log
+    .trim()
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => !line.startsWith('chore'))

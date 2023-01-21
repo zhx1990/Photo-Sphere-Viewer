@@ -58,3 +58,5 @@ export type AutorotatePluginConfig = {
      */
     startFromClosest?: boolean;
 };
+
+export type UpdatableAutorotatePluginConfig = Omit<AutorotatePluginConfig, 'keypoints'>;

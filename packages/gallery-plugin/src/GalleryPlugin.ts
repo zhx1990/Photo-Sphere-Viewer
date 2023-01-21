@@ -1,9 +1,9 @@
 import type { Viewer } from '@photo-sphere-viewer/core';
-import { AbstractPlugin, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import { GalleryPluginEvents, HideGalleryEvent, ShowGalleryEvent } from './events';
 import { GalleryButton } from './GalleryButton';
 import { GalleryComponent } from './GalleryComponent';
-import { GalleryItem, GalleryPluginConfig } from './model';
+import { GalleryItem, GalleryPluginConfig, UpdatableGalleryPluginConfig } from './model';
 
 const getConfig = utils.getConfigParser<GalleryPluginConfig>({
     items: [],
@@ -18,10 +18,15 @@ const getConfig = utils.getConfigParser<GalleryPluginConfig>({
 /**
  * Adds a gallery of multiple panoramas
  */
-export class GalleryPlugin extends AbstractPlugin<GalleryPluginEvents> {
+export class GalleryPlugin extends AbstractConfigurablePlugin<
+    GalleryPluginConfig,
+    GalleryPluginConfig,
+    UpdatableGalleryPluginConfig,
+    GalleryPluginEvents
+> {
     static override readonly id = 'gallery';
-
-    readonly config: GalleryPluginConfig;
+    static override readonly configParser = getConfig;
+    static override readonly readonlyOptions: Array<keyof GalleryPluginConfig> = ['visibleOnLoad', 'items'];
 
     private readonly gallery: GalleryComponent;
 
@@ -30,9 +35,7 @@ export class GalleryPlugin extends AbstractPlugin<GalleryPluginEvents> {
     private currentId?: GalleryItem['id'];
 
     constructor(viewer: Viewer, config: GalleryPluginConfig) {
-        super(viewer);
-
-        this.config = getConfig(config);
+        super(viewer, config);
 
         this.gallery = new GalleryComponent(this, this.viewer);
     }
@@ -69,6 +72,14 @@ export class GalleryPlugin extends AbstractPlugin<GalleryPluginEvents> {
         this.gallery.destroy();
 
         super.destroy();
+    }
+
+    override setOptions(options: Partial<UpdatableGalleryPluginConfig>) {
+        super.setOptions(options);
+
+        if (options.thumbnailSize) {
+            this.gallery.setItems(this.items);
+        }
     }
 
     /**

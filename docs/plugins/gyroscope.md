@@ -30,6 +30,7 @@ There are known inconsistencies of orientation data accross devices. If the pano
 
 -   type: `boolean`
 -   default: `true`
+-   updatable: yes
 
 Allows to pan horizontally the camera when the gyroscope is enabled (requires global `mousemove=true`).
 
@@ -37,6 +38,7 @@ Allows to pan horizontally the camera when the gyroscope is enabled (requires gl
 
 -   type: `boolean`
 -   default: `false`
+-   updatable: yes
 
 By default the camera will keep its current horizontal position when the gyroscope is enabled. Turn this option `true` to enable absolute positionning and only use the device orientation.
 
@@ -44,6 +46,7 @@ By default the camera will keep its current horizontal position when the gyrosco
 
 -   type: `smooth` | `fast`
 -   default: `smooth`
+-   updatable: yes
 
 How the gyroscope data is used to rotate the panorama.
 

@@ -41,3 +41,5 @@ export type GalleryPluginConfig = {
      */
     thumbnailSize?: Size;
 };
+
+export type UpdatableGalleryPluginConfig = Omit<GalleryPluginConfig, 'visibleOnLoad' | 'items'>;

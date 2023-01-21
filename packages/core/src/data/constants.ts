@@ -113,7 +113,7 @@ export const ICONS = {
     info,
     menu,
     zoomIn,
-    zoomOut
+    zoomOut,
 };
 
 // @formatter:off

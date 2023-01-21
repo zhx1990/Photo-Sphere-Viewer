@@ -39,7 +39,7 @@ export function resolveBoolean(value: boolean | ResolvableBoolean, cb: (val: boo
 export function invertResolvableBoolean(value: ResolvableBoolean): ResolvableBoolean {
     return {
         initial: !value.initial,
-        promise: value.promise.then(res => !res),
+        promise: value.promise.then((res) => !res),
     };
 }
 
@@ -360,6 +360,15 @@ export type ConfigParsers<T, U extends T = T> = {
 };
 
 /**
+ * Result of {@link getConfigParser}
+ */
+export interface ConfigParser<T, U extends T> {
+    (config: T): U;
+    defaults: Required<U>;
+    parsers: ConfigParsers<T, U>;
+}
+
+/**
  * Creates a function to validate an user configuration object
  *
  * @template T type of input config
@@ -390,8 +399,8 @@ export type ConfigParsers<T, U extends T = T> = {
 export function getConfigParser<T extends Record<string, any>, U extends T = T>(
     defaults: Required<U>,
     parsers?: ConfigParsers<T, U>
-) {
-    return (userConfig: T): U => {
+): ConfigParser<T, U> {
+    const parser = <ConfigParser<T, U>>function (userConfig: T): U {
         if (!userConfig) {
             return clone(defaults);
         }
@@ -420,4 +429,9 @@ export function getConfigParser<T extends Record<string, any>, U extends T = T>(
 
         return config;
     };
+
+    parser.defaults = defaults;
+    parser.parsers = parsers || ({} as any);
+
+    return parser;
 }

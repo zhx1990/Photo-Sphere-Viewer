@@ -105,6 +105,7 @@ gallery.setItems([
 
 -   type: `array`
 -   default: `GalleryItem[]`
+-   updatable: no, use `setItems()` method
 
 The list of items, see bellow.
 
@@ -112,13 +113,15 @@ The list of items, see bellow.
 
 -   type: `boolean`
 -   default: `false`
+-   updatable: no
 
 Displays the gallery when loading the first panorama. The user will be able to toggle the gallery with the navbar button.
 
 #### `hideOnClick`
 
 -   type: `boolean`
--   default: `true
+-   default: `true`
+-   updatable: yes
 
 Hides the gallery when the user clicks on an item.
 
@@ -126,6 +129,7 @@ Hides the gallery when the user clicks on an item.
 
 -   type: `{ width: number, height: number }`
 -   default: `{ width: 200, height: 100 }`
+-   updatable: yes
 
 Size of the thumbnails.
 

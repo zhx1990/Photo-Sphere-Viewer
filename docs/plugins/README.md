@@ -60,3 +60,14 @@ markersPlugin.addEventListener('select-marker', () => {
     /* ... */
 });
 ```
+
+Some plugins allow their configuration to be modified after init with the `setOption()` and `setOptions()` methods. The updatable configuration properties are documented on each plugin page.
+
+```js
+markersPlugin.setOption('gotoMarkerSpeed', '3rpm');
+
+markersPlugin.setOptions({
+    gotoMarkerSpeed: '3rpm',
+    clickEventOnMarker: true,
+});
+```

@@ -1,10 +1,10 @@
 import type { ExtendedPosition, Position, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractPlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import type { VideoPlugin } from '@photo-sphere-viewer/video-plugin';
 import { MathUtils, SplineCurve, Vector2 } from 'three';
 import { AutorotateEvent, AutorotatePluginEvents } from './events';
-import { AutorotateKeypoint, AutorotatePluginConfig } from './model';
+import { AutorotateKeypoint, AutorotatePluginConfig, UpdatableAutorotatePluginConfig } from './model';
 // import { debugCurve } from '../../shared/autorotate-utils';
 
 type ParsedAutorotatePluginConfig = Omit<
@@ -69,10 +69,15 @@ function serializePt(position: Position): [number, number] {
 /**
  * Adds an automatic rotation of the panorama
  */
-export class AutorotatePlugin extends AbstractPlugin<AutorotatePluginEvents> {
+export class AutorotatePlugin extends AbstractConfigurablePlugin<
+    AutorotatePluginConfig,
+    ParsedAutorotatePluginConfig,
+    UpdatableAutorotatePluginConfig,
+    AutorotatePluginEvents
+> {
     static override readonly id = 'autorotate';
-
-    readonly config: ParsedAutorotatePluginConfig;
+    static override readonly configParser = getConfig;
+    static override readonly readonlyOptions: Array<keyof AutorotatePluginConfig> = ['keypoints'];
 
     private readonly state = {
         initialStart: true,
@@ -104,9 +109,7 @@ export class AutorotatePlugin extends AbstractPlugin<AutorotatePluginEvents> {
     private markers?: MarkersPlugin;
 
     constructor(viewer: Viewer, config: AutorotatePluginConfig) {
-        super(viewer);
-
-        this.config = getConfig(config);
+        super(viewer, config);
 
         this.state.initialStart = !utils.isNil(this.config.autostartDelay);
     }
@@ -312,8 +315,7 @@ export class AutorotatePlugin extends AbstractPlugin<AutorotatePluginEvents> {
                 // "2" is magic, and kinda related to the "PI/4" in animate()
                 speed: `${this.viewer.config.zoomSpeed * 2}rpm`,
             });
-        }
-        else {
+        } else {
             p = Promise.resolve();
         }
 

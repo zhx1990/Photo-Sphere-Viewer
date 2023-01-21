@@ -1,6 +1,6 @@
 import type { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
 import type { Point, Position, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractPlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import type { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
 import type { events as markersEvents, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { AmbientLight, BackSide, Group, Mesh, MeshBasicMaterial, MeshLambertMaterial, PointLight } from 'three';
@@ -60,10 +60,15 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
 /**
  * Creates virtual tours by linking multiple panoramas
  */
-export class VirtualTourPlugin extends AbstractPlugin<VirtualTourEvents> {
+export class VirtualTourPlugin extends AbstractConfigurablePlugin<
+    VirtualTourPluginConfig,
+    VirtualTourPluginConfig,
+    never,
+    VirtualTourEvents
+> {
     static override readonly id = 'virtual-tour';
-
-    readonly config: VirtualTourPluginConfig;
+    static override readonly configParser = getConfig;
+    static override readonly readonlyOptions = Object.keys(getConfig.defaults);
 
     private readonly state = {
         currentNode: null as VirtualTourNode,
@@ -92,9 +97,7 @@ export class VirtualTourPlugin extends AbstractPlugin<VirtualTourEvents> {
     }
 
     constructor(viewer: Viewer, config: VirtualTourPluginConfig) {
-        super(viewer);
-
-        this.config = getConfig(config);
+        super(viewer, config);
 
         if (this.is3D) {
             this.arrowsGroup = new Group();

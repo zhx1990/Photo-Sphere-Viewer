@@ -117,7 +117,7 @@ module.exports = {
                     collapsable: false,
                     children: getFiles('docs/plugins')
                         .filter((f) => f !== 'README.md' && f !== 'writing-a-plugin.md' && f !== 'third-party.md')
-                        .map(f => f === 'map.md' ? [f, 'MapPlugin (NEW)'] : f),
+                        .map((f) => (f === 'map.md' ? [f, 'MapPlugin (NEW)'] : f)),
                 },
                 'third-party',
             ],

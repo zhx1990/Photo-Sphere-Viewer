@@ -321,6 +321,7 @@ Overrides the global style of the marker used to display the link. See global co
 
 -   type: `'client' | 'server'`
 -   default: `'client'`
+-   updatable: no
 
 Configure how the nodes configuration is provided.
 
@@ -328,6 +329,7 @@ Configure how the nodes configuration is provided.
 
 -   type: `'manual' | 'gps'`
 -   default: `'manual'`
+-   updatable: no
 
 Configure how the links between nodes are positionned.
 
@@ -335,24 +337,28 @@ Configure how the links between nodes are positionned.
 
 -   type: `'markers' | '3d'`
 -   default: `'3d'`
+-   updatable: no
 
 How the links are displayed, `markers` requires the [Markers plugin](./markers.md).
 
 #### `nodes` (client mode only)
 
 -   type: `array`
+-   updatable: no
 
 Initial list of nodes. You can also call `setNodes` method later.
 
 #### `getNode(nodeId)` (required in server mode)
 
 -   type: `function(nodeId: string) => Promise<Node>`
+-   updatable: no
 
 Callback to load the configuration of a node.
 
 #### `startNodeId`
 
 -   type: `string`
+-   updatable: no
 
 Id of the initially loaded node. If empty the first node will be displayed. You can also call `setCurrentNode` method later.
 
@@ -360,6 +366,7 @@ Id of the initially loaded node. If empty the first node will be displayed. You 
 
 -   type: `boolean | function(node: Node, link: NodeLink) => boolean`
 -   default: `false`
+-   updatable: no
 
 Enable the preloading of linked nodes, can be a function that returns true or false for each link.
 
@@ -367,6 +374,7 @@ Enable the preloading of linked nodes, can be a function that returns true or fa
 
 -   type: `boolean | string | number`
 -   default: `20rpm`
+-   updatable: no
 
 When a link is clicked, adds a animation to face it before actually changing the node. If `false` the viewer won't rotate at all and keep the current orientation.
 
@@ -374,6 +382,7 @@ When a link is clicked, adds a animation to face it before actually changing the
 
 -   type: `boolean | number`
 -   default: `1500`
+-   updatable: no
 
 Duration of the transition between nodes.
 
@@ -381,12 +390,14 @@ Duration of the transition between nodes.
 
 -   type: `boolean`
 -   default: `true` if markers render mode
+-   updatable: no
 
 If the [Compass plugin](./compass.md) is enabled, displays the links on the compass.
 
 #### `markerStyle` (markers mode only)
 
 -   type: `object`
+-   updatable: no
 
 Style of the marker used to display links.
 
@@ -420,6 +431,7 @@ markerStyle: {
 #### `arrowStyle` (3d mode only)
 
 -   type: `object`
+-   updatable: no
 
 Style of the arrow used to display links.
 
@@ -440,6 +452,7 @@ Default value is:
 
 -   type: `number`
 -   default: `-0.1`
+-   updatable: no
 
 Vertical offset in radians applied to the markers to compensate for the viewer position above ground.
 
@@ -447,6 +460,7 @@ Vertical offset in radians applied to the markers to compensate for the viewer p
 
 -   type: `'top' | 'bottom'`
 -   default: `'bottom'`
+-   updatable: no
 
 Vertical position of the arrows.
 

@@ -1,5 +1,5 @@
 import type { Position, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractPlugin, events, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, events, utils } from '@photo-sphere-viewer/core';
 import { Object3D, Vector3 } from 'three';
 import { DeviceOrientationControls } from './DeviceOrientationControls';
 import { GyroscopePluginEvents, GyroscopeUpdatedEvent } from './events';
@@ -28,10 +28,14 @@ const direction = new Vector3();
 /**
  * Adds gyroscope controls on mobile devices
  */
-export class GyroscopePlugin extends AbstractPlugin<GyroscopePluginEvents> {
+export class GyroscopePlugin extends AbstractConfigurablePlugin<
+    GyroscopePluginConfig,
+    GyroscopePluginConfig,
+    GyroscopePluginConfig,
+    GyroscopePluginEvents
+> {
     static override readonly id = 'gyroscope';
-
-    readonly config: GyroscopePluginConfig;
+    static override readonly configParser = getConfig;
 
     private readonly state = {
         isSupported: this.__checkSupport(),
@@ -43,9 +47,7 @@ export class GyroscopePlugin extends AbstractPlugin<GyroscopePluginEvents> {
     private controls: DeviceOrientationControls;
 
     constructor(viewer: Viewer, config: GyroscopePluginConfig) {
-        super(viewer);
-
-        this.config = getConfig(config);
+        super(viewer, config);
     }
 
     /**

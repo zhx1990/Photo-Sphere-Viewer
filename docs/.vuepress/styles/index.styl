@@ -35,6 +35,7 @@
   background-color: lightness($accentColor, 90%);
 }
 
+/* sponsors */
 .sponsors {
   text-align: center;
   margin-top: 2.5rem;
@@ -56,4 +57,27 @@
 }
 .sponsors img {
   height: 50px;
+}
+
+/* options types + default */
+h4 + ul {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 0;
+}
+
+h4 + ul li {
+  display: flex;
+  align-items: center;
+  margin-right: 1em;
+  margin-top: 10px;
+  padding: 0.2em 0.5em;
+  font-size: 0.8rem;
+  border: 1px solid var(--md-theme-default-primary);
+  border-radius: 3px;
+}
+
+h4 + ul li code:last-child {
+  margin-right: -0.3em;
 }

@@ -432,7 +432,7 @@ _(This option is ignored for polygons and polylines)._
 #### `zoomLvl`
 
 -   type: `number`
--   default: `undefind`
+-   default: `undefined`
 
 The zoom level which will be applied when calling `gotoMarker()` method or when clicking on the marker in the list.
 If not provided, the current zoom level is kept.
@@ -495,6 +495,29 @@ Any custom data you want to attach to the marker. You may access this data in th
 
 ## Configuration
 
+#### `markers`
+
+-   type: `MarkerConfig[]`
+-   updatable: no, use `setMarkers()` method
+
+Initial list of markers.
+
+#### `gotoMarkerSpeed`
+
+-   type: `string|number`
+-   default: `'8rpm'`
+-   updatable: yes
+
+Default animation speed for `gotoMarker` method.
+
+#### `clickEventOnMarker`
+
+-   type: `boolean`
+-   default: `false`
+-   updatable: yes
+
+If a `click` event is triggered on the viewer additionally to the `select-marker` event.
+
 #### `lang`
 
 -   type: `object`
@@ -508,26 +531,6 @@ lang: {
 ```
 
 _Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
-
-#### `markers`
-
--   type: `MarkerConfig[]`
-
-Initial list of markers.
-
-#### `gotoMarkerSpeed`
-
--   type: `string|number`
--   default: `'8rpm'`
-
-Default animation speed for `gotoMarker` method.
-
-#### `clickEventOnMarker`
-
--   type: `boolean`
--   default: `false`
-
-If a `click` event is triggered on the viewer additionally to the `select-marker` event.
 
 ## Methods
 
