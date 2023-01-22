@@ -1,21 +1,28 @@
 name: close-milestone
+run-name: Close milestone ${{ github.ref_name }}
 
 on:
-  milestone:
-    types: [closed]
-
-permissions:
-  issues: write
-  pull-requests: write
+  release:
+    types: [published]
 
 jobs:
-  comment:
+  close:
     if: github.repository == 'mistic100/Photo-Sphere-Viewer'
 
     runs-on: ubuntu-latest
 
     steps:
-      - uses: bflad/action-milestone-comment@v1
+      - id: close
+        uses: mistic100/close-milestone@main
         with:
+          milestone_name: ${{ github.ref_name }}
+          crash_on_missing: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - if: ${{ steps.close.outputs.milestone_id != null }}
+        uses: bflad/action-milestone-comment@v1
+        with:
+          milestone: ${{ steps.close.outputs.milestone_id }}
           body: |
-            This feature/bug fix has been released in [version ${{ github.event.milestone.title }}](https://github.com/mistic100/Photo-Sphere-Viewer/releases/tag/${{ github.event.milestone.title }}).
+            This feature/bug fix has been released in [version ${{ github.ref_name }}](https://github.com/mistic100/Photo-Sphere-Viewer/releases/tag/${{ github.ref_name }}).

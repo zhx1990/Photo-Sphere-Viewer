@@ -56,13 +56,6 @@ jobs:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
           NPM_TAG: latest
 
-      - uses: Akkjon/close-milestone@v2.0.2
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
-        with:
-          milestone_name: ${{ github.ref_name }}
-          crash_on_missing: false
-
       - name: update issue templates
         run: |
           git fetch origin main --depth 1
