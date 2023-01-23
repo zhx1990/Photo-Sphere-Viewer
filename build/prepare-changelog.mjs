@@ -38,10 +38,11 @@ ${log
     .split('\n')
     .map((line) => line.trim())
     .filter((line) => !line.startsWith('chore'))
-    .map((line) => ` - ${line}`)
+    .map((line) => `- ${line}`)
     .join('\n')
 }`;
 
+    console.log(content);
     writeFileAndExit(content);
 });
 

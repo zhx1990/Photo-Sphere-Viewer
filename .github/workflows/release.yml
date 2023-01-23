@@ -17,11 +17,6 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: data
-        id: data
-        run: |
-          echo "PREVIOUS_TAG=$(git tag --sort=-committerdate | sed -n '2 p')" >> $GITHUB_OUTPUT
-
       - uses: actions/setup-node@v3
         with:
           node-version: '16'
@@ -35,18 +30,19 @@ jobs:
 
       - name: package
         run: |
+          PREVIOUS_TAG=$(git tag --sort=-committerdate | sed -n '2 p')
           echo '📂 prepare'
           node ./build/prepare-package.mjs
           echo '📦 archive'
           (cd dist && zip -r photo-sphere-viewer-${{ github.ref_name }}.zip .)
           echo '📄 changelog'
-          git log --pretty=format:"%s" ${{ steps.data.outputs.PREVIOUS_TAG }}...${{ github.ref_name }} | node ./build/prepare-changelog.mjs ${{ steps.data.outputs.PREVIOUS_TAG }} ${{ github.ref_name }}
+          git log --pretty=format:"%s" $PREVIOUS_TAG...${{ github.ref_name }} | node ./build/prepare-changelog.mjs $PREVIOUS_TAG ${{ github.ref_name }}
 
       - name: create release
         uses: softprops/action-gh-release@v1
         with:
           draft: true
-          body_file: dist/changelog_${{ github.ref_name }}.md
+          body_path: dist/changelog_${{ github.ref_name }}.md
           files: dist/photo-sphere-viewer-${{ github.ref_name }}.zip
 
       - name: npm publish
