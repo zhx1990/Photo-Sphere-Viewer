@@ -59,7 +59,9 @@ export class MapComponent extends AbstractComponent {
     }
 
     constructor(viewer: Viewer, private plugin: MapPlugin) {
-        super(viewer, {});
+        super(viewer, {
+            className: `psv-map psv--capture-event`,
+        });
 
         // map + compass container
         const canvasContainer = document.createElement('div');
@@ -217,7 +219,13 @@ export class MapComponent extends AbstractComponent {
     }
 
     applyConfig() {
-        this.container.className = `psv-map psv-map--${this.config.position.join('-')} psv--capture-event`;
+        this.container.classList.remove(
+            'psv-map--top-right',
+            'psv-map--top-left',
+            'psv-map--bottom-right',
+            'psv-map--bottom-left'
+        );
+        this.container.classList.add(`psv-map--${this.config.position.join('-')}`);
 
         this.container.style.width = this.config.size;
         this.container.style.height = this.config.size;
