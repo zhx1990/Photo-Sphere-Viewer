@@ -69,7 +69,7 @@ ${fileContent
         /__commonJS\({[\s]+"(.*?)"\(exports, module\) {[\s]+module.exports = (.*?);[\s]+}[\s]+}\);/g,
         (_, p1, p2) => `() => ${p2.split('.').pop()};`
     )
-    .replace(/__toESM\((.*?)\(\)\)/g, '$1()')
+    .replace(/__toESM\((.*?)\(\)(, 1)?\)/g, '$1()')
     // unused functions
     .replace(/  var __toESM = ([\s\S]*?)\)\);\n/, '')
     .replace(/  var __commonJS = ([\s\S]*?)};\n/, '')

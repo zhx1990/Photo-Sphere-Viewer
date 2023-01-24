@@ -3,9 +3,9 @@ import type { Viewer } from '@photo-sphere-viewer/core';
 import { AbstractPlugin, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import type { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import { StereoEffect } from 'three/examples/jsm/effects/StereoEffect.js';
 import { StereoPluginEvents, StereoUpdatedEvent } from './events';
 import mobileRotateIcon from './icons/mobile-rotate.svg';
-import { StereoEffect } from './StereoEffect';
 
 interface WakeLockSentinel {
     release(): void;
@@ -104,7 +104,7 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
         this.__startWakelock();
         this.__lockOrientation();
 
-        return this.gyroscope.start().then(
+        return this.gyroscope.start('fast').then(
             () => {
                 this.viewer.renderer.setCustomRenderer((renderer) => new StereoEffect(renderer));
                 this.state.enabled = true;

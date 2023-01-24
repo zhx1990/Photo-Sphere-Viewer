@@ -42,6 +42,7 @@ export class GyroscopePlugin extends AbstractConfigurablePlugin<
         alphaOffset: 0,
         enabled: false,
         config_moveInertia: true,
+        moveMode: this.config.moveMode,
     };
 
     private controls: DeviceOrientationControls;
@@ -106,7 +107,7 @@ export class GyroscopePlugin extends AbstractConfigurablePlugin<
     /**
      * Enables the gyroscope navigation if available
      */
-    start(): Promise<void> {
+    start(moveMode = this.config.moveMode): Promise<void> {
         return this.state.isSupported
             .then((supported) => {
                 if (supported) {
@@ -126,6 +127,8 @@ export class GyroscopePlugin extends AbstractConfigurablePlugin<
             })
             .then(() => {
                 this.viewer.stopAll();
+
+                this.state.moveMode = moveMode;
 
                 // disable inertia
                 this.state.config_moveInertia = this.viewer.config.moveInertia;
@@ -211,7 +214,7 @@ export class GyroscopePlugin extends AbstractConfigurablePlugin<
             };
 
             // having a slow speed on smalls movements allows to absorb the device/hand vibrations
-            const step = this.config.moveMode === 'smooth' ? 3 : 10;
+            const step = this.state.moveMode === 'smooth' ? 3 : 10;
             this.viewer.dynamics.position.goto(target, utils.getAngle(position, target) < 0.01 ? 1 : step);
         }
     }

@@ -43,7 +43,7 @@ export class Renderer extends AbstractService {
     private readonly container: HTMLElement;
 
     private timestamp?: number;
-    private customRenderer?: ThreeRenderer;
+    private customRenderer?: Omit<ThreeRenderer, 'domElement'>;
 
     get panoramaPose(): Euler {
         return this.mesh.rotation;
@@ -162,7 +162,7 @@ export class Renderer extends AbstractService {
     /**
      * Resets or replaces the THREE renderer by a custom one
      */
-    setCustomRenderer(factory: (renderer: WebGLRenderer) => ThreeRenderer) {
+    setCustomRenderer(factory: (renderer: WebGLRenderer) => Omit<ThreeRenderer, 'domElement'>) {
         if (factory) {
             this.customRenderer = factory(this.renderer);
         } else {

@@ -42,6 +42,7 @@ ${
             dts: !dev,
             sourcemap: true,
             external: Object.keys(externals),
+            noExternal: [/three\/examples\/.*/],
             esbuildPlugins: [
                 sassPlugin(),
                 externalGlobalPlugin(externals),

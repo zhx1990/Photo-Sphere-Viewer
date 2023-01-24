@@ -94,10 +94,10 @@ export class CompassComponent extends AbstractComponent {
         this.container.style.width = this.config.size;
         this.container.style.height = this.config.size;
 
-         this.container.style.marginTop = this.config.position[0] === 'center' 
+        this.container.style.marginTop = this.config.position[0] === 'center'
             ? `calc(-${this.config.size} / 2)`
             : '';
-         this.container.style.marginLeft = this.config.position[1] === 'center'
+        this.container.style.marginLeft = this.config.position[1] === 'center'
             ? `calc(-${this.config.size} / 2)`
             : '';
     }
