@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/little-planet-adapter",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer adapter for equirectangular panoramas displayed with little planet effect.",
+  "description": "Photo Sphere Viewer adapter for equirectangular panoramas displayed with little planet effect.",
   "homepage": "https://photo-sphere-viewer.js.org/guide/adapters/little-planet",
   "license": "MIT",
   "main": "./src/index.ts",

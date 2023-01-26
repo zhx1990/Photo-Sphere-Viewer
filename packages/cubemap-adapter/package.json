@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/cubemap-adapter",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer adapter to display cubemaps.",
+  "description": "Photo Sphere Viewer adapter to display cubemaps.",
   "homepage": "https://photo-sphere-viewer.js.org/guide/adapters/cubemap",
   "license": "MIT",
   "main": "./src/index.ts",

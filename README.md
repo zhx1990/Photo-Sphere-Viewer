@@ -7,7 +7,7 @@
 [![Netlify Status](https://img.shields.io/netlify/472fe613-7694-4e61-a662-07e3b988afb3?logo=netlify)](https://photo-sphere-viewer.js.org)
 [![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/core.svg?token=kIlt6pn/ejbAWdKeP7rt2C7fiXpFWMf0tQDtuU4kNUg=)](https://openbase.com/js/@photo-sphere-viewer/core?utm_source=embedded&amp;utm_medium=badge&amp;utm_campaign=rate-badge)
 
-Photo Sphere Viewer is a JavaScript library that allows you to display 360×180 degrees panoramas on any web page.
+A JavaScript library to display 360° sphere panoramas.
 
 Forked from [JeremyHeleine/Photo-Sphere-Viewer](https://github.com/JeremyHeleine/Photo-Sphere-Viewer).
 

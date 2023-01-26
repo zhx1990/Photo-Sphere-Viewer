@@ -1,9 +1,14 @@
 # VideoPlugin
 
+[![NPM version](https://img.shields.io/npm/v/@photo-sphere-viewer/video-plugin?logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/video-plugin)
+[![NPM Downloads](https://img.shields.io/npm/dm/@photo-sphere-viewer/video-plugin?color=f86036&label=npm&logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/video-plugin)
+[![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/@photo-sphere-viewer/video-plugin?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/video-plugin)
+[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/video-plugin.svg?)](https://openbase.com/js/@photo-sphere-viewer/video-plugin)
+
 ::: module modules/plugin__Video.html
 Adds controls to the video [adapters](../guide/adapters/).
 
-This plugin is available in the `@photo-sphere-viewer/video-plugin` package. **It has a stylesheet.**
+This plugin is available in the [@photo-sphere-viewer/video-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/video-plugin) package. **It has a stylesheet.**
 :::
 
 [[toc]]
@@ -20,7 +25,7 @@ Once enabled it will add various elements to the viewer:
 -   Progressbar above the navbar
 -   Play button in the center of the viewer
 
-It also supports advanced autorotate with timed `keypoints`.
+It also supports advanced video with timed `keypoints`.
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
@@ -44,8 +49,8 @@ packages:
     - name: video-plugin
       imports: VideoPlugin
       style: true
-    - name: autorotate-plugin
-      imports: AutorotatePlugin
+    - name: video-plugin
+      imports: videoPlugin
     - name: settings-plugin
       imports: SettingsPlugin
       style: true
@@ -65,7 +70,7 @@ const viewer = new PhotoSphereViewer.Viewer({
     loadingImg: baseUrl + 'loader.gif',
     touchmoveTwoFingers: true,
     mousewheelCtrlKey: true,
-    navbar: 'video autorotate caption settings fullscreen',
+    navbar: 'video video caption settings fullscreen',
 
     plugins: [
         [PhotoSphereViewer.VideoPlugin, {
@@ -80,7 +85,7 @@ const viewer = new PhotoSphereViewer.Viewer({
                 { time: 35, position: { yaw: (-7 * Math.PI) / 4, pitch: -Math.PI / 8 } },
             ],
         }],
-        PhotoSphereViewer.AutorotatePlugin,
+        PhotoSphereViewer.videoPlugin,
         PhotoSphereViewer.SettingsPlugin,
         [PhotoSphereViewer.ResolutionPlugin, {
             defaultResolution: 'HD',
@@ -120,7 +125,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 -   type: `Array<{ position, time }>`
 -   updatable: no, use `setKeypoints()` method
 
-Defines timed keypoints that will be used by the autorotate button.
+Defines timed keypoints that will be used by the video button.
 
 ```js
 keypoints: [
@@ -131,7 +136,7 @@ keypoints: [
 ```
 
 ::: warning
-The usage of keypoints requires to load the [Autorotate plugin](./autorotate.md).
+The usage of keypoints requires to load the [video plugin](./video.md).
 :::
 
 #### `progressbar`

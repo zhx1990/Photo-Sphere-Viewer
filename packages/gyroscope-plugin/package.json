@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/gyroscope-plugin",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer plugin to add gyroscope controls on mobile devices.",
+  "description": "Photo Sphere Viewer plugin to add gyroscope controls on mobile devices.",
   "homepage": "https://photo-sphere-viewer.js.org/plugins/gyroscope",
   "license": "MIT",
   "main": "./src/index.ts",

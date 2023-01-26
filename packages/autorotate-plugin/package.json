@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/autorotate-plugin",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer plugin to add an automatic rotation of the panorama.",
+  "description": "Photo Sphere Viewer plugin to add an automatic rotation of the panorama.",
   "homepage": "https://photo-sphere-viewer.js.org/plugins/autorotate",
   "license": "MIT",
   "main": "./src/index.ts",

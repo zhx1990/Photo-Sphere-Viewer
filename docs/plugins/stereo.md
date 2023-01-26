@@ -1,9 +1,14 @@
 # StereoPlugin
 
+[![NPM version](https://img.shields.io/npm/v/@photo-sphere-viewer/stereo-plugin?logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/stereo-plugin)
+[![NPM Downloads](https://img.shields.io/npm/dm/@photo-sphere-viewer/stereo-plugin?color=f86036&label=npm&logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/stereo-plugin)
+[![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/@photo-sphere-viewer/stereo-plugin?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/stereo-plugin)
+[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/stereo-plugin.svg?)](https://openbase.com/js/@photo-sphere-viewer/stereo-plugin)
+
 ::: module modules/plugin__Stereo.html
 Adds stereo view on mobile devices. **Requires the [Gyroscope plugin](./gyroscope.md).**
 
-This plugin is available in the `@photo-sphere-viewer/stereo-plugin` package.
+This plugin is available in the [@photo-sphere-viewer/stereo-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/stereo-plugin) package.
 :::
 
 ## Usage

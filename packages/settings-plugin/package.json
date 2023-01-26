@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/settings-plugin",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer configurable plugin that adds a button to access various settings.",
+  "description": "Photo Sphere Viewer configurable plugin that adds a button to access various settings.",
   "homepage": "https://photo-sphere-viewer.js.org/plugins/settings",
   "license": "MIT",
   "main": "./src/index.ts",

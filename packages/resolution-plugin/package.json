@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/resolution-plugin",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer plugin that adds a setting to choose between multiple resolutions of the panorama.",
+  "description": "Photo Sphere Viewer plugin that adds a setting to choose between multiple resolutions of the panorama.",
   "homepage": "https://photo-sphere-viewer.js.org/plugins/resolution",
   "license": "MIT",
   "main": "./src/index.ts",

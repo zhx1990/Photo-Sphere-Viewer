@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/map-plugin",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer plugin to add a minimap with the panorama location.",
+  "description": "Photo Sphere Viewer plugin to add a minimap with the panorama location.",
   "homepage": "https://photo-sphere-viewer.js.org/plugins/map",
   "license": "MIT",
   "main": "./src/index.ts",

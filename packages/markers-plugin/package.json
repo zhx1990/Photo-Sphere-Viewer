@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/markers-plugin",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer plugin to display various markers/hotspots on the viewer.",
+  "description": "Photo Sphere Viewer plugin to display various markers/hotspots on the viewer.",
   "homepage": "https://photo-sphere-viewer.js.org/plugins/markers",
   "license": "MIT",
   "main": "./src/index.ts",

@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/equirectangular-tiles-adapter",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer adapter to display tiled panoramas.",
+  "description": "Photo Sphere Viewer adapter to display tiled panoramas.",
   "homepage": "https://photo-sphere-viewer.js.org/guide/adapters/equirectangular-tiles",
   "license": "MIT",
   "main": "./src/index.ts",

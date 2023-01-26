@@ -1,7 +1,7 @@
 {
   "name": "@photo-sphere-viewer/video-plugin",
   "version": "0.0.0",
-  "description": "Photo sphere Viewer plugin to add video controls.",
+  "description": "Photo Sphere Viewer plugin to add video controls.",
   "homepage": "https://photo-sphere-viewer.js.org/plugins/video",
   "license": "MIT",
   "main": "./src/index.ts",

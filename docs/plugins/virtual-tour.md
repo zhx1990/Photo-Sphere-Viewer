@@ -1,9 +1,14 @@
 # VirtualTourPlugin
 
+[![NPM version](https://img.shields.io/npm/v/@photo-sphere-viewer/virtual-tour-plugin?logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/virtual-tour-plugin)
+[![NPM Downloads](https://img.shields.io/npm/dm/@photo-sphere-viewer/virtual-tour-plugin?color=f86036&label=npm&logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/virtual-tour-plugin)
+[![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/@photo-sphere-viewer/virtual-tour-plugin?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/virtual-tour-plugin)
+[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/virtual-tour-plugin.svg?)](https://openbase.com/js/@photo-sphere-viewer/virtual-tour-plugin)
+
 ::: module modules/plugin__VirtualTour.html
 Create virtual tours by linking multiple panoramas.
 
-This plugin is available in the `@photo-sphere-viewer/virtual-tour-plugin` package. **It has a stylesheet.**
+This plugin is available in the [@photo-sphere-viewer/virtual-tour-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/virtual-tour-plugin) package. **It has a stylesheet.**
 :::
 
 [[toc]]
