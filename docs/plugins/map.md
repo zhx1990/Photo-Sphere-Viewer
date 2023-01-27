@@ -154,7 +154,7 @@ Position of the widget, accepted positions are combinations of `top`, `bottom` a
 
 Displays the map when loading the first panorama.
 
-#### `compassImage`
+#### `overlayImage`
 
 -   type: `string`
 -   default: default SVG

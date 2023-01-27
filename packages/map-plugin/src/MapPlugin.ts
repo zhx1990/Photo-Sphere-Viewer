@@ -3,7 +3,7 @@ import type { events as markersEvents, Marker, MarkersPlugin } from '@photo-sphe
 import { MapComponent } from './components/MapComponent';
 import { HOTSPOT_GENERATED_ID, HOTSPOT_MARKER_ID, MARKER_DATA_KEY } from './constants';
 import { MapPluginEvents } from './events';
-import compass from './icons/compass.svg';
+import overlay from './overlay.svg';
 import pin from './icons/pin.svg';
 import { MapHotspot, MapPluginConfig, ParsedMapPluginConfig, UpdatableMapPluginConfig } from './model';
 
@@ -15,7 +15,8 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         size: '200px',
         position: ['bottom', 'left'],
         visibleOnLoad: true,
-        compassImage: compass,
+        overlayImage: overlay,
+        compassImage: null,
         pinImage: pin,
         pinSize: 35,
         spotColor: 'white',
@@ -28,6 +29,13 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         hotspots: [],
     },
     {
+        overlayImage: (overlayImage, { rawConfig }) => {
+            if (rawConfig.compassImage) {
+                utils.logWarn('map: "compassImage" is deprecated, use "overlayImage" instead');
+                return rawConfig.compassImage;
+            }
+            return overlayImage;
+        },
         position: (position, { defValue }) => {
             return utils.cleanCssPosition(position, { allowCenter: false, cssOrder: true }) || defValue;
         },

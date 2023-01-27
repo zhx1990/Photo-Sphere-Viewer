@@ -8,6 +8,7 @@ import type { MapPlugin } from '../MapPlugin';
 import { MapHotspot } from '../model';
 import { canvasShadow, drawImageCentered, drawImageHighDpi, getImageHtml, loadImage, projectPoint, unprojectPoint } from '../utils';
 import { MapCloseButton } from './MapCloseButton';
+import { MapCompassButton } from './MapCompassButton';
 import { MapMaximizeButton } from './MapMaximizeButton';
 import { MapResetButton } from './MapResetButton';
 import { MapZoomToolbar } from './MapZoomToolbar';
@@ -40,10 +41,11 @@ export class MapComponent extends AbstractComponent {
     };
 
     private readonly canvas: HTMLCanvasElement;
-    private readonly compass: HTMLElement;
+    private readonly overlay: HTMLElement;
     private readonly resetButton: MapResetButton;
     private readonly maximizeButton: MapMaximizeButton;
     private readonly closeButton: MapCloseButton;
+    private readonly compassButton: MapCompassButton;
     private readonly zoomToolbar: MapZoomToolbar;
 
     get config() {
@@ -79,10 +81,10 @@ export class MapComponent extends AbstractComponent {
         this.canvas = document.createElement('canvas');
         canvasContainer.appendChild(this.canvas);
 
-        // compass
-        this.compass = document.createElement('div');
-        this.compass.className = 'psv-map__compass';
-        canvasContainer.appendChild(this.compass);
+        // overlay
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'psv-map__overlay';
+        canvasContainer.appendChild(this.overlay);
 
         this.container.appendChild(canvasContainer);
 
@@ -93,6 +95,7 @@ export class MapComponent extends AbstractComponent {
         this.resetButton = new MapResetButton(this);
         this.maximizeButton = new MapMaximizeButton(this);
         this.closeButton = new MapCloseButton(this);
+        this.compassButton = new MapCompassButton(this);
         this.zoomToolbar = new MapZoomToolbar(this);
 
         // render loop
@@ -207,8 +210,8 @@ export class MapComponent extends AbstractComponent {
                 this.state.forceRender = true;
                 break;
             case 'transitionend':
-                if (!this.state.maximized && this.compass) {
-                    this.compass.style.display = '';
+                if (!this.state.maximized && this.overlay) {
+                    this.overlay.style.display = '';
                 }
                 this.state.forceRender = false;
                 this.update();
@@ -230,11 +233,17 @@ export class MapComponent extends AbstractComponent {
         this.container.style.width = this.config.size;
         this.container.style.height = this.config.size;
 
-        this.compass.innerHTML = getImageHtml(this.config.compassImage);
+        this.overlay.innerHTML = getImageHtml(this.config.overlayImage);
 
         this.resetButton.applyConfig();
         this.closeButton.applyConfig();
+        this.compassButton.applyConfig();
         this.maximizeButton.applyConfig();
+
+        if (this.config.static) {
+            this.compassButton.rotate(0);
+            this.overlay.style.transform = '';
+        }
 
         this.update();
     }
@@ -307,8 +316,8 @@ export class MapComponent extends AbstractComponent {
 
         utils.toggleClass(this.container, 'psv-map--maximized', this.state.maximized);
 
-        if (this.state.maximized && this.compass) {
-            this.compass.style.display = 'none';
+        if (this.state.maximized && this.overlay) {
+            this.overlay.style.display = 'none';
         }
 
         this.maximizeButton.update();
@@ -349,8 +358,9 @@ export class MapComponent extends AbstractComponent {
         const yawAndRotation = this.config.static ? 0 : yaw + rotation;
 
         // update UI
-        if (this.compass && !this.config.static) {
-            this.compass.style.transform = `rotate(${-MathUtils.radToDeg(yawAndRotation)}deg)`;
+        if (!this.config.static) {
+            this.overlay.style.transform = `rotate(${-yawAndRotation}rad)`;
+            this.compassButton.rotate(yawAndRotation);
         }
         this.zoomToolbar.setText(zoom);
 

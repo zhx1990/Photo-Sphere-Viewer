@@ -61,6 +61,11 @@ export type MapPluginConfig = {
     /**
      * SVG or image URL drawn on top of the map (must be square)
      */
+    overlayImage?: string;
+
+    /**
+     * @deprecated Use `overlayImage` instead
+     */
     compassImage?: string;
 
     /**
