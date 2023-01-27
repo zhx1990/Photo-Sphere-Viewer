@@ -5,6 +5,7 @@ Customize the navbar with default and custom buttons.
 ::: code-demo
 
 ```yaml
+autoload: true
 title: PSV Navbar Demo
 ```
 

@@ -35,7 +35,6 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ```yaml
 title: PSV Map Demo
-version: 5.1.0-alpha.2
 packages:
     - name: map-plugin
       imports: MapPlugin

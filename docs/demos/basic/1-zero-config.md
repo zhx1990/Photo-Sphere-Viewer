@@ -5,6 +5,7 @@ Simple panorama with minimal options.
 ::: code-demo
 
 ```yaml
+autoload: true
 title: PSV Basic Demo
 ```
 

@@ -95,6 +95,7 @@ const viewer = new Viewer({
 ::: code-demo
 
 ```yaml
+autoload: true
 title: PSV Basic Demo
 ```
 

@@ -5,6 +5,7 @@ Display a secondary image above the panorama.
 ::: code-demo
 
 ```yaml
+autoload: true
 title: PSV Overlay Demo
 ```
 

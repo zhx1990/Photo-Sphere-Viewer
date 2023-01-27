@@ -15,9 +15,13 @@
         </template>
 
         <md-tab md-label="Result">
+            <div v-if="!show" class="demo-loader">
+                <button v-on:click="show = true">Load demo</button>
+            </div>
+
             <iframe
                 class="demo-runner"
-                v-if="srcdoc"
+                v-if="show && srcdoc"
                 v-bind:srcdoc="srcdoc"
                 allowfullscreen="allowfullscreen"
                 allow="vr; xr; accelerometer; gyroscope; webvr; webxr;"
@@ -50,6 +54,7 @@ export default {
     name: 'CodeDemo',
     components: { ServiceButton },
     props: {
+        autoload: { type: Boolean, default: false },
         title: { type: String, default: '' },
         version: { type: String, default: '' },
         rawHtml: { type: String, default: '' },
@@ -60,7 +65,11 @@ export default {
     data() {
         return {
             SERVICES: SERVICES,
+            show: false,
         };
+    },
+    created() {
+        this.show = this.autoload;
     },
     computed: {
         html() {
@@ -89,6 +98,8 @@ export default {
 </script>
 
 <style lang="stylus">
+$height = 540px
+
 .demo-tabs
   .md-tab
     padding 0
@@ -107,9 +118,32 @@ export default {
 
 .demo-runner
   width 100%
-  height 540px !important
+  height $height !important
 
 .demo-source
-  max-height 540px
+  height $height
   overflow auto
+
+.demo-loader
+  width 100%
+  height $height
+  display flex
+  justify-content center
+  align-items center
+  background radial-gradient(#fff 0%, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%, #efefef 66%, #dfdfdf 82%, #bfbfbf 100%)
+
+  button
+    font-size 1.2rem
+    text-transform uppercase
+    padding 0.5em 1em
+    background #448aff
+    color white
+    border none
+    border-radius 6px
+    cursor pointer
+    box-shadow 0 0 20px rgba(0, 0, 0, 0.5)
+    transition background ease-in-out .2s
+
+    &:hover
+      background #5494ff
 </style>

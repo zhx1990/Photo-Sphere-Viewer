@@ -14,6 +14,7 @@ module.exports = (options, ctx) => ({
 
                 if (nesting === 1) {
                     const config = {
+                        autoload: false,
                         title: '',
                         version: '',
                         html: '',
@@ -35,7 +36,8 @@ module.exports = (options, ctx) => ({
                         }
                     }
 
-                    return `<CodeDemo title="${config.title}"
+                    return `<CodeDemo autoload="${config.autoload}"
+                            title="${config.title}"
                             version="${config.version}"
                             rawHtml="${encodeURIComponent(config.html)}"
                             rawJs="${encodeURIComponent(config.js)}"

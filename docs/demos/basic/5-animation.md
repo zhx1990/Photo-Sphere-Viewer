@@ -5,6 +5,7 @@ Use the `Animation` helper to create a cool intro.
 ::: code-demo
 
 ```yaml
+autoload: true
 title: PSV Intro Animation Demo
 packages:
     - name: autorotate-plugin

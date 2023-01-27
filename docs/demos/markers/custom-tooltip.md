@@ -5,6 +5,7 @@ Advanced styling of a marker's tooltip.
 ::: code-demo
 
 ```yaml
+autoload: true
 title: PSV Marker custom tooltip Demo
 packages:
     - name: markers-plugin

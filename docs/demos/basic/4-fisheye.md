@@ -5,6 +5,7 @@ Display the panorama with a fisheye effect.
 ::: code-demo
 
 ```yaml
+autoload: true
 title: PSV Fisheye Demo
 ```
 

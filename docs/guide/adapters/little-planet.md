@@ -12,7 +12,7 @@ This adapter is available in the [@photo-sphere-viewer/little-planet-adapter](ht
 :::
 
 ::: warning
-This adapter is not complatible with some options and plugins, it is provided as it just for fun.
+This adapter is not compatible with some options and plugins, it is provided as it just for fun.
 :::
 
 ```js

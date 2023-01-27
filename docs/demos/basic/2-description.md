@@ -5,6 +5,7 @@
 ::: code-demo
 
 ```yaml
+autoload: true
 title: PSV Description Demo
 ```
 
