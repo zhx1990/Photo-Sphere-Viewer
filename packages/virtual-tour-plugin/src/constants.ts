@@ -4,10 +4,8 @@ import { VirtualTourArrowStyle, VirtualTourMarkerStyle } from './model';
 import arrowGeometryJson from './models/arrow.json';
 import arrowOutlineGeometryJson from './models/arrow_outline.json';
 
-/**
- * Property name added to markers and THREE objects
- */
 export const LINK_DATA = 'tourLink';
+export const LINK_ID = '__tour-link__';
 
 /**
  * Default style of the link marker

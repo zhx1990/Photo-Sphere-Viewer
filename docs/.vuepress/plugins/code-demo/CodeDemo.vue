@@ -54,7 +54,7 @@ export default {
     name: 'CodeDemo',
     components: { ServiceButton },
     props: {
-        autoload: { type: Boolean, default: false },
+        autoload: { type: String, default: 'false' },
         title: { type: String, default: '' },
         version: { type: String, default: '' },
         rawHtml: { type: String, default: '' },
@@ -69,7 +69,7 @@ export default {
         };
     },
     created() {
-        this.show = this.autoload;
+        this.show = this.autoload === 'true';
     },
     computed: {
         html() {

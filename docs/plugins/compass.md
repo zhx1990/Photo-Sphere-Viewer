@@ -152,7 +152,7 @@ Small dots visible on the compass. Each spot consists of a position (either `yaw
 ::: tip
 [Markers](./markers.md) can be displayed on the compass by defining their `compass` data, which can be `true` or a specific color.
 
-```js
+```js{6,12}
 markers: [
     {
         id: 'marker-1',

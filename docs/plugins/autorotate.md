@@ -92,6 +92,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 
     plugins: [
         [PhotoSphereViewer.AutorotatePlugin, {
+            autostartDelay: 1000,
             autorotatePitch: '5deg',
         }],
     ],

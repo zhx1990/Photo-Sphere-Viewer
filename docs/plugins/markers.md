@@ -242,9 +242,11 @@ markersPlugin.addEventListener('select-marker', ({ marker, doubleClick, rightCli
 You can try markers live in [the playground](../playground.md).
 :::
 
-## Markers definition
+## Markers
 
-One of these options is required.
+### Definition
+
+One, and only one, of these options is required for each marker.
 
 | Name             | Type                                     | Description                                                                             |
 | ---------------- | ---------------------------------------- | --------------------------------------------------------------------------------------- |
@@ -257,7 +259,7 @@ One of these options is required.
 | `ellipse`        | `integer[2]`<br>`{cx:int,cy:int}`        | Radiuses of the ellipse.                                                                |
 | `path`           | `string`                                 | Definition of the path (0,0 will be placed at the defined `position`).                  |
 | `polygon`        | `double[2][]`<br>`string[2][]`           | Array of points defining the polygon in spherical coordinates.                          |
-| `polygonPixels`  | `integer[2][]`                           | Same as above in pixel coordinates on the panorama image.                               |
+| `polygonPixels`  | `integer[2][]`                           | Same as `polygon` but in pixel coordinates on the panorama image.                       |
 | `polyline`       | `double[2][]`<br>`string[2][]`           | Same as `polygon` but generates a polyline.                                             |
 | `polylinePixels` | `integer[2][]`                           | Same as `polygonPixels` but generates a polyline.                                       |
 
@@ -287,7 +289,7 @@ Both allows to display an image but the difference is in the rendering technique
 And `image` marker is rendered flat above the viewer but and `imageLayer` is rendered inside the panorama itself, this allows for more natural movements and scaling.
 :::
 
-## Markers options
+### Options
 
 #### `id` (required)
 

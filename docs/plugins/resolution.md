@@ -100,8 +100,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 -   type: `object[]`
 -   updatable: no, use `setResolutions()` method
 
-List of available resolutions. Each resolution consist of an object with the properties `id`, `label` and `panorama`.
-Cubemaps are supported.
+List of available resolutions. Each resolution consists of an object with the properties `id`, `label` and `panorama`.
 
 #### `defaultResolution`
 

@@ -169,7 +169,7 @@ lang: {
 
 _Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
 
-## Multi resolution
+### Multi resolution
 
 You can offer multiple resolutions of your video with the [ResolutionPlugin](./resolution.md).
 

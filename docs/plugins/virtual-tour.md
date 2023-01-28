@@ -65,7 +65,7 @@ The nodes can be provided all at once or asynchronously as the user navigates.
 :::: tabs
 
 ::: tab Client mode
-In client mode you must provide all `nodes` all at once, you can also change all the nodes with the `setNodes` method.
+In client mode you must provide all the `nodes` at once, you can also change the nodes with the `setNodes` method.
 
 ```js
 const nodes = [
@@ -77,7 +77,7 @@ const nodes = [
 :::
 
 ::: tab Server mode
-In server mode you provide the `getNode callbacks function which returns a Promise to load the data of a node.
+In server mode you provide the `getNode` function which returns a Promise to load the data of a node.
 
 ```js
 getNode = async (nodeId) => {
@@ -91,7 +91,7 @@ getNode = async (nodeId) => {
 ::::
 
 ::: tip
-If the [Gallery plugin](./gallery.md) is loaded, it will be configured with the list of nodes (client mode only).
+The [Gallery plugin](./gallery.md), [Map plugin](./map.md) and [Compass plugin](./compass.md) plugins can be easily integrated with the virtual tour.
 :::
 
 ## Example
@@ -218,7 +218,9 @@ virtualTour.setNodes([
 
 :::
 
-## Nodes options
+## Nodes
+
+### Configuration
 
 #### `id` (required)
 
@@ -234,7 +236,7 @@ Refer to the main [config page](../guide/config.md#panorama-required).
 
 -   type: `array`
 
-Definition of the links of this node. See bellow.
+Definition of the links of this node. [See bellow](#links).
 
 #### `gps` (required in GPS mode)
 
@@ -282,7 +284,11 @@ Refer to the main [config page](../guide/config.md#panodata).
 
 Refer to the main [config page](../guide/config.md#spherecorrection).
 
-## Links options
+#### `map` (client mode only)
+
+Configuration of the hotspot when using the MapPlugin. [See bellow](#map-plugin).
+
+### Links
 
 #### `nodeId` (required)
 
@@ -302,7 +308,7 @@ Position of the link in **spherical coordinates** (radians/degrees) or **texture
 
 Overrides the GPS coordinates of the target node.
 
-#### `name`
+#### `name` (recommended in server mode)
 
 -   type: `string`
 
@@ -394,10 +400,14 @@ Duration of the transition between nodes.
 #### `linksOnCompass`
 
 -   type: `boolean`
--   default: `true` if markers render mode
+-   default: `true`
 -   updatable: no
 
 If the [Compass plugin](./compass.md) is enabled, displays the links on the compass.
+
+#### `map` (client mode only)
+
+Configuration when using the MapPlugin. [See bellow](#map-plugin).
 
 #### `markerStyle` (markers mode only)
 
@@ -424,7 +434,7 @@ Default value is:
 ::: tip
 If you want to use another marker type like `image` you must define `html: null` to remove the default value.
 
-```js
+```js{2}
 markerStyle: {
   html : null,
   image: 'path/to/image.png',
@@ -468,6 +478,62 @@ Vertical offset in radians applied to the markers to compensate for the viewer p
 -   updatable: no
 
 Vertical position of the arrows.
+
+### Map plugin <Badge text="5.1.1"/>
+
+Using the [Map plugin](./map.md) allows to show the position of each node on a map. It requires some additional configuration, especially when working with GPS coordinates.
+
+:::: tabs
+
+::: tab Configure the map manually
+
+This configuration is required if `positionMode=manual`. You can also choose to use it if `positionMode=gps`.
+
+To define the position of the node on the map you have to configure its `map` property with `x` and `y`. You can also configure other things like `color`, `image` and `size`. Please refer to the [Hotspots section](map.md#hotspots-2) of the Map plugin.
+
+```js{7}
+plugins: [
+    [VirtualTourPlugin, {
+        nodes: [
+            {
+                id: 'node-1', 
+                panorama: '001.jpg',
+                map: { x: 500, y: 815, color: 'red' },
+            },
+        ],
+    }],
+],
+```
+
+:::
+
+::: tab Configure the map with GPS
+
+This configuration can only be used if `positionMode=gps`.
+
+You have to provide additional metadata about the map for the automatic positionning to work : its `size` in pixels and its `extent` (GPS bounds).
+
+```js{5-6}
+plugins: [
+    [VirtualTourPlugin, {
+        map: {
+            imageUrl: 'map.jpg',
+            size: { width: 1600, height: 1200 },
+            extent: [-80.158123, 25.668050, -80.153824, 25.665308],
+        },
+    }],
+],
+```
+
+Each node can still have a `map` property to override  `color`, `image` and `size`.
+
+:::
+
+::::
+
+::: warning Map image
+The map image must be configured with `map.imageUrl` inside the VirtualTour plugin configuration. The `imageUrl` in the Map plugin is ignored.
+:::
 
 ## Methods
 

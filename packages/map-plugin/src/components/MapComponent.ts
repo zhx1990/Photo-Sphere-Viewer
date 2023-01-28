@@ -266,11 +266,13 @@ export class MapComponent extends AbstractComponent {
     }
 
     /**
-     * Clears the map image and offset
+     * Load a new map image
      */
-    reload() {
+    reload(url: string) {
         delete this.state.images[this.config.imageUrl];
+        this.config.imageUrl = url;
         this.state.imgScale = 1;
+        this.__loadImage(this.config.imageUrl, true);
         this.recenter();
     }
 
@@ -346,8 +348,12 @@ export class MapComponent extends AbstractComponent {
     }
 
     private render() {
+        if (!this.config.center) {
+            return;
+        }
+
         // load the map image
-        const mapImage = this.__loadImage(this.config.imageUrl, true);
+        const mapImage = this.__loadImage(this.config.imageUrl);
         if (!mapImage) {
             return;
         }
@@ -581,7 +587,7 @@ export class MapComponent extends AbstractComponent {
         this.state.hotspotId = null;
     }
 
-    private __loadImage(url: string, isMap = false): ImageSource {
+    private __loadImage(url: string, isInit = false): ImageSource {
         if (!url) {
             return null;
         }
@@ -595,7 +601,7 @@ export class MapComponent extends AbstractComponent {
             };
 
             image.onload = () => {
-                if (isMap && Math.max(image.width, image.height) > SYSTEM.maxCanvasWidth) {
+                if (isInit && Math.max(image.width, image.height) > SYSTEM.maxCanvasWidth) {
                     this.state.imgScale = SYSTEM.maxCanvasWidth / Math.max(image.width, image.height);
 
                     const buffer = document.createElement('canvas');
@@ -614,6 +620,10 @@ export class MapComponent extends AbstractComponent {
 
                 this.state.images[url].loading = false;
                 this.update();
+
+                if (isInit) {
+                    this.show();
+                }
             };
 
             return null;

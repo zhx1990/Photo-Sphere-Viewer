@@ -1,5 +1,6 @@
-import type { ExtendedPosition, PanoData, PanoDataProvider, SphereCorrection } from '@photo-sphere-viewer/core';
+import type { ExtendedPosition, PanoData, PanoDataProvider, Point, Size, SphereCorrection } from '@photo-sphere-viewer/core';
 import type { MarkerConfig } from '@photo-sphere-viewer/markers-plugin';
+import type { MapHotspot } from '@photo-sphere-viewer/map-plugin';
 
 /**
  * Definition of GPS coordinates (longitude, latitude, optional altitude)
@@ -35,12 +36,13 @@ export type VirtualTourMarkerStyle = Omit<
     MarkerConfig,
     | 'id'
     | 'position'
-    | 'polygonPx'
-    | 'polygonRad'
-    | 'polylinePx'
-    | 'polylineRad'
+    | 'polygon'
+    | 'polygonPixels'
+    | 'polyline'
+    | 'polylinePixels'
     | 'tooltip'
     | 'content'
+    | 'listContent'
     | 'hideList'
     | 'visible'
     | 'data'
@@ -118,6 +120,10 @@ export type VirtualTourNode = {
      * additional markers to use on this node
      */
     markers?: (MarkerConfig & { gps?: GpsPosition })[];
+    /**
+     * configuration of the hotspot when using the MapPlugin
+     */
+    map?: Partial<Point> & Omit<MapHotspot, 'id' | 'yaw' | 'distance'>,
 };
 
 export type VirtualTourPluginConfig = {
@@ -163,7 +169,7 @@ export type VirtualTourPluginConfig = {
      */
     transition?: boolean | number;
     /**
-     * if the Compass plugin is enabled, displays the links on the compass, defaults to `true` on in markers render mode
+     * if the Compass plugin is enabled, displays the links on the compass
      * @default true
      */
     linksOnCompass?: boolean;
@@ -185,4 +191,21 @@ export type VirtualTourPluginConfig = {
      * @default 'bottom'
      */
     arrowPosition?: 'top' | 'bottom';
+    /**
+     * special configuration when using the MapPlugin
+     */
+    map?: {
+        /**
+         * URL of the map
+         */
+        imageUrl: string;
+        /**
+         * size of the map in pixels
+         */
+        size?: Size;
+        /**
+         * bounds of the map in GPS coordinates (minX, minY, maxX, maxY)
+         */
+        extent?: [number, number, number, number],
+    },
 };

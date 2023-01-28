@@ -241,6 +241,23 @@ Minimum zoom level of the map.
 
 Small dots visible on the map. See bellow.
 
+#### `lang`
+
+-   type: `object`
+-   default:
+
+```js
+lang: {
+    map: 'Map',
+    mapMaximize: 'Maximize',
+    mapMinimize: 'Minimize',
+    mapReset: 'Reset',
+}
+```
+
+_Note: this option is not part of the plugin but is merged with the main [`lang`](../guide/config.md#lang) object._
+
+
 ### Hotspots
 
 #### `id`
@@ -265,7 +282,7 @@ Allow to override the default `spotColor`, `spotImage` and `spotSize`.
 
 The marker tooltip is reused if defined. The viewer will be moved to face the marker if clicked on the map.
 
-```js
+```js{7,15}
 markers: [
     {
         id: 'marker-1',

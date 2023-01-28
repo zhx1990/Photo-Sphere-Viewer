@@ -118,7 +118,7 @@ export class MapPlugin extends AbstractConfigurablePlugin<
     handleEvent(e: Event) {
         switch (e.type) {
             case events.ReadyEvent.type:
-                this.show();
+                this.component.reload(this.config.imageUrl);
                 break;
             case events.PositionUpdatedEvent.type:
                 this.component.update();
@@ -203,8 +203,7 @@ export class MapPlugin extends AbstractConfigurablePlugin<
         if (!utils.isNil(center)) {
             this.config.center = center;
         }
-        this.config.imageUrl = url;
-        this.component.reload();
+        this.component.reload(url);
     }
 
     /**

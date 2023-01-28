@@ -30,7 +30,7 @@ export function bearing(p1: [number, number], p2: [number, number]): number {
 }
 
 /**
- * Retursn the difference between to WS84 GPS points as yaw+pitch on the viewer
+ * Returns the difference between two WS84 GPS points as yaw+pitch on the viewer
  */
 export function gpsToSpherical(gps1: GpsPosition, gps2: GpsPosition): Position {
     const p1: [number, number] = [MathUtils.degToRad(gps1[0]), MathUtils.degToRad(gps1[1])];
