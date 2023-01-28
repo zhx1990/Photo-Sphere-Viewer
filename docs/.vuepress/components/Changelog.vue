@@ -19,7 +19,7 @@
                     </svg>
                 </a>
             </h2>
-            <div v-html="entry.desc"></div>
+            <div v-html="entry.desc" class="release-content"></div>
         </template>
     </div>
 </template>
@@ -71,7 +71,7 @@ export default {
             desc = desc.replace(/&quot;/g, '"').replace(/&#39;/g, "'");
 
             // Change titles
-            desc = desc.replace(/<(\/?)h[0-9]+/g, '<$1h4').replace(/<h4 id=".*?">/g, '<h4>');
+            desc = desc.replace(/<(\/?)h[0-9]+/g, '<$1h4').replace(/<h4 id=".*?">/g, '<h4 class="release-subtitle">');
 
             // Add links to issues
             desc = desc.replace(
@@ -109,6 +109,10 @@ export default {
 .release-link svg {
     width: 1rem;
     height: 1rem;
+}
+.release-content {
+    border-left: 3px solid var(--md-theme-default-primary);
+    padding-left: 1em;
 }
 
 /**

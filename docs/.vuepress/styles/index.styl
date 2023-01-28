@@ -60,14 +60,14 @@
 }
 
 /* options types + default */
-h4 + ul {
+h4:not(.release-subtitle) + ul {
   list-style: none;
   display: flex;
   flex-wrap: wrap;
   margin-top: 0;
 }
 
-h4 + ul li {
+h4:not(.release-subtitle) + ul li {
   display: flex;
   align-items: center;
   margin-right: 1em;
@@ -78,6 +78,6 @@ h4 + ul li {
   border-radius: 3px;
 }
 
-h4 + ul li code:last-child {
+h4:not(.release-subtitle) + ul li code:last-child {
   margin-right: -0.3em;
 }
