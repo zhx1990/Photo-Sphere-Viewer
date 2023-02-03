@@ -124,3 +124,24 @@ export function getTouchData(e: TouchEvent): TouchData {
         center: { x: (p1.x + p2.x) / 2, y: (p1.y + p2.y) / 2 },
     };
 }
+
+/**
+ * Detects if fullscreen is enabled
+ */
+export function isFullscreenEnabled(elt: HTMLElement): boolean {
+    return (document.fullscreenElement || (document as any).webkitFullscreenElement) === elt;
+}
+
+/**
+ * Enters fullscreen mode
+ */
+export function requestFullscreen(elt: HTMLElement) {
+    (elt.requestFullscreen || (elt as any).webkitRequestFullscreen).call(elt);
+}
+
+/**
+ * Exits fullscreen mode
+ */
+export function exitFullscreen() {
+    (document.exitFullscreen || (document as any).webkitExitFullscreen).call(document);
+}

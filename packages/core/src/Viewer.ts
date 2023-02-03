@@ -44,13 +44,16 @@ import { ViewerDynamics } from './services/ViewerDynamics';
 import { ViewerState } from './services/ViewerState';
 import {
     Animation,
+    exitFullscreen,
     getAbortError,
     getAngle,
     getElement,
     getShortestArc,
     isAbortError,
     isExtendedPosition,
+    isFullscreenEnabled,
     logWarn,
+    requestFullscreen,
     resolveBoolean,
     throttle,
     toggleClass,
@@ -259,7 +262,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      * Checks if the viewer is in fullscreen
      */
     isFullscreenEnabled(): boolean {
-        return document.fullscreenElement === this.container;
+        return isFullscreenEnabled(this.container);
     }
 
     /**
@@ -726,7 +729,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      */
     enterFullscreen() {
         if (!this.isFullscreenEnabled()) {
-            this.container.requestFullscreen();
+            requestFullscreen(this.container);
         }
     }
 
@@ -735,7 +738,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      */
     exitFullscreen() {
         if (this.isFullscreenEnabled()) {
-            document.exitFullscreen();
+            exitFullscreen();
         }
     }
 
