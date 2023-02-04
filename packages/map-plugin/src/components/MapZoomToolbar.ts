@@ -68,7 +68,7 @@ export class MapZoomToolbar extends AbstractComponent {
     }
 
     setText(zoom: number) {
-        this.zoomIndicator.innerText = `${Math.round(zoom * 100)}%`;
+        this.zoomIndicator.innerText = `${Math.round(Math.exp(zoom) * 100)}%`;
     }
 
     private animateZoom(delta: number) {

@@ -6,7 +6,7 @@ import { HOTSPOT_MARKER_ID, MAP_SHADOW_BLUR, PIN_SHADOW_BLUR, PIN_SHADOW_OFFSET 
 import { SelectHotspot } from '../events';
 import type { MapPlugin } from '../MapPlugin';
 import { MapHotspot } from '../model';
-import { canvasShadow, drawImageCentered, drawImageHighDpi, getImageHtml, loadImage, projectPoint, unprojectPoint } from '../utils';
+import { canvasShadow, drawImageCentered, drawImageHighDpi, getImageHtml, ImageSource, loadImage, projectPoint, unprojectPoint } from '../utils';
 import { MapCloseButton } from './MapCloseButton';
 import { MapCompassButton } from './MapCompassButton';
 import { MapMaximizeButton } from './MapMaximizeButton';
@@ -19,6 +19,7 @@ export class MapComponent extends AbstractComponent {
         maximized: false,
         collapsed: false,
 
+        imgScale: 1,
         zoom: this.config.defaultZoom,
         offset: { x: 0, y: 0 } as Point,
 
@@ -28,7 +29,7 @@ export class MapComponent extends AbstractComponent {
         pinchDist: 0,
         pinchAngle: 0,
 
-        hotspotPos: {} as Record<string, Point>,
+        hotspotPos: {} as Record<string, Point & { s: number }>,
         hotspotId: null as string,
         hotspotTooltip: null as Tooltip,
         markers: [] as MapHotspot[],
@@ -37,7 +38,7 @@ export class MapComponent extends AbstractComponent {
         needsUpdate: false,
         renderLoop: null as ReturnType<typeof requestAnimationFrame>,
 
-        images: {} as Record<string, { loading: boolean; value: HTMLImageElement }>,
+        images: {} as Record<string, { loading: boolean; value: ImageSource }>,
     };
 
     private readonly canvas: HTMLCanvasElement;
@@ -248,6 +249,10 @@ export class MapComponent extends AbstractComponent {
         this.update();
     }
 
+    override isVisible(): boolean {
+        return this.state.visible && !this.state.collapsed;
+    }
+
     override show(): void {
         super.show();
         this.update();
@@ -265,6 +270,7 @@ export class MapComponent extends AbstractComponent {
      */
     reload() {
         delete this.state.images[this.config.imageUrl];
+        this.state.imgScale = 1;
         this.recenter();
     }
 
@@ -341,7 +347,7 @@ export class MapComponent extends AbstractComponent {
 
     private render() {
         // load the map image
-        const mapImage = this.__loadImage(this.config.imageUrl);
+        const mapImage = this.__loadImage(this.config.imageUrl, true);
         if (!mapImage) {
             return;
         }
@@ -351,9 +357,15 @@ export class MapComponent extends AbstractComponent {
         this.__resetHotspot();
 
         const yaw = this.viewer.getPosition().yaw;
-        const zoom = Math.exp(this.state.zoom);
-        const center = this.config.center;
-        const offset = this.state.offset;
+        const zoom = Math.exp(this.state.zoom) / this.state.imgScale;
+        const center: Point = {
+            x: this.config.center.x * this.state.imgScale,
+            y: this.config.center.y * this.state.imgScale,
+        };
+        const offset: Point = {
+            x: this.state.offset.x * this.state.imgScale,
+            y: this.state.offset.y * this.state.imgScale,
+        };
         const rotation = this.config.rotation;
         const yawAndRotation = this.config.static ? 0 : yaw + rotation;
 
@@ -362,7 +374,7 @@ export class MapComponent extends AbstractComponent {
             this.overlay.style.transform = `rotate(${-yawAndRotation}rad)`;
             this.compassButton.rotate(yawAndRotation);
         }
-        this.zoomToolbar.setText(zoom);
+        this.zoomToolbar.setText(this.state.zoom);
 
         // clear canvas
         this.canvas.width = this.container.clientWidth * SYSTEM.pixelRatio;
@@ -404,11 +416,11 @@ export class MapComponent extends AbstractComponent {
             const hotspotPos = { ...offset };
             if ('yaw' in hotspot && 'distance' in hotspot) {
                 const angle = utils.parseAngle(hotspot.yaw) + rotation;
-                hotspotPos.x += Math.sin(-angle) * hotspot.distance;
-                hotspotPos.y += Math.cos(-angle) * hotspot.distance;
+                hotspotPos.x += Math.sin(-angle) * hotspot.distance * this.state.imgScale;
+                hotspotPos.y += Math.cos(-angle) * hotspot.distance * this.state.imgScale;
             } else if ('x' in hotspot && 'y' in hotspot) {
-                hotspotPos.x += center.x - hotspot.x;
-                hotspotPos.y += center.y - hotspot.y;
+                hotspotPos.x += center.x - hotspot.x * this.state.imgScale;
+                hotspotPos.y += center.y - hotspot.y * this.state.imgScale;
             } else {
                 utils.logWarn(`Hotspot ${hotspot['id']} is missing position (yaw+distance or x+y)`);
                 return;
@@ -416,15 +428,18 @@ export class MapComponent extends AbstractComponent {
 
             const spotPos = projectPoint(hotspotPos, yawAndRotation, zoom);
 
-            // save absolute position on the viewer
-            this.state.hotspotPos[hotspot.id] = {
-                x: canvasVirtualCenterX - spotPos.x + canvasPos.x,
-                y: canvasVirtualCenterY - spotPos.y + canvasPos.y,
-            };
+            // TODO filter out not visible
 
             const x = canvasVirtualCenterX - spotPos.x;
             const y = canvasVirtualCenterY - spotPos.y;
             const size = hotspot.size || this.config.spotSize;
+
+            // save absolute position on the viewer
+            this.state.hotspotPos[hotspot.id] = {
+                x: x + canvasPos.x,
+                y: y + canvasPos.y,
+                s: size,
+            };
 
             context.save();
             context.translate(x * SYSTEM.pixelRatio, y * SYSTEM.pixelRatio);
@@ -527,8 +542,8 @@ export class MapComponent extends AbstractComponent {
                         left: hotspotPos.x - viewerPos.x,
                         top: hotspotPos.y - viewerPos.y,
                         box: {
-                            width: this.config.spotSize,
-                            height: this.config.spotSize,
+                            width: hotspotPos.s,
+                            height: hotspotPos.s,
                         },
                     });
                 }
@@ -566,7 +581,7 @@ export class MapComponent extends AbstractComponent {
         this.state.hotspotId = null;
     }
 
-    private __loadImage(url: string): HTMLImageElement {
+    private __loadImage(url: string, isMap = false): ImageSource {
         if (!url) {
             return null;
         }
@@ -580,6 +595,23 @@ export class MapComponent extends AbstractComponent {
             };
 
             image.onload = () => {
+                if (isMap && Math.max(image.width, image.height) > SYSTEM.maxCanvasWidth) {
+                    this.state.imgScale = SYSTEM.maxCanvasWidth / Math.max(image.width, image.height);
+
+                    const buffer = document.createElement('canvas');
+                    buffer.width = image.width * this.state.imgScale;
+                    buffer.height = image.height * this.state.imgScale;
+
+                    const ctx = buffer.getContext('2d');
+                    ctx.drawImage(
+                        image,
+                        0, 0,
+                        buffer.width, buffer.height
+                    );
+
+                    this.state.images[url].value = buffer;
+                }
+
                 this.state.images[url].loading = false;
                 this.update();
             };

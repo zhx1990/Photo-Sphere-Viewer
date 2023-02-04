@@ -43,6 +43,8 @@ export function projectPoint(pt: Point, yaw: number, zoom: number): Point {
     };
 }
 
+export type ImageSource = HTMLImageElement | HTMLCanvasElement;
+
 /**
  * Setup the canvas drop shadow
  */
@@ -64,7 +66,7 @@ export function canvasShadow(
  */
 export function drawImageCentered(
     context: CanvasRenderingContext2D,
-    image: HTMLImageElement,
+    image: ImageSource,
     size: number
 ) {
     const w = image.width;
@@ -86,7 +88,7 @@ export function drawImageCentered(
  */
 export function drawImageHighDpi(
     context: CanvasRenderingContext2D,
-    image: HTMLImageElement,
+    image: ImageSource,
     x: number,
     y: number,
     w: number,
