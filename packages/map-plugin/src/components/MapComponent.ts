@@ -211,7 +211,7 @@ export class MapComponent extends AbstractComponent {
                 this.state.forceRender = true;
                 break;
             case 'transitionend':
-                if (!this.state.maximized && this.overlay) {
+                if (!this.state.maximized) {
                     this.overlay.style.display = '';
                 }
                 this.state.forceRender = false;
@@ -253,9 +253,17 @@ export class MapComponent extends AbstractComponent {
         return this.state.visible && !this.state.collapsed;
     }
 
-    override show(): void {
+    override show() {
         super.show();
         this.update();
+        if (!this.state.maximized) {
+            this.overlay.style.display = '';
+        }
+    }
+
+    override hide() {
+        super.hide();
+        this.state.forceRender = false;
     }
 
     /**
@@ -324,7 +332,7 @@ export class MapComponent extends AbstractComponent {
 
         utils.toggleClass(this.container, 'psv-map--maximized', this.state.maximized);
 
-        if (this.state.maximized && this.overlay) {
+        if (this.state.maximized) {
             this.overlay.style.display = 'none';
         }
 
