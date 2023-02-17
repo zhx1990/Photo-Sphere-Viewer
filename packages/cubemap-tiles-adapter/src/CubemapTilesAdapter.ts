@@ -28,6 +28,8 @@ const NB_VERTICES_BY_PLANE = NB_VERTICES_BY_FACE * CUBE_SEGMENTS * CUBE_SEGMENTS
 const NB_VERTICES = 6 * NB_VERTICES_BY_PLANE;
 const NB_GROUPS_BY_FACE = CUBE_SEGMENTS * CUBE_SEGMENTS;
 
+const CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
+
 const ATTR_UV = 'uv';
 const ATTR_ORIGINAL_UV = 'originaluv';
 const ATTR_POSITION = 'position';
@@ -358,7 +360,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama, T
             col = panorama.nbTiles - col - 1;
             row = panorama.nbTiles - row - 1;
         }
-        const url = panorama.tileUrl(CubemapAdapter.CUBE_HASHMAP[tile.face], col, row);
+        const url = panorama.tileUrl(CUBE_HASHMAP[tile.face], col, row);
 
         return this.__loadImage(url)
             .then((image) => {

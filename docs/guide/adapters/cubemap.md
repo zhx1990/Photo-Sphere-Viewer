@@ -70,10 +70,14 @@ Set to `true` if the top and bottom faces are not correctly oriented.
 
 ## Panorama options
 
-When using this adapter, the `panorama` option and the `setPanorama()` method accept an array or an object of six URLs.
+When using this adapter, the `panorama` option and the `setPanorama()` method accept three types of cubemaps.
+
+### Separate files
+
+Each face is in a separate file, all files will be loaded before showing the panorama.
 
 ```js
-// Cubemap as array (order is important) :
+// With an array (order is important)
 panorama: [
   'path/to/left.jpg',
   'path/to/front.jpg',
@@ -83,7 +87,7 @@ panorama: [
   'path/to/bottom.jpg',
 ]
 
-// Cubemap as object :
+// With an object
 panorama: {
   left:   'path/to/left.jpg',
   front:  'path/to/front.jpg',
@@ -91,5 +95,38 @@ panorama: {
   back:   'path/to/back.jpg',
   top:    'path/to/top.jpg',
   bottom: 'path/to/bottom.jpg',
+}
+
+// Alternatively
+panorama: {
+  type: 'separate',
+  paths: /* array or object */
+}
+```
+
+### Stripe
+
+All faces are in a single file arranged in an horizontal stripe. The default stripe order is `left, front, right, back, top, bottom` but it can be changed with the `order` field.
+
+![](../../images/cubemap-stripe.png)
+
+```js
+panorama: {
+  type: 'stripe',
+  path: 'path/to/panorama.jpg',
+  order: ['left', 'right', 'top', 'bottom', 'back', 'front'] // optional
+}
+```
+
+### Polyhedron net
+
+All faces are in a single file arranged in an horizontal "T" unfolded cube.
+
+![](../../images/cubemap-net.png)
+
+```js
+panorama: {
+  type: 'net',
+  path: 'path/to/panorama.jpg',
 }
 ```

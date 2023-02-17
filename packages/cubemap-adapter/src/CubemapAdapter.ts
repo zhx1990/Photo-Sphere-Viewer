@@ -1,7 +1,8 @@
 import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '@photo-sphere-viewer/core';
 import { BoxGeometry, Mesh, ShaderMaterial, Texture } from 'three';
-import { CubemapAdapterConfig, CubemapPanorama } from './model';
+import { Cubemap, CubemapAdapterConfig, CubemapFaces, CubemapNet, CubemapPanorama, CubemapSeparate, CubemapStripe } from './model';
+import { cleanCubemap, cleanCubemapArray, isCubemap } from './utils';
 
 type CubemapMesh = Mesh<BoxGeometry, ShaderMaterial[]>;
 type CubemapTexture = TextureData<Texture[]>;
@@ -15,11 +16,6 @@ const getConfig = utils.getConfigParser<CubemapAdapterConfig>({
  * Adapter for cubemaps
  */
 export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> {
-    // PSV faces order is left, front, right, back, top, bottom
-    // 3JS faces order is left, right, top, bottom, back, front
-    static readonly CUBE_ARRAY = [0, 2, 4, 5, 3, 1];
-    static readonly CUBE_HASHMAP = ['left', 'right', 'top', 'bottom', 'back', 'front'];
-
     static override readonly id = 'cubemap';
     static override readonly supportsDownload = false;
     static override readonly supportsOverlay = true;
@@ -40,44 +36,58 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
         return true;
     }
 
-    loadTexture(panorama: CubemapPanorama): Promise<CubemapTexture> {
-        const cleanPanorama = [];
-
-        if (Array.isArray(panorama)) {
-            if (panorama.length !== 6) {
-                return Promise.reject(new PSVError('A cubemap array must contain exactly 6 images.'));
-            }
-
-            // reorder images
-            for (let i = 0; i < 6; i++) {
-                cleanPanorama[i] = panorama[CubemapAdapter.CUBE_ARRAY[i]];
-            }
-        } else if (typeof panorama === 'object') {
-            if (!CubemapAdapter.CUBE_HASHMAP.every((side) => !!(panorama as any)[side])) {
-                return Promise.reject(
-                    new PSVError('A cubemap object must contain exactly left, front, right, back, top, bottom images.')
-                );
-            }
-
-            // transform into array
-            CubemapAdapter.CUBE_HASHMAP.forEach((side, i) => {
-                cleanPanorama[i] = (panorama as any)[side];
-            });
-        } else {
-            return Promise.reject(new PSVError('Invalid cubemap panorama, are you using the right adapter?'));
-        }
-
+    async loadTexture(panorama: CubemapPanorama): Promise<CubemapTexture> {
         if (this.viewer.config.fisheye) {
             utils.logWarn('fisheye effect with cubemap texture can generate distorsion');
         }
 
+        let cleanPanorama: CubemapSeparate | CubemapStripe | CubemapNet;
+        if (Array.isArray(panorama) || isCubemap(panorama)) {
+            cleanPanorama = {
+                type: 'separate',
+                paths: panorama,
+            } as CubemapSeparate;
+        } else {
+            cleanPanorama = panorama as any;
+        }
+
+        let texture: Texture[];
+        switch (cleanPanorama.type) {
+            case 'separate': {
+                let paths: string[];
+                if (Array.isArray(cleanPanorama.paths)) {
+                    paths = cleanCubemapArray(cleanPanorama.paths as string[]);
+                } else {
+                    paths = cleanCubemap(cleanPanorama.paths as Cubemap);
+                }
+
+                texture = await this.loadTexturesSeparate(paths);
+                break;
+            }
+
+            case 'stripe':
+                texture = await this.loadTexturesStripe(cleanPanorama.path, cleanPanorama.order);
+                break;
+
+            case 'net':
+                texture = await this.loadTexturesNet(cleanPanorama.path);
+                break;
+
+            default:
+                throw new PSVError('Invalid cubemap panorama, are you using the right adapter?');
+        }
+
+        return { panorama, texture };
+    }
+
+    private loadTexturesSeparate(paths: string[]): Promise<Texture[]> {
         const promises: Promise<Texture>[] = [];
         const progress = [0, 0, 0, 0, 0, 0];
 
         for (let i = 0; i < 6; i++) {
             promises.push(
                 this.viewer.textureLoader
-                    .loadImage(cleanPanorama[i], (p) => {
+                    .loadImage(paths[i], (p) => {
                         progress[i] = p;
                         this.viewer.loader.setProgress(utils.sum(progress) / 6);
                     })
@@ -85,15 +95,12 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
             );
         }
 
-        return Promise.all(promises).then((texture) => ({ panorama, texture }));
+        return Promise.all(promises);
     }
 
-    /**
-     * Creates the final texture from image
-     */
     private createCubemapTexture(img: HTMLImageElement): Texture {
         if (img.width !== img.height) {
-            utils.logWarn('Invalid base image, the width equal the height');
+            utils.logWarn('Invalid cubemap image, the width should equal the height');
         }
 
         // resize image
@@ -116,6 +123,92 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
         }
 
         return utils.createTexture(img);
+    }
+
+    private async loadTexturesStripe(
+        path: string,
+        order: CubemapStripe['order'] = ['left', 'front', 'right', 'back', 'top', 'bottom']
+    ): Promise<Texture[]> {
+        const img = await this.viewer.textureLoader.loadImage(path, (p) => this.viewer.loader.setProgress(p));
+
+        if (img.width !== img.height * 6) {
+            utils.logWarn('Invalid cubemap image, the width should be six times the height');
+        }
+
+        const ratio = Math.min(1, SYSTEM.maxCanvasWidth / img.height);
+        const tileWidth = img.height * ratio;
+
+        const textures = {} as { [K in CubemapFaces]: Texture };
+
+        for (let i = 0; i < 6; i++) {
+            const buffer = document.createElement('canvas');
+            buffer.width = tileWidth;
+            buffer.height = tileWidth;
+
+            const ctx = buffer.getContext('2d');
+
+            if (this.config.blur) {
+                ctx.filter = 'blur(1px)';
+            }
+
+            ctx.drawImage(
+                img,
+                img.height * i, 0,
+                img.height, img.height,
+                0, 0,
+                tileWidth, tileWidth
+            );
+
+            textures[order[i]] = utils.createTexture(buffer);
+        }
+
+        return cleanCubemap(textures);
+    }
+
+    private async loadTexturesNet(path: string): Promise<Texture[]> {
+        const img = await this.viewer.textureLoader.loadImage(path, (p) => this.viewer.loader.setProgress(p));
+
+        if (img.width / 4 !== img.height / 3) {
+            utils.logWarn('Invalid cubemap image, the width should be 4/3rd of the height');
+        }
+
+        const ratio = Math.min(1, SYSTEM.maxCanvasWidth / (img.width / 4));
+        const tileWidth = (img.width / 4) * ratio;
+
+        const pts = [
+            [0, 1 / 3], // left
+            [1 / 2, 1 / 3], // right
+            [1 / 4, 0], // top
+            [1 / 4, 2 / 3], // bottom
+            [3 / 4, 1 / 3], // back
+            [1 / 4, 1 / 3], // front
+        ];
+
+        const textures: Texture[] = [];
+
+        for (let i = 0; i < 6; i++) {
+            const buffer = document.createElement('canvas');
+            buffer.width = tileWidth;
+            buffer.height = tileWidth;
+
+            const ctx = buffer.getContext('2d');
+
+            if (this.config.blur) {
+                ctx.filter = 'blur(1px)';
+            }
+
+            ctx.drawImage(
+                img,
+                img.width * pts[i][0], img.height * pts[i][1],
+                img.width / 4, img.height / 3,
+                0, 0,
+                tileWidth, tileWidth
+            );
+
+            textures[i] = utils.createTexture(buffer);
+        }
+
+        return textures;
     }
 
     createMesh(scale = 1): CubemapMesh {
@@ -152,10 +245,12 @@ void main() {
     }
 
     setTexture(mesh: CubemapMesh, textureData: CubemapTexture) {
-        const { texture } = textureData;
+        const { texture, panorama } = textureData;
+        const isNet = panorama.type === 'net';
+        const flipTopBottom = isNet ? !this.config.flipTopBottom : this.config.flipTopBottom;
 
         for (let i = 0; i < 6; i++) {
-            if (this.config.flipTopBottom && (i === 2 || i === 3)) {
+            if (flipTopBottom && (i === 2 || i === 3)) {
                 this.__setUniform(mesh, i, 'rotation', Math.PI);
             }
 
