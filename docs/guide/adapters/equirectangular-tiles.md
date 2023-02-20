@@ -113,7 +113,8 @@ Number of rows, must be power of two (2, 4, 8, 16, 32) and the maximum value is 
 
 -   type: `function: (col, row) => string`
 
-Function used to build the URL of a tile.
+Function used to build the URL of a tile. 
+If the function returns `null` the corresponding tile will not be loaded.
 
 #### `baseUrl` (recommended)
 

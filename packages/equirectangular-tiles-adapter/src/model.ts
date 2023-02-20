@@ -27,7 +27,7 @@ export type EquirectangularTilesPanorama = {
     /**
      * function to build a tile url
      */
-    tileUrl: (col: number, row: number) => string;
+    tileUrl: (col: number, row: number) => string | null;
 };
 
 export type EquirectangularTilesAdapterConfig = EquirectangularAdapterConfig & {

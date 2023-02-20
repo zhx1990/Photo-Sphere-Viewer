@@ -42,6 +42,9 @@
                             bottom: baseUrl + 'cubemap/ny.jpg',
                         },
                         tileUrl: (face, col, row) => {
+                            if (face === 'bottom') {
+                                return null; // the tile won't be loaded
+                            }
                             if (face === 'front' && col === 2 && row === 2) {
                                 return 'error.jpg';
                             }

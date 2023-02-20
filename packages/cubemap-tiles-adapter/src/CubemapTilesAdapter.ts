@@ -362,6 +362,10 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama, T
         }
         const url = panorama.tileUrl(CUBE_HASHMAP[tile.face], col, row);
 
+        if (!url) {
+            return Promise.resolve();
+        }
+
         return this.__loadImage(url)
             .then((image) => {
                 if (!task.isCancelled()) {

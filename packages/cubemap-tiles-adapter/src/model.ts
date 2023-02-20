@@ -19,7 +19,7 @@ export type CubemapTilesPanorama = {
     /**
      * function to build a tile url
      */
-    tileUrl: (face: keyof Cubemap, col: number, row: number) => string;
+    tileUrl: (face: keyof Cubemap, col: number, row: number) => string | null;
 };
 
 export type CubemapTilesAdapterConfig = CubemapAdapterConfig & {

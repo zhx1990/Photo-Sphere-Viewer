@@ -510,6 +510,10 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
         const panorama: EquirectangularTilesPanorama = this.viewer.config.panorama;
         const url = panorama.tileUrl(tile.col, tile.row);
 
+        if (!url) {
+            return Promise.resolve();
+        }
+
         return this.__loadImage(url)
             .then((image) => {
                 if (!task.isCancelled()) {

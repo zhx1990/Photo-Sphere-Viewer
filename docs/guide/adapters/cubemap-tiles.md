@@ -119,6 +119,7 @@ Number of columns and rows on a face. Each tile must be square. Must be power of
 -   type: `function: (face, col, row) => string`
 
 Function used to build the URL of a tile. `face` will be one of `'left'|'front'|'right'|'back'|'top'|'bottom'`.
+If the function returns `null` the corresponding tile will not be loaded.
 
 #### `baseUrl` (recommended)
 

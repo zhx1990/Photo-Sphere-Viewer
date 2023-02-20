@@ -34,6 +34,9 @@
                         rows: 8,
                         baseUrl: `${baseUrl}sphere-small.jpg`,
                         tileUrl: (col, row) => {
+                            if (row === 0 || row === 7) {
+                                return null; // the tile won't be loaded
+                            }
                             if (col === 8 && row === 4) {
                                 return 'error.jpg';
                             }
