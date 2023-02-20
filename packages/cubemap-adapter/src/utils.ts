@@ -15,7 +15,7 @@ export function isCubemap(cubemap: any): cubemap is Cubemap {
  */
 export function cleanCubemapArray<T>(panorama: T[]): T[] {
     const cleanPanorama: T[] = [];
-    
+
     if (panorama.length !== 6) {
         throw new PSVError('A cubemap array must contain exactly 6 images.');
     }
@@ -33,7 +33,7 @@ export function cleanCubemapArray<T>(panorama: T[]): T[] {
  */
 export function cleanCubemap<T>(cubemap: { [K in CubemapFaces]: T }): T[] {
     const cleanPanorama: T[] = [];
-    
+
     if (!isCubemap(cubemap)) {
         throw new PSVError('A cubemap object must contain exactly left, front, right, back, top, bottom images.');
     }

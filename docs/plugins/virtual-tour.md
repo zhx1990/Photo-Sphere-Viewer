@@ -496,7 +496,7 @@ plugins: [
     [VirtualTourPlugin, {
         nodes: [
             {
-                id: 'node-1', 
+                id: 'node-1',
                 panorama: '001.jpg',
                 map: { x: 500, y: 815, color: 'red' },
             },
@@ -525,7 +525,7 @@ plugins: [
 ],
 ```
 
-Each node can still have a `map` property to override  `color`, `image` and `size`.
+Each node can still have a `map` property to override `color`, `image` and `size`.
 
 :::
 

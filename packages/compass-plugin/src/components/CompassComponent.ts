@@ -7,14 +7,13 @@ import type { CompassPlugin } from '../CompassPlugin';
 const HOTSPOT_SIZE_RATIO = 1 / 40;
 
 export class CompassComponent extends AbstractComponent {
-
     protected override readonly state = {
         visible: true,
         mouse: null as { clientX: number; clientY: number },
         mousedown: false,
         markers: [] as Marker[],
     };
-    
+
     private readonly canvas: HTMLCanvasElement;
     private readonly background: HTMLElement;
 
@@ -94,12 +93,8 @@ export class CompassComponent extends AbstractComponent {
         this.container.style.width = this.config.size;
         this.container.style.height = this.config.size;
 
-        this.container.style.marginTop = this.config.position[0] === 'center'
-            ? `calc(-${this.config.size} / 2)`
-            : '';
-        this.container.style.marginLeft = this.config.position[1] === 'center'
-            ? `calc(-${this.config.size} / 2)`
-            : '';
+        this.container.style.marginTop = this.config.position[0] === 'center' ? `calc(-${this.config.size} / 2)` : '';
+        this.container.style.marginLeft = this.config.position[1] === 'center' ? `calc(-${this.config.size} / 2)` : '';
     }
 
     override show(): void {

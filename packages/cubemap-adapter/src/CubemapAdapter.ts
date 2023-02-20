@@ -1,7 +1,15 @@
 import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '@photo-sphere-viewer/core';
 import { BoxGeometry, Mesh, ShaderMaterial, Texture } from 'three';
-import { Cubemap, CubemapAdapterConfig, CubemapFaces, CubemapNet, CubemapPanorama, CubemapSeparate, CubemapStripe } from './model';
+import {
+    Cubemap,
+    CubemapAdapterConfig,
+    CubemapFaces,
+    CubemapNet,
+    CubemapPanorama,
+    CubemapSeparate,
+    CubemapStripe,
+} from './model';
 import { cleanCubemap, cleanCubemapArray, isCubemap } from './utils';
 
 type CubemapMesh = Mesh<BoxGeometry, ShaderMaterial[]>;

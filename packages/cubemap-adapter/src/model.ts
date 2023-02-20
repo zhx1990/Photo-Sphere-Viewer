@@ -23,7 +23,7 @@ export type CubemapSeparate = {
  * Object defining a cubemap as a single stripe file
  */
 export type CubemapStripe = {
-    type: 'stripe',
+    type: 'stripe';
     path: string;
     /**
      * Order of the faces in the file
@@ -36,7 +36,7 @@ export type CubemapStripe = {
  * Object defining a cubemap as a single net file (cross arrangement)
  */
 export type CubemapNet = {
-    type: 'net',
+    type: 'net';
     path: string;
 };
 

@@ -6,7 +6,16 @@ import { HOTSPOT_MARKER_ID, MAP_SHADOW_BLUR, PIN_SHADOW_BLUR, PIN_SHADOW_OFFSET 
 import { SelectHotspot } from '../events';
 import type { MapPlugin } from '../MapPlugin';
 import { MapHotspot } from '../model';
-import { canvasShadow, drawImageCentered, drawImageHighDpi, getImageHtml, ImageSource, loadImage, projectPoint, unprojectPoint } from '../utils';
+import {
+    canvasShadow,
+    drawImageCentered,
+    drawImageHighDpi,
+    getImageHtml,
+    ImageSource,
+    loadImage,
+    projectPoint,
+    unprojectPoint,
+} from '../utils';
 import { MapCloseButton } from './MapCloseButton';
 import { MapCompassButton } from './MapCompassButton';
 import { MapMaximizeButton } from './MapMaximizeButton';
@@ -181,10 +190,7 @@ export class MapComponent extends AbstractComponent {
                         this.viewer.dynamics.position.step({ yaw: this.state.pinchAngle - touchData.angle }, 0);
                     }
 
-                    ({
-                        distance: this.state.pinchDist,
-                        angle: this.state.pinchAngle,
-                    } = touchData);
+                    ({ distance: this.state.pinchDist, angle: this.state.pinchAngle } = touchData);
                     e.stopPropagation();
                 }
                 break;
@@ -463,7 +469,7 @@ export class MapComponent extends AbstractComponent {
             } else {
                 context.fillStyle = hotspot.color || this.config.spotColor;
                 context.beginPath();
-                context.arc(0, 0, size * SYSTEM.pixelRatio / 2, 0, 2 * Math.PI);
+                context.arc(0, 0, (size * SYSTEM.pixelRatio) / 2, 0, 2 * Math.PI);
                 context.fill();
             }
             context.restore();
@@ -617,11 +623,7 @@ export class MapComponent extends AbstractComponent {
                     buffer.height = image.height * this.state.imgScale;
 
                     const ctx = buffer.getContext('2d');
-                    ctx.drawImage(
-                        image,
-                        0, 0,
-                        buffer.width, buffer.height
-                    );
+                    ctx.drawImage(image, 0, 0, buffer.width, buffer.height);
 
                     this.state.images[url].value = buffer;
                 }

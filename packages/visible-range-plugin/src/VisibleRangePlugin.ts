@@ -11,13 +11,11 @@ type RangeResult = {
 
 const EPS = 0.000001;
 
-const getConfig = utils.getConfigParser<VisibleRangePluginConfig>(
-    {
-        verticalRange: null,
-        horizontalRange: null,
-        usePanoData: false,
-    }
-);
+const getConfig = utils.getConfigParser<VisibleRangePluginConfig>({
+    verticalRange: null,
+    horizontalRange: null,
+    usePanoData: false,
+});
 
 /**
  * Locks the visible angles

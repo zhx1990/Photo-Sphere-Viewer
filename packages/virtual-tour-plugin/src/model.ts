@@ -1,4 +1,11 @@
-import type { ExtendedPosition, PanoData, PanoDataProvider, Point, Size, SphereCorrection } from '@photo-sphere-viewer/core';
+import type {
+    ExtendedPosition,
+    PanoData,
+    PanoDataProvider,
+    Point,
+    Size,
+    SphereCorrection,
+} from '@photo-sphere-viewer/core';
 import type { MarkerConfig } from '@photo-sphere-viewer/markers-plugin';
 import type { MapHotspot } from '@photo-sphere-viewer/map-plugin';
 
@@ -123,7 +130,7 @@ export type VirtualTourNode = {
     /**
      * configuration of the hotspot when using the MapPlugin
      */
-    map?: Partial<Point> & Omit<MapHotspot, 'id' | 'yaw' | 'distance'>,
+    map?: Partial<Point> & Omit<MapHotspot, 'id' | 'yaw' | 'distance'>;
 };
 
 export type VirtualTourPluginConfig = {
@@ -206,6 +213,6 @@ export type VirtualTourPluginConfig = {
         /**
          * bounds of the map in GPS coordinates (minX, minY, maxX, maxY)
          */
-        extent?: [number, number, number, number],
-    },
+        extent?: [number, number, number, number];
+    };
 };

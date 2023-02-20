@@ -20,7 +20,7 @@ const getConfig = utils.getConfigParser<CompassPluginConfig, ParsedCompassPlugin
         position: (position, { defValue }) => {
             return utils.cleanCssPosition(position, { allowCenter: true, cssOrder: true }) || defValue;
         },
-    },
+    }
 );
 
 /**
@@ -97,7 +97,9 @@ export class CompassPlugin extends AbstractConfigurablePlugin<
                 this.component.update();
                 break;
             case 'set-markers':
-                this.component.setMarkers((e as markersEvents.SetMarkersEvent).markers.filter((m) => m.data?.['compass']));
+                this.component.setMarkers(
+                    (e as markersEvents.SetMarkersEvent).markers.filter((m) => m.data?.['compass'])
+                );
                 break;
         }
     }

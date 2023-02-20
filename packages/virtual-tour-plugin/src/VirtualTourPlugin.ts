@@ -4,7 +4,16 @@ import { AbstractConfigurablePlugin, CONSTANTS, events, PSVError, utils } from '
 import type { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
 import type { events as mapEvents, MapPlugin } from '@photo-sphere-viewer/map-plugin';
 import type { events as markersEvents, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
-import { AmbientLight, BackSide, Group, MathUtils, Mesh, MeshBasicMaterial, MeshLambertMaterial, PointLight } from 'three';
+import {
+    AmbientLight,
+    BackSide,
+    Group,
+    MathUtils,
+    Mesh,
+    MeshBasicMaterial,
+    MeshLambertMaterial,
+    PointLight,
+} from 'three';
 import { ARROW_GEOM, ARROW_OUTLINE_GEOM, DEFAULT_ARROW, DEFAULT_MARKER, LINK_DATA, LINK_ID } from './constants';
 import { AbstractDatasource } from './datasources/AbstractDataSource';
 import { ClientSideDatasource } from './datasources/ClientSideDatasource';
@@ -141,7 +150,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         if (this.markers?.config.markers) {
             utils.logWarn(
                 'No default markers can be configured on Markers plugin when using VirtualTour plugin. ' +
-                'Consider defining `markers` on each tour node.'
+                    'Consider defining `markers` on each tour node.'
             );
             delete this.markers.config.markers;
         }
@@ -306,15 +315,14 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         if (this.map) {
             this.map.setHotspots([
-                ...nodes
-                    .map((node) => {
-                        return {
-                            ...(node.map || {}),
-                            ...this.__getNodeMapPosition(node),
-                            id: LINK_ID + node.id,
-                            tooltip: node.name,
-                        };
-                    }),
+                ...nodes.map((node) => {
+                    return {
+                        ...(node.map || {}),
+                        ...this.__getNodeMapPosition(node),
+                        id: LINK_ID + node.id,
+                        tooltip: node.name,
+                    };
+                }),
             ]);
         }
     }
@@ -640,7 +648,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 x: MathUtils.mapLinear(gps[0], map.extent[0], map.extent[2], 0, map.size.width),
                 y: MathUtils.mapLinear(gps[1], map.extent[1], map.extent[3], 0, map.size.height),
             };
-        } else  {
+        } else {
             return null;
         }
     }

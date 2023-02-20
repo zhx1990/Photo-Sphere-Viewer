@@ -5,7 +5,7 @@
 [![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/@photo-sphere-viewer/core?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/core)
 [![Build Status](https://img.shields.io/github/actions/workflow/status/mistic100/Photo-Sphere-Viewer/build.yml?branch=main&logo=github)](https://github.com/mistic100/Photo-Sphere-Viewer/actions/workflows/build.yml)
 [![Netlify Status](https://img.shields.io/netlify/472fe613-7694-4e61-a662-07e3b988afb3?logo=netlify)](https://photo-sphere-viewer.js.org)
-[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/core.svg?token=kIlt6pn/ejbAWdKeP7rt2C7fiXpFWMf0tQDtuU4kNUg=)](https://openbase.com/js/@photo-sphere-viewer/core?utm_source=embedded&amp;utm_medium=badge&amp;utm_campaign=rate-badge)
+[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/core.svg?token=kIlt6pn/ejbAWdKeP7rt2C7fiXpFWMf0tQDtuU4kNUg=)](https://openbase.com/js/@photo-sphere-viewer/core?utm_source=embedded&utm_medium=badge&utm_campaign=rate-badge)
 
 A JavaScript library to display 360° sphere panoramas.
 
