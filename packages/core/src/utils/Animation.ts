@@ -74,14 +74,10 @@ export class Animation<T = any> implements PromiseLike<boolean> {
                         : EASINGS[options.easing] || EASINGS['linear'];
             }
 
-            if (options.delay) {
-                this.delayTimeout = setTimeout(() => {
-                    this.delayTimeout = undefined;
-                    this.animationFrame = window.requestAnimationFrame((t) => this.__run(t));
-                }, options.delay);
-            } else {
+            this.delayTimeout = setTimeout(() => {
+                this.delayTimeout = undefined;
                 this.animationFrame = window.requestAnimationFrame((t) => this.__run(t));
-            }
+            }, options.delay || 0);
         } else {
             this.resolved = true;
         }

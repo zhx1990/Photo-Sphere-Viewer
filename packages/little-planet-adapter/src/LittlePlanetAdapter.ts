@@ -12,7 +12,7 @@ const euler = new Euler();
  */
 export class LittlePlanetAdapter extends EquirectangularAdapter {
     static override readonly id = 'little-planet';
-    static override readonly supportsDownload = false;
+    static override readonly supportsDownload = true;
     static override readonly supportsOverlay = false;
 
     private uniforms: ShaderMaterial['uniforms'];

@@ -11,6 +11,7 @@ import {
     Vector2,
     Vector3,
     WebGLRenderer,
+    WebGLRenderTarget,
 } from 'three';
 import { SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
 import { SYSTEM } from '../data/system';
@@ -297,6 +298,11 @@ export class Renderer extends AbstractService {
 
         group.add(mesh);
         this.scene.add(group);
+
+        // make sure the new texture is transfered to the GPU before starting the animation
+        this.renderer.setRenderTarget(new WebGLRenderTarget());
+        this.renderer.render(this.scene, this.camera);
+        this.renderer.setRenderTarget(null);
 
         const animation = new Animation({
             properties: {
