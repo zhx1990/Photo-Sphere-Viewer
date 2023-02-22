@@ -211,7 +211,7 @@ export class VideoPlugin extends AbstractConfigurablePlugin<
      * Starts the video if paused
      */
     play() {
-        if (this.video && this.video.paused) {
+        if (this.video?.paused) {
             this.video.play();
         }
     }

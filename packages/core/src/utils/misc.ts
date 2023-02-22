@@ -53,6 +53,7 @@ export function isPlainObject<T extends Record<string, any>>(value: any): value 
 export function deepmerge<T>(target: T, src: T): T {
     const first = src;
 
+    // eslint-disable-next-line @typescript-eslint/no-shadow
     return (function merge(target: any, src: any) {
         if (Array.isArray(src)) {
             if (!target || !Array.isArray(target)) {
@@ -70,7 +71,7 @@ export function deepmerge<T>(target: T, src: T): T {
             Object.keys(src).forEach((key) => {
                 if (typeof src[key] !== 'object' || !src[key] || !isPlainObject(src[key])) {
                     target[key] = src[key];
-                } else if (src[key] != first) {
+                } else if (src[key] !== first) {
                     if (!target[key]) {
                         target[key] = merge(null, src[key]);
                     } else {
@@ -143,5 +144,5 @@ export function deepEqual(obj1: any, obj2: any): boolean {
 }
 
 function isObject(obj: any): boolean {
-    return typeof obj === 'object' && obj != null;
+    return typeof obj === 'object' && obj !== null;
 }

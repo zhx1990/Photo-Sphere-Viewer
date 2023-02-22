@@ -138,7 +138,7 @@ export class Animation<T = any> implements PromiseLike<boolean> {
      * Promise chaining
      * @param [onFulfilled] - Called when the animation is complete (true) or cancelled (false)
      */
-    then<T>(onFulfilled: (complete: boolean) => PromiseLike<T> | T): Promise<T> {
+    then<U>(onFulfilled: (complete: boolean) => PromiseLike<U> | U): Promise<U> {
         if (this.resolved || this.cancelled) {
             return Promise.resolve(this.resolved).then(onFulfilled);
         }

@@ -169,6 +169,8 @@ export class Navbar extends AbstractComponent {
             if (item instanceof NavbarCaption) {
                 item.setCaption(html);
                 return true;
+            } else {
+                return false;
             }
         });
     }

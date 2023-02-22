@@ -572,7 +572,7 @@ export class EventsHandler extends AbstractService {
             const emit = (
                 object: Mesh,
                 key: string,
-                evtCtor: new (event: MouseEvent, object: Mesh, point: Point, data: any) => ViewerEvents
+                evtCtor: new (e: MouseEvent, o: Mesh, pt: Point, data: any) => ViewerEvents
             ) => {
                 this.viewer.dispatchEvent(new evtCtor(evt, object, viewerPoint, key));
             };
