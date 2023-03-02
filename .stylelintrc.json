@@ -7,7 +7,6 @@
     "alpha-value-notation": "number",
     "scss/dollar-variable-empty-line-before": null,
     "string-quotes": "single",
-    "selector-class-pattern": null,
-    "declaration-colon-newline-after": null
+    "selector-class-pattern": null
   }
 }
