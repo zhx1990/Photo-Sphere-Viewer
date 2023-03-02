@@ -28,7 +28,7 @@ export class TypedEventTarget<TEvents extends TypedEvent<any>> extends EventTarg
      */
     override addEventListener<T extends TEvents['type'], E extends TEvents & { type: T }>(
         type: T,
-        callback: ((e: E) => void) | EventListenerObject,
+        callback: ((e: E) => void) | EventListenerObject | null,
         options?: AddEventListenerOptions | boolean
     ) {
         super.addEventListener(type, callback as any, options);
@@ -40,7 +40,7 @@ export class TypedEventTarget<TEvents extends TypedEvent<any>> extends EventTarg
      */
     override removeEventListener<T extends TEvents['type'], E extends TEvents & { type: T }>(
         type: TEvents['type'],
-        callback: ((e: E) => void) | EventListenerObject,
+        callback: ((e: E) => void) | EventListenerObject | null,
         options?: EventListenerOptions | boolean
     ) {
         super.removeEventListener(type, callback as any, options);
