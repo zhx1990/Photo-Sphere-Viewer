@@ -244,7 +244,7 @@ export class GyroscopePlugin extends AbstractConfigurablePlugin<
         } else if ('DeviceOrientationEvent' in window) {
             return new Promise((resolve) => {
                 const listener = (e: DeviceOrientationEvent) => {
-                    resolve(e?.alpha !== null && !isNaN(e.alpha));
+                    resolve(e && !utils.isNil(e.alpha) && !isNaN(e.alpha));
 
                     window.removeEventListener('deviceorientation', listener);
                 };
