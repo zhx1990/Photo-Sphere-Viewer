@@ -5,7 +5,7 @@ import { AbstractVideoAdapter } from '../../shared/AbstractVideoAdapter';
 import { EquirectangularVideoAdapterConfig, EquirectangularVideoPanorama } from './model';
 
 type EquirectangularMesh = Mesh<SphereGeometry, MeshBasicMaterial>;
-type EquirectangularTexture = TextureData<VideoTexture>;
+type EquirectangularTexture = TextureData<VideoTexture, EquirectangularVideoPanorama>;
 
 const getConfig = utils.getConfigParser<EquirectangularVideoAdapterConfig>(
     {

@@ -24,7 +24,7 @@ export type EquirectangularAdapterConfig = {
 };
 
 type EquirectangularMesh = Mesh<BufferGeometry, ShaderMaterial>;
-type EquirectangularTexture = TextureData<Texture>;
+type EquirectangularTexture = TextureData<Texture, string>;
 
 const getConfig = getConfigParser<EquirectangularAdapterConfig>(
     {

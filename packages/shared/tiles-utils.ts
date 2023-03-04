@@ -1,23 +1,48 @@
+import { PSVError } from '@photo-sphere-viewer/core';
 import {
     BufferGeometry,
     CanvasTexture,
     LineSegments,
     Material,
-    Mesh,
     MeshBasicMaterial,
     Object3D,
-    SphereGeometry,
     WireframeGeometry,
 } from 'three';
+
+/**
+ * Checks if the zoomRange properties are coherent
+ * @internal
+ */
+export function checkTilesLevels(levels: { zoomRange: [number, number] }[]) {
+    let previous = 0;
+    levels.forEach((level, i) => {
+        if (!level.zoomRange || level.zoomRange.length !== 2) {
+            throw new PSVError(`Tiles level ${i} is missing "zoomRange" property`);
+        }
+        if (level.zoomRange[0] >= level.zoomRange[1]
+            || level.zoomRange[0] !== previous
+            || i === 0 && level.zoomRange[0] !== 0
+            || i === levels.length - 1 && level.zoomRange[1] !== 100) {
+            throw new PSVError(`Tiles levels' "zoomRange" are not orderer or are not covering the whole 0-100 range`);
+        }
+        previous = level.zoomRange[1];
+    });
+}
+
+export function getTileIndexByZoomLevel<T extends { zoomRange: [number, number] }>(levels: T[], zoomLevel: number): number {
+    return levels.findIndex((level) => {
+        return zoomLevel >= level.zoomRange[0] && zoomLevel <= level.zoomRange[1];
+    });
+}
 
 /**
  * Generates an material for errored tiles
  * @internal
  */
-export function buildErrorMaterial(width: number, height: number): MeshBasicMaterial {
+export function buildErrorMaterial(): MeshBasicMaterial {
     const canvas = document.createElement('canvas');
-    canvas.width = width;
-    canvas.height = height;
+    canvas.width = 512;
+    canvas.height = 512;
 
     const ctx = canvas.getContext('2d');
 
@@ -46,14 +71,32 @@ export function createWireFrame(geometry: BufferGeometry): Object3D {
     return line;
 }
 
+const DEBUG_COLORS = ['dodgerblue', 'limegreen', 'indianred'];
+
 /**
- * Creates a small red sphere, for debug
+ * Applies a color filter to an tile image and shows the id of the tile
  * @internal
  */
-export function createDot(x: number, y: number, z: number) {
-    const geom = new SphereGeometry(0.1);
-    const material = new MeshBasicMaterial({ color: 0xff0000 });
-    const mesh = new Mesh(geom, material);
-    mesh.position.set(x, y, z);
-    return mesh;
+export function buildDebugTexture(image: HTMLImageElement, level: number, id: string): HTMLCanvasElement {
+    const canvas = document.createElement('canvas');
+    canvas.width = image.width;
+    canvas.height = image.height;
+    const ctx = canvas.getContext('2d');
+
+    ctx.fillStyle = DEBUG_COLORS[level % DEBUG_COLORS.length];
+    ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+    ctx.globalCompositeOperation = 'multiply';
+    ctx.drawImage(image, 0, 0);
+
+    const fontSize = image.width / 7;
+    ctx.globalCompositeOperation = 'source-over';
+    ctx.fillStyle = 'white';
+    ctx.font = `${fontSize}px monospace`;
+    ctx.textAlign = 'center';
+    id.split('\n').forEach((id2, i) => {
+        ctx.fillText(id2, image.width / 2, image.height / 2 + fontSize * (0.3 + i));
+    });
+
+    return canvas;
 }

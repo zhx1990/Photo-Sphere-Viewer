@@ -3,7 +3,7 @@ import { EquirectangularAdapter, events } from '@photo-sphere-viewer/core';
 import { BufferGeometry, Euler, MathUtils, Matrix4, Mesh, PlaneGeometry, ShaderMaterial, Texture } from 'three';
 
 type EquirectangularMesh = Mesh<BufferGeometry, ShaderMaterial>;
-type EquirectangularTexture = TextureData<Texture>;
+type EquirectangularTexture = TextureData<Texture, string>;
 
 const euler = new Euler();
 

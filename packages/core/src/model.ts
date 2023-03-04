@@ -152,10 +152,10 @@ export type PanoramaOptions = Partial<ExtendedPosition> & {
 /**
  * Result of {@link AbstractAdapter.loadTexture}
  */
-export type TextureData<T = Texture | Texture[] | Record<string, Texture>> = {
+export type TextureData<T = Texture | Texture[] | Record<string, Texture>, P = any> = {
     texture: T;
     panoData?: PanoData;
-    panorama: any;
+    panorama: P;
 };
 
 /**

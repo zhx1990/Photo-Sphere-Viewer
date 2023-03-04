@@ -21,12 +21,12 @@
 
             const panos = [
                 {
-                    caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
                     minFov: 30,
-                    position: {
+                    options: {
                         yaw: 0,
                         pitch: 0,
                         zoom: 50,
+                        caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
                     },
                     config: {
                         width: 6656,
@@ -46,21 +46,48 @@
                     },
                 },
                 {
-                    caption: "Simon's Town <b>&copy;  Greg Zall (HDRI Haven)</b>",
                     minFov: 10,
-                    position: {
+                    options: {
                         yaw: '52deg',
                         pitch: 0,
-                        zoom: 70,
+                        zoom: 20,
+                        caption: "Simon's Town <b>&copy;  Greg Zall (HDRI Haven)</b>",
                     },
                     config: {
-                        width: 24576,
-                        cols: 64,
-                        rows: 32,
                         baseUrl: `${baseUrl}sphere-tiles-24k/base.jpg`,
-                        tileUrl: (col, row) => {
-                            const num = row * 64 + col;
-                            return `${baseUrl}sphere-tiles-24k/tile_${('0000' + num).slice(-4)}.jpg`;
+                        levels: [
+                            {
+                                width: 6144,
+                                cols: 16,
+                                rows: 8,
+                                zoomRange: [0, 30],
+                            },
+                            {
+                                width: 12288,
+                                cols: 32,
+                                rows: 16,
+                                zoomRange: [30, 70],
+                            },
+                            {
+                                width: 24576,
+                                cols: 64,
+                                rows: 32,
+                                zoomRange: [70, 100],
+                            },
+                        ],
+                        tileUrl: (col, row, level) => {
+                            // skip top and bottom tiles on higher resolutions
+                            if (level === 1 && (row <= 4 || row >= 14)
+                                || level === 2 && (row <= 13 || row >= 29)) {
+                                return null;
+                            }
+                            if (level === 0 && col === 11 && row === 4
+                                || level === 1 && col === 22 && row === 8
+                                || level === 2 && col === 44 && row === 16
+                            ) {
+                                return 'error.jpg';
+                            }
+                            return `${baseUrl}sphere-tiles-24k/tile_${level}_${col}_${row}.jpg`;
                         },
                     },
                 },
@@ -71,6 +98,7 @@
                 adapter: [PhotoSphereViewer.EquirectangularTilesAdapter, {
                     showErrorTile: true,
                     baseBlur: true,
+                    // debug: true,
                 }],
                 plugins: [PhotoSphereViewer.GyroscopePlugin],
                 loadingImg: baseUrl + 'loader.gif',
@@ -99,10 +127,8 @@
             loadPanorama(panos[0]);
 
             function loadPanorama(pano) {
-                return viewer.setPanorama(pano.config, pano.position).then(() => {
-                    viewer.navbar.setCaption(pano.caption);
-                    viewer.setOption('minFov', pano.minFov);
-                });
+                viewer.setOption('minFov', pano.minFov);
+                return viewer.setPanorama(pano.config, pano.options);
             }
         </script>
     </body>

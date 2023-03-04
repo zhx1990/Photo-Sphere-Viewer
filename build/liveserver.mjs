@@ -23,6 +23,7 @@ liveServer.start({
     ],
     mount: [
         ['/node_modules', path.join(rootDir, 'node_modules')],
+        ['/data', path.join(rootDir, '..', 'photo-sphere-viewer-data/assets')],
         ...packages.map((name) => [`/${DIST_DIR}/${name}`, path.join(rootDir, PACKAGES_DIR, name, DIST_DIR)]),
     ],
 });

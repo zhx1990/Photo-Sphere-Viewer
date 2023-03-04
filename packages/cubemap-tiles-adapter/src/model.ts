@@ -22,6 +22,39 @@ export type CubemapTilesPanorama = {
     tileUrl: (face: keyof Cubemap, col: number, row: number) => string | null;
 };
 
+export type CubemapTileLevel = {
+    /**
+     * Lower and upper zoom levels (0-100)
+     */
+    zoomRange: [number, number];
+    /**
+     * size of a face in pixels
+     */
+    faceSize: number;
+    /**
+     * number of tiles on a side of a face
+     */
+    nbTiles: number;
+};
+
+/**
+ * Configuration of a tiled cubemap with multiple tiles configurations
+ */
+export type CubemapMultiTilesPanorama = {
+    /**
+     * low resolution panorama loaded before tiles
+     */
+    baseUrl?: string;
+    /**
+     * Configuration of tiles by zoom level
+     */
+    levels: CubemapTileLevel[];
+    /**
+     * function to build a tile url
+     */
+    tileUrl: (face: keyof Cubemap, col: number, row: number, level: number) => string | null;
+};
+
 export type CubemapTilesAdapterConfig = CubemapAdapterConfig & {
     /**
      * shows a warning sign on tiles that cannot be loaded
@@ -33,4 +66,10 @@ export type CubemapTilesAdapterConfig = CubemapAdapterConfig & {
      * @default true
      */
     baseBlur?: boolean;
+    /**
+     * shows debug helpers
+     * @default false
+     * @internal
+     */
+    debug?: boolean;
 };

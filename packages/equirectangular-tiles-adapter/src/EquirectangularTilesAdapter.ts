@@ -13,8 +13,13 @@ import {
     Vector3,
 } from 'three';
 import { Queue, Task } from '../../shared/Queue';
-import { buildErrorMaterial } from '../../shared/tiles-utils';
-import { EquirectangularTilesAdapterConfig, EquirectangularTilesPanorama } from './model';
+import { buildDebugTexture, buildErrorMaterial, createWireFrame } from '../../shared/tiles-utils';
+import {
+    EquirectangularMultiTilesPanorama,
+    EquirectangularTilesAdapterConfig,
+    EquirectangularTilesPanorama,
+} from './model';
+import { checkPanoramaConfig, getTileConfig, EquirectangularTileConfig, getTileConfigByIndex } from './utils';
 
 /* the faces of the top and bottom rows are made of a single triangle (3 vertices)
  * all other faces are made of two triangles (6 vertices)
@@ -49,8 +54,14 @@ import { EquirectangularTilesAdapterConfig, EquirectangularTilesPanorama } from 
  */
 
 type EquirectangularMesh = Mesh<SphereGeometry, MeshBasicMaterial[]>;
-type EquirectangularTexture = TextureData<Texture>;
-type EquirectangularTile = { col: number; row: number; angle: number };
+type EquirectangularTexture = TextureData<Texture, EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama>;
+type EquirectangularTile = {
+    row: number;
+    col: number;
+    angle: number;
+    config: EquirectangularTileConfig;
+    url: string;
+};
 
 const NB_VERTICES_BY_FACE = 6;
 const NB_VERTICES_BY_SMALL_FACE = 3;
@@ -59,8 +70,10 @@ const ATTR_UV = 'uv';
 const ATTR_ORIGINAL_UV = 'originaluv';
 const ATTR_POSITION = 'position';
 
+const ERROR_LEVEL = -1;
+
 function tileId(tile: EquirectangularTile): string {
-    return `${tile.col}x${tile.row}`;
+    return `${tile.col}x${tile.row}/${tile.config.level}`;
 }
 
 const getConfig = utils.getConfigParser<EquirectangularTilesAdapterConfig>(
@@ -69,6 +82,7 @@ const getConfig = utils.getConfigParser<EquirectangularTilesAdapterConfig>(
         showErrorTile: true,
         baseBlur: true,
         blur: false,
+        debug: false,
     },
     {
         resolution: (resolution) => {
@@ -87,27 +101,31 @@ const vertexPosition = new Vector3();
 /**
  * Adapter for tiled panoramas
  */
-export class EquirectangularTilesAdapter extends AbstractAdapter<EquirectangularTilesPanorama, Texture> {
+export class EquirectangularTilesAdapter extends AbstractAdapter<
+    EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama,
+    Texture
+> {
     static override readonly id = 'equirectangular-tiles';
     static override readonly supportsDownload = false;
     static override readonly supportsOverlay = false;
 
-    private readonly SPHERE_SEGMENTS: number;
-    private readonly SPHERE_HORIZONTAL_SEGMENTS: number;
+    // @internal
+    public readonly SPHERE_SEGMENTS: number;
+    // @internal
+    public readonly SPHERE_HORIZONTAL_SEGMENTS: number;
     private readonly NB_VERTICES: number;
     private readonly NB_GROUPS: number;
 
     private readonly config: EquirectangularTilesAdapterConfig;
 
     private readonly state = {
-        colSize: 0,
-        rowSize: 0,
-        facesByCol: 0,
-        facesByRow: 0,
+        tileConfig: null as EquirectangularTileConfig,
         tiles: {} as Record<string, boolean>,
+        faces: {} as Record<number, number>,
         geom: null as SphereGeometry,
         materials: [] as MeshBasicMaterial[],
         errorMaterial: null as MeshBasicMaterial,
+        inTransition: false,
     };
 
     private adapter: EquirectangularAdapter;
@@ -130,7 +148,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
         if (this.viewer.config.requestHeaders) {
             utils.logWarn(
                 'EquirectangularTilesAdapter fallbacks to file loader because "requestHeaders" where provided. ' +
-                    'Consider removing "requestHeaders" if you experience performances issues.'
+                'Consider removing "requestHeaders" if you experience performances issues.'
             );
         } else {
             this.loader = new ImageLoader();
@@ -167,35 +185,29 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
         }
     }
 
-    override supportsTransition(panorama: EquirectangularTilesPanorama) {
+    override supportsTransition(panorama: EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama) {
         return !!panorama.baseUrl;
     }
 
-    override supportsPreload(panorama: EquirectangularTilesPanorama) {
+    override supportsPreload(panorama: EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama) {
         return !!panorama.baseUrl;
     }
 
-    override loadTexture(panorama: EquirectangularTilesPanorama): Promise<EquirectangularTexture> {
-        if (typeof panorama !== 'object' || !panorama.width || !panorama.cols || !panorama.rows || !panorama.tileUrl) {
-            return Promise.reject(new PSVError('Invalid panorama configuration, are you using the right adapter?'));
-        }
-        if (panorama.cols > this.SPHERE_SEGMENTS) {
-            return Promise.reject(new PSVError(`Panorama cols must not be greater than ${this.SPHERE_SEGMENTS}.`));
-        }
-        if (panorama.rows > this.SPHERE_HORIZONTAL_SEGMENTS) {
-            return Promise.reject(
-                new PSVError(`Panorama rows must not be greater than ${this.SPHERE_HORIZONTAL_SEGMENTS}.`)
-            );
-        }
-        if (!MathUtils.isPowerOfTwo(panorama.cols) || !MathUtils.isPowerOfTwo(panorama.rows)) {
-            return Promise.reject(new PSVError('Panorama cols and rows must be powers of 2.'));
+    override loadTexture(
+        panorama: EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama
+    ): Promise<EquirectangularTexture> {
+        try {
+            checkPanoramaConfig(panorama, this);
+        } catch (e) {
+            return Promise.reject(e);
         }
 
+        const firstTile = getTileConfig(panorama, 0, this);
         const panoData = {
-            fullWidth: panorama.width,
-            fullHeight: panorama.width / 2,
-            croppedWidth: panorama.width,
-            croppedHeight: panorama.width / 2,
+            fullWidth: firstTile.width,
+            fullHeight: firstTile.width / 2,
+            croppedWidth: firstTile.width,
+            croppedHeight: firstTile.width / 2,
             croppedX: 0,
             croppedY: 0,
             poseHeading: 0,
@@ -255,9 +267,10 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
      * Applies the base texture and starts the loading of tiles
      */
     setTexture(mesh: EquirectangularMesh, textureData: EquirectangularTexture, transition: boolean) {
-        const { panorama, texture } = textureData;
+        const { texture } = textureData;
 
         if (transition) {
+            this.state.inTransition = true;
             this.__setTexture(mesh, texture);
             return;
         }
@@ -269,14 +282,13 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
         this.state.geom = mesh.geometry;
         this.state.geom.setAttribute(ATTR_UV, (this.state.geom.getAttribute(ATTR_ORIGINAL_UV) as BufferAttribute).clone());
 
-        this.state.colSize = panorama.width / panorama.cols;
-        this.state.rowSize = panorama.width / 2 / panorama.rows;
-        this.state.facesByCol = this.SPHERE_SEGMENTS / panorama.cols;
-        this.state.facesByRow = this.SPHERE_HORIZONTAL_SEGMENTS / panorama.rows;
+        if (this.config.debug) {
+            const wireframe = createWireFrame(this.state.geom);
+            this.viewer.renderer.addObject(wireframe);
+            this.viewer.renderer.setSphereCorrection(this.viewer.config.sphereCorrection, wireframe);
+        }
 
-        // this.psv.renderer.scene.add(createWireFrame(this.state.geom));
-
-        setTimeout(() => this.__refresh(true));
+        setTimeout(() => this.__refresh());
     }
 
     private __setTexture(mesh: EquirectangularMesh, texture: Texture) {
@@ -311,10 +323,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
     /**
      * Compute visible tiles and load them
      */
-    // @ts-ignore unused paramater
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    private __refresh(init = false) {
-        if (!this.state.geom) {
+    private __refresh() {
+        if (!this.state.geom || this.state.inTransition) {
             return;
         }
 
@@ -323,164 +333,73 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
         projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
         frustum.setFromProjectionMatrix(projScreenMatrix);
 
-        const panorama: EquirectangularTilesPanorama = this.viewer.config.panorama;
+        const panorama: EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama = this.viewer.config.panorama;
+        const zoomLevel = this.viewer.getZoomLevel();
+        const tileConfig = getTileConfig(panorama, zoomLevel, this);
+
         const verticesPosition = this.state.geom.getAttribute(ATTR_POSITION) as BufferAttribute;
-        const tilesToLoad = [];
+        const tilesToLoad: Record<string, EquirectangularTile> = {};
 
-        for (let col = 0; col < panorama.cols; col++) {
-            for (let row = 0; row < panorama.rows; row++) {
-                // for each tile, find the vertices corresponding to the four corners (three for first and last rows)
-                // if at least one vertex is visible, the tile must be loaded
-                // for larger tiles we also test the four edges centers and the tile center
+        for (let i = 0; i < this.NB_VERTICES; i += 1) {
+            vertexPosition.fromBufferAttribute(verticesPosition, i);
+            vertexPosition.applyEuler(this.viewer.renderer.sphereCorrection);
 
-                const verticesIndex = [];
-
-                if (row === 0) {
-                    // bottom-left
-                    const v0 = this.state.facesByRow === 1
-                        ? col * this.state.facesByCol * NB_VERTICES_BY_SMALL_FACE + 1
-                        : this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-                            + (this.state.facesByRow - 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-                            + col * this.state.facesByCol * NB_VERTICES_BY_FACE + 4;
-
-                    // bottom-right
-                    const v1 = this.state.facesByRow === 1
-                        ? v0 + (this.state.facesByCol - 1) * NB_VERTICES_BY_SMALL_FACE + 1
-                        : v0 + (this.state.facesByCol - 1) * NB_VERTICES_BY_FACE + 1;
-
-                    // top (all vertices are equal)
-                    const v2 = 0;
-
-                    verticesIndex.push(v0, v1, v2);
-
-                    if (this.state.facesByCol >= this.SPHERE_SEGMENTS / 8) {
-                        // bottom-center
-                        const v4 = v0 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
-
-                        verticesIndex.push(v4);
-                    }
-
-                    if (this.state.facesByRow >= this.SPHERE_HORIZONTAL_SEGMENTS / 4) {
-                        // left-center
-                        const v6 = v0 - (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
-
-                        // right-center
-                        const v7 = v1 - (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
-
-                        verticesIndex.push(v6, v7);
-                    }
-                } else if (row === panorama.rows - 1) {
-                    // top-left
-                    const v0 = this.state.facesByRow === 1
-                        ? -this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-                            + row * this.state.facesByRow * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-                            + col * this.state.facesByCol * NB_VERTICES_BY_SMALL_FACE + 1
-                        : -this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-                            + row * this.state.facesByRow * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-                            + col * this.state.facesByCol * NB_VERTICES_BY_FACE + 1;
-
-                    // top-right
-                    const v1 = this.state.facesByRow === 1
-                        ? v0 + (this.state.facesByCol - 1) * NB_VERTICES_BY_SMALL_FACE - 1
-                        : v0 + (this.state.facesByCol - 1) * NB_VERTICES_BY_FACE - 1;
-
-                    // bottom (all vertices are equal)
-                    const v2 = this.NB_VERTICES - 1;
-
-                    verticesIndex.push(v0, v1, v2);
-
-                    if (this.state.facesByCol >= this.SPHERE_SEGMENTS / 8) {
-                        // top-center
-                        const v4 = v0 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
-
-                        verticesIndex.push(v4);
-                    }
-
-                    if (this.state.facesByRow >= this.SPHERE_HORIZONTAL_SEGMENTS / 4) {
-                        // left-center
-                        const v6 = v0 + (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
-
-                        // right-center
-                        const v7 = v1 + (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
-
-                        verticesIndex.push(v6, v7);
-                    }
+            if (frustum.containsPoint(vertexPosition)) {
+                // compute position of the segment (3 or 6 vertices)
+                let segmentIndex;
+                if (i < this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE) {
+                    // first row
+                    segmentIndex = Math.floor(i / 3);
+                } else if (i < this.NB_VERTICES - this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE) {
+                    // second to before last rows
+                    segmentIndex = Math.floor((i / 3 - this.SPHERE_SEGMENTS) / 2) + this.SPHERE_SEGMENTS;
                 } else {
-                    // top-left
-                    const v0 = -this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE
-                        + row * this.state.facesByRow * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE
-                        + col * this.state.facesByCol * NB_VERTICES_BY_FACE + 1;
-
-                    // bottom-left
-                    const v1 = v0 + (this.state.facesByRow - 1) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE + 3;
-
-                    // bottom-right
-                    const v2 = v1 + (this.state.facesByCol - 1) * NB_VERTICES_BY_FACE + 1;
-
-                    // top-right
-                    const v3 = v0 + (this.state.facesByCol - 1) * NB_VERTICES_BY_FACE - 1;
-
-                    verticesIndex.push(v0, v1, v2, v3);
-
-                    if (this.state.facesByCol >= this.SPHERE_SEGMENTS / 8) {
-                        // top-center
-                        const v4 = v0 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
-
-                        // bottom-center
-                        const v5 = v1 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
-
-                        verticesIndex.push(v4, v5);
-                    }
-
-                    if (this.state.facesByRow >= this.SPHERE_HORIZONTAL_SEGMENTS / 4) {
-                        // left-center
-                        const v6 = v0 + (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
-
-                        // right-center
-                        const v7 = v3 + (this.state.facesByRow / 2) * this.SPHERE_SEGMENTS * NB_VERTICES_BY_FACE;
-
-                        verticesIndex.push(v6, v7);
-
-                        if (this.state.facesByCol >= this.SPHERE_SEGMENTS / 8) {
-                            // center-center
-                            const v8 = v6 + (this.state.facesByCol / 2) * NB_VERTICES_BY_FACE;
-
-                            verticesIndex.push(v8);
-                        }
-                    }
+                    // last row
+                    segmentIndex = Math.floor((i - this.NB_VERTICES - this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE) / 3) 
+                        + this.SPHERE_HORIZONTAL_SEGMENTS * (this.SPHERE_SEGMENTS - 1);
                 }
+                const segmentRow = Math.floor(segmentIndex / this.SPHERE_SEGMENTS);
+                const segmentCol = segmentIndex - segmentRow * this.SPHERE_SEGMENTS;
 
-                // if (init && col === 0 && row === 0) {
-                //   verticesIndex.forEach((vertexIdx) => {
-                //     this.psv.renderer.scene.add(createDot(
-                //       verticesPosition.getX(vertexIdx),
-                //       verticesPosition.getY(vertexIdx),
-                //       verticesPosition.getZ(vertexIdx)
-                //     ));
-                //   });
-                // }
-
-                const vertexVisible = verticesIndex.some((vertexIdx) => {
-                    vertexPosition.set(
-                        verticesPosition.getX(vertexIdx),
-                        verticesPosition.getY(vertexIdx),
-                        verticesPosition.getZ(vertexIdx)
-                    );
-                    vertexPosition.applyEuler(this.viewer.renderer.sphereCorrection);
-                    return frustum.containsPoint(vertexPosition);
-                });
-
-                if (vertexVisible) {
+                let config = tileConfig;
+                while (config) {
+                    // compute the position of the tile
+                    const row = Math.floor(segmentRow / config.facesByRow);
+                    const col = Math.floor(segmentCol / config.facesByCol);
                     let angle = vertexPosition.angleTo(this.viewer.state.direction);
-                    if (row === 0 || row === panorama.rows - 1) {
+                    if (row === 0 || row === config.rows - 1) {
                         angle *= 2; // lower priority to top and bottom tiles
                     }
-                    tilesToLoad.push({ col, row, angle });
+
+                    const tile: EquirectangularTile = {
+                        row,
+                        col,
+                        angle,
+                        config,
+                        url: null,
+                    };
+                    const id = tileId(tile);
+
+                    if (tilesToLoad[id]) {
+                        tilesToLoad[id].angle = Math.min(tilesToLoad[id].angle, angle);
+                        break;
+                    } else {
+                        tile.url = panorama.tileUrl(col, row, config.level);
+
+                        if (tile.url) {
+                            tilesToLoad[id] = tile;
+                            break;
+                        } else {
+                            // if no url is returned, try a lower tile level
+                            config = getTileConfigByIndex(panorama, config.level - 1, this);
+                        }
+                    }
                 }
             }
         }
 
-        this.__loadTiles(tilesToLoad);
+        this.state.tileConfig = tileConfig;
+        this.__loadTiles(Object.values(tilesToLoad));
     }
 
     /**
@@ -507,27 +426,24 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
      * Loads and draw a tile
      */
     private __loadTile(tile: EquirectangularTile, task: Task): Promise<any> {
-        const panorama: EquirectangularTilesPanorama = this.viewer.config.panorama;
-        const url = panorama.tileUrl(tile.col, tile.row);
-
-        if (!url) {
-            return Promise.resolve();
-        }
-
-        return this.__loadImage(url)
-            .then((image) => {
+        return this.__loadImage(tile.url)
+            .then((image: HTMLImageElement) => {
                 if (!task.isCancelled()) {
+                    if (this.config.debug) {
+                        image = buildDebugTexture(image, tile.config.level, tileId(tile)) as any;
+                    }
+
                     const material = new MeshBasicMaterial({ map: utils.createTexture(image) });
-                    this.__swapMaterial(tile.col, tile.row, material);
+                    this.__swapMaterial(tile, material, false);
                     this.viewer.needsUpdate();
                 }
             })
             .catch(() => {
                 if (!task.isCancelled() && this.config.showErrorTile) {
                     if (!this.state.errorMaterial) {
-                        this.state.errorMaterial = buildErrorMaterial(this.state.colSize, this.state.rowSize);
+                        this.state.errorMaterial = buildErrorMaterial();
                     }
-                    this.__swapMaterial(tile.col, tile.row, this.state.errorMaterial);
+                    this.__swapMaterial(tile, this.state.errorMaterial, true);
                     this.viewer.needsUpdate();
                 }
             });
@@ -546,14 +462,14 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
     /**
      * Applies a new texture to the faces
      */
-    private __swapMaterial(col: number, row: number, material: MeshBasicMaterial) {
+    private __swapMaterial(tile: EquirectangularTile, material: MeshBasicMaterial, isError: boolean) {
         const uvs = this.state.geom.getAttribute(ATTR_UV) as BufferAttribute;
 
-        for (let c = 0; c < this.state.facesByCol; c++) {
-            for (let r = 0; r < this.state.facesByRow; r++) {
-                // position of the face (two triangles of the same square)
-                const faceCol = col * this.state.facesByCol + c;
-                const faceRow = row * this.state.facesByRow + r;
+        for (let c = 0; c < tile.config.facesByCol; c++) {
+            for (let r = 0; r < tile.config.facesByRow; r++) {
+                // position of the face
+                const faceCol = tile.col * tile.config.facesByCol + c;
+                const faceRow = tile.row * tile.config.facesByRow + r;
                 const isFirstRow = faceRow === 0;
                 const isLastRow = faceRow === (this.SPHERE_HORIZONTAL_SEGMENTS - 1);
 
@@ -571,15 +487,25 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
                         + faceCol * NB_VERTICES_BY_FACE;
                 }
 
+                // in case of error, skip the face if already showing valid data
+                if (isError && this.state.faces[firstVertex] > ERROR_LEVEL) {
+                    continue;
+                }
+                // skip this face if its already showing an higher resolution
+                if (this.state.faces[firstVertex] > tile.config.level) {
+                    continue;
+                }
+                this.state.faces[firstVertex] = isError ? ERROR_LEVEL : tile.config.level;
+
                 // swap material
                 const matIndex = this.state.geom.groups.find((g) => g.start === firstVertex).materialIndex;
                 this.state.materials[matIndex] = material;
 
                 // define new uvs
-                const top = 1 - r / this.state.facesByRow;
-                const bottom = 1 - (r + 1) / this.state.facesByRow;
-                const left = c / this.state.facesByCol;
-                const right = (c + 1) / this.state.facesByCol;
+                const top = 1 - r / tile.config.facesByRow;
+                const bottom = 1 - (r + 1) / tile.config.facesByRow;
+                const left = c / tile.config.facesByCol;
+                const right = (c + 1) / tile.config.facesByCol;
 
                 if (isFirstRow) {
                     uvs.setXY(firstVertex, (left + right) / 2, top);
@@ -609,6 +535,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<Equirectangular
     private __cleanup() {
         this.queue.clear();
         this.state.tiles = {};
+        this.state.faces = {};
+        this.state.inTransition = false;
 
         this.state.materials.forEach((mat) => {
             mat?.map?.dispose();

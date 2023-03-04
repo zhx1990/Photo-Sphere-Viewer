@@ -5,7 +5,7 @@ import { AbstractVideoAdapter } from '../../shared/AbstractVideoAdapter';
 import { CubemapVideoAdapterConfig, CubemapVideoPanorama } from './model';
 
 type CubemapMesh = Mesh<BoxGeometry, ShaderMaterial>;
-type CubemapTexture = TextureData<VideoTexture>;
+type CubemapTexture = TextureData<VideoTexture, CubemapVideoPanorama>;
 
 const getConfig = utils.getConfigParser<CubemapVideoAdapterConfig>({
     equiangular: true,

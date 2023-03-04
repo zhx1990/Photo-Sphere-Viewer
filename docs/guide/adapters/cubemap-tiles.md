@@ -99,6 +99,12 @@ Shows a warning sign on tiles that cannot be loaded.
 
 When using this adapter, the `panorama` option and the `setPanorama()` method accept an object to configure the tiles.
 
+You may choose to provide a single tiles configuration or multiple configurations which will be applied at different zoom levels, this allows to serve files adapted to the current zoom level and achieve very high resolutions without consuming too much bandwidth.
+
+:::: tabs
+
+::: tab Single level
+
 #### `faceSize` (required)
 
 -   type: `number`
@@ -124,6 +130,53 @@ If the function returns `null` the corresponding tile will not be loaded.
 
 URL of a low resolution complete panorama image to display while the tiles are loading. It accepts the same format as the standard [cubemap adapter](./cubemap.md#panorama-options).
 
+:::
+
+::: tab Multiple levels
+
+#### `levels` (required)
+
+-   type: `array`
+
+Array of available tiles configurations. Each element is an object with `faceSize` and `nbTiles` (see "Single level") as well as `zoomRange`, an array containing the minimum and the maximum zoom level. **The levels must be ordered and cover the whole 0-100 zoom range.**
+
+```js
+levels: [
+    {
+        faceSize: 3000,
+        nbTiles: 4,
+        zoomRange: [0, 30],
+    },
+    {
+        faceSize: 6000,
+        nbTiles: 8,
+        zoomRange: [30, 70],
+    },
+    {
+        faceSize: 12000,
+        nbTiles: 16,
+        zoomRange: [70, 100],
+    },
+]
+```
+
+#### `tileUrl` (required)
+
+-   type: `function: (face, col, row, level) => string`
+
+Function used to build the URL of a tile. `face` will be one of `'left'|'front'|'right'|'back'|'top'|'bottom'`.
+If the function returns `null` the corresponding tile will not be loaded.
+
+#### `baseUrl` (recommended)
+
+-   type: `string[] | Record<string, string>`
+
+URL of a low resolution complete panorama image to display while the tiles are loading. It accepts the same format as the standard [cubemap adapter](./cubemap.md#panorama-options).
+
+:::
+
+::::
+
 ## Preparing the panorama
 
 The tiles can be easily generated using [ImageMagick](https://imagemagick.org) tool.
@@ -132,7 +185,7 @@ Let's say you have a cubemap where each face is 6.000x6.000 pixels and you want 
 
 ```
 magick.exe front.jpg \
-  -crop 750x750 \
+  -crop 750x750 -quality 95 \
   -set filename:tile "%[fx:page.x/750]_%[fx:page.y/750]" \
   -set filename:orig %t \
   %[filename:orig]_%[filename:tile].jpg

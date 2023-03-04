@@ -260,7 +260,7 @@ export class Renderer extends AbstractService {
      * Applies a SphereCorrection to a Group
      * @internal
      */
-    setSphereCorrection(sphereCorrection: SphereCorrection, group: Group = this.meshContainer) {
+    setSphereCorrection(sphereCorrection: SphereCorrection, group: Object3D = this.meshContainer) {
         const cleanCorrection = this.viewer.dataHelper.cleanSphereCorrection(sphereCorrection);
 
         group.rotation.set(cleanCorrection.tilt, cleanCorrection.pan, cleanCorrection.roll, 'ZXY');

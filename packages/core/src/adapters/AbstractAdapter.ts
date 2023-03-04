@@ -56,7 +56,7 @@ export abstract class AbstractAdapter<TPanorama, TTexture> {
         panorama: TPanorama,
         newPanoData?: PanoData | PanoDataProvider,
         useXmpPanoData?: boolean
-    ): Promise<TextureData<TTexture>>;
+    ): Promise<TextureData<TTexture, TPanorama>>;
 
     /**
      * Creates the mesh
@@ -66,7 +66,7 @@ export abstract class AbstractAdapter<TPanorama, TTexture> {
     /**
      * Applies the texture to the mesh
      */
-    abstract setTexture(mesh: Mesh, textureData: TextureData<TTexture>, transition?: boolean): void;
+    abstract setTexture(mesh: Mesh, textureData: TextureData<TTexture, TPanorama>, transition?: boolean): void;
 
     /**
      * Changes the opacity of the mesh
@@ -76,12 +76,12 @@ export abstract class AbstractAdapter<TPanorama, TTexture> {
     /**
      * Clear a loaded texture from memory
      */
-    abstract disposeTexture(textureData: TextureData<TTexture>): void;
+    abstract disposeTexture(textureData: TextureData<TTexture, TPanorama>): void;
 
     /**
      * Applies the overlay to the mesh
      */
-    abstract setOverlay(mesh: Mesh, textureData: TextureData<TTexture>, opacity: number): void;
+    abstract setOverlay(mesh: Mesh, textureData: TextureData<TTexture, TPanorama>, opacity: number): void;
 
     /**
      * @internal
