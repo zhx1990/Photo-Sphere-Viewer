@@ -404,6 +404,8 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                 .then((textureData) => {
                     this.loader.hide();
 
+                    this.dispatchEvent(new PanoramaLoadedEvent(textureData));
+
                     this.state.transitionAnimation = this.renderer.transition(textureData, options);
                     return this.state.transitionAnimation;
                 })
