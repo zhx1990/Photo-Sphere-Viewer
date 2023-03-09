@@ -1,11 +1,9 @@
 # AutorotatePlugin
 
-[![NPM version](https://img.shields.io/npm/v/@photo-sphere-viewer/autorotate-plugin?logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/autorotate-plugin)
-[![NPM Downloads](https://img.shields.io/npm/dm/@photo-sphere-viewer/autorotate-plugin?color=f86036&label=npm&logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/autorotate-plugin)
-[![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/@photo-sphere-viewer/autorotate-plugin?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/autorotate-plugin)
-[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/autorotate-plugin.svg?)](https://openbase.com/js/@photo-sphere-viewer/autorotate-plugin)
+<Badges module="autorotate-plugin"/>
 
-::: module modules/plugin__Autorotate.html
+::: module
+<ApiButton page="modules/plugin__Autorotate.html"/>
 Adds a an automatic rotation the panorama, which starts automatically on idle or with a click on a button. The rotation can also be configured to visit specific points.
 
 This plugin is available in the [@photo-sphere-viewer/autorotate-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/autorotate-plugin) package.

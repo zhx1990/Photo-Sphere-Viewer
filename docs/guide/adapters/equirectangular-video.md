@@ -1,9 +1,6 @@
 # Equirectangular video
 
-[![NPM version](https://img.shields.io/npm/v/@photo-sphere-viewer/equirectangular-video-adapter?logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/equirectangular-video-adapter)
-[![NPM Downloads](https://img.shields.io/npm/dm/@photo-sphere-viewer/equirectangular-video-adapter?color=f86036&label=npm&logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/equirectangular-video-adapter)
-[![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/@photo-sphere-viewer/equirectangular-video-adapter?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/equirectangular-video-adapter)
-[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/equirectangular-video-adapter.svg?)](https://openbase.com/js/@photo-sphere-viewer/equirectangular-video-adapter)
+<Badges module="equirectangular-video-adapter"/>
 
 ::: module
 This adapter is available in the [@photo-sphere-viewer/equirectangular-video-adapter](https://www.npmjs.com/package/@photo-sphere-viewer/equirectangular-video-adapter) package.

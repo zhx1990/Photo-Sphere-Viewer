@@ -1,12 +1,10 @@
 # VisibleRangePlugin
 
-[![NPM version](https://img.shields.io/npm/v/@photo-sphere-viewer/visible-range-plugin?logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/visible-range-plugin)
-[![NPM Downloads](https://img.shields.io/npm/dm/@photo-sphere-viewer/visible-range-plugin?color=f86036&label=npm&logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/visible-range-plugin)
-[![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/@photo-sphere-viewer/visible-range-plugin?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/visible-range-plugin)
-[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/visible-range-plugin.svg?)](https://openbase.com/js/@photo-sphere-viewer/visible-range-plugin)
+<Badges module="visible-range-plugin"/>
 
-::: module modules/plugin__VisibleRange.html
-Locks the visible angles.
+::: module
+<ApiButton page="modules/plugin__VisibleRange.html"/>
+Locks the visible area of the panorama.
 
 This plugin is available in the [@photo-sphere-viewer/visible-range-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/visible-range-plugin) package.
 :::

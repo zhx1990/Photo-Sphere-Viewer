@@ -9,7 +9,6 @@ export const readme = (pkg) => {
 [![NPM version](https://img.shields.io/npm/v/${pkg.name}?logo=npm)](https://www.npmjs.com/package/${pkg.name})
 [![NPM Downloads](https://img.shields.io/npm/dm/${pkg.name}?color=f86036&label=npm&logo=npm)](https://www.npmjs.com/package/${pkg.name})
 [![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/${pkg.name}?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/${pkg.name})
-[![Rate this package](https://badges.openbase.com/js/rating/${pkg.name}.svg?)](https://openbase.com/js/${pkg.name})
 
 ${pkg.description}
 

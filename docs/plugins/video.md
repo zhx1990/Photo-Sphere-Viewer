@@ -1,11 +1,9 @@
 # VideoPlugin
 
-[![NPM version](https://img.shields.io/npm/v/@photo-sphere-viewer/video-plugin?logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/video-plugin)
-[![NPM Downloads](https://img.shields.io/npm/dm/@photo-sphere-viewer/video-plugin?color=f86036&label=npm&logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/video-plugin)
-[![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/@photo-sphere-viewer/video-plugin?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/video-plugin)
-[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/video-plugin.svg?)](https://openbase.com/js/@photo-sphere-viewer/video-plugin)
+<Badges module="video-plugin"/>
 
-::: module modules/plugin__Video.html
+::: module
+<ApiButton page="modules/plugin__Video.html"/>
 Adds controls to the video [adapters](../guide/adapters/).
 
 This plugin is available in the [@photo-sphere-viewer/video-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/video-plugin) package. **It has a stylesheet.**

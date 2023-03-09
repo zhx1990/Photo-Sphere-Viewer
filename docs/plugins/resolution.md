@@ -1,11 +1,9 @@
 # ResolutionPlugin
 
-[![NPM version](https://img.shields.io/npm/v/@photo-sphere-viewer/resolution-plugin?logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/resolution-plugin)
-[![NPM Downloads](https://img.shields.io/npm/dm/@photo-sphere-viewer/resolution-plugin?color=f86036&label=npm&logo=npm)](https://www.npmjs.com/package/@photo-sphere-viewer/resolution-plugin)
-[![jsDelivr Hits](https://img.shields.io/jsdelivr/npm/hm/@photo-sphere-viewer/resolution-plugin?color=%23f86036&logo=jsdelivr)](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/resolution-plugin)
-[![Rate this package](https://badges.openbase.com/js/rating/@photo-sphere-viewer/resolution-plugin.svg?)](https://openbase.com/js/@photo-sphere-viewer/resolution-plugin)
+<Badges module="resolution-plugin"/>
 
-::: module modules/plugin__Resolution.html
+::: module
+<ApiButton page="modules/plugin__Resolution.html"/>
 Adds a button to choose between multiple resolutions of the panorama. **Requires the [Settings plugin](./settings.md).**
 
 This plugin is available in the [@photo-sphere-viewer/resolution-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/resolution-plugin) package.
