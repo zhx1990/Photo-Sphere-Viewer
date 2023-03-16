@@ -196,7 +196,7 @@ export class Marker {
         if (Array.isArray(this.config.scale.yaw)) {
             const [min, max] = this.config.scale.yaw;
             const halfFov = MathUtils.degToRad(this.viewer.state.hFov) / 2;
-            const arc = Math.abs(utils.getShortestArc(this.state.position.yaw, position.pitch));
+            const arc = Math.abs(utils.getShortestArc(this.state.position.yaw, position.yaw));
             scale *= max + (min - max) * CONSTANTS.EASINGS.outQuad(Math.max(0, (halfFov - arc) / halfFov));
         }
         return scale;
