@@ -61,6 +61,13 @@ A text displayed in the side panel when the user clicks the "i" button. HTML is 
 
 Define the file which will be downloaded with the `download` button. This is particularly useful for adapters that use multiple files, like the CubemapAdapter or the EquirectangularTilesAdapter.
 
+#### `downloadName`
+
+-   type: `string`
+-   default: `panorama` or `downloadUrl` filename
+
+Overrides the filename when downloading the panorama. This is mostly useful if the panorama is provided as base64.
+
 #### `size`
 
 -   type: `{ width: integer, height: integer }`

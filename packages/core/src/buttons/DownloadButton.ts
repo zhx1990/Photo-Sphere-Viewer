@@ -34,7 +34,11 @@ export class DownloadButton extends AbstractButton {
     onClick() {
         const link = document.createElement('a');
         link.href = this.viewer.config.downloadUrl || this.viewer.config.panorama;
-        link.download = link.href.split('/').pop();
+        if (link.href.startsWith('data:') && !this.viewer.config.downloadName) {
+            link.download = 'panorama.' + link.href.substring(0, link.href.indexOf(';')).split('/').pop();
+        } else {
+            link.download = this.viewer.config.downloadName || link.href.split('/').pop();
+        }
         this.viewer.container.appendChild(link);
         link.click();
 

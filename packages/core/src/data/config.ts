@@ -20,6 +20,7 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
     caption: null,
     description: null,
     downloadUrl: null,
+    downloadName: null,
     loadingImg: null,
     loadingTxt: 'Loading...',
     size: null,

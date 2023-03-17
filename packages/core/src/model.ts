@@ -278,6 +278,8 @@ export type ViewerConfig = {
     /** @default null */
     downloadUrl?: string;
     /** @default null */
+    downloadName?: string;
+    /** @default null */
     loadingImg?: string;
     /** @default 'Loading...' */
     loadingTxt?: string;
