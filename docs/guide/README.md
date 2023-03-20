@@ -22,7 +22,7 @@ yarn add @photo-sphere-viewer/core
 
 #### Via CDN
 
-Photo Sphere Viewer is available on [jsDelivr](https://www.jsdelivr.com/package/npm/@photo-sphere-viewer/core)
+Photo Sphere Viewer is available on [jsDelivr](https://www.jsdelivr.com/?query=@photo-sphere-viewer)
 
 #### Manually
 

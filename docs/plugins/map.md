@@ -1,4 +1,4 @@
-# MapPlugin <Badge text="NEW"/>
+# MapPlugin
 
 <Badges module="map-plugin"/>
 
