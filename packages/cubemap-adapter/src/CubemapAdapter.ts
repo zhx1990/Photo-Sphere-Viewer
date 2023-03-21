@@ -13,7 +13,7 @@ import {
 import { cleanCubemap, cleanCubemapArray, isCubemap } from './utils';
 
 type CubemapMesh = Mesh<BoxGeometry, ShaderMaterial[]>;
-type CubemapTexture = TextureData<Texture[], CubemapSeparate | CubemapStripe | CubemapNet>;
+type CubemapTexture = TextureData<Texture[], CubemapPanorama>;
 
 const getConfig = utils.getConfigParser<CubemapAdapterConfig>({
     flipTopBottom: false,
@@ -85,7 +85,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
                 throw new PSVError('Invalid cubemap panorama, are you using the right adapter?');
         }
 
-        return { panorama: cleanPanorama, texture };
+        return { panorama, texture };
     }
 
     private loadTexturesSeparate(paths: string[]): Promise<Texture[]> {
@@ -254,7 +254,7 @@ void main() {
 
     setTexture(mesh: CubemapMesh, textureData: CubemapTexture) {
         const { texture, panorama } = textureData;
-        const isNet = panorama.type === 'net';
+        const isNet = (panorama as CubemapNet).type === 'net';
         const flipTopBottom = isNet ? !this.config.flipTopBottom : this.config.flipTopBottom;
 
         for (let i = 0; i < 6; i++) {
