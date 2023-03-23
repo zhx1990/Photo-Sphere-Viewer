@@ -3,7 +3,7 @@
 [[toc]]
 
 ::: tip Full featured example
-You can find a complete example of plugin implementation in the [examples](https://github.com/mistic100/Photo-Sphere-Viewer/main/dev/examples/custom-plugin) folder of the project.
+You can find a complete example of plugin implementation in the [examples](https://github.com/mistic100/Photo-Sphere-Viewer/tree/main/examples/custom-plugin) folder of the project.
 :::
 
 ## Syntax
