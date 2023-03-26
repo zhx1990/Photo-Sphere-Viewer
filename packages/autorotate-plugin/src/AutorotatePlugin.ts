@@ -131,6 +131,7 @@ export class AutorotatePlugin extends AbstractConfigurablePlugin<
         this.viewer.addEventListener(events.StopAllEvent.type, this);
         this.viewer.addEventListener(events.BeforeRenderEvent.type, this);
 
+        // conflict with play/pause of the video plugin
         if (!this.video) {
             this.viewer.addEventListener(events.KeypressEvent.type, this);
         }
@@ -166,7 +167,7 @@ export class AutorotatePlugin extends AbstractConfigurablePlugin<
             }
 
             case events.KeypressEvent.type:
-                if ((e as events.KeypressEvent).key === CONSTANTS.KEY_CODES.Space) {
+                if ((e as events.KeypressEvent).key === CONSTANTS.KEY_CODES.Space && this.viewer.state.keyboardEnabled) {
                     this.toggle();
                     e.preventDefault();
                 }

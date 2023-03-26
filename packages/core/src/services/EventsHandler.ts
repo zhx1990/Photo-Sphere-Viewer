@@ -168,11 +168,11 @@ export class EventsHandler extends AbstractService {
             return;
         }
 
-        if (!this.state.keyboardEnabled || !this.config.keyboard) {
+        if (!this.state.keyboardEnabled) {
             return;
         }
 
-        const action = this.config.keyboardActions[e.key];
+        const action = this.config.keyboardActions?.[e.key];
 
         if (typeof action === 'function') {
             action(this.viewer);
