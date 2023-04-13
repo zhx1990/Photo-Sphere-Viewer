@@ -8,6 +8,7 @@ import type {
 } from '@photo-sphere-viewer/core';
 import type { MarkerConfig } from '@photo-sphere-viewer/markers-plugin';
 import type { MapHotspot } from '@photo-sphere-viewer/map-plugin';
+import { HexColorString } from 'three';
 
 /**
  * Definition of GPS coordinates (longitude, latitude, optional altitude)
@@ -21,15 +22,15 @@ export type VirtualTourArrowStyle = {
     /**
      * @default '#aaaaaa'
      */
-    color?: string;
+    color?: HexColorString;
     /**
      * @default '#aa5500'
      */
-    hoverColor?: string;
+    hoverColor?: HexColorString;
     /**
      * @default '#000000'
      */
-    outlineColor?: string;
+    outlineColor?: HexColorString;
     /**
      * @default [0.5,2]
      */
