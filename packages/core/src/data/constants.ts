@@ -59,6 +59,11 @@ export const SPHERE_RADIUS = 10;
 export const VIEWER_DATA = 'photoSphereViewer';
 
 /**
+ * CSS class that must be applied on elements whose mouse events must not bubble to the viewer itself
+ */
+export const CAPTURE_EVENTS_CLASS = 'psv--capture-event';
+
+/**
  * Actions available for {@link ViewerConfig['keyboard']} configuration
  */
 export enum ACTIONS {

@@ -12,6 +12,7 @@ import { ZoomInButton } from '../buttons/ZoomInButton';
 import { ZoomOutButton } from '../buttons/ZoomOutButton';
 import { ZoomRangeButton } from '../buttons/ZoomRangeButton';
 import { DEFAULTS } from '../data/config';
+import { CAPTURE_EVENTS_CLASS } from '../data/constants';
 import { ParsedViewerConfig } from '../model';
 import { PSVError } from '../PSVError';
 import { logWarn } from '../utils';
@@ -100,7 +101,7 @@ export class Navbar extends AbstractComponent {
      */
     constructor(viewer: Viewer) {
         super(viewer, {
-            className: 'psv-navbar psv--capture-event',
+            className: `psv-navbar ${CAPTURE_EVENTS_CLASS}`,
         });
 
         this.state.visible = false;

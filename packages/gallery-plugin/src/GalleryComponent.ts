@@ -18,7 +18,7 @@ export class GalleryComponent extends AbstractComponent {
 
     constructor(private readonly plugin: GalleryPlugin, viewer: Viewer) {
         super(viewer, {
-            className: 'psv-gallery psv--capture-event',
+            className: `psv-gallery ${CONSTANTS.CAPTURE_EVENTS_CLASS}`,
         });
 
         this.container.innerHTML = blankIcon;

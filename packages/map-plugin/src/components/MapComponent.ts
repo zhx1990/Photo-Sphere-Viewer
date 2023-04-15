@@ -1,5 +1,5 @@
 import type { Point, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractComponent, SYSTEM, utils } from '@photo-sphere-viewer/core';
+import { AbstractComponent, CONSTANTS, SYSTEM, utils } from '@photo-sphere-viewer/core';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { MathUtils } from 'three';
 import { HOTSPOT_MARKER_ID, MAP_SHADOW_BLUR, PIN_SHADOW_BLUR, PIN_SHADOW_OFFSET } from '../constants';
@@ -72,7 +72,7 @@ export class MapComponent extends AbstractComponent {
 
     constructor(viewer: Viewer, private plugin: MapPlugin) {
         super(viewer, {
-            className: `psv-map psv--capture-event`,
+            className: `psv-map ${CONSTANTS.CAPTURE_EVENTS_CLASS}`,
         });
 
         // map + compass container
@@ -138,6 +138,9 @@ export class MapComponent extends AbstractComponent {
     }
 
     handleEvent(e: Event) {
+        if (utils.getClosest(e.target as HTMLElement, `.${CONSTANTS.CAPTURE_EVENTS_CLASS}:not(.psv-map)`)) {
+            return;
+        }
         switch (e.type) {
             case 'mousedown': {
                 const event = e as MouseEvent;
@@ -222,8 +225,6 @@ export class MapComponent extends AbstractComponent {
                 }
                 this.state.forceRender = false;
                 this.update();
-                break;
-            default:
                 break;
         }
     }

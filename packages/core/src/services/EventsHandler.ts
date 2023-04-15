@@ -1,6 +1,7 @@
 import { MathUtils, Mesh, SplineCurve, Vector2 } from 'three';
 import {
     ACTIONS,
+    CAPTURE_EVENTS_CLASS,
     CTRLZOOM_TIMEOUT,
     DBLCLICK_DELAY,
     IDS,
@@ -137,7 +138,7 @@ export class EventsHandler extends AbstractService {
             case SYSTEM.fullscreenEvent: this.__onFullscreenChange(); break;
         }
 
-        if (!getClosest(evt.target as HTMLElement, '.psv--capture-event')) {
+        if (!getClosest(evt.target as HTMLElement, '.' + CAPTURE_EVENTS_CLASS)) {
             // prettier-ignore
             switch (evt.type) {
                 case 'mousedown': this.__onMouseDown(evt as MouseEvent); break;

@@ -1,5 +1,5 @@
 import type { Viewer } from '@photo-sphere-viewer/core';
-import { AbstractComponent, events, utils } from '@photo-sphere-viewer/core';
+import { AbstractComponent, CONSTANTS, events, utils } from '@photo-sphere-viewer/core';
 import { PlayPauseEvent } from '../events';
 import playIcon from '../icons/play.svg';
 import { VideoPlugin } from '../VideoPlugin';
@@ -13,7 +13,7 @@ export class PauseOverlay extends AbstractComponent {
         });
 
         this.button = document.createElement('button');
-        this.button.className = 'psv-video-bigbutton psv--capture-event';
+        this.button.className = `psv-video-bigbutton ${CONSTANTS.CAPTURE_EVENTS_CLASS}`;
         this.button.innerHTML = playIcon;
         this.container.appendChild(this.button);
 

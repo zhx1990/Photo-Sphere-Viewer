@@ -1,4 +1,4 @@
-import { ICONS, KEY_CODES } from '../data/constants';
+import { CAPTURE_EVENTS_CLASS, ICONS, KEY_CODES } from '../data/constants';
 import { PSVError } from '../PSVError';
 import { toggleClass } from '../utils';
 import type { Viewer } from '../Viewer';
@@ -61,7 +61,7 @@ export class Panel extends AbstractComponent {
      */
     constructor(viewer: Viewer) {
         super(viewer, {
-            className: 'psv-panel psv--capture-event',
+            className: `psv-panel ${CAPTURE_EVENTS_CLASS}`,
         });
 
         const resizer = document.createElement('div');

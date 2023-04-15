@@ -1,7 +1,7 @@
-import { KEY_CODES } from '../data/constants';
+import { CAPTURE_EVENTS_CLASS, KEY_CODES } from '../data/constants';
 import { PSVError } from '../PSVError';
 import type { Viewer } from '../Viewer';
-import { ClickEvent, HideOverlayEvent, KeypressEvent, ShowOverlayEvent } from '../events';
+import { HideOverlayEvent, KeypressEvent, ShowOverlayEvent } from '../events';
 import { AbstractComponent } from './AbstractComponent';
 
 /**
@@ -53,7 +53,7 @@ export class Overlay extends AbstractComponent {
      */
     constructor(viewer: Viewer) {
         super(viewer, {
-            className: 'psv-overlay',
+            className: `psv-overlay ${CAPTURE_EVENTS_CLASS}`,
         });
 
         this.image = document.createElement('div');
@@ -68,7 +68,7 @@ export class Overlay extends AbstractComponent {
         this.text.className = 'psv-overlay-text';
         this.container.appendChild(this.text);
 
-        this.viewer.addEventListener(ClickEvent.type, this);
+        this.container.addEventListener('click', this);
         this.viewer.addEventListener(KeypressEvent.type, this);
 
         super.hide();
@@ -78,7 +78,6 @@ export class Overlay extends AbstractComponent {
      * @internal
      */
     override destroy() {
-        this.viewer.removeEventListener(ClickEvent.type, this);
         this.viewer.removeEventListener(KeypressEvent.type, this);
 
         super.destroy();
@@ -88,7 +87,7 @@ export class Overlay extends AbstractComponent {
      * @internal
      */
     handleEvent(e: Event) {
-        if (e instanceof ClickEvent) {
+        if (e.type === 'click') {
             if (this.isVisible() && this.state.dissmisable) {
                 this.hide();
                 e.stopPropagation();
