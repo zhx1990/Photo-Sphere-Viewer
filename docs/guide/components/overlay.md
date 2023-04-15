@@ -1,6 +1,7 @@
 # Overlay
 
-::: module classes/Core.Overlay.html
+::: module
+<ApiButton page="classes/Core.Overlay.html"/>
 Display a message with an illustration on top of the viewer.
 :::
 

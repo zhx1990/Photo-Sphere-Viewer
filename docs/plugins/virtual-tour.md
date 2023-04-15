@@ -3,7 +3,7 @@
 <Badges module="virtual-tour-plugin"/>
 
 ::: module
-<ApiButton page="modules/plugin__VirtualTour.html"/>
+<ApiButton page="modules/VirtualTourPlugin.html"/>
 Create virtual tours by linking multiple panoramas.
 
 This plugin is available in the [@photo-sphere-viewer/virtual-tour-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/virtual-tour-plugin) package. **It has a stylesheet.**

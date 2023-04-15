@@ -3,7 +3,7 @@
 <Badges module="markers-plugin"/>
 
 ::: module
-<ApiButton page="modules/plugin__Markers.html"/>
+<ApiButton page="modules/MarkersPlugin.html"/>
 Displays various shapes, images and texts on the viewer.
 
 This plugin is available in the [@photo-sphere-viewer/markers-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/markers-plugin) package. **It has a stylesheet.**

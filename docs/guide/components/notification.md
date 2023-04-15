@@ -1,6 +1,7 @@
 # Notification
 
-::: module classes/Core.Notification.html"
+::: module
+<ApiButton page="classes/Core.Notification.html"/>
 Display a small message above the navbar.
 :::
 

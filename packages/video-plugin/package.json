@@ -21,9 +21,5 @@
   "psv": {
     "globalName": "PhotoSphereViewer.VideoPlugin",
     "style": true
-  },
-  "typedoc": {
-    "displayName": "plugin: Video",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

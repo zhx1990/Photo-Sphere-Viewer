@@ -19,9 +19,5 @@
   "psv": {
     "globalName": "PhotoSphereViewer",
     "style": true
-  },
-  "typedoc": {
-    "displayName": "Core",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

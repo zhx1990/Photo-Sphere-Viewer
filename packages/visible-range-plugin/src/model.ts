@@ -1,3 +1,6 @@
+import type { ViewerConfig } from '@photo-sphere-viewer/core';
+import type { VisibleRangePlugin } from './VisibleRangePlugin';
+
 export type Range = [number, number] | [string, string];
 
 export type VisibleRangePluginConfig = {
@@ -10,7 +13,7 @@ export type VisibleRangePluginConfig = {
      */
     verticalRange?: Range;
     /**
-     * use {@link ViewerConfig.panoData} as visible range, you can also manually call {@link VisibleRangePlugin.setRangesFromPanoData}
+     * use {@link ViewerConfig panoData} as visible range, you can also manually call {@link VisibleRangePlugin.setRangesFromPanoData}
      * @default false
      */
     usePanoData?: boolean;

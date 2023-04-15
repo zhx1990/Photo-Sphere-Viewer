@@ -21,9 +21,5 @@
   "psv": {
     "globalName": "PhotoSphereViewer.CompassPlugin",
     "style": true
-  },
-  "typedoc": {
-    "displayName": "plugin: Compass",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

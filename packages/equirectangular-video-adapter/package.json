@@ -17,9 +17,5 @@
   },
   "psv": {
     "globalName": "PhotoSphereViewer.EquirectangularVideoAdapter"
-  },
-  "typedoc": {
-    "displayName": "adapter: EquirectangularVideo",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

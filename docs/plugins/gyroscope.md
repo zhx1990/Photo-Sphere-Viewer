@@ -3,7 +3,7 @@
 <Badges module="gyroscope-plugin"/>
 
 ::: module
-<ApiButton page="modules/plugin__Gyroscope.html"/>
+<ApiButton page="modules/GyroscopePlugin.html"/>
 Adds gyroscope controls on mobile devices.
 
 This plugin is available in the [@photo-sphere-viewer/gyroscope-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/gyroscope-plugin) package.

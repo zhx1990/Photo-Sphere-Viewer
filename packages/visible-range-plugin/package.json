@@ -17,9 +17,5 @@
   },
   "psv": {
     "globalName": "PhotoSphereViewer.VisibleRangePlugin"
-  },
-  "typedoc": {
-    "displayName": "plugin: VisibleRange",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

@@ -3,7 +3,7 @@
 <Badges module="compass-plugin"/>
 
 ::: module
-<ApiButton page="modules/plugin__Compass.html"/>
+<ApiButton page="modules/CompassPlugin.html"/>
 Adds a compass on the viewer to represent which portion of the sphere is currently visible.
 
 This plugin is available in the [@photo-sphere-viewer/compass-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/compass-plugin) package. **It has a stylesheet.**

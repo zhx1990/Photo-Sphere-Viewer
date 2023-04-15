@@ -18,9 +18,5 @@
   },
   "psv": {
     "globalName": "PhotoSphereViewer.ResolutionPlugin"
-  },
-  "typedoc": {
-    "displayName": "plugin: Resolution",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

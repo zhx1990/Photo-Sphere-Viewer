@@ -18,9 +18,5 @@
   "psv": {
     "globalName": "PhotoSphereViewer.MarkersPlugin",
     "style": true
-  },
-  "typedoc": {
-    "displayName": "plugin: Markers",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

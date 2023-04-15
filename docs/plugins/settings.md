@@ -3,7 +3,7 @@
 <Badges module="settings-plugin"/>
 
 ::: module
-<ApiButton page="modules/plugin__Settings.html"/>
+<ApiButton page="modules/SettingsPlugin.html"/>
 This plugin does nothing on it's own but is required by other plugins.
 
 This plugin is available in the [@photo-sphere-viewer/settings-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/settings-plugin) package. **It has a stylesheet.**

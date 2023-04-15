@@ -18,9 +18,5 @@
   "psv": {
     "globalName": "PhotoSphereViewer.GalleryPlugin",
     "style": true
-  },
-  "typedoc": {
-    "displayName": "plugin: Gallery",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

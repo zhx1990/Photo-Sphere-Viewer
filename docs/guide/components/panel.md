@@ -1,6 +1,7 @@
 # Panel
 
-::: module classes/Core.Panel.html
+::: module
+<ApiButton page="classes/Core.Panel.html"/>
 Display HTML content on a sidebar on the left of the viewer.
 :::
 

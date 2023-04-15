@@ -17,9 +17,5 @@
   },
   "psv": {
     "globalName": "PhotoSphereViewer.LittlePlanetAdapter"
-  },
-  "typedoc": {
-    "displayName": "adapter: LittlePlanet",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

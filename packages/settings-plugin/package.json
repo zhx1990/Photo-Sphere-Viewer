@@ -18,9 +18,5 @@
   "psv": {
     "globalName": "PhotoSphereViewer.SettingsPlugin",
     "style": true
-  },
-  "typedoc": {
-    "displayName": "plugin: Settings",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

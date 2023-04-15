@@ -17,9 +17,5 @@
   },
   "psv": {
     "globalName": "PhotoSphereViewer.AutorotatePlugin"
-  },
-  "typedoc": {
-    "displayName": "plugin: Autorotate",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

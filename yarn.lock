@@ -10303,20 +10303,15 @@ typedarray@^0.0.6:
   resolved "https://registry.yarnpkg.com/typedarray/-/typedarray-0.0.6.tgz#867ac74e3864187b1d3d47d996a78ec5c8830777"
   integrity sha512-/aCDEGatGvZ2BIk+HmLf4ifCJFwvKFNb9/JeZPMulfgFracn9QFcAf5GO8B/mweUjSoblS5In0cWhqpfs/5PQA==
 
-typedoc-plugin-extras@^2.3.2:
-  version "2.3.2"
-  resolved "https://registry.yarnpkg.com/typedoc-plugin-extras/-/typedoc-plugin-extras-2.3.2.tgz#1015320935cd01c6d2e793d8198134f33074df24"
-  integrity sha512-g2m8UuGgaD5lNKO6f1p3atEugtTEb/le8IYkAiksmGYZyyF44SvRe8NcaJLq61mC+XRHHszQ664v3Vw9avIrMw==
+typedoc-plugin-extras@^2.3.3:
+  version "2.3.3"
+  resolved "https://registry.yarnpkg.com/typedoc-plugin-extras/-/typedoc-plugin-extras-2.3.3.tgz#274b3fd419392b39d94b25597063e792a7c70e40"
+  integrity sha512-n9zOdVSbGQ8rhsSxtmGCQPVEim345MwpeKl9PUC6ToLR8tu3YYA3BEuR9fP0z+FSx1ExU/kGzxY3sn4+FyHE2w==
 
-typedoc-plugin-resolve-crossmodule-references@^0.3.3:
-  version "0.3.3"
-  resolved "https://registry.yarnpkg.com/typedoc-plugin-resolve-crossmodule-references/-/typedoc-plugin-resolve-crossmodule-references-0.3.3.tgz#812a6e7083f46031c69fe0021bb3913b10bd68cb"
-  integrity sha512-ZWWBy2WR8z9a6iXYGlyB3KrpV+JDdZv1mndYU6Eh6mInrfMCrQJi3Y5K9ihMBfuaBGB//le1nEmQLgzU3IO+dw==
-
-typedoc@^0.23.28:
-  version "0.23.28"
-  resolved "https://registry.yarnpkg.com/typedoc/-/typedoc-0.23.28.tgz#3ce9c36ef1c273fa849d2dea18651855100d3ccd"
-  integrity sha512-9x1+hZWTHEQcGoP7qFmlo4unUoVJLB0H/8vfO/7wqTnZxg4kPuji9y3uRzEu0ZKez63OJAUmiGhUrtukC6Uj3w==
+typedoc@^0.24.1:
+  version "0.24.1"
+  resolved "https://registry.yarnpkg.com/typedoc/-/typedoc-0.24.1.tgz#6b793a800400d46ec1b93246d175608626275c0b"
+  integrity sha512-u4HwjZcSQhQSkkhLjgcs0ooAf6HrFVLDHHrwU2xZW8WxH0KnGZlNkaWxiOcK5Gagj7mxJSgwWx0dv8ACDAOXAQ==
   dependencies:
     lunr "^2.3.9"
     marked "^4.2.12"

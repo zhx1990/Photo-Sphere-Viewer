@@ -38,7 +38,6 @@ export const packageJson = (pkg) =>
         delete content.devDependencies;
         delete content.psv;
         delete content.scripts;
-        delete content.typedoc;
 
         return JSON.stringify(sortPackageJson(content), null, 2);
     });

@@ -3,7 +3,7 @@
 <Badges module="visible-range-plugin"/>
 
 ::: module
-<ApiButton page="modules/plugin__VisibleRange.html"/>
+<ApiButton page="modules/VisibleRangePlugin.html"/>
 Locks the visible area of the panorama.
 
 This plugin is available in the [@photo-sphere-viewer/visible-range-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/visible-range-plugin) package.

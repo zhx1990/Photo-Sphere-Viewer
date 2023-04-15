@@ -17,9 +17,5 @@
   },
   "psv": {
     "globalName": "PhotoSphereViewer.GyroscopePlugin"
-  },
-  "typedoc": {
-    "displayName": "plugin: Gyroscope",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

@@ -18,9 +18,5 @@
   "psv": {
     "globalName": "PhotoSphereViewer.MapPlugin",
     "style": true
-  },
-  "typedoc": {
-    "displayName": "plugin: Map",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

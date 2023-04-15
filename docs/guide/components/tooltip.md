@@ -1,6 +1,7 @@
 # Tooltip
 
-::: module classes/Core.Tooltip.html
+::: module
+<ApiButton page="classes/Core.Tooltip.html"/>
 Add custom tooltips over the viewer.
 :::
 

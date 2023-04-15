@@ -3,7 +3,7 @@
 <Badges module="resolution-plugin"/>
 
 ::: module
-<ApiButton page="modules/plugin__Resolution.html"/>
+<ApiButton page="modules/ResolutionPlugin.html"/>
 Adds a button to choose between multiple resolutions of the panorama. **Requires the [Settings plugin](./settings.md).**
 
 This plugin is available in the [@photo-sphere-viewer/resolution-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/resolution-plugin) package.

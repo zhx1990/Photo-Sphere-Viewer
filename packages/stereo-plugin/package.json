@@ -18,9 +18,5 @@
   },
   "psv": {
     "globalName": "PhotoSphereViewer.StereoPlugin"
-  },
-  "typedoc": {
-    "displayName": "plugin: Stereo",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

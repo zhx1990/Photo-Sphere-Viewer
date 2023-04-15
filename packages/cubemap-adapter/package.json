@@ -17,9 +17,5 @@
   },
   "psv": {
     "globalName": "PhotoSphereViewer.CubemapAdapter"
-  },
-  "typedoc": {
-    "displayName": "adapter: Cubemap",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

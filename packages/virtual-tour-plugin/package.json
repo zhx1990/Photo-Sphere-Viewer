@@ -23,9 +23,5 @@
   "psv": {
     "globalName": "PhotoSphereViewer.VirtualTourPlugin",
     "style": true
-  },
-  "typedoc": {
-    "displayName": "plugin: VirtualTour",
-    "readmeFile": "./.typedoc/README.md"
   }
 }

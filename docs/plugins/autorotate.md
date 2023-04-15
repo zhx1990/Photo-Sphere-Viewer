@@ -3,7 +3,7 @@
 <Badges module="autorotate-plugin"/>
 
 ::: module
-<ApiButton page="modules/plugin__Autorotate.html"/>
+<ApiButton page="modules/AutorotatePlugin.html"/>
 Adds a an automatic rotation the panorama, which starts automatically on idle or with a click on a button. The rotation can also be configured to visit specific points.
 
 This plugin is available in the [@photo-sphere-viewer/autorotate-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/autorotate-plugin) package.
