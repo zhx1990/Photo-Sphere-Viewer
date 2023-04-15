@@ -150,7 +150,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         if (this.markers?.config.markers) {
             utils.logWarn(
                 'No default markers can be configured on Markers plugin when using VirtualTour plugin. ' +
-                    'Consider defining `markers` on each tour node.'
+                'Consider defining `markers` on each tour node.'
             );
             delete this.markers.config.markers;
         }
@@ -430,6 +430,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
                 this.state.loadingNode = null;
 
+
                 return true;
             })
             .catch((err) => {
@@ -456,6 +457,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         node.links.forEach((link) => {
             const position = this.__getLinkPosition(node, link);
+            position.yaw += link.linkOffset?.yaw ?? 0;
+            position.pitch += link.linkOffset?.pitch ?? 0;
             positions.push(position);
 
             if (this.is3D) {

@@ -3,6 +3,7 @@ import type {
     PanoData,
     PanoDataProvider,
     Point,
+    Position,
     Size,
     SphereCorrection,
 } from '@photo-sphere-viewer/core';
@@ -72,6 +73,11 @@ export type VirtualTourLink = Partial<ExtendedPosition> & {
      * define the position of the link (manual mode)
      */
     position?: ExtendedPosition;
+    /**
+     * offset added to the final link position  order to move the marker/arrow 
+     * without affecting where the viewer is rotated before going to the next node
+     */
+    linkOffset?: Partial<Position>;
     /**
      * override the GPS position of the node (GPS mode)
      */

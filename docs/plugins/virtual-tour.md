@@ -312,6 +312,12 @@ Overrides the GPS coordinates of the target node.
 
 Overrides the tooltip content (defaults to the node's `name` property).
 
+#### `linkOffset`
+
+-   type: `{ yaw, pitch }`
+
+Offset added to the final link position  order to move the marker/arrow without affecting where the viewer is rotated before going to the next node.
+
 #### `arrowStyle` (3d mode only)
 
 -   type: `object`
