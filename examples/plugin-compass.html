@@ -13,21 +13,44 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/markers-plugin/index.js"></script>
-        <script src="/dist/compass-plugin/index.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/compass-plugin": "/dist/compass-plugin/index.module.js",
+                    "@photo-sphere-viewer/markers-plugin": "/dist/markers-plugin/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
+            import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
                 panorama: baseUrl + 'sphere.jpg',
                 caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
                 loadingImg: baseUrl + 'loader.gif',
                 plugins: [
-                    [PhotoSphereViewer.MarkersPlugin, {
+                    [CompassPlugin, {
+                        // size: '200px',
+                        // coneColor: 'rgba(150, 50, 50, 0.5)',
+                        // navigationColor: 'rgba(200, 200, 0, 0.5)',
+                        // position: 'bottom left',
+                        // navigation: false,
+                        hotspots: [
+                            { yaw: '0deg' },
+                            { yaw: '90deg' },
+                            { yaw: '180deg' },
+                            { yaw: '270deg' },
+                        ],
+                    }],
+                    [MarkersPlugin, {
                         markers: (() => {
                             const m = [];
                             for (let i = 0, l = Math.random() * 2 + 2; i < l; i++) {
@@ -85,21 +108,12 @@
                             return m;
                         })(),
                     }],
-                    [PhotoSphereViewer.CompassPlugin, {
-                        // size: '200px',
-                        // coneColor: 'rgba(150, 50, 50, 0.5)',
-                        // navigationColor: 'rgba(200, 200, 0, 0.5)',
-                        // position: 'bottom left',
-                        // navigation: false,
-                        hotspots: [
-                            { yaw: '0deg' },
-                            { yaw: '90deg' },
-                            { yaw: '180deg' },
-                            { yaw: '270deg' },
-                        ],
-                    }],
                 ],
             });
+
+            const compass = viewer.getPlugin(CompassPlugin);
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

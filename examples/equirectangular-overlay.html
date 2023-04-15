@@ -11,14 +11,23 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/randomcolor@0.6.2/randomColor.min.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "randomcolor": "https://cdn.jsdelivr.net/npm/randomcolor/+esm",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import randomColor from 'randomcolor';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
                 panorama: baseUrl + 'sphere.jpg',
                 overlay: baseUrl + 'sphere-overlay.png',
@@ -59,6 +68,8 @@
                     viewer.setOverlay(canvas.toDataURL(), 0.8);
                 });
             }
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

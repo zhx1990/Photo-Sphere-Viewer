@@ -13,19 +13,31 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/cubemap-video-adapter/index.js"></script>
-        <script src="/dist/settings-plugin/index.js"></script>
-        <script src="/dist/resolution-plugin/index.js"></script>
-        <script src="/dist/video-plugin/index.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/cubemap-video-adapter": "/dist/cubemap-video-adapter/index.module.js",
+                    "@photo-sphere-viewer/resolution-plugin": "/dist/resolution-plugin/index.module.js",
+                    "@photo-sphere-viewer/settings-plugin": "/dist/settings-plugin/index.module.js",
+                    "@photo-sphere-viewer/video-plugin": "/dist/video-plugin/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { CubemapVideoAdapter } from '@photo-sphere-viewer/cubemap-video-adapter';
+            import { ResolutionPlugin } from '@photo-sphere-viewer/resolution-plugin';
+            import { SettingsPlugin } from '@photo-sphere-viewer/settings-plugin';
+            import { VideoPlugin } from '@photo-sphere-viewer/video-plugin';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
-                adapter: [PhotoSphereViewer.CubemapVideoAdapter, {
+                adapter: [CubemapVideoAdapter, {
                     autoplay: false,
                     muted: true,
                     equiangular: true,
@@ -34,12 +46,12 @@
                 loadingImg: baseUrl + 'loader.gif',
                 navbar: 'video zoom move caption settings fullscreen',
                 plugins: [
-                    [PhotoSphereViewer.VideoPlugin, {
+                    [VideoPlugin, {
                         progressbar: true,
                         bigbutton: true,
                     }],
-                    PhotoSphereViewer.SettingsPlugin,
-                    [PhotoSphereViewer.ResolutionPlugin, {
+                    SettingsPlugin,
+                    [ResolutionPlugin, {
                         defaultResolution: 'FHD',
                         resolutions: [
                             {
@@ -61,6 +73,8 @@
                     }],
                 ],
             });
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

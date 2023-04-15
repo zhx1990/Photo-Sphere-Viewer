@@ -32,7 +32,7 @@ ${
         return {
             entryPoints: [entry],
             outDir: 'dist',
-            format: dev ? ['iife'] : ['iife', 'esm'],
+            format: dev ? ['esm'] : ['iife', 'esm'],
             globalName: pkg.psv.globalName,
             outExtension({ format }) {
                 return {

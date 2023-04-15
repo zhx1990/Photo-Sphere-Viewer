@@ -11,12 +11,22 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/equirectangular-tiles-adapter/index.js"></script>
-        <script src="/dist/gyroscope-plugin/index.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/equirectangular-tiles-adapter": "/dist/equirectangular-tiles-adapter/index.module.js",
+                    "@photo-sphere-viewer/gyroscope-plugin": "/dist/gyroscope-plugin/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { EquirectangularTilesAdapter } from '@photo-sphere-viewer/equirectangular-tiles-adapter';
+            import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
             const panos = [
@@ -93,14 +103,14 @@
                 },
             ];
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
-                adapter: [PhotoSphereViewer.EquirectangularTilesAdapter, {
+                adapter: [EquirectangularTilesAdapter, {
                     showErrorTile: true,
                     baseBlur: true,
                     // debug: true,
                 }],
-                plugins: [PhotoSphereViewer.GyroscopePlugin],
+                plugins: [GyroscopePlugin],
                 loadingImg: baseUrl + 'loader.gif',
                 navbar: [
                     'zoom',
@@ -130,6 +140,8 @@
                 viewer.setOption('minFov', pano.minFov);
                 return viewer.setPanorama(pano.config, pano.options);
             }
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

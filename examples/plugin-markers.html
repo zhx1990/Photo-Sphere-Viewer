@@ -42,12 +42,6 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/gyroscope-plugin/index.js"></script>
-        <script src="/dist/stereo-plugin/index.js"></script>
-        <script src="/dist/markers-plugin/index.js"></script>
-
         <!-- text used for the marker description -->
         <script type="text/template" id="pin-content">
             <h1>HTML Ipsum Presents</h1>
@@ -102,10 +96,27 @@
             </defs>
         </svg>
 
-        <script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/gyroscope-plugin": "/dist/gyroscope-plugin/index.module.js",
+                    "@photo-sphere-viewer/markers-plugin": "/dist/markers-plugin/index.module.js",
+                    "@photo-sphere-viewer/stereo-plugin": "/dist/stereo-plugin/index.module.js"
+                }
+            }
+        </script>
+
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
+            import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+            import { StereoPlugin } from '@photo-sphere-viewer/stereo-plugin';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
                 panorama: baseUrl + 'sphere.jpg',
                 caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -119,7 +130,7 @@
                         content: '💬',
                         title: 'Show all tooltips',
                         className: 'custom-button',
-                        onClick: function () {
+                        onClick: () => {
                             markers.toggleAllTooltips();
                         },
                     },
@@ -127,9 +138,9 @@
                     'fullscreen',
                 ],
                 plugins: [
-                    PhotoSphereViewer.GyroscopePlugin,
-                    PhotoSphereViewer.StereoPlugin,
-                    [PhotoSphereViewer.MarkersPlugin, {
+                    GyroscopePlugin,
+                    StereoPlugin,
+                    [MarkersPlugin, {
                         markers: (() => {
                             const a = [];
 
@@ -418,7 +429,7 @@ tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretiu
                 ],
             });
 
-            const markers = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
+            const markers = viewer.getPlugin(MarkersPlugin);
 
             viewer.addEventListener('ready', () => {
                 markers.showMarkerTooltip('content');
@@ -481,6 +492,8 @@ tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretiu
             markers.addEventListener('marker-visibility', ({ marker, visible }) => {
                 console.log('marker-visibility', marker.id, visible);
             });
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

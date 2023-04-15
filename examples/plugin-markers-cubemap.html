@@ -12,17 +12,27 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/cubemap-adapter/index.js"></script>
-        <script src="/dist/markers-plugin/index.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/cubemap-adapter": "/dist/cubemap-adapter/index.module.js",
+                    "@photo-sphere-viewer/markers-plugin": "/dist/markers-plugin/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { CubemapAdapter } from '@photo-sphere-viewer/cubemap-adapter';
+            import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
-                adapter: PhotoSphereViewer.CubemapAdapter,
+                adapter: CubemapAdapter,
                 panorama: {
                     left: baseUrl + 'cubemap/px.jpg',
                     front: baseUrl + 'cubemap/nz.jpg',
@@ -40,7 +50,7 @@
                         content: '💬',
                         title: 'Show all tooltips',
                         className: 'custom-button',
-                        onClick: function () {
+                        onClick: () => {
                             markers.toggleAllTooltips();
                         },
                     },
@@ -48,7 +58,7 @@
                     'fullscreen',
                 ],
                 plugins: [
-                    [PhotoSphereViewer.MarkersPlugin, {
+                    [MarkersPlugin, {
                         markers: (() => {
                             const a = [];
                             for (let i = 0; i < Math.PI * 2; i += Math.PI / 4) {
@@ -90,7 +100,9 @@
                 ],
             });
 
-            const markers = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
+            const markers = viewer.getPlugin(MarkersPlugin);
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

@@ -11,12 +11,22 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/cubemap-adapter/index.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/randomcolor@0.6.2/randomColor.min.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "randomcolor": "https://cdn.jsdelivr.net/npm/randomcolor/+esm",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/cubemap-adapter": "/dist/cubemap-adapter/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import randomColor from 'randomcolor';
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { CubemapAdapter } from '@photo-sphere-viewer/cubemap-adapter';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
             const panorama = {
@@ -36,9 +46,9 @@
                 bottom: baseUrl + 'cubemap-overlay/ny.png',
             };
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
-                adapter: PhotoSphereViewer.CubemapAdapter,
+                adapter: CubemapAdapter,
                 panorama: panorama,
                 overlay: overlay,
                 overlayOpacity: 0.8,
@@ -94,6 +104,8 @@
                     viewer.setOverlay(panorama, 0.8);
                 });
             }
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

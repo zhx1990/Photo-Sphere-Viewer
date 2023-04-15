@@ -11,11 +11,20 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/little-planet-adapter/index.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/little-planet-adapter": "/dist/little-planet-adapter/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { LittlePlanetAdapter } from '@photo-sphere-viewer/little-planet-adapter';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
             const panos = [
@@ -29,9 +38,9 @@
                 },
             ];
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
-                adapter: PhotoSphereViewer.LittlePlanetAdapter,
+                adapter: LittlePlanetAdapter,
                 panorama: panos[0].url,
                 caption: panos[0].caption,
                 loadingImg: baseUrl + 'loader.gif',
@@ -74,6 +83,8 @@
                     'fullscreen',
                 ],
             });
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

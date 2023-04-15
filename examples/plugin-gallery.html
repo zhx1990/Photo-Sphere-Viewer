@@ -12,11 +12,20 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/gallery-plugin/index.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/gallery-plugin": "/dist/gallery-plugin/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { GalleryPlugin } from '@photo-sphere-viewer/@photo-sphere-viewer/gallery-plugin';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
             const items = [
@@ -98,13 +107,13 @@
                 },
             ];
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
                 loadingImg: baseUrl + 'loader.gif',
                 panorama: items[0].panorama,
                 caption: items[0].options.caption,
                 plugins: [
-                    [PhotoSphereViewer.GalleryPlugin, {
+                    [GalleryPlugin, {
                         items: items,
                         visibleOnLoad: true,
                         // thumbnailSize: {
@@ -115,7 +124,9 @@
                 ],
             });
 
-            const gallery = viewer.getPlugin(PhotoSphereViewer.GalleryPlugin);
+            const gallery = viewer.getPlugin(GalleryPlugin);
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

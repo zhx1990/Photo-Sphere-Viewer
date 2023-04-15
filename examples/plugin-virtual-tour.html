@@ -16,15 +16,28 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/markers-plugin/index.js"></script>
-        <script src="/dist/compass-plugin/index.js"></script>
-        <script src="/dist/gallery-plugin/index.js"></script>
-        <script src="/dist/map-plugin/index.js"></script>
-        <script src="/dist/virtual-tour-plugin/index.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/compass-plugin": "/dist/compass-plugin/index.module.js",
+                    "@photo-sphere-viewer/gallery-plugin": "/dist/gallery-plugin/index.module.js",
+                    "@photo-sphere-viewer/map-plugin": "/dist/map-plugin/index.module.js",
+                    "@photo-sphere-viewer/markers-plugin": "/dist/markers-plugin/index.module.js",
+                    "@photo-sphere-viewer/virtual-tour-plugin": "/dist/virtual-tour-plugin/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
+            import { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
+            import { MapPlugin } from '@photo-sphere-viewer/map-plugin';
+            import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+            import { VirtualTourPlugin } from '@photo-sphere-viewer/virtual-tour-plugin';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
             const markerLighthouse = {
@@ -143,20 +156,20 @@
             const nodesById = {};
             nodes.forEach((node) => (nodesById[node.id] = node));
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
                 loadingImg: baseUrl + 'loader.gif',
                 caption: 'Cape Florida Light, Key Biscayne <b>&copy; Pixexid</b>',
                 defaultYaw: '100deg',
                 plugins: [
-                    PhotoSphereViewer.MarkersPlugin,
-                    PhotoSphereViewer.CompassPlugin,
-                    PhotoSphereViewer.GalleryPlugin,
-                    [PhotoSphereViewer.MapPlugin, {
+                    MarkersPlugin,
+                    CompassPlugin,
+                    GalleryPlugin,
+                    [MapPlugin, {
                         static: true,
                         maxZoom: 150,
                     }],
-                    [PhotoSphereViewer.VirtualTourPlugin, {
+                    [VirtualTourPlugin, {
                         positionMode: 'gps',
                         renderMode: '3d',
                         startNodeId: nodes[1].id,
@@ -192,7 +205,9 @@
                 ],
             });
 
-            const virtualTour = viewer.getPlugin(PhotoSphereViewer.VirtualTourPlugin);
+            const virtualTour = viewer.getPlugin(VirtualTourPlugin);
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

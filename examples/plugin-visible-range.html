@@ -11,15 +11,25 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/autorotate-plugin/index.js"></script>
-        <script src="/dist/visible-range-plugin/index.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/autorotate-plugin": "/dist/autorotate-plugin/index.module.js",
+                    "@photo-sphere-viewer/visible-range-plugin": "/dist/visible-range-plugin/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
+            import { VisibleRangePlugin } from '@photo-sphere-viewer/visible-range-plugin';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
                 panorama: baseUrl + 'sphere-cropped.jpg', // this file has XMP data
                 caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -54,14 +64,16 @@
                     'fullscreen',
                 ],
                 plugins: [
-                    PhotoSphereViewer.AutorotatePlugin,
-                    [PhotoSphereViewer.VisibleRangePlugin, {
+                    AutorotatePlugin,
+                    [VisibleRangePlugin, {
                         usePanoData: true,
                     }],
                 ],
             });
 
-            const visibleRange = viewer.getPlugin(PhotoSphereViewer.VisibleRangePlugin);
+            const visibleRange = viewer.getPlugin(VisibleRangePlugin);
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>

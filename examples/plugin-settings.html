@@ -12,20 +12,29 @@
     <body>
         <div id="photosphere"></div>
 
-        <script src="/node_modules/three/build/three.js"></script>
-        <script src="/dist/core/index.js"></script>
-        <script src="/dist/settings-plugin/index.js"></script>
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/settings-plugin": "/dist/settings-plugin/index.module.js"
+                }
+            }
+        </script>
 
-        <script>
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { SettingsPlugin } from '@photo-sphere-viewer/settings-plugin';
+
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-            const viewer = new PhotoSphereViewer.Viewer({
+            const viewer = new Viewer({
                 container: 'photosphere',
                 panorama: baseUrl + 'sphere.jpg',
                 caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
                 loadingImg: baseUrl + 'loader.gif',
                 plugins: [
-                    [PhotoSphereViewer.SettingsPlugin, {
+                    [SettingsPlugin, {
                         persist: true, // default
                         // storage: { // default is localStorage
                         //     get(id) {
@@ -39,7 +48,7 @@
                 ],
             });
 
-            const settings = viewer.getPlugin(PhotoSphereViewer.SettingsPlugin);
+            const settings = viewer.getPlugin(SettingsPlugin);
 
             let currentToggle = true;
             let currentOption = 'A';
@@ -68,6 +77,8 @@
             settings.addEventListener('setting-changed', ({ settingId, settingValue }) => {
                 console.log(`${settingId}: ${settingValue}`);
             });
+
+            window.viewer = viewer;
         </script>
     </body>
 </html>
