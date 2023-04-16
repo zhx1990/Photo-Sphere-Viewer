@@ -8,7 +8,7 @@ import pkg from './package.json';
  */
 describe('UMD', () => {
     it('should correctly wrap iife to umd', () => {
-        execSync('yarn build');
+        execSync('yarn build:test');
 
         const output = readFileSync('./dist/index.js', { encoding: 'utf8' });
 

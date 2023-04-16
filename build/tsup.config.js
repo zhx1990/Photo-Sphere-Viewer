@@ -29,6 +29,8 @@ ${
 
     return defineConfig((options) => {
         const dev = options.watch || options.define?.['config'] === 'dev';
+        const dts = !dev && options.define?.['dts'] !== 'off';
+
         return {
             entryPoints: [entry],
             outDir: 'dist',
@@ -39,7 +41,7 @@ ${
                     js: format === 'iife' ? '.js' : '.module.js',
                 };
             },
-            dts: !dev,
+            dts: dts,
             sourcemap: true,
             external: Object.keys(externals),
             noExternal: [/three\/examples\/.*/],
