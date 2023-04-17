@@ -147,7 +147,7 @@ export type VirtualTourPluginConfig = {
     positionMode?: 'manual' | 'gps';
     /**
      * configure rendering mode of links
-     * @defaul '3d'
+     * @default '3d'
      */
     renderMode?: '3d' | 'markers';
     /**
@@ -168,7 +168,7 @@ export type VirtualTourPluginConfig = {
     preload?: boolean | ((node: VirtualTourNode, link: VirtualTourLink) => boolean);
     /**
      * speed of rotation when clicking on a link, if 'false' the viewer won't rotate at all
-     * @defaul '20rpm'
+     * @default '20rpm'
      */
     rotateSpeed?: false | string | number;
     /**
