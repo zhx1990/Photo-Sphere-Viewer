@@ -8,9 +8,9 @@ Official plugins (listed on the left menu) are available in various `@photo-sphe
 
 **Example for the Markers plugin:**
 
-:::: tabs
+::::: tabs
 
-::: tab Direct import
+:::: tab Direct import
 
 ```html
 <!-- base imports of PSV and dependencies -->
@@ -20,18 +20,21 @@ Official plugins (listed on the left menu) are available in various `@photo-sphe
 <script src="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin/index.min.js"></script>
 ```
 
-:::
+::::
 
-::: tab ES import
-Import `@photo-sphere-viewer/markers-plugin/index.css` with the prefered way depending on your tooling.
+:::: tab ES import
 
 ```js
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 ```
 
+::: tip Stylesheet
+Import `@photo-sphere-viewer/markers-plugin/index.css` with the prefered way depending on your tooling.
 :::
 
 ::::
+
+:::::
 
 ## Using a plugin
 

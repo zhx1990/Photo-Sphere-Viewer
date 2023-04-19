@@ -36,9 +36,9 @@ You can also [download the latest release](https://github.com/mistic100/Photo-Sp
 
 Include all JS & CSS files in your page manually or with your favorite bundler and init the viewer.
 
-:::: tabs
+::::: tabs
 
-::: tab Direct import
+:::: tab Direct import
 
 ```html
 <head>
@@ -62,10 +62,9 @@ Include all JS & CSS files in your page manually or with your favorite bundler a
 </script>
 ```
 
-:::
+::::
 
-::: tab ES import
-Import `@photo-sphere-viewer/core/index.css` with the prefered way depending on your tooling.
+:::: tab ES import
 
 ```html
 <head>
@@ -86,9 +85,13 @@ const viewer = new Viewer({
 });
 ```
 
+::: tip Stylesheet
+Import `@photo-sphere-viewer/core/index.css` with the prefered way depending on your tooling.
 :::
 
 ::::
+
+:::::
 
 <br>
 

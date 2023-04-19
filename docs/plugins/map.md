@@ -1,4 +1,4 @@
-# MapPlugin
+# MapPlugin <Badge text="Styles"/>
 
 <Badges module="map-plugin"/>
 
@@ -6,7 +6,7 @@
 <ApiButton page="modules/MapPlugin.html"/>
 Adds a interactive map on the viewer, with zoom/pan and optional hotspots.
 
-This plugin is available in the [@photo-sphere-viewer/map-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/map-plugin) package. **It has a stylesheet.**
+This plugin is available in the [@photo-sphere-viewer/map-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/map-plugin) package.
 :::
 
 [[toc]]

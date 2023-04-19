@@ -1,4 +1,4 @@
-# VideoPlugin
+# VideoPlugin <Badge text="Styles"/>
 
 <Badges module="video-plugin"/>
 
@@ -6,7 +6,7 @@
 <ApiButton page="modules/VideoPlugin.html"/>
 Adds controls to the video [adapters](../guide/adapters/).
 
-This plugin is available in the [@photo-sphere-viewer/video-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/video-plugin) package. **It has a stylesheet.**
+This plugin is available in the [@photo-sphere-viewer/video-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/video-plugin) package.
 :::
 
 [[toc]]

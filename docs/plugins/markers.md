@@ -1,4 +1,4 @@
-# MarkersPlugin
+# MarkersPlugin <Badge text="Styles"/>
 
 <Badges module="markers-plugin"/>
 
@@ -6,7 +6,7 @@
 <ApiButton page="modules/MarkersPlugin.html"/>
 Displays various shapes, images and texts on the viewer.
 
-This plugin is available in the [@photo-sphere-viewer/markers-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/markers-plugin) package. **It has a stylesheet.**
+This plugin is available in the [@photo-sphere-viewer/markers-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/markers-plugin) package.
 :::
 
 [[toc]]
@@ -254,7 +254,7 @@ One, and only one, of these options is required for each marker.
 | `square`         | `integer`                                | Size of the square.                                                                     |
 | `rect`           | `integer[2]`<br>`{width:int,height:int}` | Size of the rectangle.                                                                  |
 | `circle`         | `integer`                                | Radius of the circle.                                                                   |
-| `ellipse`        | `integer[2]`<br>`{cx:int,cy:int}`        | Radiuses of the ellipse.                                                                |
+| `ellipse`        | `integer[2]`<br>`{rx:int,ry:int}`        | Radiuses of the ellipse.                                                                |
 | `path`           | `string`                                 | Definition of the path (0,0 will be placed at the defined `position`).                  |
 | `polygon`        | `double[2][]`<br>`string[2][]`           | Array of points defining the polygon in spherical coordinates.                          |
 | `polygonPixels`  | `integer[2][]`                           | Same as `polygon` but in pixel coordinates on the panorama image.                       |
@@ -273,7 +273,7 @@ One, and only one, of these options is required for each marker.
   rect: {width: 10, height: 5},
   circle: 10,
   ellipse: [10, 5],
-  ellipse: {cx: 10, cy: 5},
+  ellipse: {rx: 10, ry: 5},
   path: 'M 0 0 L 60 60 L 60 0 L 0 60 L 0 0',
   polygon: [[0.2, 0.4], [0.9, 1.1], [1.5, 0.7]],
   polygonPixels: [[100, 200], [150, 300], [300, 200]],

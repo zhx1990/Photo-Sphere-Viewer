@@ -1,4 +1,4 @@
-# VirtualTourPlugin
+# VirtualTourPlugin <Badge text="Styles"/>
 
 <Badges module="virtual-tour-plugin"/>
 
@@ -6,7 +6,7 @@
 <ApiButton page="modules/VirtualTourPlugin.html"/>
 Create virtual tours by linking multiple panoramas.
 
-This plugin is available in the [@photo-sphere-viewer/virtual-tour-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/virtual-tour-plugin) package. **It has a stylesheet.**
+This plugin is available in the [@photo-sphere-viewer/virtual-tour-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/virtual-tour-plugin) package.
 :::
 
 [[toc]]
@@ -489,9 +489,12 @@ This configuration is required if `positionMode=manual`. You can also choose to 
 
 To define the position of the node on the map you have to configure its `map` property with `x` and `y`. You can also configure other things like `color`, `image` and `size`. Please refer to the [Hotspots section](map.md#hotspots-2) of the Map plugin.
 
-```js{7}
+```js{10}
 plugins: [
     [VirtualTourPlugin, {
+        map: {
+            imageUrl: 'map.jpg',
+        },
         nodes: [
             {
                 id: 'node-1',
@@ -511,7 +514,7 @@ This configuration can only be used if `positionMode=gps`.
 
 You have to provide additional metadata about the map for the automatic positionning to work : its `size` in pixels and its `extent` (GPS bounds).
 
-```js{5-6}
+```js{5-6,13}
 plugins: [
     [VirtualTourPlugin, {
         map: {
@@ -519,6 +522,14 @@ plugins: [
             size: { width: 1600, height: 1200 },
             extent: [-80.158123, 25.668050, -80.153824, 25.665308],
         },
+        nodes: [
+            {
+                id: 'node-1',
+                panorama: '001.jpg',
+                gps: [-80.155487, 25.666000]
+                map: { color: 'red' },
+            },
+        ],
     }],
 ],
 ```

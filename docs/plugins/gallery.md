@@ -1,4 +1,4 @@
-# GalleryPlugin
+# GalleryPlugin <Badge text="Styles"/>
 
 <Badges module="gallery-plugin"/>
 
@@ -6,7 +6,7 @@
 <ApiButton page="modules/GalleryPlugin.html"/>
 Adds a gallery on the bottom of the viewer to navigate between multiple panoramas.
 
-This plugin is available in the [@photo-sphere-viewer/gallery-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/gallery-plugin) package. **It has a stylesheet.**
+This plugin is available in the [@photo-sphere-viewer/gallery-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/gallery-plugin) package.
 :::
 
 [[toc]]
