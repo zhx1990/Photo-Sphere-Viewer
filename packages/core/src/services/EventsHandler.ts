@@ -437,9 +437,10 @@ export class EventsHandler extends AbstractService {
                 this.__resetMove();
                 this.viewer.resetIdleTimer();
             }
-        } else if (this.__isStep(Step.CLICK)) {
-            this.viewer.stopAnimation();
-            this.__doClick(clientX, clientY, target, rightclick);
+        } else {
+            if (this.__isStep(Step.CLICK) && !this.__moveThresholdReached(clientX, clientY)) {
+                this.__doClick(clientX, clientY, target, rightclick);
+            }
             this.__resetMove();
             this.viewer.resetIdleTimer();
         }
@@ -605,11 +606,7 @@ export class EventsHandler extends AbstractService {
      * Starts moving when crossing moveThreshold and performs movement
      */
     private __doMove(clientX: number, clientY: number) {
-        if (
-            this.__isStep(Step.CLICK)
-            && (Math.abs(clientX - this.data.startMouseX) >= this.moveThreshold
-                || Math.abs(clientY - this.data.startMouseY) >= this.moveThreshold)
-        ) {
+        if (this.__isStep(Step.CLICK) && this.__moveThresholdReached(clientX, clientY)) {
             this.viewer.stopAll();
             this.__resetMove();
             this.data.step = Step.MOVING;
@@ -620,6 +617,14 @@ export class EventsHandler extends AbstractService {
             this.__applyMove(clientX, clientY);
             this.__logMouseMove(clientX, clientY);
         }
+    }
+
+    /**
+     * Checks if the cursor was move beyond the move threshold
+     */
+    private __moveThresholdReached(clientX: number, clientY: number) {
+        return Math.abs(clientX - this.data.startMouseX) >= this.moveThreshold
+            || Math.abs(clientY - this.data.startMouseY) >= this.moveThreshold;
     }
 
     /**
