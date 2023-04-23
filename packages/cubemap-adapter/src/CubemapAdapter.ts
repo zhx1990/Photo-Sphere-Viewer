@@ -122,7 +122,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
             const ctx = buffer.getContext('2d');
 
             if (this.config.blur) {
-                ctx.filter = 'blur(1px)';
+                ctx.filter = `blur(${buffer.width / 512}px)`;
             }
 
             ctx.drawImage(img, 0, 0, buffer.width, buffer.height);

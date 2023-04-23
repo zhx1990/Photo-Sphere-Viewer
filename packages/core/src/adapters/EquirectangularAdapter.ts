@@ -180,7 +180,7 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
             const ctx = buffer.getContext('2d');
 
             if (this.config.blur) {
-                ctx.filter = 'blur(1px)';
+                ctx.filter = `blur(${buffer.width / 2048}px)`;
             }
 
             ctx.drawImage(
