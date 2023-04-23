@@ -80,15 +80,9 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
             return Promise.reject(new PSVError('Invalid panorama url, are you using the right adapter?'));
         }
 
-        let img: HTMLImageElement;
-        let xmpPanoData: PanoData;
-
-        if (useXmpPanoData) {
-            xmpPanoData = await this.loadXMP(panorama, (p) => this.viewer.loader.setProgress(p));
-            img = await this.viewer.textureLoader.loadImage(panorama);
-        } else {
-            img = await this.viewer.textureLoader.loadImage(panorama, (p) => this.viewer.loader.setProgress(p));
-        }
+        const blob = await this.viewer.textureLoader.loadFile(panorama, (p) => this.viewer.loader.setProgress(p));
+        const xmpPanoData = useXmpPanoData ? await this.loadXMP(blob) : null;
+        const img = await this.viewer.textureLoader.blobToImage(blob);
 
         if (typeof newPanoData === 'function') {
             newPanoData = newPanoData(img);
@@ -122,8 +116,7 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
     /**
      * Loads the XMP data of an image
      */
-    private async loadXMP(panorama: string, onProgress?: (p: number) => void): Promise<PanoData> {
-        const blob = await this.viewer.textureLoader.loadFile(panorama, onProgress);
+    private async loadXMP(blob: Blob): Promise<PanoData> {
         const binary = await this.loadBlobAsString(blob);
 
         const a = binary.indexOf('<x:xmpmeta');

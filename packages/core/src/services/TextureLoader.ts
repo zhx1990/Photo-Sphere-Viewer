@@ -77,18 +77,22 @@ export class TextureLoader extends AbstractService {
      * Loads an Image using FileLoader to have progress events
      */
     loadImage(url: string, onProgress?: (p: number) => void): Promise<HTMLImageElement> {
-        return this.loadFile(url, onProgress).then(
-            (result) =>
-                new Promise((resolve, reject) => {
-                    const img = document.createElement('img');
-                    img.onload = () => {
-                        URL.revokeObjectURL(img.src);
-                        resolve(img);
-                    };
-                    img.onerror = reject;
-                    img.src = URL.createObjectURL(result);
-                })
-        );
+        return this.loadFile(url, onProgress).then((blob) => this.blobToImage(blob));
+    }
+
+    /**
+     * Converts a file loaded with {@link loadFile} into an image
+     */
+    blobToImage(blob: Blob): Promise<HTMLImageElement> {
+        return new Promise((resolve, reject) => {
+            const img = document.createElement('img');
+            img.onload = () => {
+                URL.revokeObjectURL(img.src);
+                resolve(img);
+            };
+            img.onerror = reject;
+            img.src = URL.createObjectURL(blob);
+        });
     }
 
     /**
