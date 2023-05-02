@@ -80,7 +80,9 @@ export class Marker {
             this.element = document.createElementNS(SVG_NS, 'polyline');
         } else if (this.isSvg()) {
             const svgType = this.type === MarkerType.square ? 'rect' : this.type;
-            this.element = document.createElementNS(SVG_NS, svgType);
+            const elt = document.createElementNS(SVG_NS, svgType);
+            this.element = document.createElementNS(SVG_NS, 'svg');
+            this.domElement.appendChild(elt);
         } else if (this.is3d()) {
             this.element = this.__createMesh();
             this.loader = new TextureLoader();
@@ -329,10 +331,11 @@ export class Marker {
             const element = this.domElement;
 
             // reset CSS class
-            if (this.isNormal()) {
-                element.setAttribute('class', 'psv-marker psv-marker--normal');
+            element.setAttribute('class', 'psv-marker');
+            if (this.isNormal() || this.isSvg()) {
+                element.classList.add('psv-marker--normal');
             } else {
-                element.setAttribute('class', 'psv-marker psv-marker--svg');
+                element.classList.add('psv-marker--poly');
             }
 
             // add CSS classes
@@ -387,12 +390,15 @@ export class Marker {
             this.state.dynamicSize = true;
         }
 
-        if (this.config.image) {
-            this.definition = this.config.image;
-            element.style.backgroundImage = `url(${this.config.image})`;
-        } else if (this.config.html) {
-            this.definition = this.config.html;
-            element.innerHTML = this.config.html;
+        switch (this.type) {
+            case MarkerType.image:
+                this.definition = this.config.image;
+                element.style.backgroundImage = `url(${this.config.image})`;
+                break;
+            case MarkerType.html:
+                this.definition = this.config.html;
+                element.innerHTML = this.config.html;
+                break
         }
 
         // set anchor
@@ -409,7 +415,7 @@ export class Marker {
      * Updates an SVG marker
      */
     private __updateSvg() {
-        const element = this.domElement;
+        const svgElement = this.domElement.firstElementChild as SVGElement;
 
         if (!utils.isExtendedPosition(this.config.position)) {
             throw new PSVError('missing marker position');
@@ -482,17 +488,20 @@ export class Marker {
         }
 
         Object.entries(this.definition).forEach(([prop, value]) => {
-            element.setAttributeNS(null, prop, value as string);
+            svgElement.setAttributeNS(null, prop, value as string);
         });
 
         // set style
         if (this.config.svgStyle) {
             Object.entries(this.config.svgStyle).forEach(([prop, value]) => {
-                element.setAttributeNS(null, utils.dasherize(prop), value);
+                svgElement.setAttributeNS(null, utils.dasherize(prop), value);
             });
         } else {
-            element.setAttributeNS(null, 'fill', 'rgba(0,0,0,0.5)');
+            svgElement.setAttributeNS(null, 'fill', 'rgba(0,0,0,0.5)');
         }
+
+        // set anchor
+        svgElement.style.transformOrigin = `${this.state.anchor.x * 100}% ${this.state.anchor.y * 100}%`;
 
         // convert texture coordinates to spherical coordinates
         this.state.position = this.viewer.dataHelper.cleanPosition(this.config.position);
@@ -658,6 +667,51 @@ export class Marker {
         });
 
         return element;
+    }
+
+    /**
+     * Computes the real size of a marker
+     * @description This is done by removing all it's transformations (if any) and making it visible
+     * before querying its bounding rect
+     */
+    updateSize() {
+        if (!this.state.dynamicSize) {
+            return;
+        }
+        if (!this.isNormal() && !this.isSvg()) {
+            return;
+        }
+
+        const element = this.domElement;
+
+        element.classList.add('psv-marker--transparent');
+
+        const transform = element.style.transform;
+        element.style.transform = '';
+
+        let rect;
+        if (this.isSvg()) {
+            rect = (element.firstElementChild as SVGElement).getBoundingClientRect();
+            // the real size must be declared on the SVG root
+            element.style.width = rect.width + 'px';
+            element.style.height = rect.height + 'px';
+        } else {
+            rect = element.getBoundingClientRect();
+        }
+
+        this.state.size = {
+            width: rect.width,
+            height: rect.height,
+        };
+
+        element.classList.remove('psv-marker--transparent');
+
+        if (transform) {
+            element.style.transform = transform;
+        }
+
+        // the size is no longer dynamic once known
+        this.state.dynamicSize = false;
     }
 
     /**

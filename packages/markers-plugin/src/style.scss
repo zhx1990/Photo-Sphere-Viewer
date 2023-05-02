@@ -25,6 +25,7 @@
         top: 0;
         left: 0;
         z-index: $psv-marker-zindex;
+        overflow: visible;
         background-size: contain;
         background-repeat: no-repeat;
     }

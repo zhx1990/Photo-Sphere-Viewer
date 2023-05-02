@@ -268,14 +268,12 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
         const marker = new Marker(this.viewer, config);
 
-        if (marker.isNormal()) {
-            this.container.appendChild(marker.domElement);
-        } else if (marker.isPoly() || marker.isSvg()) {
+        if (marker.isPoly()) {
             this.svgContainer.appendChild(marker.domElement);
         } else if (marker.is3d()) {
             this.viewer.renderer.addObject(marker.threeElement);
         } else {
-            throw new PSVError('invalid state');
+            this.container.appendChild(marker.domElement);
         }
 
         this.markers[marker.id] = marker;
@@ -326,12 +324,12 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     removeMarker(markerId: string | MarkerConfig, render = true) {
         const marker = this.getMarker(markerId);
 
-        if (marker.isNormal()) {
-            this.container.removeChild(marker.domElement);
-        } else if (marker.isPoly() || marker.isSvg()) {
+        if (marker.isPoly()) {
             this.svgContainer.removeChild(marker.domElement);
         } else if (marker.is3d()) {
             this.viewer.renderer.removeObject(marker.threeElement);
+        } else {
+            this.container.removeChild(marker.domElement);
         }
 
         if (this.state.hoveringMarker === marker) {
@@ -560,9 +558,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
                     marker.domElement.setAttributeNS(null, 'transform', `translate(${position.x} ${position.y})`);
                 }
             } else if (isVisible) {
-                if (marker.state.dynamicSize) {
-                    this.__updateMarkerSize(marker);
-                }
+                marker.updateSize();
 
                 position = this.__getMarkerPosition(marker);
                 isVisible = this.__isMarkerVisible(marker, position);
@@ -570,18 +566,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
                 if (isVisible) {
                     const scale = marker.getScale(zoomLevel, viewerPosition);
 
-                    if (marker.isSvg()) {
-                        // simulate transform-origin relative to SVG element
-                        const x = position.x + marker.state.size.width * marker.state.anchor.x * (1 - scale);
-                        const y = position.y + marker.state.size.height * marker.state.anchor.y * (1 - scale);
-                        marker.domElement.setAttributeNS(
-                            null,
-                            'transform',
-                            `translate(${x}, ${y}) scale(${scale}, ${scale})`
-                        );
-                    } else {
-                        marker.domElement.style.transform = `translate3D(${position.x}px, ${position.y}px, 0px) scale(${scale}, ${scale})`;
-                    }
+                    marker.domElement.style.transform = `translate3D(${position.x}px, ${position.y}px, 0px) scale(${scale}, ${scale})`;
                 }
             }
 
@@ -622,45 +607,6 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
             && position.x - marker.state.size.width <= this.viewer.state.size.width
             && position.y + marker.state.size.height >= 0
             && position.y - marker.state.size.height <= this.viewer.state.size.height;
-    }
-
-    /**
-     * Computes the real size of a marker
-     * @description This is done by removing all it's transformations (if any) and making it visible
-     * before querying its bounding rect
-     */
-    private __updateMarkerSize(marker: Marker) {
-        const element = marker.domElement;
-
-        element.classList.add('psv-marker--transparent');
-
-        let transform;
-        if (marker.isSvg()) {
-            transform = element.getAttributeNS(null, 'transform');
-            element.removeAttributeNS(null, 'transform');
-        } else {
-            transform = element.style.transform;
-            element.style.transform = '';
-        }
-
-        const rect = element.getBoundingClientRect();
-        marker.state.size = {
-            width: rect.width,
-            height: rect.height,
-        };
-
-        element.classList.remove('psv-marker--transparent');
-
-        if (transform) {
-            if (marker.isSvg()) {
-                element.setAttributeNS(null, 'transform', transform);
-            } else {
-                element.style.transform = transform;
-            }
-        }
-
-        // the size is no longer dynamic once known
-        marker.state.dynamicSize = false;
     }
 
     /**
