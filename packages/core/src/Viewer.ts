@@ -382,6 +382,10 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                     this.renderer.setPanoramaPose(textureData.panoData);
                     this.renderer.setSphereCorrection(options.sphereCorrection);
 
+                    if (!this.state.ready) {
+                        this.init();
+                    }
+
                     this.dispatchEvent(new PanoramaLoadedEvent(textureData));
 
                     if (zoomProvided) {
@@ -389,10 +393,6 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                     }
                     if (positionProvided) {
                         this.rotate(options);
-                    }
-
-                    if (!this.state.ready) {
-                        this.init();
                     }
                 })
                 .then(

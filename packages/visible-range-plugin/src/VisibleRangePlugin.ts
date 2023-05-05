@@ -77,6 +77,8 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
             case events.PanoramaLoadedEvent.type:
                 if (this.config.usePanoData) {
                     this.setRangesFromPanoData();
+                } else {
+                    this.__moveToRange();
                 }
                 break;
 
@@ -138,7 +140,7 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
             }
 
             if (this.viewer.state.ready) {
-                this.viewer.rotate(this.viewer.getPosition());
+                this.__moveToRange();
             }
         } else {
             this.config.verticalRange = null;
@@ -160,7 +162,7 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
             this.config.horizontalRange = range.map((angle) => utils.parseAngle(angle)) as any;
 
             if (this.viewer.state.ready) {
-                this.viewer.rotate(this.viewer.getPosition());
+                this.__moveToRange();
             }
         } else {
             this.config.horizontalRange = null;
@@ -202,6 +204,13 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
     }
 
     /**
+     * Immediately moves the viewer to respect the ranges
+     */
+    private __moveToRange() {
+        this.viewer.rotate(this.viewer.getPosition());
+    }
+
+    /**
      * Apply "horizontalRange" and "verticalRange"
      */
     private __applyRanges(
@@ -215,11 +224,18 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
         const hFov = this.viewer.dataHelper.vFovToHFov(vFov);
 
         if (this.config.horizontalRange) {
-            const range = utils.clone(this.config.horizontalRange) as any;
-            const offset = MathUtils.degToRad(hFov) / 2;
+            const range = utils.clone(this.config.horizontalRange) as [number, number];
+            const rangeFov = range[0] > range[1] ? range[1] + (2 * Math.PI - range[0]) : range[1] - range[0];
 
-            range[0] = utils.parseAngle(range[0] + offset);
-            range[1] = utils.parseAngle(range[1] - offset);
+            // for very narrow ranges, lock the horizontal angle to the center
+            if (rangeFov <= MathUtils.degToRad(hFov)) {
+                range[0] = utils.parseAngle(range[0] + rangeFov / 2);
+                range[1] = range[0];
+            } else {
+                const offset = MathUtils.degToRad(hFov) / 2;
+                range[0] = utils.parseAngle(range[0] + offset);
+                range[1] = utils.parseAngle(range[1] - offset);
+            }
 
             if (range[0] > range[1]) {
                 // when the range cross horizontal origin
@@ -243,16 +259,17 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
         }
 
         if (this.config.verticalRange) {
-            const range = utils.clone(this.config.verticalRange) as any;
-            const offset = MathUtils.degToRad(vFov) / 2;
+            const range = utils.clone(this.config.verticalRange) as [number, number];
+            const rangeFov = range[1] - range[0];
 
-            range[0] = utils.parseAngle(range[0] + offset, true);
-            range[1] = utils.parseAngle(range[1] - offset, true);
-
-            // for very a narrow images, lock the horizontal angle to the center
-            if (range[0] > range[1]) {
-                range[0] = (range[0] + range[1]) / 2;
+            // for very narrow ranges, lock the vertical angle to the center
+            if (rangeFov <= MathUtils.degToRad(vFov)) {
+                range[0] = utils.parseAngle(range[0] + rangeFov / 2, true);
                 range[1] = range[0];
+            } else {
+                const offset = MathUtils.degToRad(vFov) / 2;
+                range[0] = utils.parseAngle(range[0] + offset, true);
+                range[1] = utils.parseAngle(range[1] - offset, true);
             }
 
             if (position.pitch < range[0]) {
