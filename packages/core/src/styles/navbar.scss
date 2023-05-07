@@ -8,6 +8,7 @@
     height: $psv-navbar-height;
     background: $psv-navbar-background;
     transition: bottom ease-in-out 0.1s;
+    font: $psv-caption-font;
 
     &--open {
         bottom: 0;
@@ -42,6 +43,7 @@
         width: 100%;
         transform: scale(1);
         transition: transform $psv-buttons-hover-scale-delay ease;
+        vertical-align: initial;
     }
 }
 
@@ -76,7 +78,6 @@
     &-content {
         display: inline-block;
         padding: $psv-buttons-padding;
-        font: $psv-caption-font;
         white-space: nowrap;
     }
 }
