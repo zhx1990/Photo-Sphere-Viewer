@@ -300,6 +300,7 @@ Unique identifier of the marker.
 -   type: `{ yaw, pitch } | { textureX, textureY }`
 
 Position of the marker in **spherical coordinates** (radians/degrees) or **texture coordinates** (pixels).
+
 _(This option is ignored for polygons and polylines)._
 
 #### `size` (required for images, recommended for html)
@@ -307,6 +308,7 @@ _(This option is ignored for polygons and polylines)._
 -   type: `{ width, height }`
 
 Size of the marker in pixels.
+
 _(This option is ignored for polygons and polylines)._
 
 #### `orientation` (only for `imageLayer`)
@@ -322,7 +324,8 @@ Applies a perspective on the image to make it look like placed on the floor or o
 -   default: no scalling
 
 Configures the scale of the marker depending on the zoom level and/or the horizontal angle offset. This aims to give a natural feeling to the size of the marker as the users zooms and moves.
-_(This option is ignored for polygons, polylines and imageLayer)._
+
+_(This option is ignored for polygons, polylines and `imageLayer` markers)._
 
 :::: tabs
 
@@ -364,6 +367,29 @@ scale: {
 
 ::::
 
+#### `hoverScale`
+
+-   type: `boolean | number | { amount?: number, duration?: number, easing?: string }`
+-   default: `null`
+
+Overrides the [global `defaultHoverScale`](#defaulthoverscale). The configuration is merged with the default configuration of x2 scalling in 100ms with a linear easing. Defining `hoverScale: false` allows to disable the scaling for this marker.
+
+_(This option is ignored for polygons, polylines and `imageLayer` markers)._
+
+```js
+{
+    defaultHoverScale: { amount: 1.5, duration: 150 },
+    markers: [
+        {
+            ...,
+            hoverScale: { amount: 3 },
+            hoverScale: 3,
+            hoverScale: false,
+        },
+    ],
+}
+```
+
 #### `opacity`
 
 -   type: `number`
@@ -376,6 +402,7 @@ Opacity of the marker.
 -   type: `string`
 
 CSS class(es) added to the marker element.
+
 _(This option is ignored for `imageLayer` markers)._
 
 #### `style`
@@ -383,6 +410,7 @@ _(This option is ignored for `imageLayer` markers)._
 -   type: `object`
 
 CSS properties to set on the marker (background, border, etc.).
+
 _(This option is ignored for `imageLayer` markers)._
 
 ```js
@@ -432,6 +460,7 @@ And use it in your marker : `fill: 'url(#image)'`.
 -   default: `'center center'`
 
 Defines where the marker is placed toward its defined position. Any CSS position is valid like `bottom center` or `20% 80%`.
+
 _(This option is ignored for polygons and polylines)._
 
 #### `zoomLvl`
@@ -506,6 +535,13 @@ Any custom data you want to attach to the marker. You may access this data in th
 -   updatable: no, use `setMarkers()` method
 
 Initial list of markers.
+
+#### `defaultHoverScale`
+
+-   type: `boolean | number | { amount?: number, duration?: number, easing?: string }`
+-   default: `null`
+
+Default mouse hover scalling applied to all markers, can be overriden with each marker [`hoverScale` parameter](#hoverscale). Defining `defaultHoverScale: true` will use the default configuration of x2 scalling in 100ms with a linear easing.
 
 #### `gotoMarkerSpeed`
 

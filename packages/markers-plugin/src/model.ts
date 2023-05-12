@@ -77,6 +77,11 @@ export type MarkerConfig = {
         | { zoom?: [number, number]; yaw?: [number, number] }
         | ((zoomLevel: number, position: Position) => number);
     /**
+     * Overrides the global `defaultHoverScale`
+     * @default null
+     */
+    hoverScale?: boolean | number | { amount?: number; duration?: number; easing?: string; };
+    /**
      * Opacity of the marker
      * @default 1
      */
@@ -133,11 +138,12 @@ export type MarkerConfig = {
     data?: any;
 };
 
-export type ParsedMarkerConfig = Omit<MarkerConfig, 'scale' | 'tooltip'> & {
+export type ParsedMarkerConfig = Omit<MarkerConfig, 'scale' | 'tooltip' | 'hoverScale'> & {
     scale?:
         | { zoom?: [number, number]; yaw?: [number, number] }
         | ((zoomLevel: number, position: Position) => number);
     tooltip?: { content: string; position?: string; className?: string; trigger?: 'hover' | 'click' };
+    hoverScale?: { amount: number; duration: number; easing: string; };
 };
 
 export type MarkersPluginConfig = {
@@ -155,6 +161,16 @@ export type MarkersPluginConfig = {
      * @default '8rpm'
      */
     gotoMarkerSpeed?: string | number;
+    /**
+     * Default mouse hover scalling parameters applied to all markers
+     * (`true` = `{ amount: 2, duration: 100, easing: 'linear' }`)
+     * @default null
+     */
+    defaultHoverScale?: boolean | number | { amount?: number; duration?: number; easing?: string; };
+};
+
+export type ParsedMarkersPluginConfig = Omit<MarkersPluginConfig, 'defaultHoverScale'> & {
+    defaultHoverScale?: { amount: number; duration: number; easing: string; };
 };
 
 export type UpdatableMarkersPluginConfig = Omit<MarkersPluginConfig, 'markers'>;

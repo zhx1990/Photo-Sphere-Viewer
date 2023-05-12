@@ -1,7 +1,7 @@
-import type { Point, Tooltip, Viewer } from '@photo-sphere-viewer/core';
+import type { Point, Position, Tooltip, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractConfigurablePlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import { Vector3 } from 'three';
-import { ID_PANEL_MARKER, ID_PANEL_MARKERS_LIST, MARKERS_LIST_TEMPLATE, MARKER_DATA, SVG_NS } from './constants';
+import { DEFAULT_HOVER_SCALE, ID_PANEL_MARKER, ID_PANEL_MARKERS_LIST, MARKERS_LIST_TEMPLATE, MARKER_DATA, SVG_NS } from './constants';
 import {
     EnterMarkerEvent,
     GotoMarkerDoneEvent,
@@ -19,12 +19,29 @@ import {
 import { Marker } from './Marker';
 import { MarkersButton } from './MarkersButton';
 import { MarkersListButton } from './MarkersListButton';
-import { MarkerConfig, MarkersPluginConfig, UpdatableMarkersPluginConfig } from './model';
+import { MarkerConfig, MarkersPluginConfig, ParsedMarkersPluginConfig, UpdatableMarkersPluginConfig } from './model';
 
-const getConfig = utils.getConfigParser<MarkersPluginConfig>({
+const getConfig = utils.getConfigParser<MarkersPluginConfig, ParsedMarkersPluginConfig>({
     clickEventOnMarker: false,
     gotoMarkerSpeed: '8rpm',
     markers: null,
+    defaultHoverScale: null,
+}, {
+    defaultHoverScale(defaultHoverScale) {
+        if (!defaultHoverScale) {
+            return null;
+        }
+        if (defaultHoverScale === true) {
+            defaultHoverScale = DEFAULT_HOVER_SCALE;
+        }
+        if (typeof defaultHoverScale === 'number') {
+            defaultHoverScale = { amount: defaultHoverScale };
+        }
+        return {
+            ...DEFAULT_HOVER_SCALE,
+            ...defaultHoverScale,
+        };
+    },
 });
 
 /**
@@ -32,7 +49,7 @@ const getConfig = utils.getConfigParser<MarkersPluginConfig>({
  */
 export class MarkersPlugin extends AbstractConfigurablePlugin<
     MarkersPluginConfig,
-    MarkersPluginConfig,
+    ParsedMarkersPluginConfig,
     UpdatableMarkersPluginConfig,
     MarkersPluginEvents
 > {
@@ -266,7 +283,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
             throw new PSVError(`marker "${config.id}" already exists`);
         }
 
-        const marker = new Marker(this.viewer, config);
+        const marker = new Marker(this.viewer, this, config);
 
         if (marker.isPoly()) {
             this.svgContainer.appendChild(marker.domElement);
@@ -564,9 +581,13 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
                 isVisible = this.__isMarkerVisible(marker, position);
 
                 if (isVisible) {
-                    const scale = marker.getScale(zoomLevel, viewerPosition);
+                    marker.domElement.style.translate = `${position.x}px ${position.y}px 0px`;
 
-                    marker.domElement.style.transform = `translate3D(${position.x}px, ${position.y}px, 0px) scale(${scale}, ${scale})`;
+                    this.__applyScale(marker, {
+                        zoomLevel,
+                        viewerPosition,
+                        mouseover: null,
+                    });
                 }
             }
 
@@ -595,6 +616,26 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
                 this.dispatchEvent(new MarkerVisibilityEvent(marker, isVisible));
             }
         });
+    }
+
+    /**
+     * Computes and applies the scale to the marker
+     */
+    private __applyScale(marker: Marker, {
+        zoomLevel,
+        viewerPosition,
+        mouseover
+    }: {
+        zoomLevel: number,
+        viewerPosition: Position,
+        mouseover: boolean
+    }) {
+        if (mouseover !== null && marker.config.hoverScale) {
+            marker.domElement.style.transition = `scale ${marker.config.hoverScale.duration}ms ${marker.config.hoverScale.easing}`;
+        }
+
+        const scale = marker.getScale(zoomLevel, viewerPosition, mouseover);
+        marker.domElement.style.scale = `${scale}`;
     }
 
     /**
@@ -717,6 +758,14 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
             this.dispatchEvent(new EnterMarkerEvent(marker));
 
+            if (marker.isNormal() || marker.isSvg()) {
+                this.__applyScale(marker, {
+                    zoomLevel: this.viewer.getZoomLevel(),
+                    viewerPosition: this.viewer.getPosition(),
+                    mouseover: true,
+                });
+            }
+
             if (!marker.state.staticTooltip && marker.config.tooltip?.trigger === 'hover') {
                 marker.showTooltip(e.clientX, e.clientY);
             }
@@ -730,6 +779,14 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         // do not hide if we enter the tooltip itself while hovering a polygon
         if (marker && !(marker.isPoly() && this.__targetOnTooltip(e.relatedTarget as HTMLElement, marker.tooltip))) {
             this.dispatchEvent(new LeaveMarkerEvent(marker));
+
+            if (marker.isNormal() || marker.isSvg()) {
+                this.__applyScale(marker, {
+                    zoomLevel: this.viewer.getZoomLevel(),
+                    viewerPosition: this.viewer.getPosition(),
+                    mouseover: false,
+                });
+            }
 
             this.state.hoveringMarker = null;
 

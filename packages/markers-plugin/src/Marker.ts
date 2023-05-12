@@ -1,7 +1,8 @@
 import type { Point, Position, Size, Tooltip, TooltipConfig, Viewer } from '@photo-sphere-viewer/core';
 import { CONSTANTS, PSVError, utils } from '@photo-sphere-viewer/core';
+import type { MarkersPlugin } from './MarkersPlugin';
 import { Group, MathUtils, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, TextureLoader, Vector3 } from 'three';
-import { MARKER_DATA, SVG_NS } from './constants';
+import { DEFAULT_HOVER_SCALE, MARKER_DATA, SVG_NS } from './constants';
 import { MarkerConfig, ParsedMarkerConfig } from './model';
 import { getPolygonCenter, getPolylineCenter } from './utils';
 
@@ -64,7 +65,11 @@ export class Marker {
         size: null as Size,
     };
 
-    constructor(private readonly viewer: Viewer, config: MarkerConfig) {
+    constructor(
+        private readonly viewer: Viewer,
+        private readonly plugin: MarkersPlugin, 
+        config: MarkerConfig
+    ) {
         if (!config.id) {
             throw new PSVError('missing marker id');
         }
@@ -94,6 +99,14 @@ export class Marker {
         if (!this.is3d()) {
             this.element.id = `psv-marker-${config.id}`;
             this.element[MARKER_DATA] = this;
+        }
+
+        if (this.isNormal() || this.isSvg()) {
+            this.domElement.addEventListener('transitionend', () => {
+                // the transition "scale" is only applied manually on mouseover
+                // because it must not be present when the scale changes on zoom/move
+                this.domElement.style.transition = '';
+            });
         }
 
         this.update(config);
@@ -182,24 +195,24 @@ export class Marker {
      * Computes marker scale
      * @internal
      */
-    getScale(zoomLevel: number, position: Position): number {
-        if (!this.config.scale) {
-            return 1;
-        }
-        if (typeof this.config.scale === 'function') {
-            return this.config.scale(zoomLevel, position);
-        }
-
+    getScale(zoomLevel: number, position: Position, mouseover: boolean): number {
         let scale = 1;
-        if (Array.isArray(this.config.scale.zoom)) {
-            const [min, max] = this.config.scale.zoom;
-            scale *= min + (max - min) * CONSTANTS.EASINGS.inQuad(zoomLevel / 100);
+        if (typeof this.config.scale === 'function') {
+            scale = this.config.scale(zoomLevel, position);
+        } else if (this.config.scale) {
+            if (Array.isArray(this.config.scale.zoom)) {
+                const [min, max] = this.config.scale.zoom;
+                scale *= min + (max - min) * CONSTANTS.EASINGS.inQuad(zoomLevel / 100);
+            }
+            if (Array.isArray(this.config.scale.yaw)) {
+                const [min, max] = this.config.scale.yaw;
+                const halfFov = MathUtils.degToRad(this.viewer.state.hFov) / 2;
+                const arc = Math.abs(utils.getShortestArc(this.state.position.yaw, position.yaw));
+                scale *= max + (min - max) * CONSTANTS.EASINGS.outQuad(Math.max(0, (halfFov - arc) / halfFov));
+            }
         }
-        if (Array.isArray(this.config.scale.yaw)) {
-            const [min, max] = this.config.scale.yaw;
-            const halfFov = MathUtils.degToRad(this.viewer.state.hFov) / 2;
-            const arc = Math.abs(utils.getShortestArc(this.state.position.yaw, position.yaw));
-            scale *= max + (min - max) * CONSTANTS.EASINGS.outQuad(Math.max(0, (halfFov - arc) / halfFov));
+        if (mouseover && this.config.hoverScale) {
+            scale *= this.config.hoverScale.amount;
         }
         return scale;
     }
@@ -321,6 +334,20 @@ export class Marker {
         }
         if (this.config.scale && Array.isArray(this.config.scale)) {
             this.config.scale = { zoom: this.config.scale as any };
+        }
+        if (typeof this.config.hoverScale === 'boolean')  {
+            this.config.hoverScale = this.config.hoverScale ? this.plugin.config.defaultHoverScale || DEFAULT_HOVER_SCALE : null;
+        } else if (typeof this.config.hoverScale === 'number') {
+            this.config.hoverScale = { amount: this.config.hoverScale } as any;
+        } else if (!this.config.hoverScale) {
+            this.config.hoverScale = this.plugin.config.defaultHoverScale;
+        }
+        if (this.config.hoverScale) {
+            this.config.hoverScale = {
+                ...DEFAULT_HOVER_SCALE,
+                ...this.plugin.config.defaultHoverScale,
+                ...this.config.hoverScale,
+            };
         }
 
         this.visible = this.config.visible !== false;
@@ -501,7 +528,7 @@ export class Marker {
         }
 
         // set anchor
-        svgElement.style.transformOrigin = `${this.state.anchor.x * 100}% ${this.state.anchor.y * 100}%`;
+        this.domElement.style.transformOrigin = `${this.state.anchor.x * 100}% ${this.state.anchor.y * 100}%`;
 
         // convert texture coordinates to spherical coordinates
         this.state.position = this.viewer.dataHelper.cleanPosition(this.config.position);
@@ -578,6 +605,7 @@ export class Marker {
      */
     private __update3d() {
         const element = this.threeElement;
+        const mesh = element.children[0] as Mesh<any, MeshBasicMaterial>;
 
         if (!utils.isExtendedPosition(this.config.position)) {
             throw new PSVError('missing marker position');
@@ -601,7 +629,7 @@ export class Marker {
                     if (this.viewer.config.requestHeaders) {
                         this.loader.setRequestHeader(this.viewer.config.requestHeaders(this.config.imageLayer));
                     }
-                    (element.children[0] as Mesh<any, MeshBasicMaterial>).material.map = this.loader.load(
+                    mesh.material.map = this.loader.load(
                         this.config.imageLayer,
                         (texture) => {
                             texture.anisotropy = 4;
@@ -611,9 +639,9 @@ export class Marker {
                     this.definition = this.config.imageLayer;
                 }
 
-                (element.children[0] as Mesh).position.set(this.state.anchor.x - 0.5, this.state.anchor.y - 0.5, 0);
+                mesh.position.set(this.state.anchor.x - 0.5, this.state.anchor.y - 0.5, 0);
 
-                (element.children[0] as Mesh<any, MeshBasicMaterial>).material.opacity = this.config.opacity ?? 1;
+                mesh.material.opacity = this.config.opacity ?? 1;
 
                 element.position.copy(this.state.positions3D[0]);
 

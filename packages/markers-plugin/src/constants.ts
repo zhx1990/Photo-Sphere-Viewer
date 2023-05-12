@@ -33,6 +33,16 @@ export const ID_PANEL_MARKER = 'marker';
 export const ID_PANEL_MARKERS_LIST = 'markersList';
 
 /**
+ * Default configuration for the "hoverScale" parameters
+ * @internal
+ */
+export const DEFAULT_HOVER_SCALE = {
+  amount: 2,
+  duration: 100,
+  easing: 'linear',
+};
+
+/**
  * Markers list template
  * @internal
  */

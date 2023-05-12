@@ -141,6 +141,7 @@
                     GyroscopePlugin,
                     StereoPlugin,
                     [MarkersPlugin, {
+                        // defaultHoverScale: true,
                         markers: (() => {
                             const a = [];
 
@@ -153,6 +154,7 @@
                                 image: baseUrl + 'pictos/pin-blue.png',
                                 size: { width: 32, height: 32 },
                                 anchor: 'bottom center',
+                                hoverScale: 1.5,
                             });
 
                             // marker with custom tooltip
@@ -378,6 +380,7 @@ tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretiu
                                     fill: 'rgba(0, 0, 0, 0.5)',
                                 },
                                 position: { yaw: -0.1, pitch: -0.4 },
+                                hoverScale: false,
                             });
 
                             a.push({
@@ -391,6 +394,7 @@ tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretiu
                                     fill: 'rgba(0, 0, 0, 0.5)',
                                 },
                                 position: { yaw: 0, pitch: -0.4 },
+                                hoverScale: false,
                             });
 
                             a.push({
@@ -404,6 +408,7 @@ tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretiu
                                     fill: 'rgba(0, 0, 0, 0.5)',
                                 },
                                 position: { yaw: 0.1, pitch: -0.4 },
+                                hoverScale: false,
                             });
 
                             // add markers all hover the sphere
