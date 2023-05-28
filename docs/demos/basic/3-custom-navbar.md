@@ -20,6 +20,7 @@ new PhotoSphereViewer.Viewer({
         'zoom',
         'move',
         {
+            id: 'change',
             title: 'Change image',
             content: document.querySelector('#icon').innerText,
             onClick(viewer) {
@@ -27,6 +28,7 @@ new PhotoSphereViewer.Viewer({
                     caption: '',
                     description: null,
                 });
+                viewer.navbar.getButton('change').hide();
             },
         },
         'caption',

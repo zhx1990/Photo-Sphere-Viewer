@@ -56,6 +56,14 @@ Use the `Animation` helper to create a cool intro.
 Display a secondary image above the panorama.
 :::
 
+::: item
+[![](../images/demos/screenshot.jpg)](./basic/7-screenshot.md)
+
+### Make a screenshot
+
+Download a screenshot of the visible panorama.
+:::
+
 ::::
 
 ## Markers
