@@ -12,6 +12,7 @@ import {
     Vector3,
     WebGLRenderer,
     WebGLRenderTarget,
+    LinearSRGBColorSpace,
 } from 'three';
 import { SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
 import { SYSTEM } from '../data/system';
@@ -62,6 +63,8 @@ export class Renderer extends AbstractService {
 
         this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
         this.renderer.setPixelRatio(SYSTEM.pixelRatio);
+        // https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791
+        this.renderer.outputColorSpace = LinearSRGBColorSpace;
         this.renderer.domElement.className = 'psv-canvas';
 
         this.scene = new Scene();

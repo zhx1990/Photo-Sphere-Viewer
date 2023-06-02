@@ -1,6 +1,10 @@
+import { ColorManagement } from 'three';
 import * as CONSTANTS from './data/constants';
 import * as utils from './utils';
 import * as events from './events';
+
+// https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791
+ColorManagement.enabled = false;
 
 export type { AdapterConstructor } from './adapters/AbstractAdapter';
 export { AbstractAdapter } from './adapters/AbstractAdapter';
