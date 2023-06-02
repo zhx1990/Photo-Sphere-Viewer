@@ -1,8 +1,9 @@
-import { ColorManagement } from 'three';
+import { Cache, ColorManagement } from 'three';
 import * as CONSTANTS from './data/constants';
 import * as utils from './utils';
 import * as events from './events';
 
+Cache.enabled = true;
 // https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791
 ColorManagement.enabled = false;
 
