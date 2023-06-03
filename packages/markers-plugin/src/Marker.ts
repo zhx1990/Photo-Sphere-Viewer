@@ -364,17 +364,17 @@ export class Marker {
             } else {
                 element.classList.add('psv-marker--poly');
             }
-
-            // add CSS classes
-            if (this.config.className) {
-                utils.addClasses(element, this.config.className);
+            if (this.state.visible) {
+                element.classList.add('psv-marker--visible');
             }
-
             if (this.config.tooltip) {
                 element.classList.add('psv-marker--has-tooltip');
             }
             if (this.config.content) {
                 element.classList.add('psv-marker--has-content');
+            }
+            if (this.config.className) {
+                utils.addClasses(element, this.config.className);
             }
 
             // apply style
