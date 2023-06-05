@@ -9,7 +9,7 @@ autoload: true
 title: PSV Overlay Demo
 ```
 
-```js
+```js{7-8}
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
 new PhotoSphereViewer.Viewer({

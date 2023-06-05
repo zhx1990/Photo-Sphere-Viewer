@@ -9,7 +9,7 @@ autoload: true
 title: PSV Description Demo
 ```
 
-```js
+```js{7}
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
 new PhotoSphereViewer.Viewer({

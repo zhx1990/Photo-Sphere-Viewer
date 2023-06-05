@@ -23,15 +23,16 @@ module.exports = (options, ctx) => ({
                         packages: [],
                     };
                     for (let index = idx; index < tokens.length; index++) {
-                        const { type, content, info: info } = tokens[index];
+                        const { type, content, info } = tokens[index];
                         if (type === `container_${BLOCK_NAME}_close`) {
                             break;
                         }
                         if (type === 'fence') {
-                            if (info === 'yaml' || info === 'yml') {
+                            const lang = info.split('{')[0];
+                            if (lang === 'yaml' || lang === 'yml') {
                                 Object.assign(config, parseYaml(content));
                             } else {
-                                config[info] = content;
+                                config[lang] = content;
                             }
                         }
                     }

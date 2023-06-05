@@ -13,7 +13,7 @@ packages:
       style: true
 ```
 
-```js
+```js{12-17}
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
 const viewer = new PhotoSphereViewer.Viewer({

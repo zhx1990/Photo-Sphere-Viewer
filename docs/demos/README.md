@@ -78,4 +78,12 @@ Download a screenshot of the visible panorama.
 Advanced styling of a marker's tooltip.
 :::
 
+::: item
+[![](../images/demos/hover-scale.jpg)](./markers/hover-scale.md)
+
+### Mouse hover scalling
+
+Enable global scalling and customize for each marker.
+:::
+
 ::::
