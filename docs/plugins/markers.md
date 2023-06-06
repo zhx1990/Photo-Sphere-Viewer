@@ -120,7 +120,7 @@ const viewer = new PhotoSphereViewer.Viewer({
                 {
                     // polygon marker
                     id: 'polygon',
-                    polyline: [
+                    polygon: [
                         [6.2208, 0.0906], [0.0443, 0.1028], [0.2322, 0.0849], [0.4531, 0.0387],
                         [0.5022, -0.0056], [0.4587, -0.0396], [0.252, -0.0453], [0.0434, -0.0575],
                         [6.1302, -0.0623], [6.0094, -0.0169], [6.0471, 0.032], [6.2208, 0.0906],
@@ -321,7 +321,7 @@ Applies a perspective on the image to make it look like placed on the floor or o
 #### `scale`
 
 -   type: `double[] | { zoom: double[], yaw: [] }`
--   default: no scalling
+-   default: no scaling
 
 Configures the scale of the marker depending on the zoom level and/or the horizontal angle offset. This aims to give a natural feeling to the size of the marker as the users zooms and moves.
 
@@ -372,7 +372,7 @@ scale: {
 -   type: `boolean | number | { amount?: number, duration?: number, easing?: string }`
 -   default: `null`
 
-Overrides the [global `defaultHoverScale`](#defaulthoverscale). The configuration is merged with the default configuration of x2 scalling in 100ms with a linear easing. Defining `hoverScale: false` allows to disable the scaling for this marker.
+Overrides the [global `defaultHoverScale`](#defaulthoverscale). The configuration is merged with the default configuration of x2 scaling in 100ms with a linear easing. Defining `hoverScale: false` allows to disable the scaling for this marker.
 
 _(This option is ignored for polygons, polylines and `imageLayer` markers)._
 
@@ -436,22 +436,7 @@ svgStyle: {
 ```
 
 ::: tip Image and pattern background
-You can define complex SVG backgrounds such as images by using a pattern definition.
-
-First declare the pattern somewhere in your page :
-
-```html
-<svg id="patterns">
-    <defs>
-        <!-- define pattern origin on its center -->
-        <pattern id="image" x="256" y="256" width="512" height="512" patternUnits="userSpaceOnUse">
-            <image href="my-image.jpg" x="0" y="0" width="512" height="512" />
-        </pattern>
-    </defs>
-</svg>
-```
-
-And use it in your marker : `fill: 'url(#image)'`.
+You can define complex SVG backgrounds such as images by using a pattern definition. [See demo](../demos/markers/polygon-pattern.md).
 :::
 
 #### `anchor`
@@ -541,7 +526,7 @@ Initial list of markers.
 -   type: `boolean | number | { amount?: number, duration?: number, easing?: string }`
 -   default: `null`
 
-Default mouse hover scalling applied to all markers, can be overriden with each marker [`hoverScale` parameter](#hoverscale). Defining `defaultHoverScale: true` will use the default configuration of x2 scalling in 100ms with a linear easing.
+Default mouse hover scaling applied to all markers, can be overriden with each marker [`hoverScale` parameter](#hoverscale). Defining `defaultHoverScale: true` will use the default configuration of x2 scaling in 100ms with a linear easing.
 
 #### `gotoMarkerSpeed`
 

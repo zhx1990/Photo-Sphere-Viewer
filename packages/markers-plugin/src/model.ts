@@ -162,7 +162,7 @@ export type MarkersPluginConfig = {
      */
     gotoMarkerSpeed?: string | number;
     /**
-     * Default mouse hover scalling parameters applied to all markers
+     * Default mouse hover scaling parameters applied to all markers
      * (`true` = `{ amount: 2, duration: 100, easing: 'linear' }`)
      * @default null
      */

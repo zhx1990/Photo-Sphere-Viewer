@@ -1,19 +1,19 @@
-# Mouse hover scalling
+# Mouse hover scaling
 
-Enable global mouse hover scalling and customize for each marker.
+Enable global mouse hover scaling and customize for each marker.
 
 ::: code-demo
 
 ```yaml
 autoload: true
-title: PSV Marker custom tooltip Demo
+title: PSV Marker mouse hover scaling Demo
 packages:
     - name: markers-plugin
       imports: MarkersPlugin
       style: true
 ```
 
-```js{10,27,34}
+```js{10,27,36}
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
 const viewer = new PhotoSphereViewer.Viewer({
@@ -31,7 +31,7 @@ const viewer = new PhotoSphereViewer.Viewer({
                     image: baseUrl + 'pictos/pin-blue.png',
                     size: { width: 32, height: 32 },
                     anchor: 'bottom center',
-                    tooltip: 'Default scalling',
+                    tooltip: 'Default scaling',
                 },
                 {
                     id: 'marker-2',
@@ -39,7 +39,7 @@ const viewer = new PhotoSphereViewer.Viewer({
                     image: baseUrl + 'pictos/pin-red.png',
                     size: { width: 32, height: 32 },
                     anchor: 'bottom center',
-                    tooltip: 'Disable scalling',
+                    tooltip: 'Disable scaling',
                     hoverScale: false,
                 },
                 {
@@ -48,7 +48,7 @@ const viewer = new PhotoSphereViewer.Viewer({
                     image: baseUrl + 'pictos/pin-red.png',
                     size: { width: 32, height: 32 },
                     anchor: 'bottom center',
-                    // tooltip: 'Custom scalling',
+                    tooltip: 'Custom scaling',
                     hoverScale: { amount: 3, easing: 'ease-in-out', duration: 1000 },
                 },
             ],

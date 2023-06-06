@@ -81,9 +81,17 @@ Advanced styling of a marker's tooltip.
 ::: item
 [![](../images/demos/hover-scale.jpg)](./markers/hover-scale.md)
 
-### Mouse hover scalling
+### Mouse hover scaling
 
-Enable global scalling and customize for each marker.
+Enable global scaling and customize for each marker.
+:::
+
+::: item
+[![](../images/demos/polygon-pattern.jpg)](./markers/polygon-pattern.md)
+
+### Polygon pattern
+
+Use custom SVG patterns as polygon `fill`.
 :::
 
 ::::
