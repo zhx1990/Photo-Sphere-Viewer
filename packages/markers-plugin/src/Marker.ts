@@ -265,12 +265,20 @@ export class Marker {
                     config.left = this.state.position2D.x;
                 }
             } else {
-                config.top = this.state.position2D.y + this.state.size.height / 2;
-                config.left = this.state.position2D.x + this.state.size.width / 2;
-                config.box = {
-                    width: this.state.size.width,
-                    height: this.state.size.height,
-                };
+                // note: state.position2D already has the anchor applied with the default size
+                const position = this.viewer.dataHelper.vector3ToViewerCoords(this.state.positions3D[0]);
+                let width = this.state.size.width;
+                let height = this.state.size.height;
+
+                // only apply scaling for "temporary" tooltips
+                if (this.config.hoverScale && !this.state.staticTooltip) {
+                    width *= this.config.hoverScale.amount;
+                    height *= this.config.hoverScale.amount;
+                }
+
+                config.top = position.y - height * this.state.anchor.y + height / 2;
+                config.left = position.x - width * this.state.anchor.x + width / 2;
+                config.box = { width, height };
             }
 
             if (this.tooltip) {
