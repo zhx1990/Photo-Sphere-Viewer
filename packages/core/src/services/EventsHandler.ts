@@ -351,7 +351,7 @@ export class EventsHandler extends AbstractService {
      * Handles mouse wheel events
      */
     private __onMouseWheel(evt: WheelEvent) {
-        if (!this.config.mousewheel) {
+        if (!this.config.mousewheel || !evt.deltaY) {
             return;
         }
 
