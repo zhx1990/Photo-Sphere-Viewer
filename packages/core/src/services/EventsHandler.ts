@@ -41,11 +41,29 @@ import { PressHandler } from '../utils/PressHandler';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
 
-const enum Step {
-    IDLE,
-    CLICK,
-    MOVING,
-    INERTIA,
+class Step {
+    static IDLE = 0;
+    static CLICK = 1;
+    static MOVING = 2;
+    static INERTIA = 4;
+
+    private $: number = Step.IDLE;
+
+    is(...steps: number[]): boolean {
+        return steps.some(step => this.$ & step);
+    }
+
+    set(step: number) {
+        this.$ = step;
+    }
+
+    add(step: number) {
+        this.$ |= step;
+    }
+
+    remove(step: number) {
+        this.$ &= ~step;
+    }
 }
 
 /**
@@ -54,7 +72,6 @@ const enum Step {
  */
 export class EventsHandler extends AbstractService {
     private readonly data = {
-        step: Step.IDLE,
         /** start x position of the click/touch */
         startMouseX: 0,
         /** start y position of the click/touch */
@@ -77,6 +94,7 @@ export class EventsHandler extends AbstractService {
         ctrlZoomTimeout: null as ReturnType<typeof setTimeout>,
     };
 
+    private readonly step = new Step();
     private readonly keyHandler = new PressHandler();
     private readonly resizeObserver = new ResizeObserver(throttle(() => this.viewer.autoSize(), 50));
     private readonly moveThreshold = MOVE_THRESHOLD * SYSTEM.pixelRatio;
@@ -148,10 +166,6 @@ export class EventsHandler extends AbstractService {
         }
     }
 
-    private __isStep(...step: Step[]): boolean {
-        return step.indexOf(this.data.step) !== -1;
-    }
-
     /**
      * Handles keyboard events
      */
@@ -219,7 +233,7 @@ export class EventsHandler extends AbstractService {
      * Handles mouse down events
      */
     private __onMouseDown(evt: MouseEvent) {
-        this.data.step = Step.CLICK;
+        this.step.add(Step.CLICK);
         this.data.startMouseX = evt.clientX;
         this.data.startMouseY = evt.clientY;
     }
@@ -228,7 +242,7 @@ export class EventsHandler extends AbstractService {
      *Handles mouse up events
      */
     private __onMouseUp(evt: MouseEvent) {
-        if (this.__isStep(Step.CLICK, Step.MOVING)) {
+        if (this.step.is(Step.CLICK, Step.MOVING)) {
             this.__stopMove(evt.clientX, evt.clientY, evt.target, evt.button === 2);
         }
     }
@@ -237,7 +251,7 @@ export class EventsHandler extends AbstractService {
      * Handles mouse move events
      */
     private __onMouseMove(evt: MouseEvent) {
-        if (this.config.mousemove && this.__isStep(Step.CLICK, Step.MOVING)) {
+        if (this.config.mousemove && this.step.is(Step.CLICK, Step.MOVING)) {
             evt.preventDefault();
             this.__doMove(evt.clientX, evt.clientY);
         }
@@ -250,7 +264,7 @@ export class EventsHandler extends AbstractService {
      */
     private __onTouchStart(evt: TouchEvent) {
         if (evt.touches.length === 1) {
-            this.data.step = Step.CLICK;
+            this.step.add(Step.CLICK);
             this.data.startMouseX = evt.touches[0].clientX;
             this.data.startMouseY = evt.touches[0].clientY;
 
@@ -262,7 +276,7 @@ export class EventsHandler extends AbstractService {
                 }, LONGTOUCH_DELAY);
             }
         } else if (evt.touches.length === 2) {
-            this.data.step = Step.IDLE;
+            this.step.set(Step.IDLE);
             this.__cancelLongTouch();
 
             if (this.config.mousemove) {
@@ -279,7 +293,7 @@ export class EventsHandler extends AbstractService {
     private __onTouchEnd(evt: TouchEvent) {
         this.__cancelLongTouch();
 
-        if (this.__isStep(Step.CLICK, Step.MOVING)) {
+        if (this.step.is(Step.CLICK, Step.MOVING)) {
             evt.preventDefault();
             this.__cancelTwoFingersOverlay();
 
@@ -304,7 +318,7 @@ export class EventsHandler extends AbstractService {
 
         if (evt.touches.length === 1) {
             if (this.config.touchmoveTwoFingers) {
-                if (this.__isStep(Step.CLICK) && !this.data.twofingersTimeout) {
+                if (this.step.is(Step.CLICK) && !this.data.twofingersTimeout) {
                     this.data.twofingersTimeout = setTimeout(() => {
                         this.viewer.overlay.show({
                             id: IDS.TWO_FINGERS,
@@ -313,7 +327,7 @@ export class EventsHandler extends AbstractService {
                         });
                     }, TWOFINGERSOVERLAY_DELAY);
                 }
-            } else if (this.__isStep(Step.CLICK, Step.MOVING)) {
+            } else if (this.step.is(Step.CLICK, Step.MOVING)) {
                 evt.preventDefault();
                 const touch = evt.touches[0];
                 this.__doMove(touch.clientX, touch.clientY);
@@ -398,7 +412,7 @@ export class EventsHandler extends AbstractService {
      * Resets all state variables
      */
     private __resetMove() {
-        this.data.step = Step.IDLE;
+        this.step.set(Step.IDLE);
         this.data.mouseX = 0;
         this.data.mouseY = 0;
         this.data.startMouseX = 0;
@@ -415,7 +429,7 @@ export class EventsHandler extends AbstractService {
 
         const touchData = getTouchData(evt);
 
-        this.data.step = Step.MOVING;
+        this.step.set(Step.MOVING);
         ({
             distance: this.data.pinchDist,
             center: { x: this.data.mouseX, y: this.data.mouseY },
@@ -429,7 +443,7 @@ export class EventsHandler extends AbstractService {
      * @description If the move threshold was not reached a click event is triggered, otherwise an animation is launched to simulate inertia
      */
     private __stopMove(clientX: number, clientY: number, target?: EventTarget, rightclick = false) {
-        if (this.__isStep(Step.MOVING)) {
+        if (this.step.is(Step.MOVING)) {
             if (this.config.moveInertia) {
                 this.__logMouseMove(clientX, clientY);
                 this.__stopMoveInertia(clientX, clientY);
@@ -438,11 +452,14 @@ export class EventsHandler extends AbstractService {
                 this.viewer.resetIdleTimer();
             }
         } else {
-            if (this.__isStep(Step.CLICK) && !this.__moveThresholdReached(clientX, clientY)) {
+            if (this.step.is(Step.CLICK) && !this.__moveThresholdReached(clientX, clientY)) {
                 this.__doClick(clientX, clientY, target, rightclick);
             }
-            this.__resetMove();
-            this.viewer.resetIdleTimer();
+            this.step.remove(Step.CLICK);
+            if (!this.step.is(Step.INERTIA)) {
+                this.__resetMove();
+                this.viewer.resetIdleTimer();
+            }
         }
     }
 
@@ -470,7 +487,7 @@ export class EventsHandler extends AbstractService {
             return;
         }
 
-        this.data.step = Step.INERTIA;
+        this.step.set(Step.INERTIA);
 
         let currentClientX = clientX;
         let currentClientY = clientY;
@@ -606,14 +623,14 @@ export class EventsHandler extends AbstractService {
      * Starts moving when crossing moveThreshold and performs movement
      */
     private __doMove(clientX: number, clientY: number) {
-        if (this.__isStep(Step.CLICK) && this.__moveThresholdReached(clientX, clientY)) {
+        if (this.step.is(Step.CLICK) && this.__moveThresholdReached(clientX, clientY)) {
             this.viewer.stopAll();
             this.__resetMove();
-            this.data.step = Step.MOVING;
+            this.step.set(Step.MOVING);
             this.data.mouseX = clientX;
             this.data.mouseY = clientY;
             this.__logMouseMove(clientX, clientY);
-        } else if (this.__isStep(Step.MOVING)) {
+        } else if (this.step.is(Step.MOVING)) {
             this.__applyMove(clientX, clientY);
             this.__logMouseMove(clientX, clientY);
         }
@@ -656,7 +673,7 @@ export class EventsHandler extends AbstractService {
      * Perfoms combined move and zoom
      */
     private __doMoveZoom(evt: TouchEvent) {
-        if (this.__isStep(Step.MOVING)) {
+        if (this.step.is(Step.MOVING)) {
             evt.preventDefault();
 
             const touchData = getTouchData(evt);
