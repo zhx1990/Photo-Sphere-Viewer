@@ -1,4 +1,4 @@
-import { Object3D, Texture } from 'three';
+import { Object3D, Texture, WebGLRendererParameters } from 'three';
 import { AdapterConstructor } from './adapters/AbstractAdapter';
 import { ACTIONS } from './data/constants';
 import { PluginConstructor } from './plugins/AbstractPlugin';
@@ -319,6 +319,8 @@ export type ViewerConfig = {
     requestHeaders?: Record<string, string> | ((url: string) => Record<string, string>);
     /** @default '#000' */
     canvasBackground?: string;
+    /** @default '{ alpha: true, antialias: true }' */
+    rendererParameters?: WebGLRendererParameters;
     /** @default false */
     withCredentials?: boolean;
     /** @default 'zoom move download description caption fullscreen' */

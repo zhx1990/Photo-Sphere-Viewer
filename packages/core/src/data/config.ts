@@ -42,6 +42,7 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
     panoData: null,
     requestHeaders: null,
     canvasBackground: '#000',
+    rendererParameters: { alpha: true, antialias: true },
     withCredentials: false,
     // prettier-ignore
     navbar: [
@@ -197,6 +198,10 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
         }
         return null;
     },
+    rendererParameters: (rendererParameters, { defValue }) => ({
+        ...rendererParameters,
+        ...defValue,
+    }),
     plugins: (plugins) => {
         return plugins.map((plugin, i) => {
             if (Array.isArray(plugin)) {

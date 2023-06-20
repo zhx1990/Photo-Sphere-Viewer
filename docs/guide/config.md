@@ -372,3 +372,10 @@ keyboardActions: {
   'f': (viewer) => viewer.toggleFullscreen(),
 },
 ```
+
+#### `rendererParameters`
+
+-   type: [`WebGLRendererParameters`](https://threejs.org/docs/#api/en/renderers/WebGLRenderer)
+-   default: `{ alpha: true, antialias: true }`
+
+Configuration of the ThreeJS WebGLRenderer.

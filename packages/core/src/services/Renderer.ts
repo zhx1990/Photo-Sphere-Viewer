@@ -61,7 +61,7 @@ export class Renderer extends AbstractService {
     constructor(viewer: Viewer) {
         super(viewer);
 
-        this.renderer = new WebGLRenderer({ alpha: true, antialias: true });
+        this.renderer = new WebGLRenderer(this.config.rendererParameters);
         this.renderer.setPixelRatio(SYSTEM.pixelRatio);
         // https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791
         this.renderer.outputColorSpace = LinearSRGBColorSpace;
