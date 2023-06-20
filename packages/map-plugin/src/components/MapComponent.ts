@@ -555,11 +555,16 @@ export class MapComponent extends AbstractComponent {
                 }
 
                 if (tooltip) {
+                    if (typeof tooltip === 'string') {
+                        tooltip = { content: tooltip };
+                    }
+
                     const hotspotPos = this.state.hotspotPos[hotspotId];
                     const viewerPos = utils.getPosition(this.viewer.container);
 
                     this.state.hotspotTooltip = this.viewer.createTooltip({
-                        content: tooltip,
+                        content: tooltip.content,
+                        className: tooltip.className,
                         left: hotspotPos.x - viewerPos.x,
                         top: hotspotPos.y - viewerPos.y,
                         box: {

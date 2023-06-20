@@ -9,7 +9,7 @@ export type MapHotspot = (Point | { yaw: number | string; distance: number }) & 
     /**
      * Tooltip visible on the map
      */
-    tooltip?: string;
+    tooltip?: string | { content: string; className?: string; };
     /**
      * Override the default `spotSize`
      */

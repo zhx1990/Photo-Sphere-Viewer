@@ -254,7 +254,7 @@ export class MapPlugin extends AbstractConfigurablePlugin<
                 const hotspot: MapHotspot = {
                     ...markerData,
                     id: HOTSPOT_MARKER_ID + marker.id,
-                    tooltip: marker.config.tooltip?.content,
+                    tooltip: marker.config.tooltip,
                 };
 
                 if ('distance' in markerData) {

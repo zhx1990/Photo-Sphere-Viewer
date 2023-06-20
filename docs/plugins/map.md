@@ -274,6 +274,11 @@ Configure the position of the hotspot on the map, either with a angle and a dist
 
 Allow to override the default `spotColor`, `spotImage` and `spotSize`.
 
+#### `tooltip`
+
+-   type: `string | { content: string, className: string }`
+-   default: `null`
+
 ::: tip
 [Markers](./markers.md) can be displayed on the map by defining their `map` data, which must be an hotspot object (minus `yaw` which is know from the marker position).
 
