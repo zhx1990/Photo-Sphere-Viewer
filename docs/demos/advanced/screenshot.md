@@ -6,7 +6,7 @@ Adds a button that will download a screenshot of the visible panorama.
 
 ```yaml
 autoload: true
-title: PSV Screeshot Demo
+title: PSV Screenshot Demo
 ```
 
 ```js

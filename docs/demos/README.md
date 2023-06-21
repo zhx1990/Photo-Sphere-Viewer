@@ -9,7 +9,7 @@ Visit each [plugin page](../plugins/) to see a dedicated example.
 :::: gallery
 
 ::: item
-[![](../images/demos/default.jpg)](./basic/1-zero-config.md)
+[![](../images/demos/default.jpg)](./basic/0-config.md)
 
 ### Zero config
 
@@ -17,15 +17,7 @@ Simple panorama with default options.
 :::
 
 ::: item
-[![](../images/demos/description.jpg)](./basic/2-description.md)
-
-### Description
-
-&laquo; i &raquo; button will display the `description` in the side panel.
-:::
-
-::: item
-[![](../images/demos/navbar.jpg)](./basic/3-custom-navbar.md)
+[![](../images/demos/navbar.jpg)](./basic/custom-navbar.md)
 
 ### Custom navbar
 
@@ -33,7 +25,15 @@ Customize the navbar with default and custom buttons.
 :::
 
 ::: item
-[![](../images/demos/fisheye.jpg)](./basic/4-fisheye.md)
+[![](../images/demos/description.jpg)](./basic/description.md)
+
+### Description
+
+&laquo; i &raquo; button will display the `description` in the side panel.
+:::
+
+::: item
+[![](../images/demos/fisheye.jpg)](./basic/fisheye.md)
 
 ### Fisheye
 
@@ -41,7 +41,21 @@ Display the panorama with a fisheye effect.
 :::
 
 ::: item
-[![](../images/demos/animation.gif)](./basic/5-animation.md)
+[![](../images/demos/overlay.jpg)](./basic/overlay.md)
+
+### Overlay
+
+Display a secondary image above the panorama.
+:::
+
+::::
+
+## Advanced
+
+:::: gallery
+
+::: item
+[![](../images/demos/animation.gif)](./advanced/animation.md)
 
 ### Intro animation
 
@@ -49,15 +63,15 @@ Use the `Animation` helper to create a cool intro.
 :::
 
 ::: item
-[![](../images/demos/overlay.jpg)](./basic/6-overlay.md)
+[![](../images/demos/double-click-zoom.gif)](./advanced/double-click-zoom.md)
 
-### Overlay
+### Double click zoom
 
-Display a secondary image above the panorama.
+Zoom to the cursor position on double-click.
 :::
 
 ::: item
-[![](../images/demos/screenshot.jpg)](./basic/7-screenshot.md)
+[![](../images/demos/screenshot.jpg)](./advanced/screenshot.md)
 
 ### Make a screenshot
 

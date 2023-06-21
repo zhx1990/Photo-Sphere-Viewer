@@ -135,11 +135,15 @@ module.exports = {
                                 return groups;
                             }, {});
 
-                        return Object.entries(demoFiles).map(([group, files]) => ({
-                            title: group[0].toUpperCase() + group.substring(1),
-                            collapsable: false,
-                            children: files.map((f) => `${group}/${f}`),
-                        }));
+                        return Object.entries(demoFiles)
+                            .map(([group, files]) => ({
+                                title: group[0].toUpperCase() + group.substring(1),
+                                collapsable: false,
+                                children: files.map((f) => `${group}/${f}`),
+                            }))
+                            .sort((a, b) => {
+                                return a.title === 'Basic' ? -1 : b.title === 'Basic' ? 1 : a.title.localeCompare(b.title);
+                            });
                     })(),
                 },
             ],
