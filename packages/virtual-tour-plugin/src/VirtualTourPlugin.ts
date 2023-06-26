@@ -455,6 +455,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     private __renderLinks(node: VirtualTourNode) {
         const positions: Position[] = [];
 
+        let i = 0;
         node.links.forEach((link) => {
             const position = this.__getLinkPosition(node, link);
             position.yaw += link.linkOffset?.yaw ?? 0;
@@ -479,6 +480,15 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
                 this.arrowsGroup.add(mesh);
                 this.arrowsGroup.add(outlineMesh);
+
+                // arrows are renderer last and on top of their outline
+                // the depth buffer must be cleared only once
+                mesh.renderOrder = 1000 + (i++);
+                mesh.onBeforeRender = function (renderer) {
+                    if (this.renderOrder === 1000) {
+                        renderer.clearDepth();
+                    }
+                };
             } else {
                 if (this.isGps) {
                     position.pitch += this.config.markerPitchOffset;
@@ -531,6 +541,11 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             this.state.currentTooltip = this.viewer.createTooltip({
                 left: viewerPoint.x,
                 top: viewerPoint.y,
+                box: {
+                    // separate the tooltip from the cursor
+                    width: 20,
+                    height: 20,
+                },
                 content: link.name,
             });
         }
