@@ -1,7 +1,6 @@
-import { PSVError } from '@photo-sphere-viewer/core';
+import { PSVError, utils } from '@photo-sphere-viewer/core';
 import {
     BufferGeometry,
-    CanvasTexture,
     LineSegments,
     Material,
     MeshBasicMaterial,
@@ -54,8 +53,7 @@ export function buildErrorMaterial(): MeshBasicMaterial {
     ctx.textBaseline = 'middle';
     ctx.fillText('⚠', canvas.width / 2, canvas.height / 2);
 
-    const texture = new CanvasTexture(canvas);
-    return new MeshBasicMaterial({ map: texture });
+    return new MeshBasicMaterial({ map: utils.createTexture(canvas) });
 }
 
 /**

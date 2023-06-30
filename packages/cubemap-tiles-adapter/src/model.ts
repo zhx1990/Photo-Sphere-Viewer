@@ -67,6 +67,11 @@ export type CubemapTilesAdapterConfig = CubemapAdapterConfig & {
      */
     baseBlur?: boolean;
     /**
+     * applies antialiasing to high resolutions tiles
+     * @default true
+     */
+    antialias?: boolean;
+    /**
      * shows debug helpers
      * @default false
      * @internal

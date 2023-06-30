@@ -84,6 +84,13 @@ The number of faces of the sphere geometry used to display the panorama, higher 
 
 _Note: the actual number of faces is `resolution² / 2`._
 
+#### `antialias`
+
+-   type: `boolean`
+-   default: `true`
+
+Applies antialiasing to high resolutions tiles.
+
 ## Panorama options
 
 When using this adapter, the `panorama` option and the `setPanorama()` method accept an object to configure the tiles.

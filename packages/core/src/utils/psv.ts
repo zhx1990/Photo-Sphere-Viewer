@@ -1,6 +1,6 @@
-import { Euler, LinearFilter, MathUtils, Quaternion, Texture, Vector3 } from 'three';
-import { ExtendedPosition, Point, ResolvableBoolean } from '../model';
+import { Euler, LinearFilter, LinearMipmapLinearFilter, MathUtils, Quaternion, Texture, Vector3 } from 'three';
 import { PSVError } from '../PSVError';
+import { ExtendedPosition, Point, ResolvableBoolean } from '../model';
 import { wrap } from './math';
 import { clone, isPlainObject } from './misc';
 
@@ -315,11 +315,12 @@ export function parseAngle(angle: string | number, zeroCenter = false, halfCircl
 /**
  * Creates a THREE texture from an image
  */
-export function createTexture(img: HTMLImageElement | HTMLCanvasElement): Texture {
+export function createTexture(img: HTMLImageElement | HTMLCanvasElement, mimaps = false): Texture {
     const texture = new Texture(img);
     texture.needsUpdate = true;
-    texture.minFilter = LinearFilter;
-    texture.generateMipmaps = false;
+    texture.minFilter = mimaps ? LinearMipmapLinearFilter : LinearFilter;
+    texture.generateMipmaps = mimaps;
+    texture.anisotropy = mimaps ? 2 : 1;
     return texture;
 }
 

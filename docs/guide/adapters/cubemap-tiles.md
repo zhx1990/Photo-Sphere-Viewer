@@ -95,6 +95,13 @@ Applies a 1px blur to the base image (option `baseUrl`).
 
 Shows a warning sign on tiles that cannot be loaded.
 
+#### `antialias`
+
+-   type: `boolean`
+-   default: `true`
+
+Applies antialiasing to high resolutions tiles.
+
 ## Panorama options
 
 When using this adapter, the `panorama` option and the `setPanorama()` method accept an object to configure the tiles.

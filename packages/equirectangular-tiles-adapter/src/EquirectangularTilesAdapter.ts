@@ -81,6 +81,7 @@ const getConfig = utils.getConfigParser<EquirectangularTilesAdapterConfig>(
         resolution: 64,
         showErrorTile: true,
         baseBlur: true,
+        antialias: true,
         blur: false,
         debug: false,
     },
@@ -434,7 +435,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
                         image = buildDebugTexture(image, tile.config.level, tileId(tile)) as any;
                     }
 
-                    const material = new MeshBasicMaterial({ map: utils.createTexture(image) });
+                    const mipmaps = this.config.antialias && tile.config.level > 0;
+                    const material = new MeshBasicMaterial({ map: utils.createTexture(image, mipmaps) });
                     this.__swapMaterial(tile, material, false);
                     this.viewer.needsUpdate();
                 }
