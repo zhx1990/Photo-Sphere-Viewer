@@ -22,6 +22,7 @@ $psv-gallery-thumb-hover-scale: 1.2 !default;
     transition: transform ease-in-out 0.1s;
     transform: translateY(100%);
     z-index: $psv-navbar-zindex;
+    cursor: default;
 
     @at-root .psv--has-navbar & {
         bottom: $psv-navbar-height;

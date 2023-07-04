@@ -6,6 +6,7 @@ $psv-compass-margin: 10px !default;
     position: absolute;
     margin: $psv-compass-margin;
     z-index: $psv-compass-zindex;
+    cursor: default;
 
     @at-root .psv--has-navbar & {
         margin-bottom: calc(#{$psv-navbar-height} + #{$psv-compass-margin});

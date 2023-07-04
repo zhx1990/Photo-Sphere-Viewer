@@ -96,6 +96,11 @@ export class ViewerState {
     };
 
     /**
+     * Current override of the global cursor
+     */
+    cursorOverride: string;
+
+    /**
      * @internal
      */
     // eslint-disable-next-line  @typescript-eslint/no-empty-function

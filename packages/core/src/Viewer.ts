@@ -126,6 +126,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
 
         // init
         this.resize(this.config.size);
+        this.setCursor(null);
 
         resolveBoolean(SYSTEM.isTouchEnabled, (enabled) => {
             toggleClass(this.container, 'psv--is-touch', enabled);
@@ -497,6 +498,12 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
             this.config[key] = value;
 
             switch (key) {
+                case 'mousemove':
+                    if (!this.state.cursorOverride) {
+                        this.setCursor(null);
+                    }
+                    break;
+
                 case 'caption':
                     this.navbar.setCaption(this.config.caption);
                     break;
@@ -776,6 +783,18 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      */
     createTooltip(config: TooltipConfig): Tooltip {
         return new Tooltip(this, config);
+    }
+
+    /**
+     * Changes global the mouse cursor
+     */
+    setCursor(cursor: string) {
+        this.state.cursorOverride = cursor;
+        if (!cursor) {
+            this.container.style.cursor = this.config.mousemove ? 'move' : 'default';
+        } else {
+            this.container.style.cursor = cursor;
+        }
     }
 
     /**

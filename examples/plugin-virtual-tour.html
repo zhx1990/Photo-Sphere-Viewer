@@ -7,7 +7,6 @@
 
         <link rel="stylesheet" href="/dist/core/index.css" />
         <link rel="stylesheet" href="/dist/markers-plugin/index.css" />
-        <link rel="stylesheet" href="/dist/compass-plugin/index.css" />
         <link rel="stylesheet" href="/dist/gallery-plugin/index.css" />
         <link rel="stylesheet" href="/dist/map-plugin/index.css" />
         <link rel="stylesheet" href="/dist/virtual-tour-plugin/index.css" />
@@ -21,7 +20,6 @@
                 "imports": {
                     "three": "/node_modules/three/build/three.module.js",
                     "@photo-sphere-viewer/core": "/dist/core/index.module.js",
-                    "@photo-sphere-viewer/compass-plugin": "/dist/compass-plugin/index.module.js",
                     "@photo-sphere-viewer/gallery-plugin": "/dist/gallery-plugin/index.module.js",
                     "@photo-sphere-viewer/map-plugin": "/dist/map-plugin/index.module.js",
                     "@photo-sphere-viewer/markers-plugin": "/dist/markers-plugin/index.module.js",
@@ -32,7 +30,6 @@
 
         <script type="module">
             import { Viewer } from '@photo-sphere-viewer/core';
-            import { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
             import { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
             import { MapPlugin } from '@photo-sphere-viewer/map-plugin';
             import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
@@ -47,8 +44,7 @@
                 size: { width: 32, height: 32 },
                 anchor: 'bottom center',
                 gps: [-80.155975, 25.666680, 29 + 3],
-                data: { 
-                    compass: 'red',
+                data: {
                     map: { image: baseUrl + 'pictos/pin-red.png', size: 25 },
                 },
             };
@@ -163,7 +159,6 @@
                 defaultYaw: '100deg',
                 plugins: [
                     MarkersPlugin,
-                    CompassPlugin,
                     GalleryPlugin,
                     [MapPlugin, {
                         static: true,

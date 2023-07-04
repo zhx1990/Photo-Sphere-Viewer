@@ -551,6 +551,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         }
 
         this.viewer.needsUpdate();
+        this.viewer.setCursor('pointer');
     }
 
     private __onHoverObject(viewerPoint: Point) {
@@ -573,6 +574,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         }
 
         this.viewer.needsUpdate();
+        this.viewer.setCursor(null);
     }
 
     /**

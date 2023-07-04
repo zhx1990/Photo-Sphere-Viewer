@@ -74,7 +74,6 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
         this.container = document.createElement('div');
         this.container.className = 'psv-markers';
-        this.container.style.cursor = this.viewer.config.mousemove ? 'move' : 'default';
 
         this.svgContainer = document.createElementNS(SVG_NS, 'svg');
         this.svgContainer.setAttribute('class', 'psv-markers-svg-container');
@@ -117,7 +116,6 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         this.viewer.removeEventListener(events.ClickEvent.type, this);
         this.viewer.removeEventListener(events.DoubleClickEvent.type, this);
         this.viewer.removeEventListener(events.RenderEvent.type, this);
-        this.viewer.removeEventListener(events.ConfigChangedEvent.type, this);
         this.viewer.removeEventListener(events.ObjectEnterEvent.type, this);
         this.viewer.removeEventListener(events.ObjectHoverEvent.type, this);
         this.viewer.removeEventListener(events.ObjectLeaveEvent.type, this);
@@ -152,10 +150,6 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
                 this.__onClick(e as events.DoubleClickEvent, true);
                 break;
 
-            case events.ConfigChangedEvent.type:
-                this.container.style.cursor = this.viewer.config.mousemove ? 'move' : 'default';
-                break;
-
             case events.ObjectEnterEvent.type:
             case events.ObjectLeaveEvent.type:
             case events.ObjectHoverEvent.type:
@@ -164,9 +158,13 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
                     const marker = (e as events.ObjectEvent).object.userData[MARKER_DATA];
                     switch (e.type) {
                         case events.ObjectEnterEvent.type:
+                            if (marker.config.tooltip || marker.config.content) {
+                                this.viewer.setCursor('pointer');
+                            }
                             this.__onMouseEnter(event, marker);
                             break;
                         case events.ObjectLeaveEvent.type:
+                            this.viewer.setCursor(null);
                             this.__onMouseLeave(event, marker);
                             break;
                         case events.ObjectHoverEvent.type:

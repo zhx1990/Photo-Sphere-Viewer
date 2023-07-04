@@ -98,9 +98,6 @@ export class Renderer extends AbstractService {
      * @internal
      */
     init() {
-        if (this.config.mousemove) {
-            this.container.style.cursor = 'move';
-        }
         this.show();
         this.renderer.setAnimationLoop((t) => this.__renderLoop(t));
     }
@@ -138,9 +135,6 @@ export class Renderer extends AbstractService {
             case ConfigChangedEvent.type:
                 if ((e as ConfigChangedEvent).containsOptions('fisheye')) {
                     this.__onPositionUpdated();
-                }
-                if ((e as ConfigChangedEvent).containsOptions('mousemove')) {
-                    this.container.style.cursor = this.config.mousemove ? 'move' : 'default';
                 }
                 if ((e as ConfigChangedEvent).containsOptions('canvasBackground')) {
                     this.container.style.background = this.config.canvasBackground;

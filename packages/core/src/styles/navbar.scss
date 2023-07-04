@@ -9,6 +9,7 @@
     background: $psv-navbar-background;
     transition: bottom ease-in-out 0.1s;
     font: $psv-caption-font;
+    cursor: default;
 
     &--open {
         bottom: 0;
@@ -70,7 +71,7 @@
     color: $psv-caption-text-color;
     overflow: hidden;
     text-align: center;
-    cursor: default;
+    cursor: unset;
     padding: unset;
     height: unset;
     width: unset;
