@@ -172,7 +172,7 @@ export class MapComponent extends AbstractComponent {
                 if (this.state.mousedown) {
                     this.__move(event.clientX, event.clientY);
                     e.stopPropagation();
-                } else {
+                } else if (!this.state.collapsed) {
                     this.__handleHotspots(event.clientX, event.clientY);
                 }
                 break;
@@ -205,7 +205,9 @@ export class MapComponent extends AbstractComponent {
                     this.state.mousedown = false;
                     e.stopPropagation();
                 }
-                this.__clickHotspot(mouse.clientX, mouse.clientY);
+                if (!this.state.collapsed) {
+                    this.__clickHotspot(mouse.clientX, mouse.clientY);
+                }
                 break;
             }
             case 'wheel': {
