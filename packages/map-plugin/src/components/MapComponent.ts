@@ -1,5 +1,5 @@
 import type { Point, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractComponent, CONSTANTS, SYSTEM, utils } from '@photo-sphere-viewer/core';
+import { AbstractComponent, CONSTANTS, events, SYSTEM, utils } from '@photo-sphere-viewer/core';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { MathUtils } from 'three';
 import { HOTSPOT_MARKER_ID, MAP_SHADOW_BLUR, PIN_SHADOW_BLUR, PIN_SHADOW_OFFSET } from '../constants';
@@ -86,6 +86,7 @@ export class MapComponent extends AbstractComponent {
         window.addEventListener('touchmove', this);
         window.addEventListener('touchend', this);
         canvasContainer.addEventListener('wheel', this);
+        viewer.addEventListener(events.KeypressEvent.type, this);
 
         // map canvas
         this.canvas = document.createElement('canvas');
@@ -131,6 +132,7 @@ export class MapComponent extends AbstractComponent {
         window.removeEventListener('mousemove', this);
         window.removeEventListener('touchend', this);
         window.removeEventListener('mouseup', this);
+        this.viewer.removeEventListener(events.KeypressEvent.type, this);
 
         cancelAnimationFrame(this.state.renderLoop);
 
@@ -142,6 +144,12 @@ export class MapComponent extends AbstractComponent {
             return;
         }
         switch (e.type) {
+            case events.KeypressEvent.type:
+                if (this.state.maximized) {
+                    this.__onKeyPress((e as events.KeypressEvent).key);
+                    e.preventDefault();
+                }
+                break;
             case 'mousedown': {
                 const event = e as MouseEvent;
                 this.state.mouseX = event.clientX;
@@ -213,7 +221,11 @@ export class MapComponent extends AbstractComponent {
             case 'wheel': {
                 const event = e as WheelEvent;
                 const delta = event.deltaY / Math.abs(event.deltaY);
-                this.zoom(-delta / 10);
+                if (event.ctrlKey) {
+                    this.viewer.dynamics.position.step({ yaw: delta / 10 });
+                } else {
+                    this.zoom(-delta / 10);
+                }
                 e.stopPropagation();
                 e.preventDefault();
                 break;
@@ -652,5 +664,41 @@ export class MapComponent extends AbstractComponent {
         }
 
         return this.state.images[url].value;
+    }
+
+    private __onKeyPress(key: string) {
+        if (key === CONSTANTS.KEY_CODES.Escape) {
+            this.toggleMaximized();
+            return;
+        }
+
+        if (!this.viewer.state.keyboardEnabled) {
+            return;
+        }
+
+        let x = 0;
+        let y = 0;
+        let z = 0;
+
+        switch (key) {
+            case CONSTANTS.KEY_CODES.ArrowUp: y = 1; break;
+            case CONSTANTS.KEY_CODES.ArrowDown: y = -1; break;
+            case CONSTANTS.KEY_CODES.ArrowLeft: x = 1; break;
+            case CONSTANTS.KEY_CODES.ArrowRight: x = -1; break;
+            case CONSTANTS.KEY_CODES.Plus: z = 1; break;
+            case CONSTANTS.KEY_CODES.Minus: z = -1; break;
+            case CONSTANTS.KEY_CODES.PageUp: z = 1; break;
+            case CONSTANTS.KEY_CODES.PageDown: z = -1; break;
+        }
+
+        if (x || y) {
+            this.state.mouseX = 0;
+            this.state.mouseY = 0;
+            this.__move(x * 10, y * 10);
+        }
+
+        if (z) {
+            this.zoom(z / 10);
+        }
     }
 }
