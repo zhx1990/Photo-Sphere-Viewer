@@ -1,10 +1,10 @@
 import { BufferGeometry, MathUtils, Mesh, ShaderMaterial, SphereGeometry, Texture } from 'three';
+import { PSVError } from '../PSVError';
+import type { Viewer } from '../Viewer';
 import { SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { PanoData, PanoDataProvider, TextureData } from '../model';
-import { PSVError } from '../PSVError';
-import { createTexture, firstNonNull, getConfigParser, getXMPValue, logWarn } from '../utils';
-import type { Viewer } from '../Viewer';
+import { createTexture, firstNonNull, getConfigParser, getXMPValue, isNil, logWarn } from '../utils';
 import { AbstractAdapter } from './AbstractAdapter';
 
 /**
@@ -16,6 +16,11 @@ export type EquirectangularAdapterConfig = {
      * @default 64
      */
     resolution?: number;
+    /**
+     * read real image size from XMP data
+     * @default true
+     */
+    useXmpData?: boolean;
     /**
      * used for equirectangular tiles adapter
      * @internal
@@ -29,6 +34,7 @@ type EquirectangularTexture = TextureData<Texture, string>;
 const getConfig = getConfigParser<EquirectangularAdapterConfig>(
     {
         resolution: 64,
+        useXmpData: true,
         blur: false,
     },
     {
@@ -58,6 +64,9 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         super(viewer);
 
         this.config = getConfig(config);
+        if (!isNil(this.viewer.config.useXmpData)) {
+            this.config.useXmpData = this.viewer.config.useXmpData;
+        }
 
         this.SPHERE_SEGMENTS = this.config.resolution;
         this.SPHERE_HORIZONTAL_SEGMENTS = this.SPHERE_SEGMENTS / 2;
@@ -74,7 +83,7 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
     async loadTexture(
         panorama: string,
         newPanoData: PanoData | PanoDataProvider,
-        useXmpPanoData = this.viewer.config.useXmpData
+        useXmpPanoData = this.config.useXmpData
     ): Promise<EquirectangularTexture> {
         if (typeof panorama !== 'string') {
             return Promise.reject(new PSVError('Invalid panorama url, are you using the right adapter?'));
@@ -85,7 +94,7 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         const img = await this.viewer.textureLoader.blobToImage(blob);
 
         if (typeof newPanoData === 'function') {
-            newPanoData = newPanoData(img);
+            newPanoData = newPanoData(img, xmpPanoData);
         }
 
         const panoData = {

@@ -1,4 +1,4 @@
-import type { Position, Size, TextureData, Viewer } from '@photo-sphere-viewer/core';
+import type { EquirectangularAdapterConfig, Position, Size, TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { EquirectangularAdapter, events } from '@photo-sphere-viewer/core';
 import { BufferGeometry, Euler, MathUtils, Matrix4, Mesh, PlaneGeometry, ShaderMaterial, Texture } from 'three';
 
@@ -17,8 +17,8 @@ export class LittlePlanetAdapter extends EquirectangularAdapter {
 
     private uniforms: ShaderMaterial['uniforms'];
 
-    constructor(viewer: Viewer) {
-        super(viewer, undefined);
+    constructor(viewer: Viewer, config?: EquirectangularAdapterConfig) {
+        super(viewer, config);
 
         this.viewer.state.littlePlanet = true;
 

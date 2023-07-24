@@ -82,8 +82,9 @@ const getConfig = utils.getConfigParser<EquirectangularTilesAdapterConfig>(
         showErrorTile: true,
         baseBlur: true,
         antialias: true,
-        blur: false,
         debug: false,
+        blur: false,
+        useXmpData: false,
     },
     {
         resolution: (resolution) => {
@@ -137,8 +138,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
         super(viewer);
 
         this.config = getConfig(config);
-
-        this.viewer.config.useXmpData = false;
 
         this.SPHERE_SEGMENTS = this.config.resolution;
         this.SPHERE_HORIZONTAL_SEGMENTS = this.SPHERE_SEGMENTS / 2;
@@ -221,6 +220,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
             if (!this.adapter) {
                 this.adapter = new EquirectangularAdapter(this.viewer, {
                     blur: this.config.baseBlur,
+                    useXmpData: false,
                 });
             }
 

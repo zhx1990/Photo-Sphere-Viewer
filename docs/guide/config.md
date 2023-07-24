@@ -246,16 +246,13 @@ Speed multiplicator for panorama moves. Used for click move, touch move and navb
 
 Speed multiplicator for panorama zooms. Used for mouse wheel, touch pinch and navbar buttons.
 
-#### `useXmpData`
+#### ~~`useXmpData`~~
 
--   type: `boolean`
--   default `true`
-
-Read real image size from XMP data, must be kept `true` if the panorama has been cropped after shot. This is used for [cropped panorama](./adapters/equirectangular.md#cropped-panorama).
+Deprecated : must be configured [on the adapter](./adapters/equirectangular.md#configuration).
 
 #### `panoData`
 
--   type: `object | function<Image, object>`
+-   type: `object | function<Image, PanoData, PanoData>`
 
 Overrides XMP data found in the panorama file (or if `useXmpData=false`).
 All parameters are optional.
@@ -277,7 +274,7 @@ panoData: {
 It can also be a function to dynamically compute the cropping config depending on the loaded image.
 
 ```js
-panoData: (image) => ({
+panoData: (image, xmpData) => ({
     fullWidth: image.width,
     fullHeight: Math.round(image.width / 2),
     croppedWidth: image.width,

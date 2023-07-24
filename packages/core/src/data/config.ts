@@ -38,7 +38,7 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
     mousemove: true,
     mousewheelCtrlKey: false,
     touchmoveTwoFingers: false,
-    useXmpData: true,
+    useXmpData: null,
     panoData: null,
     requestHeaders: null,
     canvasBackground: '#000',
@@ -231,6 +231,12 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
             return navbar.split(/[ ,]/);
         }
         return navbar;
+    },
+    useXmpData: (useXmpData) => {
+        if (useXmpData !== null) {
+            logWarn(`Global useXmpData is deprecated, it is now configured on the adapter.`);
+        }
+        return useXmpData;
     },
 };
 

@@ -11,13 +11,20 @@ There is no need to declare the equirectangular adapter as it is the default one
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
     adapter: [PhotoSphereViewer.EquirectangularAdapter, {
-        resolution: 64, // default
+        useXmpData: true, // default
     }],
     panorama: 'path/panorama.jpg',
 });
 ```
 
 ## Configuration
+
+#### `useXmpData`
+
+-   type: `boolean`
+-   default `true`
+
+Read real image size from XMP data, must be kept `true` if the panorama has been cropped after shot. This is used for [cropped panorama](#cropped-panorama).
 
 #### `resolution`
 

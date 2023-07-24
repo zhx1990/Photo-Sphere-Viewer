@@ -103,7 +103,7 @@ export type PanoData = {
 /**
  * Function to compute panorama data once the image is loaded
  */
-export type PanoDataProvider = (image: HTMLImageElement) => PanoData;
+export type PanoDataProvider = (image: HTMLImageElement, xmpData?: PanoData) => PanoData;
 
 /**
  * Object defining options for {@link Viewer.setPanorama}
@@ -313,7 +313,7 @@ export type ViewerConfig = {
     mousewheelCtrlKey?: boolean;
     /** @default false */
     touchmoveTwoFingers?: boolean;
-    /** @default true */
+    /** @deprecated configure on EquirectangularAdapter */
     useXmpData?: boolean;
     panoData?: PanoData | PanoDataProvider;
     requestHeaders?: Record<string, string> | ((url: string) => Record<string, string>);

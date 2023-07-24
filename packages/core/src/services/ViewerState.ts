@@ -81,7 +81,7 @@ export class ViewerState {
     };
 
     /**
-     *  panorama metadata, if supported
+     * panorama metadata, if supported
      */
     panoData: PanoData = {
         fullWidth: 0,
