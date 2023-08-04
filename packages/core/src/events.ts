@@ -215,6 +215,19 @@ export class PanoramaLoadedEvent extends ViewerEvent {
 }
 
 /**
+ * @event Triggered when an error occured when loading the panorama
+ */
+export class PanoramaErrorEvent extends ViewerEvent {
+    static override readonly type = 'panorama-error';
+    override type: 'panorama-error';
+
+    /** @internal */
+    constructor(public readonly panorama: any, public readonly error: Error) {
+        super(PanoramaErrorEvent.type);
+    }
+}
+
+/**
  * @event Triggered when the view angles change
  */
 export class PositionUpdatedEvent extends ViewerEvent {
@@ -427,6 +440,7 @@ export type ViewerEvents =
     | KeypressEvent
     | LoadProgressEvent
     | PanoramaLoadedEvent
+    | PanoramaErrorEvent
     | PositionUpdatedEvent
     | ReadyEvent
     | RenderEvent

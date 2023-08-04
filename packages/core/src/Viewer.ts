@@ -13,6 +13,7 @@ import {
     BeforeAnimateEvent,
     BeforeRotateEvent,
     ConfigChangedEvent,
+    PanoramaErrorEvent,
     PanoramaLoadedEvent,
     ReadyEvent,
     SizeUpdatedEvent,
@@ -353,6 +354,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                 this.navbar.setCaption('');
                 this.showError(this.config.lang.loadError);
                 console.error(err);
+                this.dispatchEvent(new PanoramaErrorEvent(path, err));
                 throw err;
             } else {
                 this.setOverlay(options.overlay, options.overlayOpacity);
