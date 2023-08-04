@@ -293,6 +293,10 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
         this.markers[marker.id] = marker;
 
+        if (this.state.showAllTooltips) {
+            marker.state.staticTooltip = true;
+        }
+
         if (render) {
             this.__afterChangerMarkers();
         }

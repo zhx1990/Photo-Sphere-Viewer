@@ -804,7 +804,9 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      * @param userDataKey - only objects with the following `userData` will be observed
      */
     observeObjects(userDataKey: string): void {
-        this.state.objectsObservers[userDataKey] = null;
+        if (!this.state.objectsObservers[userDataKey]) {
+            this.state.objectsObservers[userDataKey] = null;
+        }
     }
 
     /**
