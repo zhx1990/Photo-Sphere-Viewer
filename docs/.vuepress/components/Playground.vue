@@ -78,6 +78,14 @@
                                 </div>
                             </div>
 
+                            <div class="custom-block danger" v-if="error">
+                                <p class="custom-block-title">This image cannot be loaded</p> 
+                                <p>
+                                    An undefined error occurred while loading the panorama. 
+                                    If your image is very big and you are using Firefox please try with Chrome, as Firefox has trouble loading large base64 images.
+                                </p>
+                            </div>
+
                             <md-field md-clearable>
                                 <label>Caption</label>
                                 <md-input name="caption" v-model="options.caption" :disabled="!imageData" />
@@ -608,6 +616,8 @@
 const { cloneDeep, omit, debounce, isEqual, pickBy, range, size } = require('lodash');
 import EDIT_SVG from '!raw-loader!./edit.svg';
 
+const DEFAULT_IMAGE = 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg';
+
 const TEMP_ID = 'marker-temp';
 const DEFAULT_OPTIONS = omit(PhotoSphereViewer.DEFAULTS, [
     'panorama',
@@ -654,6 +664,7 @@ export default {
         markers: null,
         file: null,
         imageData: null,
+        error: false,
         sphereCorrection: cloneDeep(DEFAULT_SPHERE_CORRECTION),
         options: cloneDeep(DEFAULT_OPTIONS),
         panoData: {
@@ -781,30 +792,49 @@ export default {
         },
 
         loadFile(files) {
+            this.error = false;
+
+            if (this.imageData === DEFAULT_IMAGE) {
+                this.options.caption = null;
+            } else if (this.imageData) {
+                URL.revokeObjectURL(this.imageData);
+                this.imageData = null;
+            }
+
             if (files && files[0]) {
                 const reader = new FileReader();
 
                 reader.onload = (event) => {
+                    this.imageData = event.target.result;
+
                     const image = new Image();
 
                     image.onload = () => {
-                        this.imageData = image.src;
                         this.setPanorama(image.width, image.height);
-                        this.options.caption = null;
+                    };
+
+                    image.onerror = () => {
+                        URL.revokeObjectURL(this.imageData);
+                        this.imageData = null;
+                        this.error = true;
+                        this.setPanorama();
                     };
 
                     image.src = event.target.result;
                 };
 
                 reader.readAsDataURL(files[0]);
-            } else {
-                this.imageData = null;
-                this.setPanorama();
             }
         },
 
         loadDefaultFile() {
-            this.imageData = 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg';
+            this.error = false;
+
+            if (this.imageData) {
+                URL.revokeObjectURL(this.imageData);
+            }
+
+            this.imageData = DEFAULT_IMAGE;
             this.file = null;
             this.setPanorama(6000, 3000);
             this.options.caption = 'Parc national du Mercantour <b>&copy; Damien Sorel</b>';

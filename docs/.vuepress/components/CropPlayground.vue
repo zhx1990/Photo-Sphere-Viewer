@@ -61,7 +61,7 @@
             </div>
         </div>
 
-        <div class="md-layout md-gutter">
+        <div class="md-layout md-gutter" style="margin-bottom: 30px">
             <div class="md-layout-item">
                 <label class="md-caption">Pose Heading</label>
                 <vue-slider
@@ -97,8 +97,14 @@
             </div>
         </div>
 
-        <div style="margin-top: 30px">
-            <md-button class="md-raised md-dense md-primary" :disabled="loading" v-on:click="apply">Apply</md-button>
+        <md-button class="md-raised md-dense md-primary" :disabled="loading" v-on:click="apply">Apply</md-button>
+
+        <div class="custom-block danger" v-if="error">
+            <p class="custom-block-title">This image cannot be loaded</p> 
+            <p>
+                An undefined error occurred while loading the panorama. 
+                If your image is very big and you are using Firefox please try with Chrome, as Firefox has trouble loading large base64 images.
+            </p>
         </div>
 
         <md-tabs md-elevation="1" md-alignment="left" v-show="!loading">
@@ -119,6 +125,7 @@ export default {
     data: () => ({
         psv: null,
         loading: true,
+        error: false,
         file: null,
         imageData: null,
         xmpData: '',
@@ -141,6 +148,13 @@ export default {
     },
     methods: {
         loadFile(files) {
+            this.error = false;
+
+            if (this.imageData) {
+                URL.revokeObjectURL(this.imageData);
+                this.imageData = null;
+            }
+
             if (files && files[0]) {
                 this.loading = true;
 
@@ -158,12 +172,16 @@ export default {
                         this.loading = false;
                     };
 
+                    image.onerror = () => {
+                        URL.revokeObjectURL(this.imageData);
+                        this.imageData = null;
+                        this.error = true;
+                    };
+
                     image.src = this.imageData;
                 };
 
                 reader.readAsDataURL(files[0]);
-            } else {
-                this.imageData = null;
             }
         },
 
@@ -221,19 +239,19 @@ export default {
 
         loadPsv() {
             if (this.psv) {
-                this.psv.destroy();
+                this.psv.setPanorama(this.imageData, { panoData: this.panoData });
+            } else {
+                this.psv = new PhotoSphereViewer.Viewer({
+                    panorama: this.imageData,
+                    container: 'viewer',
+                    loadingImg: 'https://photo-sphere-viewer-data.netlify.app/assets/loader.gif',
+                    panoData: this.panoData,
+                    navbar: ['zoom', 'fullscreen'],
+                    size: {
+                        height: 500,
+                    },
+                });
             }
-
-            this.psv = new PhotoSphereViewer.Viewer({
-                panorama: this.imageData,
-                container: 'viewer',
-                loadingImg: 'https://photo-sphere-viewer-data.netlify.app/assets/loader.gif',
-                panoData: this.panoData,
-                navbar: ['zoom', 'fullscreen'],
-                size: {
-                    height: 500,
-                },
-            });
         },
     },
 };
