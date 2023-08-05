@@ -65,7 +65,7 @@
                             <div class="md-layout md-gutter">
                                 <md-button
                                     class="md-dense md-raised"
-                                    style="margin: 15px 0 0 20px; width: 150px"
+                                    style="margin: 20px 0 0 20px; width: 150px"
                                     v-on:click="loadDefaultFile"
                                 >
                                     Use demo file
@@ -432,7 +432,7 @@
                             class="md-layout md-gutter"
                             v-if="markerForm.type === 'polygon' || markerForm.type === 'polyline'"
                         >
-                            <div class="md-layout-item md-size-33" v-if="markerForm.type === 'polygon'">
+                            <div class="md-layout-item md-size-25" v-if="markerForm.type === 'polygon'">
                                 <md-field>
                                     <label>Fill color</label>
                                     <v-swatches shapes="circles" v-model="markerForm.svgStyle.fill">
@@ -440,7 +440,26 @@
                                     </v-swatches>
                                 </md-field>
                             </div>
-                            <div class="md-layout-item md-size-33">
+                            <div class="md-layout-item md-size-25" v-if="markerForm.type === 'polygon'">
+                                <label class="md-caption">Fill opacity</label>
+                                <vue-slider
+                                    v-model="markerForm.svgStyle.fillOpacity"
+                                    :min="0"
+                                    :max="1"
+                                    :interval="0.1"
+                                    :drag-on-click="true"
+                                    :marks="[0,.2,.4,.6,.8,1]"
+                                />
+                            </div>
+                            <div class="md-layout-item md-size-25">
+                                <md-field>
+                                    <label>Stroke color</label>
+                                    <v-swatches shapes="circles" popover-x="left" v-model="markerForm.svgStyle.stroke">
+                                        <md-input slot="trigger" :value="markerForm.svgStyle.stroke" />
+                                    </v-swatches>
+                                </md-field>
+                            </div>
+                            <div class="md-layout-item md-size-25">
                                 <label class="md-caption">Stroke width</label>
                                 <vue-slider
                                     v-model="markerForm.svgStyle.strokeWidth"
@@ -449,14 +468,6 @@
                                     :drag-on-click="true"
                                     :marks="true"
                                 />
-                            </div>
-                            <div class="md-layout-item md-size-33">
-                                <md-field>
-                                    <label>Stroke color</label>
-                                    <v-swatches shapes="circles" popover-x="left" v-model="markerForm.svgStyle.stroke">
-                                        <md-input slot="trigger" :value="markerForm.svgStyle.stroke" />
-                                    </v-swatches>
-                                </md-field>
                             </div>
                         </div>
 
@@ -719,6 +730,7 @@ export default {
             },
             svgStyle: {
                 fill: null,
+                fillOpacity: null,
                 stroke: null,
                 strokeWidth: null,
             },
@@ -989,6 +1001,7 @@ export default {
                 case 'polygon':
                     this.markerForm.polygon = [];
                     this.markerForm.svgStyle.fill = '#E84B3C';
+                    this.markerForm.svgStyle.fillOpacity = 0.5;
                     this.markerForm.svgStyle.strokeWidth = 2;
                     this.markerForm.svgStyle.stroke = '#C0382B';
                     break;
@@ -1219,6 +1232,9 @@ export default {
                     m.svgStyle = pickBy(marker.config.svgStyle, (v) => !!v);
                     if (!m.svgStyle.strokeWidth) {
                         delete m.svgStyle.stroke;
+                    }
+                    if (!m.svgStyle.fillOpacity) {
+                        delete m.svgStyle.fill;
                     }
                     if (!Object.entries(m.svgStyle).length) {
                         delete m.svgStyle;
