@@ -317,8 +317,8 @@ export type ViewerConfig = {
     useXmpData?: boolean;
     panoData?: PanoData | PanoDataProvider;
     requestHeaders?: Record<string, string> | ((url: string) => Record<string, string>);
-    /** @default '#000' */
-    canvasBackground?: string;
+    /** @deprecated configure on EquirectangularAdapter */
+    canvasBackground?: 'auto' | string;
     /** @default '{ alpha: true, antialias: true }' */
     rendererParameters?: WebGLRendererParameters;
     /** @default false */

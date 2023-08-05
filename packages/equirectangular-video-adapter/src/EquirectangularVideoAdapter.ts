@@ -12,7 +12,6 @@ const getConfig = utils.getConfigParser<EquirectangularVideoAdapterConfig>(
         resolution: 64,
         autoplay: false,
         muted: false,
-        useXmpData: false,
         blur: false,
     },
     {

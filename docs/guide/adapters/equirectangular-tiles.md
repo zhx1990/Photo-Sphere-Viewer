@@ -66,7 +66,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 -   type: `boolean`
 -   default: `true`
 
-Applies a 1px blur to the base image (option `baseUrl`).
+Applies a blur filter to the base image (option `baseUrl`).
 
 #### `showErrorTile`
 
@@ -75,21 +75,22 @@ Applies a 1px blur to the base image (option `baseUrl`).
 
 Shows a warning sign on tiles that cannot be loaded.
 
-#### `resolution`
-
--   type: `number`
--   default: `64`
-
-The number of faces of the sphere geometry used to display the panorama, higher values can reduce deformations on straight lines at the cost of performances.
-
-_Note: the actual number of faces is `resolution² / 2`._
-
 #### `antialias`
 
 -   type: `boolean`
 -   default: `true`
 
 Applies antialiasing to high resolutions tiles.
+
+#### `canvasBackround`
+
+See the [equirectangular adapter configuration](./equirectangular.md#canvasbackround).
+
+_Note:_ `'auto'` is only applicable if a `baseUrl` is provided on the panorama.
+
+#### `resolution`
+
+See the [equirectangular adapter configuration](./equirectangular.md#resolution).
 
 ## Panorama options
 

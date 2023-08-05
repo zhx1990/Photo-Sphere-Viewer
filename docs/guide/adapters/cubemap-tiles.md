@@ -76,17 +76,14 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 #### `flipTopBottom`
 
--   type: `boolean`
--   default: `false`
-
-Set to `true` if the top and bottom faces are not correctly oriented.
+See the [cubemap adapter configuration](./cubemap.md#fliptopbottom).
 
 #### `baseBlur`
 
 -   type: `boolean`
 -   default: `true`
 
-Applies a 1px blur to the base image (option `baseUrl`).
+Applies a blur filter to the base image (option `baseUrl`).
 
 #### `showErrorTile`
 

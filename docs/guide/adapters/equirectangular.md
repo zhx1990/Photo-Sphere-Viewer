@@ -26,6 +26,13 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 Read real image size from XMP data, must be kept `true` if the panorama has been cropped after shot. This is used for [cropped panorama](#cropped-panorama).
 
+#### `canvasBackground`
+
+-   type: `'auto' | string`
+-   default: `#000`
+
+Background color of the canvas, which will be visible when using cropped panoramas. When set to `auto`, a blurry background will be generated from the panorama image.
+
 #### `resolution`
 
 -   type: `number`

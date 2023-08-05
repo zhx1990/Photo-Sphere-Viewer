@@ -78,6 +78,7 @@ function tileId(tile: EquirectangularTile): string {
 
 const getConfig = utils.getConfigParser<EquirectangularTilesAdapterConfig>(
     {
+        canvasBackground: '#000',
         resolution: 64,
         showErrorTile: true,
         baseBlur: true,
@@ -219,6 +220,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
         if (panorama.baseUrl) {
             if (!this.adapter) {
                 this.adapter = new EquirectangularAdapter(this.viewer, {
+                    canvasBackground: this.config.canvasBackground,
                     blur: this.config.baseBlur,
                     useXmpData: false,
                 });
@@ -298,7 +300,9 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
         if (texture) {
             material = new MeshBasicMaterial({ map: texture });
         } else {
-            material = new MeshBasicMaterial({ opacity: 0, transparent: true });
+            material = new MeshBasicMaterial({ 
+                color: this.config.canvasBackground === 'auto' ? '#000' : this.config.canvasBackground,
+            });
         }
 
         for (let i = 0; i < this.NB_GROUPS; i++) {

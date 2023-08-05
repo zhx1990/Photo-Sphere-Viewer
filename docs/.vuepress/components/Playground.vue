@@ -264,20 +264,34 @@
                                     </md-checkbox>
                                 </div>
                                 <div class="md-layout-item md-size-33">
-                                    <md-field>
-                                        <label>Canvas background</label>
-                                        <v-swatches
-                                            shapes="circles"
-                                            v-model="options.canvasBackground"
-                                            :disabled="!imageData"
-                                        >
-                                            <md-input
-                                                slot="trigger"
-                                                :value="options.canvasBackground"
+                                    <div class="md-layout">
+                                        <md-field class="md-layout-item md-size-75">
+                                            <label>Canvas background</label>
+                                            <v-swatches
+                                                shapes="circles"
+                                                swatch-size="32"
+                                                row-length="8"
+                                                v-model="canvasBackground"
                                                 :disabled="!imageData"
-                                            />
-                                        </v-swatches>
-                                    </md-field>
+                                            >
+                                                <md-input
+                                                    slot="trigger"
+                                                    :value="canvasBackground"
+                                                    :disabled="!imageData"
+                                                />
+                                            </v-swatches>
+                                        </md-field>
+                                        <div class="md-layout-item md-size-25">
+                                            <md-button 
+                                                class="md-primary md-raised"
+                                                style="margin: 10px 0 0 0; min-width: 0;"
+                                                :disabled="!imageData"
+                                                v-on:click="canvasBackground = 'auto'"
+                                            >
+                                                auto
+                                            </md-button>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </md-tab>
@@ -667,6 +681,7 @@ export default {
         error: false,
         sphereCorrection: cloneDeep(DEFAULT_SPHERE_CORRECTION),
         options: cloneDeep(DEFAULT_OPTIONS),
+        canvasBackground: '#000',
         panoData: {
             fullWidth: null,
             fullHeight: null,
@@ -749,6 +764,11 @@ export default {
                 this._applyOptions();
             },
         },
+        canvasBackground: {
+            handler() {
+                this.applyCanvasBackground();
+            },
+        },
         sphereCorrection: {
             deep: true,
             handler() {
@@ -774,6 +794,9 @@ export default {
             this.viewer = new PhotoSphereViewer.Viewer({
                 container: 'viewer',
                 loadingImg: 'https://photo-sphere-viewer-data.netlify.app/assets/loader.gif',
+                adapter: [PhotoSphereViewer.EquirectangularAdapter, {
+                    canvasBackground: this.canvasBackground,
+                }],
                 plugins: [PhotoSphereViewer.MarkersPlugin],
             });
 
@@ -893,6 +916,13 @@ export default {
                 }
             }
             this.oldOptions = cloneDeep(this.options);
+        },
+
+        applyCanvasBackground() {
+            if (this.viewer) {
+                this.viewer.adapter.config.canvasBackground = this.canvasBackground;
+                this.viewer.setPanorama(this.imageData, { panoData: this.viewer.state.panoData });
+            }
         },
 
         applyNavbar() {

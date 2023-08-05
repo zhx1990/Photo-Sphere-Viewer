@@ -4,13 +4,29 @@ import type { Viewer } from '../Viewer';
 import { SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { PanoData, PanoDataProvider, TextureData } from '../model';
-import { createTexture, firstNonNull, getConfigParser, getXMPValue, isNil, logWarn } from '../utils';
+import {
+    averageRgb,
+    createHorizontalGradient,
+    createTexture,
+    firstNonNull,
+    getAverageColor,
+    getConfigParser,
+    getXMPValue,
+    isNil,
+    logWarn,
+    rgbCss,
+} from '../utils';
 import { AbstractAdapter } from './AbstractAdapter';
 
 /**
  * Configuration for {@link EquirectangularAdapter}
  */
 export type EquirectangularAdapterConfig = {
+    /**
+     * Background color of the canvas, which will be visible when using cropped panoramas
+     * @default '#000'
+     */
+    canvasBackground?: 'auto' | string;
     /**
      * number of faces of the sphere geometry, higher values may decrease performances
      * @default 64
@@ -33,6 +49,7 @@ type EquirectangularTexture = TextureData<Texture, string>;
 
 const getConfig = getConfigParser<EquirectangularAdapterConfig>(
     {
+        canvasBackground: '#000',
         resolution: 64,
         useXmpData: true,
         blur: false,
@@ -67,6 +84,9 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         if (!isNil(this.viewer.config.useXmpData)) {
             this.config.useXmpData = this.viewer.config.useXmpData;
         }
+        if (!isNil(this.viewer.config.canvasBackground)) {
+            this.config.canvasBackground = this.viewer.config.canvasBackground;
+        }
 
         this.SPHERE_SEGMENTS = this.config.resolution;
         this.SPHERE_HORIZONTAL_SEGMENTS = this.SPHERE_SEGMENTS / 2;
@@ -96,6 +116,9 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         if (typeof newPanoData === 'function') {
             newPanoData = newPanoData(img, xmpPanoData);
         }
+        if (!newPanoData && !xmpPanoData) {
+            newPanoData = this.__defaultPanoData(img);
+        }
 
         const panoData = {
             fullWidth: firstNonNull(newPanoData?.fullWidth, xmpPanoData?.fullWidth, img.width),
@@ -110,11 +133,20 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         };
 
         if (panoData.croppedWidth !== img.width || panoData.croppedHeight !== img.height) {
-            logWarn(`Invalid panoData, croppedWidth and/or croppedHeight is not coherent with loaded image.
-              panoData: ${panoData.croppedWidth}x${panoData.croppedHeight}, image: ${img.width}x${img.height}`);
+            logWarn(`Invalid panoData, croppedWidth/croppedHeight is not coherent with the loaded image.
+            panoData: ${panoData.croppedWidth}x${panoData.croppedHeight}, image: ${img.width}x${img.height}`);
         }
-        if ((newPanoData || xmpPanoData) && panoData.fullWidth !== panoData.fullHeight * 2) {
+        if (Math.abs(panoData.fullWidth - panoData.fullHeight * 2) > 1) {
             logWarn('Invalid panoData, fullWidth should be twice fullHeight');
+            panoData.fullWidth = panoData.fullHeight * 2;
+        }
+        if (panoData.croppedX + panoData.croppedWidth > panoData.fullWidth) {
+            logWarn('Invalid panoData, croppedX + croppedWidth > fullWidth');
+            panoData.croppedX = panoData.fullWidth - panoData.croppedWidth;
+        }
+        if (panoData.croppedY + panoData.croppedHeight > panoData.fullHeight) {
+            logWarn('Invalid panoData, croppedY + croppedHeight > fullHeight');
+            panoData.croppedY = panoData.fullHeight - panoData.croppedHeight;
         }
 
         const texture = this.createEquirectangularTexture(img, panoData);
@@ -188,10 +220,16 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
 
             const ctx = buffer.getContext('2d');
 
-            if (this.config.blur) {
-                ctx.filter = `blur(${buffer.width / 2048}px)`;
+            if (this.config.canvasBackground === 'auto') {
+                this.__autoBackground(buffer, img, resizedPanoData);
+            } else {
+                ctx.fillStyle = this.config.canvasBackground ?? '#000';
+                ctx.fillRect(0, 0, buffer.width, buffer.height);
             }
 
+            ctx.filter = this.config.blur ? `blur(${buffer.width / 2048}px)` : 'none';
+
+            // final draw
             ctx.drawImage(
                 img,
                 resizedPanoData.croppedX,
@@ -248,5 +286,167 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
             mesh.material.uniforms[uniform].value.dispose();
         }
         mesh.material.uniforms[uniform].value = value;
+    }
+
+    private __defaultPanoData(img: HTMLImageElement): PanoData {
+        const fullWidth = Math.max(img.width, img.height * 2);
+        const fullHeight = Math.round(fullWidth / 2);
+        const croppedX = Math.round((fullWidth - img.width) / 2);
+        const croppedY = Math.round((fullHeight - img.height) / 2);
+
+        return {
+            fullWidth: fullWidth,
+            fullHeight: fullHeight,
+            croppedWidth: img.width,
+            croppedHeight: img.height,
+            croppedX: croppedX,
+            croppedY: croppedY,
+        };
+    }
+
+    /**
+     * Many operations draw outside the canvas in order to have a correct blur filter
+     */
+    private __autoBackground(buffer: HTMLCanvasElement, img: HTMLImageElement, panoData: PanoData) {
+        const croppedY2 = panoData.fullHeight - panoData.croppedHeight - panoData.croppedY;
+        const croppedX2 = panoData.fullWidth - panoData.croppedWidth - panoData.croppedX;
+
+        if (panoData.croppedX <= 0 && panoData.croppedY <= 0 && croppedX2 <= 0 && croppedY2 <= 0) {
+            return;
+        }
+
+        const blurSize = buffer.width / 16;
+        const padding = blurSize;
+        const edge = 10;
+        const filter = `blur(${blurSize}px)`;
+
+        const ctx = buffer.getContext('2d');
+
+        // first draw to get the colors
+        ctx.drawImage(
+            img,
+            panoData.croppedX,
+            panoData.croppedY,
+            panoData.croppedWidth,
+            panoData.croppedHeight
+        );
+
+        // top section
+        if (panoData.croppedY > 0) {
+            if (panoData.croppedX > 0 || croppedX2 > 0) {
+                ctx.filter = 'none';
+
+                const colorLeft = getAverageColor(ctx, panoData.croppedX, panoData.croppedY, edge, edge, 2);
+                const colorRight = getAverageColor(ctx, buffer.width - croppedX2 - 11, panoData.croppedY, edge, edge, 2);
+                const colorCenter = averageRgb(colorLeft, colorRight);
+
+                // top-left corner
+                if (panoData.croppedX > 0) {
+                    ctx.fillStyle = createHorizontalGradient(ctx, 0, panoData.croppedX, colorCenter, colorLeft);
+                    ctx.fillRect(-padding, -padding, panoData.croppedX + padding * 2, panoData.croppedY + padding * 2);
+                }
+
+                // top right corner
+                if (croppedX2 > 0) {
+                    ctx.fillStyle = createHorizontalGradient(ctx, buffer.width - croppedX2, buffer.width, colorRight, colorCenter);
+                    ctx.fillRect(buffer.width - croppedX2 - padding, -padding, croppedX2 + padding * 2, panoData.croppedY + padding * 2);
+                }
+            }
+
+            ctx.filter = filter;
+
+            // top
+            ctx.drawImage(
+                img,
+                0, 0,
+                img.width, edge,
+                panoData.croppedX, -padding,
+                panoData.croppedWidth, panoData.croppedY + padding * 2
+            );
+
+            // hide to top seam
+            ctx.fillStyle = rgbCss(getAverageColor(ctx, 0, 0, buffer.width, edge, edge));
+            ctx.fillRect(-padding, -padding, buffer.width + padding * 2, padding * 2);
+        }
+
+        // bottom section
+        if (croppedY2 > 0) {
+            if (panoData.croppedX > 0 || croppedX2 > 0) {
+                ctx.filter = 'none';
+
+                const colorLeft = getAverageColor(ctx, panoData.croppedX, buffer.height - croppedY2 - 1 - edge, edge, edge, 2);
+                const colorRight =  getAverageColor(ctx, buffer.width - croppedX2 - 1 - edge, buffer.height - croppedY2 - 1 - edge, edge, edge, 2);
+                const colorCenter = averageRgb(colorLeft, colorRight);
+
+                // bottom-left corner
+                if (panoData.croppedX > 0) {
+                    ctx.fillStyle = createHorizontalGradient(ctx, 0, panoData.croppedX, colorCenter, colorLeft);
+                    ctx.fillRect(-padding, buffer.height - croppedY2 - padding, panoData.croppedX + padding * 2, croppedY2 + padding * 2);
+                }
+
+                // bottom-right corner
+                if (croppedX2 > 0) {
+                    ctx.fillStyle = createHorizontalGradient(ctx, buffer.width - croppedX2, buffer.width, colorRight, colorCenter);
+                    ctx.fillRect(buffer.width - croppedX2 - padding, buffer.height - croppedY2 - padding, croppedX2 + padding * 2, panoData.croppedY + padding * 2);
+                }
+            }
+
+            ctx.filter = filter;
+
+            // bottom
+            ctx.drawImage(
+                img,
+                0, img.height - edge,
+                img.width, edge,
+                panoData.croppedX, buffer.height - croppedY2 - padding,
+                panoData.croppedWidth, croppedY2 + padding * 2
+            );
+
+            // hide the bottom seam
+            ctx.fillStyle = rgbCss(getAverageColor(ctx, 0, buffer.height - 1 - edge, buffer.width, edge, edge));
+            ctx.fillRect(-padding, buffer.height - padding, buffer.width + padding * 2, padding * 2);
+        }
+
+        // left section
+        if (panoData.croppedX > 0) {
+            ctx.filter = filter;
+
+            ctx.drawImage(
+                img,
+                img.width - edge, 0,
+                edge, img.height,
+                -padding, panoData.croppedY,
+                padding * 2, panoData.croppedHeight
+            );
+
+            ctx.drawImage(
+                img,
+                0, 0,
+                edge, img.height,
+                0, panoData.croppedY,
+                panoData.croppedX + padding, panoData.croppedHeight
+            );
+        }
+
+        // right section
+        if (croppedX2 > 0) {
+            ctx.filter = filter;
+
+            ctx.drawImage(
+                img,
+                0, 0,
+                edge, img.height,
+                buffer.width - padding, panoData.croppedY,
+                padding * 2, panoData.croppedHeight
+            );
+
+            ctx.drawImage(
+                img,
+                img.width - edge, 0,
+                edge, img.height,
+                buffer.width - croppedX2 - padding, panoData.croppedY,
+                croppedX2 + padding, panoData.croppedHeight
+            );
+        }
     }
 }

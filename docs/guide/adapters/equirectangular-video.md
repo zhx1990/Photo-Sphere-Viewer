@@ -105,12 +105,7 @@ Mute the video by default.
 
 #### `resolution`
 
--   type: `number`
--   default: `64`
-
-The number of faces of the sphere geometry used to display the panorama, higher values can reduce deformations on straight lines at the cost of performances.
-
-_Note: the actual number of faces is `resolution² / 2`._
+See the [equirectangular adapter configuration](./equirectangular.md#resolution).
 
 ## Panorama options
 

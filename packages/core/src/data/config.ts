@@ -41,7 +41,7 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
     useXmpData: null,
     panoData: null,
     requestHeaders: null,
-    canvasBackground: '#000',
+    canvasBackground: 'auto',
     rendererParameters: { alpha: true, antialias: true },
     withCredentials: false,
     // prettier-ignore
@@ -237,6 +237,12 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
             logWarn(`Global useXmpData is deprecated, it is now configured on the adapter.`);
         }
         return useXmpData;
+    },
+    canvasBackground: (canvasBackground) => {
+        if (canvasBackground !== null) {
+            logWarn(`Global canvasBackground is deprecated, it is now configured on the adapter.`);
+        }
+        return canvasBackground;
     },
 };
 

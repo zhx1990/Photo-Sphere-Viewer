@@ -1,4 +1,5 @@
 export * from './browser';
+export * from './canvas';
 export * from './math';
 export * from './misc';
 export * from './psv';

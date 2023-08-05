@@ -248,13 +248,13 @@ Speed multiplicator for panorama zooms. Used for mouse wheel, touch pinch and na
 
 #### ~~`useXmpData`~~
 
-Deprecated : must be configured [on the adapter](./adapters/equirectangular.md#configuration).
+Deprecated : must be configured [on the adapter](./adapters/equirectangular.md#usexmpdata).
 
 #### `panoData`
 
 -   type: `object | function<Image, PanoData, PanoData>`
 
-Overrides XMP data found in the panorama file (or if `useXmpData=false`).
+Overrides XMP data found in the panorama file.
 All parameters are optional.
 
 ```js
@@ -310,12 +310,9 @@ requestHeaders: (url) => ({
 });
 ```
 
-#### `canvasBackground`
+#### ~~`canvasBackground`~~
 
--   type: `string`
--   default: `#000`
-
-Background of the canvas, which will be visible when using cropped panoramas.
+Deprecated : must be configured [on the adapter](./adapters/equirectangular.md#canvasbackround).
 
 #### `moveInertia`
 
