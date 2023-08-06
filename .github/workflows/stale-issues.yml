@@ -18,7 +18,7 @@ jobs:
     steps:
       - uses: actions/stale@v8
         with:
-          any-of-labels: 'invalid,info requested'
+          any-of-labels: 'invalid,awaiting answer'
           days-before-stale: 7
           days-before-close: 7
           stale-issue-message: |
