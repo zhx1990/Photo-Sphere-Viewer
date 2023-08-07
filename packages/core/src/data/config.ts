@@ -41,7 +41,7 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
     useXmpData: null,
     panoData: null,
     requestHeaders: null,
-    canvasBackground: 'auto',
+    canvasBackground: null,
     rendererParameters: { alpha: true, antialias: true },
     withCredentials: false,
     // prettier-ignore
