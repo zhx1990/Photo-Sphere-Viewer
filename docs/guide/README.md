@@ -2,10 +2,6 @@
 
 [[toc]]
 
-::: danger New version
-From version 5, Photo Sphere Viewer is now available under the name `@photo-sphere-viewer/core` an other sub-packages. If you are using the previous `photo-sphere-viewer` package, please follow the [migration guide](./migration.md). You can also read the [version 4 documentation](https://photo-sphere-viewer-4.netlify.app/guide/).
-:::
-
 ::: tip Playground
 Test Photo Sphere Viewer with you own panorama in the [Playground](../playground.md)
 :::
