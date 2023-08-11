@@ -310,12 +310,13 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
     private __autoBackground(buffer: HTMLCanvasElement, img: HTMLImageElement, panoData: PanoData) {
         const croppedY2 = panoData.fullHeight - panoData.croppedHeight - panoData.croppedY;
         const croppedX2 = panoData.fullWidth - panoData.croppedWidth - panoData.croppedX;
+        const middleY = panoData.croppedY + panoData.croppedHeight / 2;
 
         if (panoData.croppedX <= 0 && panoData.croppedY <= 0 && croppedX2 <= 0 && croppedY2 <= 0) {
             return;
         }
 
-        const blurSize = buffer.width / 16;
+        const blurSize = buffer.width / 32;
         const padding = blurSize;
         const edge = 10;
         const filter = `blur(${blurSize}px)`;
@@ -343,13 +344,13 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
                 // top-left corner
                 if (panoData.croppedX > 0) {
                     ctx.fillStyle = createHorizontalGradient(ctx, 0, panoData.croppedX, colorCenter, colorLeft);
-                    ctx.fillRect(-padding, -padding, panoData.croppedX + padding * 2, panoData.croppedY + padding * 2);
+                    ctx.fillRect(-padding, -padding, panoData.croppedX + padding * 2, middleY + padding);
                 }
 
                 // top right corner
                 if (croppedX2 > 0) {
                     ctx.fillStyle = createHorizontalGradient(ctx, buffer.width - croppedX2, buffer.width, colorRight, colorCenter);
-                    ctx.fillRect(buffer.width - croppedX2 - padding, -padding, croppedX2 + padding * 2, panoData.croppedY + padding * 2);
+                    ctx.fillRect(buffer.width - croppedX2 - padding, -padding, croppedX2 + padding * 2, middleY + padding);
                 }
             }
 
@@ -381,13 +382,13 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
                 // bottom-left corner
                 if (panoData.croppedX > 0) {
                     ctx.fillStyle = createHorizontalGradient(ctx, 0, panoData.croppedX, colorCenter, colorLeft);
-                    ctx.fillRect(-padding, buffer.height - croppedY2 - padding, panoData.croppedX + padding * 2, croppedY2 + padding * 2);
+                    ctx.fillRect(-padding, middleY, panoData.croppedX + padding * 2, buffer.height - middleY + padding);
                 }
 
                 // bottom-right corner
                 if (croppedX2 > 0) {
                     ctx.fillStyle = createHorizontalGradient(ctx, buffer.width - croppedX2, buffer.width, colorRight, colorCenter);
-                    ctx.fillRect(buffer.width - croppedX2 - padding, buffer.height - croppedY2 - padding, croppedX2 + padding * 2, panoData.croppedY + padding * 2);
+                    ctx.fillRect(buffer.width - croppedX2 - padding, middleY, croppedX2 + padding * 2, buffer.height - middleY + padding);
                 }
             }
 
