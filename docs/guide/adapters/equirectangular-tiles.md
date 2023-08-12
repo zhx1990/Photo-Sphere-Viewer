@@ -82,11 +82,9 @@ Shows a warning sign on tiles that cannot be loaded.
 
 Applies antialiasing to high resolutions tiles.
 
-#### `canvasBackround`
+#### `backgroundColor`
 
-See the [equirectangular adapter configuration](./equirectangular.md#canvasbackround).
-
-_Note:_ `'auto'` is only applicable if a `baseUrl` is provided on the panorama.
+See the [equirectangular adapter configuration](./equirectangular.md#backgroundcolor).
 
 #### `resolution`
 

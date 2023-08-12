@@ -313,12 +313,12 @@ export type ViewerConfig = {
     mousewheelCtrlKey?: boolean;
     /** @default false */
     touchmoveTwoFingers?: boolean;
-    /** @deprecated configure on EquirectangularAdapter */
+    /** @deprecated configure `useXmpData` on EquirectangularAdapter */
     useXmpData?: boolean;
     panoData?: PanoData | PanoDataProvider;
     requestHeaders?: Record<string, string> | ((url: string) => Record<string, string>);
-    /** @deprecated configure on EquirectangularAdapter */
-    canvasBackground?: 'auto' | string;
+    /** @deprecated configure `backgroundColor` on EquirectangularAdapter */
+    canvasBackground?: string;
     /** @default '{ alpha: true, antialias: true }' */
     rendererParameters?: WebGLRendererParameters;
     /** @default false */

@@ -71,7 +71,7 @@ export type EquirectangularMultiTilesPanorama = {
     tileUrl: (col: number, row: number, level: number) => string | null;
 };
 
-export type EquirectangularTilesAdapterConfig = EquirectangularAdapterConfig & {
+export type EquirectangularTilesAdapterConfig = Omit<EquirectangularAdapterConfig, 'interpolateBackground' | 'blur'> & {
     /**
      * shows a warning sign on tiles that cannot be loaded
      * @default true

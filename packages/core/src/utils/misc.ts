@@ -1,5 +1,3 @@
-import { RGB } from 'three';
-
 /**
  * Transforms a string to dash-case
  * @link https://github.com/shahata/dasherize
@@ -147,22 +145,4 @@ export function deepEqual(obj1: any, obj2: any): boolean {
 
 function isObject(obj: any): boolean {
     return typeof obj === 'object' && obj !== null;
-}
-
-/**
- * Returns the CSS string for RGB color
- */
-export function rgbCss(color: RGB): string {
-    return `rgb(${color.r}, ${color.g}, ${color.b})`;
-}
-
-/**
- * Returns the average of two RGB colors
- */
-export function averageRgb(c1: RGB, c2: RGB): RGB {
-    return {
-        r: Math.round(c1.r / 2 + c2.r / 2),
-        g: Math.round(c1.g / 2 + c2.g / 2),
-        b: Math.round(c1.b / 2 + c2.b / 2),
-    };
 }

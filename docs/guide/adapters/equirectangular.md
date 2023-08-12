@@ -26,12 +26,23 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 Read real image size from XMP data, must be kept `true` if the panorama has been cropped after shot. This is used for [cropped panorama](#cropped-panorama).
 
-#### `canvasBackground`
+#### `backgroundColor`
 
--   type: `'auto' | string`
+-   type: `string`
 -   default: `#000`
 
-Background color of the canvas, which will be visible when using cropped panoramas. When set to `auto`, a blurry background will be generated from the panorama image.
+Background color of the viewer, which will be visible when using cropped panoramas.
+
+#### `interpolateBackground`
+
+-   type: `boolean`
+-   default: `false`
+
+Interpolate the missing parts of cropped panorama with a blur effect.
+
+::: warning
+The interpolation is done asynchronously in a web worker, as such the panorama will be first be displayed without interpolation with only `canvasBackground` applied, then the interpolated image will be shown (takes about 1-3 seconds depending on the hardware).
+:::
 
 #### `resolution`
 

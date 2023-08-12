@@ -5,18 +5,15 @@ import { SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { PanoData, PanoDataProvider, TextureData } from '../model';
 import {
-    averageRgb,
-    createHorizontalGradient,
     createTexture,
     firstNonNull,
-    getAverageColor,
     getConfigParser,
     getXMPValue,
     isNil,
-    logWarn,
-    rgbCss,
+    logWarn
 } from '../utils';
 import { AbstractAdapter } from './AbstractAdapter';
+import { interpolationWorkerSrc } from './interpolationWorker';
 
 /**
  * Configuration for {@link EquirectangularAdapter}
@@ -26,7 +23,11 @@ export type EquirectangularAdapterConfig = {
      * Background color of the canvas, which will be visible when using cropped panoramas
      * @default '#000'
      */
-    canvasBackground?: 'auto' | string;
+    backgroundColor?: string;
+    /**
+     * Interpolate the missing parts of cropped panoramas (async)
+     */
+    interpolateBackground?: boolean;
     /**
      * number of faces of the sphere geometry, higher values may decrease performances
      * @default 64
@@ -49,7 +50,8 @@ type EquirectangularTexture = TextureData<Texture, string>;
 
 const getConfig = getConfigParser<EquirectangularAdapterConfig>(
     {
-        canvasBackground: '#000',
+        backgroundColor: '#000',
+        interpolateBackground: false,
         resolution: 64,
         useXmpData: true,
         blur: false,
@@ -74,6 +76,8 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
 
     private readonly config: EquirectangularAdapterConfig;
 
+    private interpolationWorker: Worker;
+
     private readonly SPHERE_SEGMENTS: number;
     private readonly SPHERE_HORIZONTAL_SEGMENTS: number;
 
@@ -85,7 +89,11 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
             this.config.useXmpData = this.viewer.config.useXmpData;
         }
         if (!isNil(this.viewer.config.canvasBackground)) {
-            this.config.canvasBackground = this.viewer.config.canvasBackground;
+            this.config.backgroundColor = this.viewer.config.canvasBackground;
+        }
+
+        if (this.config.interpolateBackground) {
+            this.interpolationWorker = new Worker(interpolationWorkerSrc);
         }
 
         this.SPHERE_SEGMENTS = this.config.resolution;
@@ -98,6 +106,12 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
 
     override supportsPreload() {
         return true;
+    }
+
+    override destroy(): void {
+        this.interpolationWorker?.terminate();
+
+        super.destroy();
     }
 
     async loadTexture(
@@ -220,16 +234,15 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
 
             const ctx = buffer.getContext('2d');
 
-            if (this.config.canvasBackground === 'auto') {
-                this.__autoBackground(buffer, img, resizedPanoData);
-            } else {
-                ctx.fillStyle = this.config.canvasBackground ?? '#000';
+            if (this.config.backgroundColor) {
+                ctx.fillStyle = this.config.backgroundColor;
                 ctx.fillRect(0, 0, buffer.width, buffer.height);
             }
 
-            ctx.filter = this.config.blur ? `blur(${buffer.width / 2048}px)` : 'none';
+            if (this.config.blur) {
+                ctx.filter = `blur(${buffer.width / 2048}px)`;
+            }
 
-            // final draw
             ctx.drawImage(
                 img,
                 resizedPanoData.croppedX,
@@ -238,7 +251,30 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
                 resizedPanoData.croppedHeight
             );
 
-            return createTexture(buffer);
+            const t = createTexture(buffer);
+
+            if (this.config.interpolateBackground && (
+                panoData.croppedWidth !== panoData.fullWidth
+                || panoData.croppedHeight !== panoData.fullHeight
+            )) {
+                this.interpolationWorker.postMessage({
+                    image: ctx.getImageData(
+                        resizedPanoData.croppedX,
+                        resizedPanoData.croppedY,
+                        resizedPanoData.croppedWidth,
+                        resizedPanoData.croppedHeight
+                    ),
+                    panoData: resizedPanoData,
+                });
+
+                this.interpolationWorker.onmessage = (e) => {
+                    ctx.putImageData(e.data, 0, 0);
+                    t.needsUpdate = true;
+                    this.viewer.needsUpdate();
+                };
+            }
+
+            return t;
         }
 
         return createTexture(img);
@@ -304,150 +340,4 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         };
     }
 
-    /**
-     * Many operations draw outside the canvas in order to have a correct blur filter
-     */
-    private __autoBackground(buffer: HTMLCanvasElement, img: HTMLImageElement, panoData: PanoData) {
-        const croppedY2 = panoData.fullHeight - panoData.croppedHeight - panoData.croppedY;
-        const croppedX2 = panoData.fullWidth - panoData.croppedWidth - panoData.croppedX;
-        const middleY = panoData.croppedY + panoData.croppedHeight / 2;
-
-        if (panoData.croppedX <= 0 && panoData.croppedY <= 0 && croppedX2 <= 0 && croppedY2 <= 0) {
-            return;
-        }
-
-        const blurSize = buffer.width / 32;
-        const padding = blurSize;
-        const edge = 10;
-        const filter = `blur(${blurSize}px)`;
-
-        const ctx = buffer.getContext('2d');
-
-        // first draw to get the colors
-        ctx.drawImage(
-            img,
-            panoData.croppedX,
-            panoData.croppedY,
-            panoData.croppedWidth,
-            panoData.croppedHeight
-        );
-
-        // top section
-        if (panoData.croppedY > 0) {
-            if (panoData.croppedX > 0 || croppedX2 > 0) {
-                ctx.filter = 'none';
-
-                const colorLeft = getAverageColor(ctx, panoData.croppedX, panoData.croppedY, edge, edge, 2);
-                const colorRight = getAverageColor(ctx, buffer.width - croppedX2 - 11, panoData.croppedY, edge, edge, 2);
-                const colorCenter = averageRgb(colorLeft, colorRight);
-
-                // top-left corner
-                if (panoData.croppedX > 0) {
-                    ctx.fillStyle = createHorizontalGradient(ctx, 0, panoData.croppedX, colorCenter, colorLeft);
-                    ctx.fillRect(-padding, -padding, panoData.croppedX + padding * 2, middleY + padding);
-                }
-
-                // top right corner
-                if (croppedX2 > 0) {
-                    ctx.fillStyle = createHorizontalGradient(ctx, buffer.width - croppedX2, buffer.width, colorRight, colorCenter);
-                    ctx.fillRect(buffer.width - croppedX2 - padding, -padding, croppedX2 + padding * 2, middleY + padding);
-                }
-            }
-
-            ctx.filter = filter;
-
-            // top
-            ctx.drawImage(
-                img,
-                0, 0,
-                img.width, edge,
-                panoData.croppedX, -padding,
-                panoData.croppedWidth, panoData.croppedY + padding * 2
-            );
-
-            // hide to top seam
-            ctx.fillStyle = rgbCss(getAverageColor(ctx, 0, 0, buffer.width, edge, edge));
-            ctx.fillRect(-padding, -padding, buffer.width + padding * 2, padding * 2);
-        }
-
-        // bottom section
-        if (croppedY2 > 0) {
-            if (panoData.croppedX > 0 || croppedX2 > 0) {
-                ctx.filter = 'none';
-
-                const colorLeft = getAverageColor(ctx, panoData.croppedX, buffer.height - croppedY2 - 1 - edge, edge, edge, 2);
-                const colorRight =  getAverageColor(ctx, buffer.width - croppedX2 - 1 - edge, buffer.height - croppedY2 - 1 - edge, edge, edge, 2);
-                const colorCenter = averageRgb(colorLeft, colorRight);
-
-                // bottom-left corner
-                if (panoData.croppedX > 0) {
-                    ctx.fillStyle = createHorizontalGradient(ctx, 0, panoData.croppedX, colorCenter, colorLeft);
-                    ctx.fillRect(-padding, middleY, panoData.croppedX + padding * 2, buffer.height - middleY + padding);
-                }
-
-                // bottom-right corner
-                if (croppedX2 > 0) {
-                    ctx.fillStyle = createHorizontalGradient(ctx, buffer.width - croppedX2, buffer.width, colorRight, colorCenter);
-                    ctx.fillRect(buffer.width - croppedX2 - padding, middleY, croppedX2 + padding * 2, buffer.height - middleY + padding);
-                }
-            }
-
-            ctx.filter = filter;
-
-            // bottom
-            ctx.drawImage(
-                img,
-                0, img.height - edge,
-                img.width, edge,
-                panoData.croppedX, buffer.height - croppedY2 - padding,
-                panoData.croppedWidth, croppedY2 + padding * 2
-            );
-
-            // hide the bottom seam
-            ctx.fillStyle = rgbCss(getAverageColor(ctx, 0, buffer.height - 1 - edge, buffer.width, edge, edge));
-            ctx.fillRect(-padding, buffer.height - padding, buffer.width + padding * 2, padding * 2);
-        }
-
-        // left section
-        if (panoData.croppedX > 0) {
-            ctx.filter = filter;
-
-            ctx.drawImage(
-                img,
-                img.width - edge, 0,
-                edge, img.height,
-                -padding, panoData.croppedY,
-                padding * 2, panoData.croppedHeight
-            );
-
-            ctx.drawImage(
-                img,
-                0, 0,
-                edge, img.height,
-                0, panoData.croppedY,
-                panoData.croppedX + padding, panoData.croppedHeight
-            );
-        }
-
-        // right section
-        if (croppedX2 > 0) {
-            ctx.filter = filter;
-
-            ctx.drawImage(
-                img,
-                0, 0,
-                edge, img.height,
-                buffer.width - padding, panoData.croppedY,
-                padding * 2, panoData.croppedHeight
-            );
-
-            ctx.drawImage(
-                img,
-                img.width - edge, 0,
-                edge, img.height,
-                buffer.width - croppedX2 - padding, panoData.croppedY,
-                croppedX2 + padding, panoData.croppedHeight
-            );
-        }
-    }
 }

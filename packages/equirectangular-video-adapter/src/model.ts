@@ -6,4 +6,4 @@ import type { AbstractVideoAdapterConfig, AbstractVideoPanorama } from '../../sh
  */
 export type EquirectangularVideoPanorama = AbstractVideoPanorama;
 
-export type EquirectangularVideoAdapterConfig = Omit<EquirectangularAdapterConfig, 'useXmpData' | 'canvasBackground'> & AbstractVideoAdapterConfig;
+export type EquirectangularVideoAdapterConfig = Omit<EquirectangularAdapterConfig, 'useXmpData' | 'backgroundColor' | 'interpolateBackground' | 'blur'> & AbstractVideoAdapterConfig;

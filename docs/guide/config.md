@@ -312,7 +312,7 @@ requestHeaders: (url) => ({
 
 #### ~~`canvasBackground`~~
 
-Deprecated : must be configured [on the adapter](./adapters/equirectangular.md#canvasbackround).
+Deprecated : must be configured [on the adapter](./adapters/equirectangular.md#backgroundcolor).
 
 #### `moveInertia`
 
