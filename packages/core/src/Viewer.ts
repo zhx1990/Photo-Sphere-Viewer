@@ -264,7 +264,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      * Checks if the viewer is in fullscreen
      */
     isFullscreenEnabled(): boolean {
-        return isFullscreenEnabled(this.container);
+        return isFullscreenEnabled(this.parent);
     }
 
     /**
@@ -740,7 +740,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      */
     enterFullscreen() {
         if (!this.isFullscreenEnabled()) {
-            requestFullscreen(this.container);
+            requestFullscreen(this.parent);
         }
     }
 
