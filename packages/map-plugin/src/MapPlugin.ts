@@ -1,5 +1,6 @@
 import { AbstractConfigurablePlugin, events, Point, utils, Viewer } from '@photo-sphere-viewer/core';
-import type { events as markersEvents, Marker, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import type { Marker, events as markersEvents, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import { Color } from 'three';
 import { MapComponent } from './components/MapComponent';
 import { HOTSPOT_GENERATED_ID, HOTSPOT_MARKER_ID, MARKER_DATA_KEY } from './constants';
 import { MapPluginEvents } from './events';
@@ -19,6 +20,8 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         compassImage: null,
         pinImage: pin,
         pinSize: 35,
+        coneColor: '#1E78E6',
+        coneSize: 40,
         spotColor: 'white',
         spotImage: null,
         spotSize: 15,
@@ -40,6 +43,7 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
             return utils.cleanCssPosition(position, { allowCenter: false, cssOrder: true }) || defValue;
         },
         rotation: (rotation) => utils.parseAngle(rotation),
+        coneColor: (coneColor) => coneColor ? new Color(coneColor).getStyle() : null,
         defaultZoom: (defaultZoom) => Math.log(defaultZoom / 100),
         maxZoom: (maxZoom) => Math.log(maxZoom / 100),
         minZoom: (minZoom) => Math.log(minZoom / 100),
@@ -83,6 +87,7 @@ export class MapPlugin extends AbstractConfigurablePlugin<
         this.markers = this.viewer.getPlugin('markers');
 
         this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
+        this.viewer.addEventListener(events.ZoomUpdatedEvent.type, this);
         this.viewer.addEventListener(events.SizeUpdatedEvent.type, this);
         this.viewer.addEventListener(events.ReadyEvent.type, this, { once: true });
 
@@ -98,6 +103,7 @@ export class MapPlugin extends AbstractConfigurablePlugin<
      */
     override destroy() {
         this.viewer.removeEventListener(events.PositionUpdatedEvent.type, this);
+        this.viewer.removeEventListener(events.ZoomUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.SizeUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.ReadyEvent.type, this);
 
@@ -121,6 +127,7 @@ export class MapPlugin extends AbstractConfigurablePlugin<
                 this.component.reload(this.config.imageUrl);
                 break;
             case events.PositionUpdatedEvent.type:
+            case events.ZoomUpdatedEvent.type:
                 this.component.update();
                 break;
             case events.SizeUpdatedEvent.type:

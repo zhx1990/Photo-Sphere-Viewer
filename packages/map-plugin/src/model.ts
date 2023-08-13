@@ -80,6 +80,18 @@ export type MapPluginConfig = {
     pinSize?: number;
 
     /**
+     * Color of the cone of the compass
+     * @default '#1E78E6'
+     */
+    coneColor?: string;
+
+    /**
+     * Size of the cone of the compass
+     * @default 40
+     */
+    coneSize?: number;
+
+    /**
      * Color of the hotspots when no image is provided
      * @default 'white'
      */

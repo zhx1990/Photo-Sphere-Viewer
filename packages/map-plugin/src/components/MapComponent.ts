@@ -14,6 +14,7 @@ import {
     ImageSource,
     loadImage,
     projectPoint,
+    rgbToRgba,
     unprojectPoint,
 } from '../utils';
 import { MapCloseButton } from './MapCloseButton';
@@ -492,10 +493,9 @@ export class MapComponent extends AbstractComponent {
             }
             context.restore();
         });
-
-        // draw the pin
+        
         const pinImage = this.__loadImage(this.config.pinImage);
-        if (pinImage) {
+        if (pinImage || this.config.coneColor && this.config.coneSize) {
             const pinPos = projectPoint(offset, yawAndRotation, zoom);
 
             const x = canvasVirtualCenterX - pinPos.x;
@@ -506,8 +506,33 @@ export class MapComponent extends AbstractComponent {
             context.save();
             context.translate(x * SYSTEM.pixelRatio, y * SYSTEM.pixelRatio);
             context.rotate(angle);
-            canvasShadow(context, PIN_SHADOW_OFFSET, PIN_SHADOW_OFFSET, PIN_SHADOW_BLUR);
-            drawImageCentered(context, pinImage, size);
+
+            // draw the cone
+            if (this.config.coneColor && this.config.coneSize) {
+                const fov = MathUtils.degToRad(this.viewer.state.hFov);
+                const a1 = - Math.PI / 2 - fov / 2;
+                const a2 = a1 + fov;
+                const c = this.config.coneSize;
+
+                const grad = context.createRadialGradient(0, 0, c / 4, 0, 0, c);
+                grad.addColorStop(0, this.config.coneColor);
+                grad.addColorStop(1, rgbToRgba(this.config.coneColor, 0));
+
+                context.beginPath();
+                context.moveTo(0, 0);
+                context.lineTo(Math.cos(a1) * c, Math.sin(a1) * c);
+                context.arc(0, 0, c, a1, a2, false);
+                context.lineTo(0, 0);
+                context.fillStyle = grad;
+                context.fill();
+            }
+
+            // draw the pin
+            if (pinImage) {
+                canvasShadow(context, PIN_SHADOW_OFFSET, PIN_SHADOW_OFFSET, PIN_SHADOW_BLUR);
+                drawImageCentered(context, pinImage, size);
+            }
+
             context.restore();
         }
     }

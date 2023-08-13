@@ -98,3 +98,10 @@ export function drawImageHighDpi(
         w * SYSTEM.pixelRatio, h * SYSTEM.pixelRatio
     );
 }
+
+/**
+ * Adds the "a" to your "rgb"
+ */
+export function rgbToRgba(rgb: string, alpha: number): string {
+    return `rgba(${rgb.slice(4, -1)},${alpha})`;
+}

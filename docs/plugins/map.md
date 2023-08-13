@@ -175,6 +175,22 @@ SVG or image URL used for the central pin.
 
 Size of the central pin.
 
+#### `coneColor`
+
+-   type: `string`
+-   default: `#1E78E6`
+-   updatable: yes
+
+Color of the cone of the compass, set to `null` to disable.
+
+#### `coneSize`
+
+-   type: `number`
+-   default: `40`
+-   updatable: yes
+
+Size of the cone of the compass.
+
 #### `spotColor`
 
 -   type: `string`
