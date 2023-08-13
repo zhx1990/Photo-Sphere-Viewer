@@ -56,6 +56,7 @@ viewer.addEventListener('ready', intro, { once: true });
 
 function intro() {
     autorotate.stop();
+    viewer.navbar.hide();
 
     new PhotoSphereViewer.utils.Animation({
         properties: animatedValues,
@@ -68,6 +69,7 @@ function intro() {
         },
     }).then(() => {
         autorotate.start();
+        viewer.navbar.show();
     });
 }
 ```

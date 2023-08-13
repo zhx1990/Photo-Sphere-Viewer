@@ -33,6 +33,14 @@ Customize the navbar with default and custom buttons.
 :::
 
 ::: item
+[![](../images/demos/cropped-panorama.jpg)](./basic/cropped-panorama.md)
+
+### Cropped panorama
+
+Display cropped panorama.
+:::
+
+::: item
 [![](../images/demos/fisheye.jpg)](./basic/fisheye.md)
 
 ### Fisheye

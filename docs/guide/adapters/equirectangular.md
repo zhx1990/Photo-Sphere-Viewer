@@ -11,7 +11,7 @@ There is no need to declare the equirectangular adapter as it is the default one
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
     adapter: [PhotoSphereViewer.EquirectangularAdapter, {
-        useXmpData: true, // default
+        interpolateBackground: true,
     }],
     panorama: 'path/panorama.jpg',
 });

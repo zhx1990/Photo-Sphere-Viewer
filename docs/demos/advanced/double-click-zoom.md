@@ -16,7 +16,6 @@ const viewer = new PhotoSphereViewer.Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
-    navbar: false,
 });
 
 viewer.addEventListener('dblclick', ({ data }) => {

@@ -18,13 +18,6 @@
                     </p>
                 </div>
 
-                <div class="hero-content migration">
-                    <p class="description">
-                        <strong>Photo Sphere Viewer 5</strong> is out! Please read the
-                        <a href="guide/migration.html">migration guide</a>
-                    </p>
-                </div>
-
                 <p v-if="data.actionText && data.actionLink" class="action">
                     <NavLink class="action-button" :item="actionLink" />
                 </p>
@@ -173,14 +166,6 @@ export default {
       padding 1px
       border-radius 20px
       margin 1rem
-
-      &.migration
-        a
-          pointer-events auto
-          color #fff
-          background-color $accentColor
-          border-radius 5px
-          padding 0 0.5em 0.2em
 
     h1
       font-size 2.5rem
