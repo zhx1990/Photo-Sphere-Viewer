@@ -1,9 +1,9 @@
 import type { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
 import type { Point, Position, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractConfigurablePlugin, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, CONSTANTS, PSVError, events, utils } from '@photo-sphere-viewer/core';
 import type { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
-import type { events as mapEvents, MapPlugin } from '@photo-sphere-viewer/map-plugin';
-import type { events as markersEvents, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import type { MapPlugin, events as mapEvents } from '@photo-sphere-viewer/map-plugin';
+import type { MarkersPlugin, events as markersEvents } from '@photo-sphere-viewer/markers-plugin';
 import {
     AmbientLight,
     BackSide,
@@ -13,6 +13,7 @@ import {
     MeshBasicMaterial,
     MeshLambertMaterial,
     PointLight,
+    REVISION,
 } from 'three';
 import { ARROW_GEOM, ARROW_OUTLINE_GEOM, DEFAULT_ARROW, DEFAULT_MARKER, LINK_DATA, LINK_ID } from './constants';
 import { AbstractDatasource } from './datasources/AbstractDataSource';
@@ -21,6 +22,9 @@ import { ServerSideDatasource } from './datasources/ServerSideDatasource';
 import { NodeChangedEvent, VirtualTourEvents } from './events';
 import { GpsPosition, VirtualTourLink, VirtualTourNode, VirtualTourPluginConfig } from './model';
 import { gpsToSpherical, setMeshColor } from './utils';
+
+// https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733
+const LIGHT_INTENSITY = parseInt(REVISION) >= 155 ? Math.PI : 1;
 
 const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
     {
@@ -127,7 +131,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         if (this.is3D) {
             this.arrowsGroup = new Group();
 
-            const localLight = new PointLight(0xffffff, 1, 0);
+            const localLight = new PointLight(0xffffff, LIGHT_INTENSITY, 0, 0);
             localLight.position.set(0, this.config.arrowPosition === 'bottom' ? 2 : -2, 0);
             this.arrowsGroup.add(localLight);
         }
@@ -237,7 +241,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             this.__positionArrows();
             this.viewer.renderer.addObject(this.arrowsGroup);
 
-            const ambientLight = new AmbientLight(0xffffff, 1);
+            const ambientLight = new AmbientLight(0xffffff, LIGHT_INTENSITY);
             this.viewer.renderer.addObject(ambientLight);
 
             this.viewer.needsUpdate();
