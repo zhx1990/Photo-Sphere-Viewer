@@ -82,7 +82,6 @@ export class Renderer extends AbstractService {
 
         this.container = document.createElement('div');
         this.container.className = 'psv-canvas-container';
-        this.container.style.background = this.config.canvasBackground;
         this.container.appendChild(this.renderer.domElement);
         this.viewer.container.appendChild(this.container);
 
@@ -310,7 +309,6 @@ export class Renderer extends AbstractService {
             easing: 'outCubic',
             onTick: (properties) => {
                 this.viewer.adapter.setTextureOpacity(mesh, properties.opacity);
-                this.viewer.adapter.setTextureOpacity(this.mesh, 1 - properties.opacity);
 
                 if (zoomProvided) {
                     this.viewer.zoom(properties.zoom);
