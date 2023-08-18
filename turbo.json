@@ -19,8 +19,7 @@
       "inputs": ["src/**"]
     },
     "watch": {
-      "cache": false,
-      "persistent": true
+      "cache": false
     },
     "//#watch": {
       "cache": false
