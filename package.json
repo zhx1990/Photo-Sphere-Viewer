@@ -7,11 +7,12 @@
     "packages/*"
   ],
   "scripts": {
-    "format": "prettier -w .",
     "build": "turbo run build",
+    "format": "prettier -w .",
     "lint": "turbo run lint",
     "test": "turbo run test",
     "serve": "turbo run watch --parallel",
+    "npm-link": "turbo run npm-link --output-logs=new-only",
     "doc:build": "yarn doc:vuepress && yarn doc:typedoc",
     "doc:typedoc": "node ./build/generate-typedoc-readme.mjs && typedoc --plugin typedoc-plugin-extras --out public/api",
     "doc:vuepress": "vuepress build docs",

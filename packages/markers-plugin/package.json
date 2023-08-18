@@ -13,7 +13,8 @@
     "build": "tsup",
     "watch": "tsup --watch",
     "lint": "eslint . --fix && stylelint \"src/**/*.scss\" --fix",
-    "publish-dist": "cd dist && npm publish --tag=$NPM_TAG --access=public"
+    "publish-dist": "cd dist && npm publish --tag=$NPM_TAG --access=public",
+    "npm-link": "cd dist && npm link"
   },
   "psv": {
     "globalName": "PhotoSphereViewer.MarkersPlugin",

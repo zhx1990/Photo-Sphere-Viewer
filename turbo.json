@@ -13,17 +13,20 @@
       "outputs": ["dist/**"]
     },
     "lint": {
-      "inputs": ["src/**"],
-      "outputs": []
+      "inputs": ["src/**"]
     },
     "test": {
-      "inputs": ["src/**"],
-      "outputs": []
+      "inputs": ["src/**"]
     },
     "watch": {
-      "cache": false
+      "cache": false,
+      "persistent": true
     },
     "//#watch": {
+      "cache": false
+    },
+    "npm-link": {
+      "dependsOn": ["build"],
       "cache": false
     },
     "publish-dist": {
