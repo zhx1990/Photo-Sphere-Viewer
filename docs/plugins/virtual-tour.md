@@ -112,10 +112,10 @@ packages:
 
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+const caption = 'Cape Florida Light, Key Biscayne <b>&copy; Pixexid</b>';
 
 const viewer = new PhotoSphereViewer.Viewer({
     container: 'viewer',
-    caption: 'Cape Florida Light, Key Biscayne <b>&copy; Pixexid</b>',
     loadingImg: baseUrl + 'loader.gif',
     touchmoveTwoFingers: true,
     mousewheelCtrlKey: true,
@@ -151,6 +151,7 @@ virtualTour.setNodes([
         panorama: baseUrl + 'tour/key-biscayne-1.jpg',
         thumbnail: baseUrl + 'tour/key-biscayne-1-thumb.jpg',
         name: 'One',
+        caption: `[1] ${caption}`,
         links: [{ nodeId: '2' }],
         markers: [markerLighthouse],
         gps: [-80.156479, 25.666725, 3],
@@ -161,6 +162,7 @@ virtualTour.setNodes([
         panorama: baseUrl + 'tour/key-biscayne-2.jpg',
         thumbnail: baseUrl + 'tour/key-biscayne-2-thumb.jpg',
         name: 'Two',
+        caption: `[2] ${caption}`,
         links: [{ nodeId: '3' }, { nodeId: '1' }],
         markers: [markerLighthouse],
         gps: [-80.156168, 25.666623, 3],
@@ -171,15 +173,17 @@ virtualTour.setNodes([
         panorama: baseUrl + 'tour/key-biscayne-3.jpg',
         thumbnail: baseUrl + 'tour/key-biscayne-3-thumb.jpg',
         name: 'Three',
+        caption: `[3] ${caption}`,
         links: [{ nodeId: '4' }, { nodeId: '2' }, { nodeId: '5' }],
         gps: [-80.155932, 25.666498, 5],
-        panoData: { poseHeading: 328 },
+        panoData: { poseHeading: 310 },
     },
     {
         id: '4',
         panorama: baseUrl + 'tour/key-biscayne-4.jpg',
         thumbnail: baseUrl + 'tour/key-biscayne-4-thumb.jpg',
         name: 'Four',
+        caption: `[4] ${caption}`,
         links: [{ nodeId: '3' }, { nodeId: '5' }],
         gps: [-80.156089, 25.666357, 3],
         panoData: { poseHeading: 78 },
@@ -189,6 +193,7 @@ virtualTour.setNodes([
         panorama: baseUrl + 'tour/key-biscayne-5.jpg',
         thumbnail: baseUrl + 'tour/key-biscayne-5-thumb.jpg',
         name: 'Five',
+        caption: `[5] ${caption}`,
         links: [{ nodeId: '6' }, { nodeId: '3' }, { nodeId: '4' }],
         gps: [-80.156292, 25.666446, 2],
         panoData: { poseHeading: 190 },
@@ -198,18 +203,20 @@ virtualTour.setNodes([
         panorama: baseUrl + 'tour/key-biscayne-6.jpg',
         thumbnail: baseUrl + 'tour/key-biscayne-6-thumb.jpg',
         name: 'Six',
+        caption: `[6] ${caption}`,
         links: [{ nodeId: '5' }, { nodeId: '7' }],
         gps: [-80.156465, 25.666496, 2],
-        panoData: { poseHeading: 328 },
+        panoData: { poseHeading: 295 },
     },
     {
         id: '7',
         panorama: baseUrl + 'tour/key-biscayne-7.jpg',
         thumbnail: baseUrl + 'tour/key-biscayne-7-thumb.jpg',
         name: 'Seven',
+        caption: `[7] ${caption}`,
         links: [{ nodeId: '6' }],
         gps: [-80.15707, 25.6665, 3],
-        panoData: { poseHeading: 250 },
+        panoData: { poseHeading: 250, posePitch: 3 },
     },
 ], '2');
 ```
@@ -218,7 +225,7 @@ virtualTour.setNodes([
 
 ## Nodes
 
-### Configuration
+### Definition
 
 #### `id` (required)
 
@@ -229,6 +236,10 @@ Unique identifier of the node
 #### `panorama` (required)
 
 Refer to the main [config page](../guide/config.md#panorama-required).
+
+#### `caption` / `description` / `panoData` / `sphereCorrection`
+
+Refer to the main [config page](../guide/config.md).
 
 #### `links` (required in client mode)
 
@@ -250,21 +261,13 @@ Only the [ESPG:4326 projection](https://epsg.io/4326) is supported.
 
 -   type: `string`
 
-Short name of this node, used in links tooltips and the gallery.
-
-#### `caption`
-
-Replace the global caption. Refer to the main [config page](../guide/config.md#caption).
-
-#### `description`
-
-Replace the global description. Refer to the main [config page](../guide/config.md#description).
+Short name of this node, used in links tooltips and the GalleryPlugin.
 
 #### `thumbnail`
 
 -   type: `string`
 
-Thumbnail for the nodes list in the gallery.
+Thumbnail for the nodes list in the GalleryPlugin.
 
 #### `markers`
 
@@ -272,19 +275,11 @@ Thumbnail for the nodes list in the gallery.
 
 Additional markers displayed on this node, requires the [Markers plugin](./markers.md).
 
-Since 5.0.2 the markers can be positioned with the classic `position` option (yaw + pitch) or, if `positionMode=gps`, with the `gps` option (longitude + latitude + altitude).
-
-#### `panoData`
-
-Refer to the main [config page](../guide/config.md#panodata).
-
-#### `sphereCorrection`
-
-Refer to the main [config page](../guide/config.md#spherecorrection).
+The markers can be positioned with the classic `position` option (yaw + pitch) or, if `positionMode=gps`, with the `gps` option (longitude + latitude + altitude).
 
 #### `map` (client mode only)
 
-Configuration of the hotspot when using the MapPlugin. [See bellow](#map-plugin).
+Configuration of the hotspot when using the MapPlugin. See global configuration for details.
 
 ### Links
 
@@ -314,21 +309,15 @@ Overrides the tooltip content (defaults to the node's `name` property).
 
 #### `linkOffset`
 
--   type: `{ yaw, pitch }`
+-   type: `{ yaw?, pitch?, depth? }`
 
 Offset added to the final link position order to move the marker/arrow without affecting where the viewer is rotated before going to the next node.
 
-#### `arrowStyle` (3d mode only)
+`depth` is only used in 3D render mode to manage overlapping arrows. Note that it is automatically computed in GPS mode depending on the distance to the node, but can be overriden if necessary.
 
--   type: `object`
+#### `arrowStyle` / `markerStyle`
 
-Overrides the global style of the arrow used to display the link. See global configuration for details.
-
-#### `markerStyle` (markers mode only)
-
--   type: `object`
-
-Overrides the global style of the marker used to display the link. See global configuration for details.
+Overrides the global style of the arrow/marker used to display the link. See global configuration for details.
 
 ## Configuration
 
@@ -385,21 +374,63 @@ Id of the initially loaded node. If empty the first node will be displayed. You 
 
 Enable the preloading of linked nodes, can be a function that returns true or false for each link.
 
-#### `rotateSpeed`
+#### `transitionOptions`
 
--   type: `boolean | string | number`
--   default: `20rpm`
+-   type: `object | function`
+-   default: `{ speed: '20rpm', fadeIn: true, rotation: true }`
 -   updatable: no
 
-When a link is clicked, adds a animation to face it before actually changing the node. If `false` the viewer won't rotate at all and keep the current orientation.
+Configuration of the transition between nodes. Can be a callback.
 
-#### `transition`
+::: dialog "See details" "Virtual tour transitionOptions"
 
--   type: `boolean | number`
--   default: `1500`
--   updatable: no
+`transitionOptions` can be defined as a static object or a function called before switching to a new node.
 
-Duration of the transition between nodes.
+The default behaviour is to rotate the view to face the direction of the link and perform a fade-in transition to the next node.
+
+**If defined as an object, the type is:**
+
+```ts
+{
+    /**
+     * Speed or duration of the transition between nodes
+     * @default '20rpm'
+     */
+    speed?: string | number;
+    /**
+     * Enable fade-in between nodes
+     * @default true
+     */
+    fadeIn?: boolean;
+    /**
+     * Enable rotation in the direction of the next node
+     * @default true
+     */
+    rotation?: boolean;
+}
+```
+
+**If defined as a function, the signature is:**
+
+```ts
+(toNode: Node, fromNode?: Node, fromLink?: NodeLink) => ({
+    speed?: string | number;
+    fadeIn?: boolean;
+    rotation?: boolean;
+    /**
+     * Define where to rotate the current panorama before switching to the next
+     * if not defined it will use the link's position
+     */
+    rotateTo?: Position;
+    /**
+     * Define the new zoom level
+     * if not defined it will keep the current zoom level
+     */
+    zoomTo?: number;
+})
+```
+
+:::
 
 #### `linksOnCompass`
 
@@ -411,7 +442,76 @@ If the [Compass plugin](./compass.md) is enabled, displays the links on the comp
 
 #### `map` (client mode only)
 
-Configuration when using the MapPlugin. [See bellow](#map-plugin).
+Configuration when using the MapPlugin.
+
+::::: dialog "See details" "Virtual tour map"
+
+Using the [Map plugin](./map.md) allows to show the position of each node on a map. It requires some additional configuration, especially when working with GPS coordinates.
+
+::: warning Map image
+The map image must be configured with `map.imageUrl` inside the VirtualTour plugin configuration. The `imageUrl` in the Map plugin is ignored.
+:::
+
+:::: tabs
+
+::: tab Configure the map manually
+
+This configuration is required if `positionMode=manual`. You can also choose to use it if `positionMode=gps`.
+
+To define the position of the node on the map you have to configure its `map` property with `x` and `y`. You can also configure other things like `color`, `image` and `size`. Please refer to the [Hotspots section](map.md#hotspots-2) of the Map plugin.
+
+```js{10}
+plugins: [
+    [VirtualTourPlugin, {
+        map: {
+            imageUrl: 'map.jpg',
+        },
+        nodes: [
+            {
+                id: 'node-1',
+                panorama: '001.jpg',
+                map: { x: 500, y: 815, color: 'red' },
+            },
+        ],
+    }],
+],
+```
+
+:::
+
+::: tab Configure the map with GPS
+
+This configuration can only be used if `positionMode=gps`.
+
+You have to provide additional metadata about the map for the automatic positionning to work : its `size` in pixels and its `extent` (GPS bounds).
+
+```js{5-6,13}
+plugins: [
+    [VirtualTourPlugin, {
+        map: {
+            imageUrl: 'map.jpg',
+            size: { width: 1600, height: 1200 },
+            extent: [-80.158123, 25.668050, -80.153824, 25.665308],
+        },
+        nodes: [
+            {
+                id: 'node-1',
+                panorama: '001.jpg',
+                gps: [-80.155487, 25.666000]
+                map: { color: 'red' },
+            },
+        ],
+    }],
+],
+```
+
+Each node can still have a `map` property to override `color`, `image` and `size`.
+
+:::
+
+::::
+
+:::::
 
 #### `markerStyle` (markers mode only)
 
@@ -483,82 +583,15 @@ Vertical offset in radians applied to the markers to compensate for the viewer p
 
 Vertical position of the arrows.
 
-### Map plugin <Badge text="5.1.1"/>
-
-Using the [Map plugin](./map.md) allows to show the position of each node on a map. It requires some additional configuration, especially when working with GPS coordinates.
-
-:::: tabs
-
-::: tab Configure the map manually
-
-This configuration is required if `positionMode=manual`. You can also choose to use it if `positionMode=gps`.
-
-To define the position of the node on the map you have to configure its `map` property with `x` and `y`. You can also configure other things like `color`, `image` and `size`. Please refer to the [Hotspots section](map.md#hotspots-2) of the Map plugin.
-
-```js{10}
-plugins: [
-    [VirtualTourPlugin, {
-        map: {
-            imageUrl: 'map.jpg',
-        },
-        nodes: [
-            {
-                id: 'node-1',
-                panorama: '001.jpg',
-                map: { x: 500, y: 815, color: 'red' },
-            },
-        ],
-    }],
-],
-```
-
-:::
-
-::: tab Configure the map with GPS
-
-This configuration can only be used if `positionMode=gps`.
-
-You have to provide additional metadata about the map for the automatic positionning to work : its `size` in pixels and its `extent` (GPS bounds).
-
-```js{5-6,13}
-plugins: [
-    [VirtualTourPlugin, {
-        map: {
-            imageUrl: 'map.jpg',
-            size: { width: 1600, height: 1200 },
-            extent: [-80.158123, 25.668050, -80.153824, 25.665308],
-        },
-        nodes: [
-            {
-                id: 'node-1',
-                panorama: '001.jpg',
-                gps: [-80.155487, 25.666000]
-                map: { color: 'red' },
-            },
-        ],
-    }],
-],
-```
-
-Each node can still have a `map` property to override `color`, `image` and `size`.
-
-:::
-
-::::
-
-::: warning Map image
-The map image must be configured with `map.imageUrl` inside the VirtualTour plugin configuration. The `imageUrl` in the Map plugin is ignored.
-:::
-
 ## Methods
 
 #### `setNodes(nodes, [startNodeId])` (client mode only)
 
 Changes the nodes and display the first one (or the one designated by `startNodeId`).
 
-#### `setCurrentNode(nodeId)`
+#### `setCurrentNode(nodeId, [options])`
 
-Changes the current node.
+Changes the current node. `options` allows to override the default `transitionOptions`.
 
 ## Events
 

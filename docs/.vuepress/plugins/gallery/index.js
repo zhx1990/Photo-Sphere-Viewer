@@ -19,11 +19,10 @@ module.exports = (options, ctx) => ({
 
         md.use(container, 'item', {
             render: (tokens, idx) => {
-                const { nesting, info } = tokens[idx];
-                const attributes = info.trim().slice('item '.length);
+                const { nesting } = tokens[idx];
 
                 if (nesting === 1) {
-                    return `<GalleryItem ${attributes}>\n`;
+                    return `<GalleryItem>\n`;
                 } else {
                     return `</GalleryItem>\n`;
                 }

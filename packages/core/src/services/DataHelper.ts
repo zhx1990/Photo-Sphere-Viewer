@@ -1,5 +1,5 @@
 import { Euler, MathUtils, Vector3 } from 'three';
-import { SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
+import { ANIMATION_MIN_DURATION, SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
 import {
     ExtendedPosition,
     PanoData,
@@ -10,7 +10,7 @@ import {
     SphericalPosition,
 } from '../model';
 import { PSVError } from '../PSVError';
-import { applyEulerInverse, parseAngle, parseSpeed } from '../utils';
+import { AnimationOptions, applyEulerInverse, getAngle, getShortestArc, isNil, parseAngle, speedToDuration } from '../utils';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
 
@@ -51,17 +51,49 @@ export class DataHelper extends AbstractService {
     }
 
     /**
-     * Converts a speed into a duration from current position to a new position
+     * @internal
      */
-    speedToDuration(value: string | number, angle: number): number {
-        if (typeof value !== 'number') {
-            // desired radial speed
-            const speed = parseSpeed(value);
-            // compute duration
-            return (angle / Math.abs(speed)) * 1000;
-        } else {
-            return Math.abs(value);
+    getAnimationProperties(
+        speed: number | string,
+        targetPosition: Position,
+        targetZoom: number
+    ): {
+        duration: number;
+        properties: AnimationOptions<{ yaw: any; pitch: any; zoom: any }>['properties'];
+    } {
+        const positionProvided = !isNil(targetPosition);
+        const zoomProvided = !isNil(targetZoom);
+
+        const properties: AnimationOptions<{ yaw: any; pitch: any; zoom: any }>['properties'] = {};
+        let duration;
+
+        // clean/filter position and compute duration
+        if (positionProvided) {
+            const currentPosition = this.viewer.getPosition();
+            const dYaw = getShortestArc(currentPosition.yaw, targetPosition.yaw);
+
+            properties.yaw = { start: currentPosition.yaw, end: currentPosition.yaw + dYaw };
+            properties.pitch = { start: currentPosition.pitch, end: targetPosition.pitch };
+
+            duration = speedToDuration(speed, getAngle(currentPosition, targetPosition));
         }
+
+        // clean/filter zoom and compute duration
+        if (zoomProvided) {
+            const currentZoom = this.viewer.getZoomLevel();
+            const dZoom = Math.abs(targetZoom - currentZoom);
+
+            properties.zoom = { start: currentZoom, end: targetZoom };
+
+            if (!duration) {
+                // if animating zoom only and a speed is given, use an arbitrary PI/4 to compute the duration
+                duration = speedToDuration(speed, ((Math.PI / 4) * dZoom) / 100);
+            }
+        }
+
+        duration = Math.max(ANIMATION_MIN_DURATION, duration);
+
+        return { duration, properties };
     }
 
     /**

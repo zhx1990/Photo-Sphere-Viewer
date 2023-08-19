@@ -261,6 +261,20 @@ export function parseSpeed(speed: string | number): number {
 }
 
 /**
+ * Converts a speed into a duration for a specific angle to travel
+ */
+export function speedToDuration(value: string | number, angle: number): number {
+    if (typeof value !== 'number') {
+        // desired radial speed
+        const speed = parseSpeed(value);
+        // compute duration
+        return (angle / Math.abs(speed)) * 1000;
+    } else {
+        return Math.abs(value);
+    }
+}
+
+/**
  * Parses an angle value in radians or degrees and returns a normalized value in radians
  * @param angle - eg: 3.14, 3.14rad, 180deg
  * @param [zeroCenter=false] - normalize between -Pi - Pi instead of 0 - 2*Pi

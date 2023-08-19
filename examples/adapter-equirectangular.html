@@ -87,8 +87,7 @@
                             return () => {
                                 i = 1 - i;
                                 viewer.setPanorama(panos[i].url, {
-                                    yaw: 0,
-                                    pitch: 0,
+                                    position: { yaw: 0, pitch: 0 },
                                     zoom: 50,
                                     caption: panos[i].caption,
                                     description: panos[i].description,
@@ -102,8 +101,10 @@
                         content: '🔀',
                         onClick: () => {
                             viewer.animate({
-                                yaw: (((Math.random() - 0.5) * 3) / 2) * Math.PI,
-                                pitch: (((Math.random() - 0.5) * 3) / 4) * Math.PI,
+                                position: {
+                                    yaw: (((Math.random() - 0.5) * 3) / 2) * Math.PI,
+                                    pitch: (((Math.random() - 0.5) * 3) / 4) * Math.PI,
+                                },
                                 zoom: Math.random() * 60 + 20,
                                 speed: 1500,
                             });

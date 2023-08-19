@@ -18,7 +18,7 @@ It is good practice to wait for the `ready` event before calling any method.
 viewer.addEventListener('ready', () => {
   viewer.rotate({
     textureX: 1500,
-    textureY: 1000
+    textureY: 1000,
   });
 }, { once: true });
 ```
@@ -29,7 +29,11 @@ This section describes the most useful methods available.
 
 ### `animate(options): Animation`
 
-Rotate and zoom the view with a smooth animation. You can change the position (`yaw`, `pitch` or `textureX`, `textureY`) and the zoom level (`zoom`). The `speed` option is either a duration in milliseconds or a string containing the speed in revolutions per minute (`2rpm`). It returns a `Animation` object which is a standard Promise with an additional `cancel` method.
+Rotate and zoom the view with a smooth animation. You can change the position (`yaw`, `pitch` or `textureX`, `textureY`) and the zoom level (`zoom`).
+
+The `speed` option is either a duration in milliseconds or a string containing the speed in revolutions per minute (`2rpm`).
+
+The method returns a `Animation` object which is a standard Promise with an additional `cancel` method.
 
 ```js
 viewer.animate({
@@ -87,9 +91,22 @@ viewer.setOptions({
 
 Change the panorama image with an optional transition animation (enabled by default). See all options in the <ApiLink page="types/Core.PanoramaOptions.html"/>.
 
+The `speed` option is either a duration in milliseconds or a string containing the speed in revolutions per minute (`2rpm`).
+
+The method returns a Promise resolved when the new panorama has finished loading.
+
 ```js
 viewer.setPanorama('image.jpg')
   .then(() => /* update complete */);
+
+viewer.setPanorama('image.jpg', { transition: false });
+
+viewer.setPanorama('image.jpg', {
+  speed: '20rpm',
+  position: { yaw: 0, pitch: 0 },
+  caption: 'The new caption',
+  // more options in the API doc
+});
 ```
 
 ### `zoom(level)` | `zoomIn()` | `zoomOut()`

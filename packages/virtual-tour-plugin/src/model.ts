@@ -57,6 +57,37 @@ export type VirtualTourMarkerStyle = Omit<
 >;
 
 /**
+ * Behaviour of the transition between nodes
+ */
+export type VirtualTourTransitionOptions = {
+    /**
+     * Speed or duration of the transition between nodes
+     * @default '20rpm'
+     */
+    speed?: string | number;
+    /**
+     * Enable fade-in between nodes
+     * @default true
+     */
+    fadeIn?: boolean;
+    /**
+     * Enable rotation in the direction of the next node
+     * @default true
+     */
+    rotation?: boolean;
+    /**
+     * Define where to rotate the current panorama before switching to the next
+     * if not defined it will use the link's position
+     */
+    rotateTo?: Position;
+    /**
+     * Define the new zoom level
+     * if not defined it will keep the current zoom level
+     */
+    zoomTo?: number;
+};
+
+/**
  * Definition of a link between two nodes
  */
 export type VirtualTourLink = Partial<ExtendedPosition> & {
@@ -73,10 +104,10 @@ export type VirtualTourLink = Partial<ExtendedPosition> & {
      */
     position?: ExtendedPosition;
     /**
-     * offset added to the final link position  order to move the marker/arrow
+     * offset added to the final link position in order to move the marker/arrow
      * without affecting where the viewer is rotated before going to the next node
      */
-    linkOffset?: Partial<Position>;
+    linkOffset?: { yaw?: number; pitch?: number; depth?: number };
     /**
      * override the GPS position of the node (GPS mode)
      */
@@ -171,14 +202,24 @@ export type VirtualTourPluginConfig = {
      * preload linked panoramas
      */
     preload?: boolean | ((node: VirtualTourNode, link: VirtualTourLink) => boolean);
+
     /**
-     * speed of rotation when clicking on a link, if 'false' the viewer won't rotate at all
-     * @default '20rpm'
+     * Configuration of the transition between nodes. Can be a callback.
+     * @default `{ speed: '20rpm', fadeIn: true, rotation: true }`
+     */
+    transitionOptions?:
+        | Pick<VirtualTourTransitionOptions, 'speed' | 'fadeIn' | 'rotation'>
+        | ((
+              toNode: VirtualTourNode,
+              fromNode?: VirtualTourNode,
+              fromLink?: VirtualTourLink
+          ) => VirtualTourTransitionOptions);
+    /**
+     * @deprecated Use {@link VirtualTourPluginConfig#transitionOptions}
      */
     rotateSpeed?: false | string | number;
     /**
-     * duration of the transition between nodes
-     * @default 1500
+     * @deprecated Use {@link VirtualTourPluginConfig#transitionOptions}
      */
     transition?: boolean | number;
     /**

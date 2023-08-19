@@ -1,5 +1,5 @@
 import assert from 'assert';
-import { cleanCssPosition, getXMPValue, parseAngle, parsePoint, parseSpeed } from './psv';
+import { cleanCssPosition, getXMPValue, parseAngle, parsePoint, parseSpeed, speedToDuration } from './psv';
 
 describe('utils:psv:parseAngle', () => {
     it('should normalize number', () => {
@@ -364,5 +364,18 @@ describe('utils:psv:cleanPosition', () => {
     it('should always order with center', () => {
         assert.deepStrictEqual(cleanCssPosition('center top'), ['top', 'center']);
         assert.deepStrictEqual(cleanCssPosition('left center'), ['center', 'left']);
+    });
+});
+
+describe('utils:psv:speedToDuration', () => {
+    it('should return numeric values as it', () => {
+        assert.strictEqual(speedToDuration(1000, NaN), 1000);
+        assert.strictEqual(speedToDuration(-1000, NaN), 1000);
+    });
+
+    it('should return valid speed', () => {
+        assert.strictEqual(speedToDuration('1rpm', Math.PI * 2), 60000);
+        assert.strictEqual(speedToDuration('-1rpm', Math.PI * 2), 60000);
+        assert.strictEqual(speedToDuration('2rpm', Math.PI), 15000);
     });
 });

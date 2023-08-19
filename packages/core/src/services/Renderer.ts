@@ -9,14 +9,15 @@ import {
     Renderer as ThreeRenderer,
     Scene,
     Vector2,
-    Vector3,
     WebGLRenderer,
     WebGLRenderTarget,
     LinearSRGBColorSpace,
+    Vector3,
 } from 'three';
 import { SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import {
+    BeforeAnimateEvent,
     BeforeRenderEvent,
     ConfigChangedEvent,
     PositionUpdatedEvent,
@@ -25,7 +26,7 @@ import {
     ZoomUpdatedEvent,
 } from '../events';
 import { PanoData, PanoramaOptions, Point, SphereCorrection, TextureData } from '../model';
-import { Animation, isExtendedPosition } from '../utils';
+import { Animation, isNil } from '../utils';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
 
@@ -267,8 +268,14 @@ export class Renderer extends AbstractService {
      * @internal
      */
     transition(textureData: TextureData, options: PanoramaOptions): Animation<any> {
-        const positionProvided = isExtendedPosition(options);
-        const zoomProvided = 'zoom' in options;
+        const positionProvided = !isNil(options.position);
+        const zoomProvided = !isNil(options.zoom);
+
+        const e = new BeforeAnimateEvent(
+            positionProvided ? this.viewer.dataHelper.cleanPosition(options.position) : undefined,
+            options.zoom
+        );
+        this.viewer.dispatchEvent(e);
 
         // create temp group and new mesh, half size to be in "front" of the first one
         const group = new Group();
@@ -279,17 +286,16 @@ export class Renderer extends AbstractService {
         this.setSphereCorrection(options.sphereCorrection, group);
 
         // rotate the new sphere to make the target position face the camera
-        if (positionProvided) {
-            const cleanPosition = this.viewer.dataHelper.cleanPosition(options);
+        if (positionProvided && options.transition === 'fade-only') {
             const currentPosition = this.viewer.getPosition();
 
             // rotation along the vertical axis
             const verticalAxis = new Vector3(0, 1, 0);
-            group.rotateOnWorldAxis(verticalAxis, cleanPosition.yaw - currentPosition.yaw);
+            group.rotateOnWorldAxis(verticalAxis, e.position.yaw - currentPosition.yaw);
 
             // rotation along the camera horizontal axis
             const horizontalAxis = new Vector3(0, 1, 0).cross(this.camera.getWorldDirection(new Vector3())).normalize();
-            group.rotateOnWorldAxis(horizontalAxis, cleanPosition.pitch - currentPosition.pitch);
+            group.rotateOnWorldAxis(horizontalAxis, e.position.pitch - currentPosition.pitch);
         }
 
         group.add(mesh);
@@ -300,18 +306,30 @@ export class Renderer extends AbstractService {
         this.renderer.render(this.scene, this.camera);
         this.renderer.setRenderTarget(null);
 
+        const { duration, properties } = this.viewer.dataHelper.getAnimationProperties(
+            options.transition as any,
+            options.transition === true ? e.position : null,
+            e.zoomLevel
+        );
+
         const animation = new Animation({
             properties: {
+                ...properties,
                 opacity: { start: 0.0, end: 1.0 },
-                zoom: zoomProvided ? { start: this.viewer.getZoomLevel(), end: options.zoom } : undefined,
             },
-            duration: options.transition as number,
-            easing: 'outCubic',
-            onTick: (properties) => {
-                this.viewer.adapter.setTextureOpacity(mesh, properties.opacity);
+            duration: duration,
+            easing: 'inOutCubic',
+            onTick: (props) => {
+                this.viewer.adapter.setTextureOpacity(mesh, props.opacity);
 
+                if (positionProvided && options.transition === true) {
+                    this.viewer.dynamics.position.setValue({
+                        yaw: props.yaw,
+                        pitch: props.pitch,
+                    });
+                }
                 if (zoomProvided) {
-                    this.viewer.zoom(properties.zoom);
+                    this.viewer.dynamics.zoom.setValue(props.zoom);
                 }
 
                 this.viewer.needsUpdate();
@@ -327,8 +345,8 @@ export class Renderer extends AbstractService {
                 this.setSphereCorrection(options.sphereCorrection);
 
                 // actually rotate the camera
-                if (positionProvided) {
-                    this.viewer.rotate(options);
+                if (positionProvided && options.transition === 'fade-only') {
+                    this.viewer.rotate(options.position);
                 }
             } else {
                 this.viewer.adapter.disposeTexture(textureData);

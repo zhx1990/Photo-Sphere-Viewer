@@ -20,8 +20,14 @@ import { AbstractDatasource } from './datasources/AbstractDataSource';
 import { ClientSideDatasource } from './datasources/ClientSideDatasource';
 import { ServerSideDatasource } from './datasources/ServerSideDatasource';
 import { NodeChangedEvent, VirtualTourEvents } from './events';
-import { GpsPosition, VirtualTourLink, VirtualTourNode, VirtualTourPluginConfig } from './model';
-import { gpsToSpherical, setMeshColor } from './utils';
+import {
+    GpsPosition,
+    VirtualTourLink,
+    VirtualTourNode,
+    VirtualTourPluginConfig,
+    VirtualTourTransitionOptions,
+} from './model';
+import { gpsDistance, gpsToSpherical, setMeshColor } from './utils';
 
 // https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733
 const LIGHT_INTENSITY = parseInt(REVISION) >= 155 ? Math.PI : 1;
@@ -35,8 +41,13 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
         getNode: null,
         startNodeId: null,
         preload: false,
-        rotateSpeed: '20rpm',
-        transition: CONSTANTS.DEFAULT_TRANSITION,
+        transitionOptions: {
+            speed: '20rpm',
+            fadeIn: true,
+            rotation: true,
+        },
+        rotateSpeed: null,
+        transition: null,
         linksOnCompass: true,
         markerStyle: DEFAULT_MARKER,
         arrowStyle: DEFAULT_ARROW,
@@ -81,6 +92,25 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
                 }
             }
             return map;
+        },
+        transitionOptions(transitionOptions, { rawConfig }) {
+            if (typeof transitionOptions === 'object') {
+                if (!utils.isNil(rawConfig.transition)) {
+                    utils.logWarn('VirtualTourPlugin: "transition" option is deprecated, use "transitionOptions" instead');
+                    if (typeof rawConfig.transition === 'number') {
+                        transitionOptions.speed = rawConfig.transition;
+                    } else if (rawConfig.transition === false) {
+                        transitionOptions.fadeIn = false;
+                    }
+                }
+                if (!utils.isNil(rawConfig.rotateSpeed)) {
+                    utils.logWarn('VirtualTourPlugin: "rotateSpeed" option is deprecated, use "transitionOptions" instead');
+                    if (rawConfig.rotateSpeed === false) {
+                        transitionOptions.rotation = false;
+                    }
+                }
+            }
+            return transitionOptions;
         },
     }
 );
@@ -250,12 +280,12 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         } else if (e instanceof events.ClickEvent) {
             const link = e.data.objects.find((o) => o.userData[LINK_DATA])?.userData[LINK_DATA];
             if (link) {
-                this.setCurrentNode(link.nodeId, link);
+                this.setCurrentNode(link.nodeId, null, link);
             }
         } else if (e.type === 'select-marker') {
             const link = (e as markersEvents.SelectMarkerEvent).marker.data?.[LINK_DATA];
             if (link) {
-                this.setCurrentNode(link.nodeId, link);
+                this.setCurrentNode(link.nodeId, null, link);
             }
         } else if (e instanceof events.ObjectEnterEvent) {
             if (e.userDataKey === LINK_DATA) {
@@ -335,7 +365,11 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
      * Changes the current node
      * @returns {Promise<boolean>} resolves false if the loading was aborted by another call
      */
-    setCurrentNode(nodeId: string, fromLink?: VirtualTourLink): Promise<boolean> {
+    setCurrentNode(
+        nodeId: string,
+        options?: VirtualTourTransitionOptions,
+        fromLink?: VirtualTourLink
+    ): Promise<boolean> {
         if (nodeId === this.state.currentNode?.id) {
             return Promise.resolve(true);
         }
@@ -347,29 +381,48 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         const fromNode = this.state.currentNode;
         const fromLinkPosition = fromNode && fromLink ? this.__getLinkPosition(fromNode, fromLink) : null;
 
-        return Promise.all([
-            // if this node is already preloading, wait for it
-            Promise.resolve(this.state.preload[nodeId]).then(() => {
+        // if this node is already preloading, wait for it
+        return Promise.resolve(this.state.preload[nodeId])
+            .then(() => {
                 if (this.state.loadingNode !== nodeId) {
                     throw utils.getAbortError();
                 }
 
                 return this.datasource.loadNode(nodeId);
-            }),
-            Promise.resolve(fromLinkPosition ? this.config.rotateSpeed : false)
-                .then((speed) => {
-                    if (speed) {
-                        return this.viewer.animate({ ...fromLinkPosition, speed });
-                    }
-                })
-                .then(() => {
-                    this.viewer.loader.show();
-                }),
-        ])
-            .then(([node]) => {
+            })
+            .then((node) => {
                 if (this.state.loadingNode !== nodeId) {
                     throw utils.getAbortError();
                 }
+
+                const transitionOptions: VirtualTourTransitionOptions = {
+                    speed: (getConfig.defaults.transitionOptions as any).speed,
+                    fadeIn: (getConfig.defaults.transitionOptions as any).fadeIn,
+                    rotation: (getConfig.defaults.transitionOptions as any).rotation,
+                    rotateTo: fromLinkPosition,
+                    ...(typeof this.config.transitionOptions === 'function'
+                        ? this.config.transitionOptions(node, fromNode, fromLink)
+                        : this.config.transitionOptions),
+                    ...options,
+                };
+
+                if (transitionOptions.rotation && !transitionOptions.fadeIn) {
+                    return this.viewer
+                        .animate({
+                            ...transitionOptions.rotateTo,
+                            speed: transitionOptions.speed,
+                        })
+                        .then(() => [node, transitionOptions] as [VirtualTourNode, VirtualTourTransitionOptions]);
+                } else {
+                    return Promise.resolve([node, transitionOptions] as [VirtualTourNode, VirtualTourTransitionOptions]);
+                }
+            })
+            .then(([node, transitionOptions]) => {
+                if (this.state.loadingNode !== nodeId) {
+                    throw utils.getAbortError();
+                }
+
+                this.viewer.loader.show();
 
                 this.state.currentNode = node;
 
@@ -385,24 +438,18 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 this.gallery?.hide();
                 this.markers?.clearMarkers();
                 this.compass?.clearHotspots();
-
-                if (this.map) {
-                    this.map.minimize();
-                    const center = this.__getNodeMapPosition(node);
-                    if (typeof this.config.transition === 'number') {
-                        setTimeout(() => this.map.setCenter(center), this.config.transition / 2);
-                    } else {
-                        this.map.setCenter(center);
-                    }
-                }
+                this.map?.minimize();
 
                 return this.viewer
                     .setPanorama(node.panorama, {
-                        transition: this.config.transition,
                         caption: node.caption,
                         description: node.description,
                         panoData: node.panoData,
                         sphereCorrection: node.sphereCorrection,
+                        transition: !transitionOptions.fadeIn ? false : transitionOptions.rotation ? true : 'fade-only',
+                        speed: transitionOptions.speed,
+                        position: transitionOptions.rotateTo,
+                        zoom: transitionOptions.zoomTo,
                     })
                     .then((completed) => {
                         if (!completed) {
@@ -416,6 +463,11 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 }
 
                 const node = this.state.currentNode;
+
+                if (this.map) {
+                    const center = this.__getNodeMapPosition(node);
+                    this.map.setCenter(center);
+                }
 
                 if (node.markers) {
                     this.__addNodeMarkers(node);
@@ -458,6 +510,19 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     private __renderLinks(node: VirtualTourNode) {
         const positions: Position[] = [];
 
+        let minDist = Number.POSITIVE_INFINITY;
+        let maxDist = Number.NEGATIVE_INFINITY;
+        const linksDist: Record<string, number> = {};
+
+        if (this.isGps) {
+            node.links.forEach((link) => {
+                const dist = gpsDistance(node.gps, link.gps);
+                linksDist[link.nodeId] = dist;
+                minDist = Math.min(dist, minDist);
+                maxDist = Math.max(dist, maxDist);
+            });
+        }
+
         let i = 0;
         node.links.forEach((link) => {
             const position = this.__getLinkPosition(node, link);
@@ -473,6 +538,14 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 this.viewer.dataHelper
                     .sphericalCoordsToVector3({ yaw: position.yaw, pitch: 0 }, mesh.position)
                     .multiplyScalar(1 / CONSTANTS.SPHERE_RADIUS);
+
+                if (!utils.isNil(link.linkOffset?.depth)) {
+                    mesh.position.multiplyScalar(link.linkOffset.depth);
+                } else if (this.isGps && minDist !== maxDist) {
+                    mesh.position.multiplyScalar(
+                        MathUtils.mapLinear(linksDist[link.nodeId], minDist, maxDist, 0.5, 1.5)
+                    );
+                }
 
                 const outlineMesh = new Mesh(ARROW_OUTLINE_GEOM, new MeshBasicMaterial({ side: BackSide }));
                 outlineMesh.position.copy(mesh.position);

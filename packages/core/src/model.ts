@@ -110,11 +110,15 @@ export type PanoDataProvider = (image: HTMLImageElement, xmpData?: PanoData) => 
  */
 export type PanoramaOptions = Partial<ExtendedPosition> & {
     /**
+     * new panorama position
+     */
+    position?: ExtendedPosition;
+    /**
      * new navbar caption
      */
     caption?: string;
     /**
-     * new ppanorama description
+     * new panorama description
      */
     description?: string;
     /**
@@ -122,10 +126,15 @@ export type PanoramaOptions = Partial<ExtendedPosition> & {
      */
     zoom?: number;
     /**
-     * duration of the transition between all and new panorama
+     * enable transition between old and new panorama
+     * @default true
+     */
+    transition?: boolean | number | 'fade-only';
+    /**
+     * speed or duration of the transition between old and new panorama
      * @default 1500
      */
-    transition?: boolean | number;
+    speed?: string | number;
     /**
      * show the loader while loading the new panorama
      * @default true

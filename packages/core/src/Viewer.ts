@@ -7,7 +7,7 @@ import { Overlay } from './components/Overlay';
 import { Panel } from './components/Panel';
 import { Tooltip, TooltipConfig } from './components/Tooltip';
 import { CONFIG_PARSERS, DEFAULTS, getViewerConfig, READONLY_OPTIONS } from './data/config';
-import { ANIMATION_MIN_DURATION, DEFAULT_TRANSITION, IDS, VIEWER_DATA } from './data/constants';
+import { DEFAULT_TRANSITION, IDS, VIEWER_DATA } from './data/constants';
 import { SYSTEM } from './data/system';
 import {
     BeforeAnimateEvent,
@@ -47,12 +47,11 @@ import {
     Animation,
     exitFullscreen,
     getAbortError,
-    getAngle,
     getElement,
-    getShortestArc,
     isAbortError,
     isExtendedPosition,
     isFullscreenEnabled,
+    isNil,
     logWarn,
     requestFullscreen,
     resolveBoolean,
@@ -313,8 +312,21 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
             });
         }
 
-        if (options.transition === undefined || options.transition === true) {
-            options.transition = DEFAULT_TRANSITION;
+        if (isExtendedPosition(options)) {
+            logWarn(`PanoramaOptions.yaw and PanoramaOptions.pitch are deprecated, use PanoramaOptions.position instead`);
+            (options as PanoramaOptions).position = this.dataHelper.cleanPosition(options);
+        }
+        if (typeof options.transition === 'number') {
+            logWarn(`Use PanoramaOptions.speed to define the speed/duration of the transition`);
+            options.speed = options.transition;
+            options.transition = true;
+        }
+
+        if (options.transition === undefined) {
+            options.transition = true;
+        }
+        if (options.speed === undefined) {
+            options.speed = DEFAULT_TRANSITION;
         }
         if (options.showLoader === undefined) {
             options.showLoader = true;
@@ -329,8 +341,8 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
             options.panoData = this.config.panoData;
         }
 
-        const positionProvided = isExtendedPosition(options);
-        const zoomProvided = 'zoom' in options;
+        const positionProvided = !isNil(options.position);
+        const zoomProvided = !isNil(options.zoom);
 
         if (positionProvided || zoomProvided) {
             this.stopAll();
@@ -395,7 +407,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                         this.zoom(options.zoom);
                     }
                     if (positionProvided) {
-                        this.rotate(options);
+                        this.rotate(options.position);
                     }
                 })
                 .then(
@@ -619,7 +631,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      */
     animate(options: AnimateOptions): Animation {
         const positionProvided = isExtendedPosition(options);
-        const zoomProvided = options.zoom !== undefined;
+        const zoomProvided = !isNil(options.zoom);
 
         const e = new BeforeAnimateEvent(
             positionProvided ? this.dataHelper.cleanPosition(options) : undefined,
@@ -631,68 +643,35 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
             return;
         }
 
-        const cleanPosition = e.position as Position;
-        const cleanZoom = e.zoomLevel;
-
         this.stopAll();
 
-        const animProperties: {
-            yaw?: { start: number; end: number };
-            pitch?: { start: number; end: number };
-            zoom?: { start: number; end: number };
-        } = {};
-        let duration;
-
-        // clean/filter position and compute duration
-        if (positionProvided) {
-            const currentPosition = this.getPosition();
-
-            // horizontal offset for shortest arc
-            const tOffset = getShortestArc(currentPosition.yaw, cleanPosition.yaw);
-
-            animProperties.yaw = { start: currentPosition.yaw, end: currentPosition.yaw + tOffset };
-            animProperties.pitch = { start: currentPosition.pitch, end: cleanPosition.pitch };
-
-            duration = this.dataHelper.speedToDuration(options.speed, getAngle(currentPosition, cleanPosition));
-        }
-
-        // clean/filter zoom and compute duration
-        if (zoomProvided) {
-            const dZoom = Math.abs(cleanZoom - this.getZoomLevel());
-
-            animProperties.zoom = { start: this.getZoomLevel(), end: cleanZoom };
-
-            if (!duration) {
-                // if animating zoom only and a speed is given, use an arbitrary PI/4 to compute the duration
-                duration = this.dataHelper.speedToDuration(options.speed, ((Math.PI / 4) * dZoom) / 100);
-            }
-        }
+        const { duration, properties } = this.dataHelper.getAnimationProperties(options.speed, e.position, e.zoomLevel);
 
         // if no animation needed
         if (!duration) {
             if (positionProvided) {
-                this.rotate(cleanPosition);
+                this.rotate(e.position);
             }
             if (zoomProvided) {
-                this.zoom(cleanZoom);
+                this.zoom(e.zoomLevel);
             }
 
             return new Animation(null);
         }
 
         this.state.animation = new Animation({
-            properties: animProperties,
-            duration: Math.max(ANIMATION_MIN_DURATION, duration),
+            properties: properties,
+            duration: duration,
             easing: 'inOutSine',
-            onTick: (properties) => {
+            onTick: (props) => {
                 if (positionProvided) {
                     this.dynamics.position.setValue({
-                        yaw: properties.yaw,
-                        pitch: properties.pitch,
+                        yaw: props.yaw,
+                        pitch: props.pitch,
                     });
                 }
                 if (zoomProvided) {
-                    this.dynamics.zoom.setValue(properties.zoom);
+                    this.dynamics.zoom.setValue(props.zoom);
                 }
             },
         });

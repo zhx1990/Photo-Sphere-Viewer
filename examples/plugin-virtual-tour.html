@@ -36,6 +36,7 @@
             import { VirtualTourPlugin } from '@photo-sphere-viewer/virtual-tour-plugin';
 
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+            const caption = 'Cape Florida Light, Key Biscayne <b>&copy; Pixexid</b>';
 
             const markerLighthouse = {
                 id: 'marker-1',
@@ -57,6 +58,7 @@
                     panorama: baseUrl + 'tour/key-biscayne-1.jpg',
                     thumbnail: baseUrl + 'tour/key-biscayne-1-thumb.jpg',
                     name: 'One',
+                    caption: `[1] ${caption}`,
                     links: [{ nodeId: '2', position: { pitch: 0, yaw: '100deg' } }],
                     markers: [
                         {
@@ -73,6 +75,7 @@
                     panorama: baseUrl + 'tour/key-biscayne-2.jpg',
                     thumbnail: baseUrl + 'tour/key-biscayne-2-thumb.jpg',
                     name: 'Two',
+                    caption: `[2] ${caption}`,
                     links: [
                         { nodeId: '3', position: { pitch: 0, yaw: '120deg' } },
                         { nodeId: '1', position: { pitch: 0, yaw: '280deg' } },
@@ -92,13 +95,14 @@
                     panorama: baseUrl + 'tour/key-biscayne-3.jpg',
                     thumbnail: baseUrl + 'tour/key-biscayne-3-thumb.jpg',
                     name: 'Three',
+                    caption: `[3] ${caption}`,
                     links: [
                         { nodeId: '2', position: { pitch: 0, yaw: '310deg' } },
                         { nodeId: '4', position: { pitch: 0, yaw: '220deg' } },
                         { nodeId: '5', position: { pitch: 0, yaw: '270deg' } },
                     ],
                     gps: [-80.15593, 25.66659, 5],
-                    panoData: { poseHeading: 328 },
+                    panoData: { poseHeading: 310 },
                     map: { x: 815, y: 640, color: '#b7c1ff' },
                 },
                 {
@@ -106,6 +110,7 @@
                     panorama: baseUrl + 'tour/key-biscayne-4.jpg',
                     thumbnail: baseUrl + 'tour/key-biscayne-4-thumb.jpg',
                     name: 'Four',
+                    caption: `[4] ${caption}`,
                     links: [
                         { nodeId: '3', position: { pitch: 0, yaw: '40deg' } },
                         { nodeId: '5', position: { pitch: 0, yaw: '300deg' } },
@@ -119,6 +124,7 @@
                     panorama: baseUrl + 'tour/key-biscayne-5.jpg',
                     thumbnail: baseUrl + 'tour/key-biscayne-5-thumb.jpg',
                     name: 'Five',
+                    caption: `[5] ${caption}`,
                     links: [
                         { nodeId: '6', position: { pitch: 0, yaw: '280deg' } },
                         { nodeId: '3', position: { pitch: 0, yaw: '70deg' } },
@@ -133,12 +139,13 @@
                     panorama: baseUrl + 'tour/key-biscayne-6.jpg',
                     thumbnail: baseUrl + 'tour/key-biscayne-6-thumb.jpg',
                     name: 'Six',
+                    caption: `[6] ${caption}`,
                     links: [
                         { nodeId: '7', position: { pitch: 0, yaw: '-60deg' } },
                         { nodeId: '5', position: { pitch: 0, yaw: '130deg' } },
                     ],
                     gps: [-80.156465, 25.666486, 2],
-                    panoData: { poseHeading: 328 },
+                    panoData: { poseHeading: 295 },
                     map: { x: 615, y: 685, color: '#de91f2' },
                 },
                 {
@@ -146,9 +153,10 @@
                     panorama: baseUrl + 'tour/key-biscayne-7.jpg',
                     thumbnail: baseUrl + 'tour/key-biscayne-7-thumb.jpg',
                     name: 'Seven',
+                    caption: `[7] ${caption}`,
                     links: [{ nodeId: '6', position: { pitch: 0, yaw: '80deg' } }],
                     gps: [-80.15709, 25.66634, 3],
-                    panoData: { poseHeading: 250 },
+                    panoData: { poseHeading: 250, posePitch: 3 },
                     map: { x: 385, y: 745, color: '#8bed82' },
                 },
             ];
@@ -159,7 +167,6 @@
             const viewer = new Viewer({
                 container: 'photosphere',
                 loadingImg: baseUrl + 'loader.gif',
-                caption: 'Cape Florida Light, Key Biscayne <b>&copy; Pixexid</b>',
                 defaultYaw: '100deg',
                 plugins: [
                     MarkersPlugin,
@@ -173,9 +180,12 @@
                         renderMode: '3d',
                         startNodeId: nodes[1].id,
                         preload: true,
-                        // transition   : false,
-                        // rotateSpeed  : false,
                         arrowPosition: 'bottom',
+                        transitionOptions: {
+                            // speed: '10rpm',
+                            // fadeIn: false,
+                            // rotation: false,
+                        },
 
                         // client mode
                         dataMode: 'client',
