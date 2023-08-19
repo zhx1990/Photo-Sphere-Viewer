@@ -1,12 +1,5 @@
 import { PSVError, utils } from '@photo-sphere-viewer/core';
-import {
-    BufferGeometry,
-    LineSegments,
-    Material,
-    MeshBasicMaterial,
-    Object3D,
-    WireframeGeometry,
-} from 'three';
+import { BufferGeometry, LineSegments, Material, MeshBasicMaterial, Object3D, WireframeGeometry } from 'three';
 
 /**
  * Checks if the zoomRange properties are coherent

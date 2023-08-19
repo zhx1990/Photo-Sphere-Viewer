@@ -25,7 +25,9 @@ export const ACTIVE_CLASS = 'psv-gallery-item--active';
  * @internal
  */
 export const ITEMS_TEMPLATE = (items: GalleryItem[], size: Size) => `
-${items.map((item) => `
+${items
+    .map(
+        (item) => `
 <div class="psv-gallery-item" data-${GALLERY_ITEM_DATA_KEY}="${item.id}" style="width:${size.width}px">
   <div class="psv-gallery-item-wrapper" style="padding-bottom:calc(100% * ${size.height} / ${size.width})">
     ${item.name ? `<div class="psv-gallery-item-title"><span>${item.name}</span></div>` : ''}
@@ -33,5 +35,7 @@ ${items.map((item) => `
     ${item.thumbnail ? `<div class="psv-gallery-item-thumb" data-src="${item.thumbnail}"></div>` : ''}
   </div>
 </div>
-`).join('')}
+`
+    )
+    .join('')}
 `;

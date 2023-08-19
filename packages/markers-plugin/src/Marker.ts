@@ -640,13 +640,10 @@ export class Marker {
                     if (this.viewer.config.requestHeaders) {
                         this.loader.setRequestHeader(this.viewer.config.requestHeaders(this.config.imageLayer));
                     }
-                    mesh.material.map = this.loader.load(
-                        this.config.imageLayer,
-                        (texture) => {
-                            texture.anisotropy = 4;
-                            this.viewer.needsUpdate();
-                        }
-                    );
+                    mesh.material.map = this.loader.load(this.config.imageLayer, (texture) => {
+                        texture.anisotropy = 4;
+                        this.viewer.needsUpdate();
+                    });
                     this.definition = this.config.imageLayer;
                 }
 

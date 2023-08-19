@@ -50,12 +50,16 @@ export const MARKERS_LIST_TEMPLATE = (markers: Marker[], title: string) => `
 <div class="psv-panel-menu psv-panel-menu--stripped">
  <h1 class="psv-panel-menu-title">${icon} ${title}</h1>
  <ul class="psv-panel-menu-list">
-   ${markers.map((marker) => `
+   ${markers
+       .map(
+           (marker) => `
    <li data-${MARKER_DATA_KEY}="${marker.id}" class="psv-panel-menu-item" tabindex="0">
      ${marker.type === 'image' ? `<span class="psv-panel-menu-item-icon"><img src="${marker.definition}"/></span>` : ''}
      <span class="psv-panel-menu-item-label">${marker.getListContent()}</span>
    </li>
-   `).join('')}
+   `
+       )
+       .join('')}
  </ul>
 </div>
 `;

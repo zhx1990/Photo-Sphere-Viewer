@@ -4,14 +4,7 @@ import type { Viewer } from '../Viewer';
 import { SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
 import { PanoData, PanoDataProvider, TextureData } from '../model';
-import {
-    createTexture,
-    firstNonNull,
-    getConfigParser,
-    getXMPValue,
-    isNil,
-    logWarn
-} from '../utils';
+import { createTexture, firstNonNull, getConfigParser, getXMPValue, isNil, logWarn } from '../utils';
 import { AbstractAdapter } from './AbstractAdapter';
 import { interpolationWorkerSrc } from './interpolationWorker';
 
@@ -339,5 +332,4 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
             croppedY: croppedY,
         };
     }
-
 }

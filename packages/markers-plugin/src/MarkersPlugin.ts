@@ -638,9 +638,9 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         viewerPosition,
         mouseover
     }: {
-        zoomLevel: number,
-        viewerPosition: Position,
-        mouseover: boolean
+        zoomLevel: number;
+        viewerPosition: Position;
+        mouseover: boolean;
     }) {
         if (mouseover !== null && marker.config.hoverScale) {
             marker.domElement.style.transition = `scale ${marker.config.hoverScale.duration}ms ${marker.config.hoverScale.easing}`;
@@ -655,11 +655,13 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      * It tests if the point is in the general direction of the camera, then check if it's in the viewport
      */
     private __isMarkerVisible(marker: Marker, position: Point): boolean {
-        return marker.state.positions3D[0].dot(this.viewer.state.direction) > 0
+        return (
+            marker.state.positions3D[0].dot(this.viewer.state.direction) > 0
             && position.x + marker.state.size.width >= 0
             && position.x - marker.state.size.width <= this.viewer.state.size.width
             && position.y + marker.state.size.height >= 0
-            && position.y - marker.state.size.height <= this.viewer.state.size.height;
+            && position.y - marker.state.size.height <= this.viewer.state.size.height
+        );
     }
 
     /**

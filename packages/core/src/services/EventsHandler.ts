@@ -640,8 +640,10 @@ export class EventsHandler extends AbstractService {
      * Checks if the cursor was move beyond the move threshold
      */
     private __moveThresholdReached(clientX: number, clientY: number) {
-        return Math.abs(clientX - this.data.startMouseX) >= this.moveThreshold
-            || Math.abs(clientY - this.data.startMouseY) >= this.moveThreshold;
+        return (
+            Math.abs(clientX - this.data.startMouseX) >= this.moveThreshold
+            || Math.abs(clientY - this.data.startMouseY) >= this.moveThreshold
+        );
     }
 
     /**

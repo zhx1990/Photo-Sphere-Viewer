@@ -39,8 +39,7 @@ ${log
     .map((line) => line.trim())
     .filter((line) => !line.startsWith('chore'))
     .map((line) => `- ${line}`)
-    .join('\n')
-}`;
+    .join('\n')}`;
 
     console.log(content);
     writeFileAndExit(content);

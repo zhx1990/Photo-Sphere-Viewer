@@ -34,12 +34,16 @@ export const SETTINGS_TEMPLATE_: Record<BaseSetting['type'], any> = {
  */
 export const SETTINGS_TEMPLATE = (settings: BaseSetting[], optionsCurrent: (s: OptionsSetting) => string) => `
 <ul class="psv-settings-list">
-  ${settings.map((setting) => `
+  ${settings
+      .map(
+          (setting) => `
     <li class="psv-settings-item" tabindex="0"
         data-${SETTING_DATA_KEY}="${setting.id}" data-${OPTION_DATA_KEY}="${ID_ENTER}">
       ${SETTINGS_TEMPLATE_[setting.type](setting as OptionsSetting, optionsCurrent)}
     </li>
-  `).join('')}
+  `
+      )
+      .join('')}
 </ul>
 `;
 
@@ -53,12 +57,17 @@ export const SETTING_OPTIONS_TEMPLATE = (setting: OptionsSetting, optionActive: 
     <span class="psv-settings-item-icon">${chevron}</span>
     <span class="psv-settings-item-label">${setting.label}</span>
   </li>
-  ${setting.options().map((option) => `
+  ${setting
+      .options()
+      .map(
+          (option) => `
     <li class="psv-settings-item" tabindex="0"
         data-${SETTING_DATA_KEY}="${setting.id}" data-${OPTION_DATA_KEY}="${option.id}">
       <span class="psv-settings-item-icon">${optionActive(option) ? check : ''}</span>
       <span class="psv-settings-item-value">${option.label}</span>
     </li>
-  `).join('')}
+  `
+      )
+      .join('')}
 </ul>
 `;

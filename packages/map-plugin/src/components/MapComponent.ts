@@ -493,9 +493,9 @@ export class MapComponent extends AbstractComponent {
             }
             context.restore();
         });
-        
+
         const pinImage = this.__loadImage(this.config.pinImage);
-        if (pinImage || this.config.coneColor && this.config.coneSize) {
+        if (pinImage || (this.config.coneColor && this.config.coneSize)) {
             const pinPos = projectPoint(offset, yawAndRotation, zoom);
 
             const x = canvasVirtualCenterX - pinPos.x;
@@ -510,7 +510,7 @@ export class MapComponent extends AbstractComponent {
             // draw the cone
             if (this.config.coneColor && this.config.coneSize) {
                 const fov = MathUtils.degToRad(this.viewer.state.hFov);
-                const a1 = - Math.PI / 2 - fov / 2;
+                const a1 = -Math.PI / 2 - fov / 2;
                 const a2 = a1 + fov;
                 const c = this.config.coneSize;
 
