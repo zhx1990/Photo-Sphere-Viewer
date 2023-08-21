@@ -15,7 +15,11 @@ export type MarkerConfig = {
     /**
      * HTML content of the marker
      */
-    html?: string;
+    html?: string ;
+    /**
+     * Exiting DOM element
+     */
+    element?: HTMLElement;
     /**
      * Size of the square
      */

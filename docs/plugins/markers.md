@@ -17,7 +17,7 @@ The plugin provides a powerful markers system allowing to define points of inter
 
 There are four types of markers :
 
--   **HTML** defined with the `html` attribute
+-   **HTML** defined with the `html`/`element` attribute
 -   **Images** defined with the `image`/`imageLayer` attribute
 -   **SVGs** defined with the `square`/`rect`/`circle`/`ellipse`/`path` attribute
 -   **Dynamic polygons & polylines** defined with the `polygon`/`polygonPixels`/`polyline`/`polylinePixels` attribute
@@ -251,6 +251,7 @@ One, and only one, of these options is required for each marker.
 | `image`          | `string`                                 | Path to the image representing the marker. Requires `width` and `height` to be defined. |
 | `imageLayer`     | `string`                                 | Path to the image representing the marker. Requires `width` and `height` to be defined. |
 | `html`           | `string`                                 | HTML content of the marker. It is recommended to define `width` and `height`.           |
+| `element`        | `HTMLElement`                            | Existing DOM element.                                                                   |
 | `square`         | `integer`                                | Size of the square.                                                                     |
 | `rect`           | `integer[2]`<br>`{width:int,height:int}` | Size of the rectangle.                                                                  |
 | `circle`         | `integer`                                | Radius of the circle.                                                                   |
@@ -268,6 +269,7 @@ One, and only one, of these options is required for each marker.
   image: 'pin-red.png',
   imageLayer: 'pin-blue.png',
   html: 'Click here',
+  element: document.querySelector('#my-marker'),
   square: 10,
   rect: [10, 5],
   rect: {width: 10, height: 5},
@@ -303,7 +305,7 @@ Position of the marker in **spherical coordinates** (radians/degrees) or **textu
 
 _(This option is ignored for polygons and polylines)._
 
-#### `size` (required for images, recommended for html)
+#### `size` (required for images, recommended for html/element)
 
 -   type: `{ width, height }`
 

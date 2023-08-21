@@ -96,6 +96,12 @@
             </defs>
         </svg>
 
+        <custom-marker id="custom-marker-element" style="display: none">
+            <img src="https://photo-sphere-viewer-data.netlify.app/assets/sphere-small.jpg">
+            <h2>Custom element</h2>
+            <p>Use an existing element as marker. This WebComponent contains it's own animations and tooltip.</p>
+        </custom-marker>
+
         <script type="importmap">
             {
                 "imports": {
@@ -113,6 +119,9 @@
             import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
             import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
             import { StereoPlugin } from '@photo-sphere-viewer/stereo-plugin';
+            import { CustomMarkerElement } from './CustomMarkerElement.js';
+
+            customElements.define('custom-marker', CustomMarkerElement);
 
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
@@ -279,15 +288,7 @@ tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretiu
                             });
 
                             a.push({
-                                id: 'gif',
-                                image: baseUrl + 'loader.gif',
-                                size: { width: 100, height: 100 },
-                                position: { yaw: 0.56, pitch: -0.32 },
-                                listContent: 'An animated gif',
-                            });
-
-                            a.push({
-                                id: 'text',
+                                id: 'html',
                                 html: `<code>HTML</code> content <img src="${baseUrl}pictos/pin-blue.png" style="height: 24px; vertical-align: top;"/>`,
                                 anchor: 'bottom right',
                                 style: {
@@ -296,7 +297,22 @@ tellus est malesuada tellus, at luctus turpis elit sit amet quam. Vivamus pretiu
                                     fontFamily: 'Helvetica, sans-serif',
                                     textAlign: 'center',
                                 },
-                                position: { yaw: 0.45, pitch: -0.38 },
+                                position: { yaw: 0.35, pitch: -0.30 },
+                            });
+
+                            a.push({
+                                id: 'image',
+                                image: baseUrl + 'loader.gif',
+                                size: { width: 100, height: 100 },
+                                position: { yaw: 0.5, pitch: -0.3 },
+                                listContent: 'An animated gif',
+                            });
+
+                            a.push({
+                                id: 'element',
+                                element: document.querySelector('#custom-marker-element'),
+                                listContent: 'Custom element',
+                                position: { yaw: 0.65, pitch: -0.3 },
                             });
 
                             // SVG markers
