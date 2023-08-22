@@ -86,7 +86,12 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         }
 
         if (this.config.interpolateBackground) {
-            this.interpolationWorker = new Worker(interpolationWorkerSrc);
+            if (!window.Worker) {
+                logWarn('Web Worker API not available');
+                this.config.interpolateBackground = false;
+            } else {
+                this.interpolationWorker = new Worker(interpolationWorkerSrc);
+            }
         }
 
         this.SPHERE_SEGMENTS = this.config.resolution;
