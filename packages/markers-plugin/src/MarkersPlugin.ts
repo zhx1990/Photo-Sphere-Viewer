@@ -23,7 +23,7 @@ import {
     ShowMarkersEvent,
     UnselectMarkerEvent,
 } from './events';
-import { Marker } from './Marker';
+import { Marker, MarkerType } from './Marker';
 import { MarkersButton } from './MarkersButton';
 import { MarkersListButton } from './MarkersListButton';
 import { MarkerConfig, MarkersPluginConfig, ParsedMarkersPluginConfig, UpdatableMarkersPluginConfig } from './model';
@@ -600,6 +600,16 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
                         viewerPosition,
                         mouseover: null,
                     });
+
+                    if (marker.type === MarkerType.element) {
+                        marker.config.element.updateMarker?.({
+                            marker,
+                            position,
+                            viewerPosition,
+                            zoomLevel,
+                            viewerSize: this.viewer.state.size,
+                        });
+                    }
                 }
             }
 

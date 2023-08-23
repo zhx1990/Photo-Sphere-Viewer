@@ -5,6 +5,8 @@ export class CustomMarkerElement extends HTMLElement {
     constructor() {
         super();
 
+        this.fmt = new Intl.NumberFormat({ maximumSignificantDigits: 4 });
+
         const dom = this.attachShadow({ mode: 'closed' });
 
         const style = document.createElement('style');
@@ -15,14 +17,27 @@ export class CustomMarkerElement extends HTMLElement {
         dom.appendChild(button);
         button.innerHTML = ICON;
 
-        const tooltip = document.createElement('div');
-        tooltip.classList.add('tooltip');
-        dom.appendChild(tooltip);
-        tooltip.innerHTML = '<slot></slot>';
+        this.tooltip = document.createElement('div');
+        this.tooltip.classList.add('tooltip');
+        dom.appendChild(this.tooltip);
+        this.tooltip.innerHTML = '<slot></slot>';
+
+        this.legend = document.createElement('pre');
+        this.tooltip.appendChild(this.legend);
 
         button.addEventListener('mouseenter', () => {
-            tooltip.classList.add('hovered');
+            this.tooltip.classList.add('hovered');
         });
+    }
+
+    updateMarker({ marker, position, viewerPosition, zoomLevel, viewerSize }) {
+        this.legend.innerText = `Params
+position: ${position.x}px x ${position.y}px
+viewerPosition: ${this.fmt.format(viewerPosition.yaw)}rad / ${this.fmt.format(viewerPosition.pitch)}rad
+zoomLevel: ${zoomLevel}%
+viewerSize: ${viewerSize.width}px x ${viewerSize.height}px
+`;
+        this.tooltip.classList.toggle('bottom', position.y < viewerSize.height / 2);
     }
 }
 
@@ -65,9 +80,16 @@ button:hover {
     transform: rotate(30deg);
     opacity: 0;
 }
+.tooltip.bottom {
+    bottom: auto;
+    top: calc(100% + 10px);
+    transform-origin: 50% -35px;
+}
+
 .tooltip.hovered {
     animation: rotate-bounce-out 200ms ease forwards;
 }
+
 .tooltip slot::slotted(img) {
     width: 100%;
     border-radius: 15px 15px 0 0;
@@ -77,17 +99,30 @@ button:hover {
     margin: 1rem;
     text-align: justify;
 }
+.tooltip pre {
+    font-size: 0.8em;
+    margin: 1rem;
+}
+
 .tooltip::after {
     content: '';
     width: 0px;
     height: 0px;
+    color: rgba(30, 30, 30, 0.8);
     border: 10px solid transparent;
-    border-top-color: rgba(30, 30, 30, 0.8);
+    border-top-color: currentColor;
     position: absolute;
     top: 100%;
     left: 50%;
     margin-left: -10px;
 }
+.tooltip.bottom::after {
+    border-top-color: transparent;
+    border-bottom-color: currentColor;
+    top: auto;
+    bottom: 100%;
+}
+
 button:hover + .tooltip {
     animation: rotate-bounce-in 300ms ease forwards;
 }

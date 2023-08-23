@@ -289,6 +289,17 @@ Both allows to display an image but the difference is in the rendering technique
 And `image` marker is rendered flat above the viewer but and `imageLayer` is rendered inside the panorama itself, this allows for more natural movements and scaling.
 :::
 
+::: tip Custom element markers
+The `element` marker accepts [Web Components](https://developer.mozilla.org/docs/Web/API/Web_components/Using_custom_elements).
+If your component has an `updateMarker()` method it will be called by the plugin on each render with a bunch of properties:
+
+- `marker`: reference to the marker object itself
+- `position`: computed 2D position in the viewport
+- `viewerPosition`: current camera orientation in yaw+pitch
+- `zoomLevel`: current zoom level
+- `viewerSize`: size of the viewport
+:::
+
 ### Options
 
 #### `id` (required)

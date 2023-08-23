@@ -442,8 +442,9 @@ export class Marker {
             case MarkerType.element:
                 if (this.definition !== this.config.element) {
                     this.definition = this.config.element;
-                    this.config.element.style.display = 'block';
+                    element.childNodes.forEach(n => n.remove());
                     element.appendChild(this.config.element);
+                    this.config.element.style.display = 'block';
                 }
                 break;
         }

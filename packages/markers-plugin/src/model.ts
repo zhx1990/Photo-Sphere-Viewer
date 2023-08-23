@@ -1,4 +1,20 @@
-import type { ExtendedPosition, Position, Size } from '@photo-sphere-viewer/core';
+import type { ExtendedPosition, Point, Position, Size } from '@photo-sphere-viewer/core';
+import type { Marker } from './Marker';
+
+/**
+ * Custom Web Component interface for `element` markers
+ */
+export interface MarkerElement extends HTMLElement {
+
+    updateMarker?(params: {
+        marker: Marker;
+        position: Point;
+        viewerPosition: Position;
+        zoomLevel: number;
+        viewerSize: Size;
+    }): void;
+
+}
 
 /**
  * Configuration of a marker
@@ -19,7 +35,7 @@ export type MarkerConfig = {
     /**
      * Exiting DOM element
      */
-    element?: HTMLElement;
+    element?: MarkerElement;
     /**
      * Size of the square
      */
