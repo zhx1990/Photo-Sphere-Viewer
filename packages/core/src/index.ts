@@ -29,7 +29,7 @@ export { TypedEvent } from './lib/TypedEventTarget';
 export type { PluginConstructor } from './plugins/AbstractPlugin';
 export { AbstractPlugin, AbstractConfigurablePlugin } from './plugins/AbstractPlugin';
 export type { DataHelper } from './services/DataHelper';
-export type { Renderer } from './services/Renderer';
+export type { Renderer, CustomRenderer } from './services/Renderer';
 export type { TextureLoader } from './services/TextureLoader';
 export type { ViewerState } from './services/ViewerState';
 export { PSVError } from './PSVError';

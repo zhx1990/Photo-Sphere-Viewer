@@ -27,7 +27,7 @@ export const DEFAULT_ARROW: VirtualTourArrowStyle = {
     color: '#aaaaaa',
     hoverColor: '#aa5500',
     outlineColor: '#000000',
-    scale: [0.5, 2],
+    size: 1,
 };
 
 export const { ARROW_GEOM, ARROW_OUTLINE_GEOM } = (() => {
@@ -35,7 +35,7 @@ export const { ARROW_GEOM, ARROW_OUTLINE_GEOM } = (() => {
     const geometries = loader.parseGeometries([arrowGeometryJson, arrowOutlineGeometryJson]);
     const arrow = geometries[arrowGeometryJson.uuid];
     const arrowOutline = geometries[arrowOutlineGeometryJson.uuid];
-    const scale = 0.015;
+    const scale = 0.03;
     const rot = Math.PI / 2;
     arrow.scale(scale, scale, scale);
     arrow.rotateX(rot);

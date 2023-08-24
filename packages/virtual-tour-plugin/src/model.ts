@@ -32,9 +32,9 @@ export type VirtualTourArrowStyle = {
      */
     outlineColor?: string;
     /**
-     * @default [0.5,2]
+     * @default 1
      */
-    scale?: [number, number];
+    size?: number;
 };
 
 /**

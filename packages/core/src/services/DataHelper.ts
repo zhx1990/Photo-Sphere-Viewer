@@ -166,13 +166,13 @@ export class DataHelper extends AbstractService {
     /**
      * Converts spherical radians coordinates to a Vector3
      */
-    sphericalCoordsToVector3(position: Position, vector?: Vector3): Vector3 {
+    sphericalCoordsToVector3(position: Position, vector?: Vector3, distance = SPHERE_RADIUS): Vector3 {
         if (!vector) {
             vector = new Vector3();
         }
-        vector.x = SPHERE_RADIUS * -Math.cos(position.pitch) * Math.sin(position.yaw);
-        vector.y = SPHERE_RADIUS * Math.sin(position.pitch);
-        vector.z = SPHERE_RADIUS * Math.cos(position.pitch) * Math.cos(position.yaw);
+        vector.x = distance * -Math.cos(position.pitch) * Math.sin(position.yaw);
+        vector.y = distance * Math.sin(position.pitch);
+        vector.z = distance * Math.cos(position.pitch) * Math.cos(position.yaw);
         return vector;
     }
 

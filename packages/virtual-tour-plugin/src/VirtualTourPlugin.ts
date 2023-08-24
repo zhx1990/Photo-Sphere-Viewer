@@ -1,21 +1,12 @@
 import type { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
 import type { Point, Position, Tooltip, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractConfigurablePlugin, CONSTANTS, PSVError, events, utils } from '@photo-sphere-viewer/core';
+import { AbstractConfigurablePlugin, PSVError, events, utils } from '@photo-sphere-viewer/core';
 import type { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
 import type { MapPlugin, events as mapEvents } from '@photo-sphere-viewer/map-plugin';
 import type { Marker, MarkerConfig, MarkersPlugin, events as markersEvents } from '@photo-sphere-viewer/markers-plugin';
-import {
-    AmbientLight,
-    BackSide,
-    Group,
-    MathUtils,
-    Mesh,
-    MeshBasicMaterial,
-    MeshLambertMaterial,
-    PointLight,
-    REVISION,
-} from 'three';
-import { ARROW_GEOM, ARROW_OUTLINE_GEOM, DEFAULT_ARROW, DEFAULT_MARKER, LINK_DATA, LINK_ID } from './constants';
+import { MathUtils, Mesh } from 'three';
+import { ArrowsRenderer } from './ArrowsRenderer';
+import { DEFAULT_ARROW, DEFAULT_MARKER, LINK_DATA, LINK_ID } from './constants';
 import { AbstractDatasource } from './datasources/AbstractDataSource';
 import { ClientSideDatasource } from './datasources/ClientSideDatasource';
 import { ServerSideDatasource } from './datasources/ServerSideDatasource';
@@ -29,9 +20,6 @@ import {
     VirtualTourTransitionOptions,
 } from './model';
 import { gpsDistance, gpsToSpherical, setMeshColor } from './utils';
-
-// https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733
-const LIGHT_INTENSITY = parseInt(REVISION) >= 155 ? Math.PI : 1;
 
 const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
     {
@@ -141,7 +129,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     };
 
     private datasource: AbstractDatasource;
-    private arrowsGroup: Group;
+    private arrowsRenderer: ArrowsRenderer;
 
     private map?: MapPlugin;
     private markers?: MarkersPlugin;
@@ -164,11 +152,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         super(viewer, config);
 
         if (this.is3D) {
-            this.arrowsGroup = new Group();
-
-            const localLight = new PointLight(0xffffff, LIGHT_INTENSITY, 0, 0);
-            localLight.position.set(0, this.config.arrowPosition === 'bottom' ? 2 : -2, 0);
-            this.arrowsGroup.add(localLight);
+            this.arrowsRenderer = new ArrowsRenderer(this.viewer, this);
         }
     }
 
@@ -209,12 +193,14 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             this.viewer.observeObjects(LINK_DATA);
 
             this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
-            this.viewer.addEventListener(events.ZoomUpdatedEvent.type, this);
+            this.viewer.addEventListener(events.SizeUpdatedEvent.type, this);
             this.viewer.addEventListener(events.ClickEvent.type, this);
             this.viewer.addEventListener(events.ObjectEnterEvent.type, this);
             this.viewer.addEventListener(events.ObjectHoverEvent.type, this);
             this.viewer.addEventListener(events.ObjectLeaveEvent.type, this);
             this.viewer.addEventListener(events.ReadyEvent.type, this, { once: true });
+
+            this.viewer.renderer.setCustomRenderer((renderer) => this.arrowsRenderer.withRenderer(renderer));
         } else {
             this.markers.addEventListener('enter-marker', this);
             this.markers.addEventListener('select-marker', this);
@@ -243,14 +229,15 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             this.markers.removeEventListener('enter-marker', this);
             this.markers.removeEventListener('select-marker', this);
         }
-        if (this.arrowsGroup) {
-            this.viewer.renderer.removeObject(this.arrowsGroup);
+
+        if (this.is3D) {
+            this.viewer.renderer.setCustomRenderer(null);
         }
 
         this.map?.removeEventListener('select-hotspot', this);
 
         this.viewer.removeEventListener(events.PositionUpdatedEvent.type, this);
-        this.viewer.removeEventListener(events.ZoomUpdatedEvent.type, this);
+        this.viewer.removeEventListener(events.SizeUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.ClickEvent.type, this);
         this.viewer.removeEventListener(events.ObjectEnterEvent.type, this);
         this.viewer.removeEventListener(events.ObjectHoverEvent.type, this);
@@ -260,12 +247,13 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         this.viewer.unobserveObjects(LINK_DATA);
 
         this.datasource.destroy();
+        this.arrowsRenderer?.destroy();
 
         delete this.datasource;
         delete this.markers;
         delete this.compass;
         delete this.gallery;
-        delete this.arrowsGroup;
+        delete this.arrowsRenderer
 
         super.destroy();
     }
@@ -274,16 +262,9 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
      * @internal
      */
     handleEvent(e: Event) {
-        if (e instanceof events.ReadyEvent) {
-            this.__positionArrows();
-            this.viewer.renderer.addObject(this.arrowsGroup);
+        if (e instanceof events.SizeUpdatedEvent || e instanceof events.PositionUpdatedEvent || e instanceof events.ReadyEvent) {
+            this.arrowsRenderer.updateCamera();
 
-            const ambientLight = new AmbientLight(0xffffff, LIGHT_INTENSITY);
-            this.viewer.renderer.addObject(ambientLight);
-
-            this.viewer.needsUpdate();
-        } else if (e instanceof events.PositionUpdatedEvent || e instanceof events.ZoomUpdatedEvent) {
-            this.__positionArrows();
         } else if (e instanceof events.ClickEvent) {
             const link = e.data.objects.find((o) => o.userData[LINK_DATA])?.userData[LINK_DATA];
             if (link) {
@@ -445,10 +426,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     this.state.currentTooltip = null;
                 }
 
-                if (this.is3D) {
-                    this.arrowsGroup.remove(...this.arrowsGroup.children.filter((o) => (o as Mesh).isMesh));
-                }
-
+                this.arrowsRenderer?.clearArrows();
                 this.gallery?.hide();
                 this.markers?.clearMarkers();
                 this.compass?.clearHotspots();
@@ -537,7 +515,6 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             });
         }
 
-        let i = 0;
         node.links.forEach((link) => {
             const position = this.__getLinkPosition(node, link);
             position.yaw += link.linkOffset?.yaw ?? 0;
@@ -545,40 +522,14 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             positions.push(position);
 
             if (this.is3D) {
-                const mesh = new Mesh(ARROW_GEOM, new MeshLambertMaterial());
-                mesh.userData = { [LINK_DATA]: link };
-                mesh.rotation.order = 'YXZ';
-                mesh.rotateY(-position.yaw);
-                this.viewer.dataHelper
-                    .sphericalCoordsToVector3({ yaw: position.yaw, pitch: 0 }, mesh.position)
-                    .multiplyScalar(1 / CONSTANTS.SPHERE_RADIUS);
-
+                let depth = 1;
                 if (!utils.isNil(link.linkOffset?.depth)) {
-                    mesh.position.multiplyScalar(link.linkOffset.depth);
+                    depth = link.linkOffset.depth;
                 } else if (this.isGps && minDist !== maxDist) {
-                    mesh.position.multiplyScalar(
-                        MathUtils.mapLinear(linksDist[link.nodeId], minDist, maxDist, 0.5, 1.5)
-                    );
+                    depth = MathUtils.mapLinear(linksDist[link.nodeId], minDist, maxDist, 0.5, 1.5);
                 }
+                this.arrowsRenderer.addArrow(link, position, depth);
 
-                const outlineMesh = new Mesh(ARROW_OUTLINE_GEOM, new MeshBasicMaterial({ side: BackSide }));
-                outlineMesh.position.copy(mesh.position);
-                outlineMesh.rotation.copy(mesh.rotation);
-
-                setMeshColor(mesh, link.arrowStyle?.color || this.config.arrowStyle.color);
-                setMeshColor(outlineMesh, link.arrowStyle?.outlineColor || this.config.arrowStyle.outlineColor);
-
-                this.arrowsGroup.add(mesh);
-                this.arrowsGroup.add(outlineMesh);
-
-                // arrows are renderer last and on top of their outline
-                // the depth buffer must be cleared only once
-                mesh.renderOrder = 1000 + (i++);
-                mesh.onBeforeRender = function (renderer) {
-                    if (this.renderOrder === 1000) {
-                        renderer.clearDepth();
-                    }
-                };
             } else {
                 if (this.isGps) {
                     position.pitch += this.config.markerPitchOffset;
@@ -610,7 +561,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         });
 
         if (this.is3D) {
-            this.__positionArrows();
+            this.viewer.needsUpdate();
         } else {
             this.markers.renderMarkers();
         }
@@ -715,18 +666,6 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         this.viewer.needsUpdate();
         this.viewer.setCursor(null);
-    }
-
-    /**
-     * Updates to position of the group of arrows
-     */
-    private __positionArrows() {
-        this.arrowsGroup.position.copy(this.viewer.state.direction).multiplyScalar(0.5);
-        const s = this.config.arrowStyle.scale;
-        const f = s[1] + (s[0] - s[1]) * (this.viewer.getZoomLevel() / 100);
-        const y = 2.5 - (this.viewer.getZoomLevel() / 100) * 1.5;
-        this.arrowsGroup.position.y += this.config.arrowPosition === 'bottom' ? -y : y;
-        this.arrowsGroup.scale.set(f, f, f);
     }
 
     /**

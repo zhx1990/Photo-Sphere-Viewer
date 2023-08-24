@@ -32,6 +32,10 @@ import { AbstractService } from './AbstractService';
 
 const vector2 = new Vector2();
 
+export type CustomRenderer = Pick<ThreeRenderer, 'render'> & {
+    getIntersections?(raycaster: Raycaster, vector: Vector2): Array<Intersection<Mesh>>;
+};
+
 /**
  * Controller for the three.js scene
  */
@@ -46,7 +50,7 @@ export class Renderer extends AbstractService {
     private readonly container: HTMLElement;
 
     private timestamp?: number;
-    private customRenderer?: Omit<ThreeRenderer, 'domElement'>;
+    private customRenderer?: CustomRenderer;
 
     get panoramaPose(): Euler {
         return this.mesh.rotation;
@@ -160,7 +164,7 @@ export class Renderer extends AbstractService {
     /**
      * Resets or replaces the THREE renderer by a custom one
      */
-    setCustomRenderer(factory: (renderer: WebGLRenderer) => Omit<ThreeRenderer, 'domElement'>) {
+    setCustomRenderer(factory: (renderer: WebGLRenderer) => CustomRenderer) {
         if (factory) {
             this.customRenderer = factory(this.renderer);
         } else {
@@ -369,9 +373,15 @@ export class Renderer extends AbstractService {
 
         this.raycaster.setFromCamera(vector2, this.camera);
 
-        return this.raycaster
+        const intersections = this.raycaster
             .intersectObjects(this.scene.children, true)
             .filter((i) => (i.object as Mesh).isMesh && !!i.object.userData) as Array<Intersection<Mesh>>;
+
+        if (this.customRenderer?.getIntersections) {
+            intersections.push(...this.customRenderer.getIntersections(this.raycaster, vector2));
+        }
+
+        return intersections;
     }
 
     /**

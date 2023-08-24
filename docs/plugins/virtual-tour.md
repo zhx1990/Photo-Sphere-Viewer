@@ -567,7 +567,7 @@ Default value is:
   color       : 0xaaaaaa,
   hoverColor  : 0xaa5500,
   outlineColor: 0x000000,
-  scale       : [0.5, 2],
+  size        : 1,
 }
 ```
 
