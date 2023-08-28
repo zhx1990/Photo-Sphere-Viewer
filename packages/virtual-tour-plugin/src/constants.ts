@@ -1,6 +1,6 @@
 import { ObjectLoader } from 'three';
-import arrowIconSvg from './arrow.svg';
 import { VirtualTourArrowStyle, VirtualTourMarkerStyle } from './model';
+import arrowIconSvg from './arrow.svg';
 import arrowGeometryJson from './models/arrow.json';
 import arrowOutlineGeometryJson from './models/arrow_outline.json';
 
@@ -11,14 +11,13 @@ export const LINK_ID = '__tour-link__';
  * Default style of the link marker
  */
 export const DEFAULT_MARKER: VirtualTourMarkerStyle = {
-    html: arrowIconSvg,
-    size: { width: 80, height: 80 },
-    scale: [0.5, 2],
-    anchor: 'top center',
-    className: 'psv-virtual-tour__marker',
-    style: {
-        color: 'rgba(0, 208, 255, 0.8)',
+    element: () => {
+        const button = document.createElement('button');
+        button.className = 'psv-virtual-tour-link';
+        button.innerHTML = arrowIconSvg;
+        return button;
     },
+    size: { width: 80, height: 80 },
 };
 
 /**

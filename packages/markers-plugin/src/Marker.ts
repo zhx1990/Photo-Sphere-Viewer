@@ -285,7 +285,7 @@ export class Marker {
             }
 
             if (this.tooltip) {
-                this.tooltip.move(config);
+                this.tooltip.update(this.config.tooltip.content, config);
             } else {
                 this.tooltip = this.viewer.createTooltip(config);
             }

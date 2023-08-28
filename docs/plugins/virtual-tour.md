@@ -281,6 +281,12 @@ The markers can be positioned with the classic `position` option (yaw + pitch) o
 
 Configuration of the hotspot when using the MapPlugin. See global configuration for details.
 
+#### `data`
+
+-   type: `any`
+
+Any custom data you want to attach to the node.
+
 ### Links
 
 #### `nodeId` (required)
@@ -311,13 +317,19 @@ Overrides the tooltip content (defaults to the node's `name` property).
 
 -   type: `{ yaw?, pitch?, depth? }`
 
-Offset added to the final link position order to move the marker/arrow without affecting where the viewer is rotated before going to the next node.
+Offset added to the final link position, to move the marker/arrow without affecting where the viewer is rotated before going to the next node.
 
 `depth` is only used in 3D render mode to manage overlapping arrows. Note that it is automatically computed in GPS mode depending on the distance to the node, but can be overriden if necessary.
 
 #### `arrowStyle` / `markerStyle`
 
 Overrides the global style of the arrow/marker used to display the link. See global configuration for details.
+
+#### `data`
+
+-   type: `any`
+
+Any custom data you want to attach to the link.
 
 ## Configuration
 
@@ -524,23 +536,17 @@ Default value is:
 
 ```js
 {
-  html     : arrowIconSvg, // an SVG provided by the plugin
-  size     : { width: 80, height: 80 },
-  scale    : [0.5, 2],
-  anchor   : 'top center',
-  className: 'psv-virtual-tour__marker',
-  style : {
-    color: 'rgba(0, 208, 255, 0.8)',
-  },
+  element: // a circular button with a ripple effect
+  size   : { width: 80, height: 80 },
 }
 ```
 
 ::: tip
-If you want to use another marker type like `image` you must define `html: null` to remove the default value.
+If you want to use another marker type like `image` you must define `element: null` to remove the default value.
 
 ```js{2}
 markerStyle: {
-  html : null,
+  element : null,
   image: 'path/to/image.png',
 }
 ```

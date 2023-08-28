@@ -30,7 +30,7 @@
         transform: translate3d(0, $psv-tooltip-animate-offset, 0);
 
         .psv-tooltip-arrow {
-            border-top-color: $psv-tooltip-arrow-color;
+            border-top-color: $psv-tooltip-background;
         }
     }
 
@@ -40,7 +40,7 @@
         transform: translate3d(0, -$psv-tooltip-animate-offset, 0);
 
         .psv-tooltip-arrow {
-            border-bottom-color: $psv-tooltip-arrow-color;
+            border-bottom-color: $psv-tooltip-background;
         }
     }
 
@@ -50,7 +50,7 @@
         transform: translate3d($psv-tooltip-animate-offset, 0, 0);
 
         .psv-tooltip-arrow {
-            border-left-color: $psv-tooltip-arrow-color;
+            border-left-color: $psv-tooltip-background;
         }
     }
 
@@ -60,7 +60,7 @@
         transform: translate3d(-$psv-tooltip-animate-offset, 0, 0);
 
         .psv-tooltip-arrow {
-            border-right-color: $psv-tooltip-arrow-color;
+            border-right-color: $psv-tooltip-background;
         }
     }
 

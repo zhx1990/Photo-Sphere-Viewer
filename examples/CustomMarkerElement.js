@@ -25,8 +25,12 @@ export class CustomMarkerElement extends HTMLElement {
         this.legend = document.createElement('pre');
         this.tooltip.appendChild(this.legend);
 
-        button.addEventListener('mouseenter', () => {
-            this.tooltip.classList.add('hovered');
+        button.addEventListener('mouseleave', () => {
+            this.tooltip.classList.add('hiding');
+        });
+
+        dom.addEventListener('animationend', () => {
+            this.tooltip.classList.remove('hiding');
         });
     }
 
@@ -37,7 +41,7 @@ viewerPosition: ${this.fmt.format(viewerPosition.yaw)}rad / ${this.fmt.format(vi
 zoomLevel: ${zoomLevel}%
 viewerSize: ${viewerSize.width}px x ${viewerSize.height}px
 `;
-        this.tooltip.classList.toggle('bottom', position.y < viewerSize.height / 2);
+        this.tooltip.classList.toggle('bottom', position.y < viewerSize.height / 3);
     }
 }
 
@@ -57,14 +61,7 @@ button {
     background: none;
     color: white;
     border-radius: 50%;
-}
-button:hover {
-    animation: shadow 1s ease-out;
-}
-@keyframes shadow {
-    0% { box-shadow: 0 0 0 0px rgba(97, 170, 242, 0); }
-    20% {  box-shadow: 0 0 0 5px rgba(97, 170, 242, 1); }
-    100% {  box-shadow: 0 0 0 20px rgba(97, 170, 242, 0); }
+    filter: drop-shadow(0 10px 5px rgba(0, 0, 0, 0.2));
 }
 
 .tooltip {
@@ -75,7 +72,8 @@ button:hover {
     left: calc(50% -  150px);
     background: rgba(30, 30, 30, 0.8);
     color: white;
-    border-radius: 15px;
+    text-shadow: 0 1px #000;
+    border-radius: 10px;
     transform-origin: 50% calc(100% + 35px);
     transform: rotate(30deg);
     opacity: 0;
@@ -92,7 +90,7 @@ button:hover {
 
 .tooltip slot::slotted(img) {
     width: 100%;
-    border-radius: 15px 15px 0 0;
+    border-radius: 10px 10px 0 0;
 }
 .tooltip slot::slotted(h2),
 .tooltip slot::slotted(p) {
@@ -123,15 +121,29 @@ button:hover {
     bottom: 100%;
 }
 
-button:hover + .tooltip {
-    animation: rotate-bounce-in 300ms ease forwards;
+button:hover {
+    animation: ripple 1s ease-out;
 }
-@keyframes rotate-bounce-in {
+
+.tooltip.hiding {
+    animation: hide 200ms ease forwards;
+}
+
+button:hover + .tooltip {
+    animation: show 300ms ease forwards;
+}
+
+@keyframes ripple {
+    0% { box-shadow: 0 0 0 0 rgba(97, 170, 242, 0); }
+    20% { box-shadow: 0 0 0 5px rgba(97, 170, 242, 1); }
+    100% { box-shadow: 0 0 0 20px rgba(97, 170, 242, 0); }
+}
+@keyframes show {
     0% { transform: rotate(30deg); opacity: 0; }
     70% { transform: rotate(-10deg); }
     100% { transform: rotate(0deg); opacity: 1; }
 }
-@keyframes rotate-bounce-out {
+@keyframes hide {
     0% { transform: rotate(0deg); opacity: 1; }
     100% { transform: rotate(30deg); opacity: 0; }
 }

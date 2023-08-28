@@ -43,6 +43,7 @@ export type VirtualTourArrowStyle = {
 export type VirtualTourMarkerStyle = Omit<
     MarkerConfig,
     | 'id'
+    | 'element'
     | 'position'
     | 'polygon'
     | 'polygonPixels'
@@ -54,7 +55,9 @@ export type VirtualTourMarkerStyle = Omit<
     | 'hideList'
     | 'visible'
     | 'data'
->;
+> & {
+    element?: HTMLElement | ((link: VirtualTourLink) => HTMLElement);
+};
 
 /**
  * Behaviour of the transition between nodes
@@ -120,6 +123,10 @@ export type VirtualTourLink = Partial<ExtendedPosition> & {
      * override global arrow style
      */
     arrowStyle?: VirtualTourArrowStyle;
+    /**
+     * Any custom data you want to attach to the link
+     */
+    data?: any;
 };
 
 /**
@@ -168,6 +175,10 @@ export type VirtualTourNode = {
      * configuration of the hotspot when using the MapPlugin
      */
     map?: Partial<Point> & Omit<MapHotspot, 'id' | 'yaw' | 'distance'>;
+    /**
+     * Any custom data you want to attach to the node
+     */
+    data?: any;
 };
 
 export type VirtualTourPluginConfig = {

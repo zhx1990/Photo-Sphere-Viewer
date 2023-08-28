@@ -73,7 +73,6 @@ $psv-loader-width: 100px;
 | $psv-tooltip-radius         | 4px                     | Border radius of the tooltips          |
 | $psv-tooltip-padding        | .5em 1em                | Content padding of the tooltips        |
 | $psv-tooltip-arrow-size     | 7px                     | Tooltips' arrow size                   |
-| $psv-tooltip-arrow-color    | $psv-tooltip-background | Color of the arrow                     |
 | $psv-tooltip-max-width      | 200px                   | Maximum width of the tooltips' content |
 | $psv-tooltip-text-color     | rgb(255, 255, 255)      | Text color of the tooltips             |
 | $psv-tooltip-font           | 14px sans-serif         | Font of the tooltips                   |

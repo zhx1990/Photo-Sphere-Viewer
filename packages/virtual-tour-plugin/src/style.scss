@@ -1,26 +1,66 @@
 @import '../../shared/vars';
 
-.psv-virtual-tour {
-    &__marker {
-        svg {
-            filter: drop-shadow(0 10px 5px rgba(0, 0, 0, 0.8));
-            transform: perspective(100px) rotate3d(1, 0, 0, 0deg);
-            transform-origin: bottom center;
-            transition: 0.2s all ease-in-out;
+$psv-virtual-tour-link-button-color: rgba(255, 255, 255, 0.8) !default;
+$psv-virtual-tour-link-button-ring: rgb(97, 170, 242) !default;
+
+.psv-virtual-tour-tooltip {
+    padding: 0;
+
+    .psv-tooltip-content {
+        line-height: 0;
+    }
+
+    h3 {
+        margin: 0;
+        padding: $psv-tooltip-padding;
+        line-height: normal;
+    }
+
+    img {
+        width: 100%;
+
+        &:first-child {
+            border-radius: $psv-tooltip-radius $psv-tooltip-radius 0 0;
         }
 
-        &:hover {
-            svg {
-                filter: drop-shadow(0 5px 3px rgba(0, 0, 0, 1));
-                transform: perspective(100px) rotate3d(1, 0, 0, 10deg);
-            }
+        &:last-child {
+            border-radius: 0 0 $psv-tooltip-radius $psv-tooltip-radius;
         }
     }
 
-    &__menu {
-        .psv-panel-menu-item-icon {
-            width: 60px;
-            height: 60px;
-        }
+    p {
+        margin: 0;
+        padding: $psv-tooltip-padding;
+        line-height: normal;
+    }
+}
+
+.psv-virtual-tour-link {
+    width: 100%;
+    height: 100%;
+    padding: 0;
+    border: none;
+    background: none;
+    color: $psv-virtual-tour-link-button-color;
+    border-radius: 50%;
+    cursor: pointer;
+    filter: drop-shadow(0 10px 5px rgba(0, 0, 0, 0.2));
+
+    &:hover {
+        animation: psv-virtual-tour-link-button-in 1s ease-out forwards;
+    }
+}
+
+@keyframes psv-virtual-tour-link-button-in {
+    0% {
+        box-shadow: 0 0 0 0 rgba($psv-virtual-tour-link-button-ring, 0);
+    }
+
+    20% {
+        box-shadow: 0 0 0 5px rgba($psv-virtual-tour-link-button-ring, 1);
+    }
+
+    100% {
+        box-shadow: 0 0 0 20px rgba($psv-virtual-tour-link-button-ring, 0);
     }
 }

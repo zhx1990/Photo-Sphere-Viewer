@@ -3,7 +3,7 @@ import type { Point, Position, Tooltip, Viewer } from '@photo-sphere-viewer/core
 import { AbstractConfigurablePlugin, CONSTANTS, PSVError, events, utils } from '@photo-sphere-viewer/core';
 import type { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
 import type { MapPlugin, events as mapEvents } from '@photo-sphere-viewer/map-plugin';
-import type { MarkersPlugin, events as markersEvents } from '@photo-sphere-viewer/markers-plugin';
+import type { Marker, MarkerConfig, MarkersPlugin, events as markersEvents } from '@photo-sphere-viewer/markers-plugin';
 import {
     AmbientLight,
     BackSide,
@@ -23,6 +23,7 @@ import { NodeChangedEvent, VirtualTourEvents } from './events';
 import {
     GpsPosition,
     VirtualTourLink,
+    VirtualTourMarkerStyle,
     VirtualTourNode,
     VirtualTourPluginConfig,
     VirtualTourTransitionOptions,
@@ -75,6 +76,10 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
             return renderMode;
         },
         markerStyle(markerStyle, { defValue }) {
+            // historically the user set "html=null" to override the marker type
+            if (markerStyle.html === null) {
+                markerStyle.element = null;
+            }
             return { ...defValue, ...markerStyle };
         },
         arrowStyle(arrowStyle, { defValue }) {
@@ -211,6 +216,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             this.viewer.addEventListener(events.ObjectLeaveEvent.type, this);
             this.viewer.addEventListener(events.ReadyEvent.type, this, { once: true });
         } else {
+            this.markers.addEventListener('enter-marker', this);
             this.markers.addEventListener('select-marker', this);
         }
 
@@ -234,6 +240,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
      */
     override destroy() {
         if (this.markers) {
+            this.markers.removeEventListener('enter-marker', this);
             this.markers.removeEventListener('select-marker', this);
         }
         if (this.arrowsGroup) {
@@ -283,9 +290,16 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 this.setCurrentNode(link.nodeId, null, link);
             }
         } else if (e.type === 'select-marker') {
-            const link = (e as markersEvents.SelectMarkerEvent).marker.data?.[LINK_DATA];
+            const marker = (e as markersEvents.SelectMarkerEvent).marker;
+            const link = marker.data?.[LINK_DATA];
             if (link) {
                 this.setCurrentNode(link.nodeId, null, link);
+            }
+        } else if (e.type === 'enter-marker') {
+            const marker = (e as markersEvents.EnterMarkerEvent).marker;
+            const link = marker.data?.[LINK_DATA];
+            if (link) {
+                this.__onEnterMarker(marker, link);
             }
         } else if (e instanceof events.ObjectEnterEvent) {
             if (e.userDataKey === LINK_DATA) {
@@ -570,17 +584,26 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     position.pitch += this.config.markerPitchOffset;
                 }
 
-                this.markers.addMarker(
-                    {
-                        ...this.config.markerStyle,
-                        ...link.markerStyle,
-                        position: position,
-                        id: LINK_ID + link.nodeId,
-                        tooltip: link.name,
-                        visible: true,
-                        hideList: true,
-                        data: { [LINK_DATA]: link },
+                const config: MarkerConfig | VirtualTourMarkerStyle = {
+                    ...this.config.markerStyle,
+                    ...link.markerStyle,
+                    tooltip: {
+                        className: 'psv-virtual-tour-tooltip',
+                        content: link.name,
                     },
+                    position: position,
+                    id: LINK_ID + link.nodeId,
+                    visible: true,
+                    hideList: true,
+                    data: { [LINK_DATA]: link },
+                };
+
+                if (typeof config.element === 'function') {
+                    config.element = config.element(link);
+                }
+
+                this.markers.addMarker(
+                    config as any,
                     false
                 );
             }
@@ -608,23 +631,64 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         }
     }
 
+    /**
+     * Returns the complete tootlip content for a node
+     */
+    private async __getTooltipContent(nodeId: string): Promise<string> {
+        const node = await this.datasource.loadNode(nodeId);
+        const elements: string[] = [];
+
+        if (node.name || node.thumbnail || node.caption) {
+            if (node.name) {
+                elements.push(`<h3>${node.name}</h3>`);
+            }
+            if (node.thumbnail) {
+                elements.push(`<img src="${node.thumbnail}">`);
+            }
+            if (node.caption) {
+                elements.push(`<p>${node.caption}</p>`);
+            }
+        }
+
+        return elements.join('');
+    }
+
+    private __onEnterMarker(marker: Marker, link: VirtualTourLink) {
+        this.__getTooltipContent(link.nodeId)
+            .then(content => {
+                if (content) {
+                    this.markers.updateMarker({
+                        id: marker.id,
+                        tooltip: {
+                            className: 'psv-virtual-tour-tooltip',
+                            content: content, 
+                        },
+                    });
+                }
+            });
+    }
+
     private __onEnterObject(mesh: Mesh, viewerPoint: Point) {
         const link = mesh.userData[LINK_DATA];
 
         setMeshColor(mesh as any, link.arrowStyle?.hoverColor || this.config.arrowStyle.hoverColor);
 
-        if (link.name) {
-            this.state.currentTooltip = this.viewer.createTooltip({
-                left: viewerPoint.x,
-                top: viewerPoint.y,
-                box: {
-                    // separate the tooltip from the cursor
-                    width: 20,
-                    height: 20,
-                },
-                content: link.name,
+        this.__getTooltipContent(link.nodeId)
+            .then(content => {
+                if (content) {
+                    this.state.currentTooltip = this.viewer.createTooltip({
+                        left: viewerPoint.x,
+                        top: viewerPoint.y,
+                        box: {
+                            // separate the tooltip from the cursor
+                            width: 20,
+                            height: 20,
+                        },
+                        className: 'psv-virtual-tour-tooltip',
+                        content: content,
+                    });
+                }
             });
-        }
 
         this.viewer.needsUpdate();
         this.viewer.setCursor('pointer');

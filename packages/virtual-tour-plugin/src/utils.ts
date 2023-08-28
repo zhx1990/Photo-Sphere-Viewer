@@ -1,5 +1,5 @@
 import { Position, utils } from '@photo-sphere-viewer/core';
-import { Mesh, BufferGeometry, MeshBasicMaterial, MathUtils } from 'three';
+import { BufferGeometry, MathUtils, Mesh, MeshBasicMaterial } from 'three';
 import { GpsPosition } from './model';
 
 /**
