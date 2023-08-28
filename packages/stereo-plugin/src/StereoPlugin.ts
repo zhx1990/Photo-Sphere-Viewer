@@ -6,10 +6,7 @@ import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { StereoEffect } from 'three/examples/jsm/effects/StereoEffect.js';
 import { StereoPluginEvents, StereoUpdatedEvent } from './events';
 import mobileRotateIcon from './icons/mobile-rotate.svg';
-
-type WakeLockSentinel = {
-    release(): void;
-};
+import { cancelWaitLandscape, getOrientation, waitLandscape } from './utils';
 
 const ID_OVERLAY_PLEASE_ROTATE = 'pleaseRotate';
 
@@ -22,6 +19,7 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
     private readonly state = {
         enabled: false,
         wakeLock: null as WakeLockSentinel,
+        waitLandscape: null as any,
     };
 
     private gyroscope: GyroscopePlugin;
@@ -195,12 +193,18 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
         let displayRotateMessageTimeout: ReturnType<typeof setTimeout>;
 
         const displayRotateMessage = () => {
-            if (window.innerHeight > window.innerWidth) {
+            if (getOrientation() !== 'landscape' && !this.viewer.overlay.isVisible(ID_OVERLAY_PLEASE_ROTATE)) {
                 this.viewer.overlay.show({
                     id: ID_OVERLAY_PLEASE_ROTATE,
                     image: mobileRotateIcon,
                     title: this.viewer.config.lang.pleaseRotate,
                     text: this.viewer.config.lang.tapToContinue,
+                });
+
+                this.state.waitLandscape = waitLandscape(() => {
+                    this.viewer.overlay.hide(ID_OVERLAY_PLEASE_ROTATE);
+                    cancelWaitLandscape(this.state.waitLandscape);
+                    this.state.waitLandscape = null;
                 });
             }
 
@@ -211,7 +215,7 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
         };
 
         try {
-            (window.screen.orientation as any).lock('landscape').then(null, () => displayRotateMessage());
+            (screen.orientation as any).lock('landscape').then(null, () => displayRotateMessage());
             displayRotateMessageTimeout = setTimeout(() => displayRotateMessage(), 1000);
         } catch {
             displayRotateMessage();
@@ -223,8 +227,14 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
      */
     private __unlockOrientation() {
         this.viewer.overlay.hide(ID_OVERLAY_PLEASE_ROTATE);
+
+        if (this.state.waitLandscape) {
+            cancelWaitLandscape(this.state.waitLandscape);
+            this.state.waitLandscape = null;
+        }
+
         try {
-            window.screen.orientation?.unlock();
+            screen.orientation?.unlock();
         } catch {
             // empty
         }
