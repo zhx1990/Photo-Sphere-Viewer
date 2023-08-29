@@ -45,6 +45,7 @@ import { ViewerDynamics } from './services/ViewerDynamics';
 import { ViewerState } from './services/ViewerState';
 import {
     Animation,
+    checkStylesheet,
     exitFullscreen,
     getAbortError,
     getElement,
@@ -108,6 +109,8 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
         this.container = document.createElement('div');
         this.container.classList.add('psv-container');
         this.parent.appendChild(this.container);
+
+        checkStylesheet(this.container, 'core');
 
         // @ts-ignore
         this.adapter = new this.config.adapter[0](this, this.config.adapter[1]);

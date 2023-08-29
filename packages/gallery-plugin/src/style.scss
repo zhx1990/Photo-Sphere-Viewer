@@ -10,6 +10,10 @@ $psv-gallery-title-color: $psv-caption-text-color !default;
 $psv-gallery-title-background: rgba(0, 0, 0, 0.6) !default;
 $psv-gallery-thumb-hover-scale: 1.2 !default;
 
+.psv-container {
+    --psv-gallery-plugin-loaded: true;
+}
+
 .psv-gallery {
     position: absolute;
     left: 0;

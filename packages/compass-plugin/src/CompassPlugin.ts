@@ -43,12 +43,14 @@ export class CompassPlugin extends AbstractConfigurablePlugin<
 
         this.component = new CompassComponent(this.viewer, this);
     }
-
+    
     /**
      * @internal
      */
     override init() {
         super.init();
+
+        utils.checkStylesheet(this.viewer.container, 'compass-plugin');
 
         this.markers = this.viewer.getPlugin('markers');
 

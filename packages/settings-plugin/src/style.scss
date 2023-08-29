@@ -13,6 +13,10 @@ $psv-settings-badge-font: 10px / 0.9 monospace !default;
 $psv-settings-badge-background: #111 !default;
 $psv-settings-badge-text-color: white !default;
 
+.psv-container {
+    --psv-settings-plugin-loaded: true;
+}
+
 .psv-settings {
     position: absolute;
     bottom: $psv-navbar-height;

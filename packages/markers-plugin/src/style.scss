@@ -1,5 +1,9 @@
 @import '../../shared/vars';
 
+.psv-container {
+    --psv-markers-plugin-loaded: true;
+}
+
 .psv-markers {
     user-select: none;
     position: absolute;

@@ -77,12 +77,14 @@ export class MapPlugin extends AbstractConfigurablePlugin<
 
         this.component = new MapComponent(this.viewer, this);
     }
-
+    
     /**
      * @internal
      */
     override init() {
         super.init();
+
+        utils.checkStylesheet(this.viewer.container, 'map-plugin');
 
         this.markers = this.viewer.getPlugin('markers');
 

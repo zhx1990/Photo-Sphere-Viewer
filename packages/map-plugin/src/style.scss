@@ -15,6 +15,10 @@ $psv-map-transition: ease-in-out 0.3s !default;
     @return math.div(math.round($value * $precision), $precision);
 }
 
+.psv-container {
+    --psv-map-plugin-loaded: true;
+}
+
 .psv-map {
     position: absolute;
     margin: $psv-map-margin;

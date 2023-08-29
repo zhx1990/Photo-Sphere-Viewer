@@ -2,6 +2,10 @@
 
 $psv-compass-margin: 10px !default;
 
+.psv-container {
+    --psv-compass-plugin-loaded: true;
+}
+
 .psv-compass {
     position: absolute;
     margin: $psv-compass-margin;

@@ -22,6 +22,10 @@ $psv-video-bigbutton-size: (
 ) !default;
 $psv-video-bigbutton-color: $psv-buttons-color !default;
 
+.psv-container {
+    --psv-video-plugin-loaded: true;
+}
+
 .psv-video {
     &-progressbar {
         position: absolute;

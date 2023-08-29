@@ -39,12 +39,14 @@ export class GalleryPlugin extends AbstractConfigurablePlugin<
 
         this.gallery = new GalleryComponent(this, this.viewer);
     }
-
+    
     /**
      * @internal
      */
     override init() {
         super.init();
+
+        utils.checkStylesheet(this.viewer.container, 'gallery-plugin');
 
         this.viewer.addEventListener(events.PanoramaLoadedEvent.type, this);
         this.viewer.addEventListener(events.ShowPanelEvent.type, this);

@@ -431,3 +431,12 @@ export function getConfigParser<T extends Record<string, any>, U extends T = T>(
 
     return parser;
 }
+
+/**
+ * Checks if a stylesheet is loaded by the presence of a CSS variable
+ */
+export function checkStylesheet(element: HTMLElement, name: string) {
+    if (window.getComputedStyle(element).getPropertyValue(`--psv-${name}-loaded`) !== 'true') {
+        console.error(`PhotoSphereViewer: stylesheet "@photo-sphere-viewer/${name}/index.css" is not loaded`);
+    }
+}

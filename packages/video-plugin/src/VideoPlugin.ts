@@ -64,6 +64,8 @@ export class VideoPlugin extends AbstractConfigurablePlugin<
     override init() {
         super.init();
 
+        utils.checkStylesheet(this.viewer.container, 'video-plugin');
+
         this.markers = this.viewer.getPlugin('markers');
         this.autorotate = this.viewer.getPlugin('autorotate');
 

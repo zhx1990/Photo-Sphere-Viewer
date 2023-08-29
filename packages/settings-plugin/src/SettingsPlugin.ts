@@ -53,6 +53,8 @@ export class SettingsPlugin extends AbstractPlugin<SettingsPluginEvents> {
     override init() {
         super.init();
 
+        utils.checkStylesheet(this.viewer.container, 'settings-plugin');
+
         this.viewer.addEventListener(events.ClickEvent.type, this);
         this.viewer.addEventListener(events.ShowPanelEvent.type, this);
 

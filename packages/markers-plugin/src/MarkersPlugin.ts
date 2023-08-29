@@ -84,6 +84,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
         this.container = document.createElement('div');
         this.container.className = 'psv-markers';
+        this.viewer.container.appendChild(this.container);
 
         this.svgContainer = document.createElementNS(SVG_NS, 'svg');
         this.svgContainer.setAttribute('class', 'psv-markers-svg-container');
@@ -102,7 +103,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     override init() {
         super.init();
 
-        this.viewer.container.appendChild(this.container);
+        utils.checkStylesheet(this.viewer.container, 'markers-plugin');
 
         // Viewer events
         this.viewer.addEventListener(events.ClickEvent.type, this);
