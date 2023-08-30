@@ -36,9 +36,9 @@ packages:
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
-    adapter: PhotoSphereViewer.CubemapAdapter,
+    adapter: CubemapAdapter,
     panorama: {
         left: baseUrl + 'cubemap/px.jpg',
         front: baseUrl + 'cubemap/nz.jpg',

@@ -29,9 +29,17 @@ module.exports = {
     // prettier-ignore
     head: [
         ['link', { rel: 'icon', href: '/favicon.png' }],
-        ['script', { src: 'https://cdn.jsdelivr.net/npm/three/build/three.min.js', defer: 'defer' }],
-        ['script', { src: 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.js', defer: 'defer' }],
         ['link', { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.css' }],
+        ['link', { rel: 'stylesheet', href: 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5/index.css' }],
+        ['script', { type: 'importmap' }, `
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+                "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.module.js",
+                "@photo-sphere-viewer/markers-plugin": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5/index.module.js"
+            }
+        }
+        `],
     ],
     themeConfig: {
         logo: '/favicon.png',

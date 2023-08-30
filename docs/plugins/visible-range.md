@@ -49,7 +49,7 @@ const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
 let visibleRangePlugin;
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere-cropped.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -88,13 +88,13 @@ const viewer = new PhotoSphereViewer.Viewer({
     ],
 
     plugins: [
-        [PhotoSphereViewer.VisibleRangePlugin, {
+        [VisibleRangePlugin, {
             usePanoData: true,
         }],
     ],
 });
 
-visibleRangePlugin = viewer.getPlugin(PhotoSphereViewer.VisibleRangePlugin);
+visibleRangePlugin = viewer.getPlugin(VisibleRangePlugin);
 ```
 
 :::

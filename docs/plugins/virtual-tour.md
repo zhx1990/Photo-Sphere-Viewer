@@ -114,7 +114,7 @@ packages:
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 const caption = 'Cape Florida Light, Key Biscayne <b>&copy; Pixexid</b>';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     loadingImg: baseUrl + 'loader.gif',
     touchmoveTwoFingers: true,
@@ -123,18 +123,18 @@ const viewer = new PhotoSphereViewer.Viewer({
     navbar: 'zoom move gallery caption fullscreen',
 
     plugins: [
-        PhotoSphereViewer.MarkersPlugin,
-        [PhotoSphereViewer.GalleryPlugin, {
+        MarkersPlugin,
+        [GalleryPlugin, {
             thumbnailSize: { width: 100, height: 100 },
         }],
-        [PhotoSphereViewer.VirtualTourPlugin, {
+        [VirtualTourPlugin, {
             positionMode: 'gps',
             renderMode: '3d',
         }],
     ],
 });
 
-const virtualTour = viewer.getPlugin(PhotoSphereViewer.VirtualTourPlugin);
+const virtualTour = viewer.getPlugin(VirtualTourPlugin);
 
 const markerLighthouse = {
     id: 'marker-1',

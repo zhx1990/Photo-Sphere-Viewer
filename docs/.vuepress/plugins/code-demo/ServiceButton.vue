@@ -5,11 +5,10 @@
         </template>
 
         <template v-if="service === 'jsfiddle'">
-            <input type="hidden" name="title" :value="title" />
-            <input type="hidden" name="js" :value="js" />
-            <input type="hidden" name="css" :value="css" />
-            <input type="hidden" name="html" :value="html" />
-            <input type="hidden" name="resources" :value="jsFiddleResources" />
+            <input type="hidden" name="title" :value="jsFiddleValue.title" />
+            <input type="hidden" name="js" :value="jsFiddleValue.js" />
+            <input type="hidden" name="css" :value="jsFiddleValue.css" />
+            <input type="hidden" name="html" :value="jsFiddleValue.html" />
         </template>
 
         <template v-if="service === 'codesandbox'">
@@ -25,7 +24,7 @@
 
 <script>
 import { SERVICE_ICON, SERVICE_NAME, SERVICE_URL, SERVICES } from './constants';
-import { getCodePenValue, getAllResources, getCodeSandboxValue } from './utils';
+import { getCodePenValue, getCodeSandboxValue, getJsFiddleValue } from './utils';
 
 export default {
     name: 'ServiceButton',
@@ -52,8 +51,14 @@ export default {
             return SERVICE_URL[this.service];
         },
 
-        jsFiddleResources() {
-            return getAllResources(this.packages);
+        jsFiddleValue() {
+            return getJsFiddleValue({
+                title: this.title,
+                js: this.js,
+                css: this.css,
+                html: this.html,
+                packages: this.packages,
+            });
         },
         codepenValue() {
             return getCodePenValue({

@@ -38,7 +38,7 @@ packages:
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -46,10 +46,10 @@ const viewer = new PhotoSphereViewer.Viewer({
     touchmoveTwoFingers: true,
     mousewheelCtrlKey: true,
 
-    plugins: [PhotoSphereViewer.SettingsPlugin],
+    plugins: [SettingsPlugin],
 });
 
-const settings = viewer.getPlugin(PhotoSphereViewer.SettingsPlugin);
+const settings = viewer.getPlugin(SettingsPlugin);
 
 let currentToggle = true;
 let currentOption = 'A';

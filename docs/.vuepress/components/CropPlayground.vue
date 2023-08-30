@@ -123,7 +123,9 @@
 <script>
 export default {
     data: () => ({
-        psv: null,
+        Viewer: null,
+
+        viewer: null,
         loading: true,
         error: false,
         file: null,
@@ -141,12 +143,26 @@ export default {
             poseRoll: null,
         },
     }),
+    mounted() {
+        // ugly hack to load PSV from jsdelivr as an ES module
+        window.__viewer = this;
+
+        window.__s = document.createElement('script');
+        __s.type = 'module';
+        __s.text = `
+import { Viewer } from '@photo-sphere-viewer/core';
+__viewer.init(Viewer);
+__s.remove();
+`;
+        document.body.appendChild(__s);
+    },
     beforeDestroy() {
-        if (this.psv) {
-            this.psv.destroy();
-        }
+        this.viewer?.destroy();
     },
     methods: {
+        init(Viewer) {
+            this.Viewer = Viewer;
+        },
         loadFile(files) {
             this.error = false;
 
@@ -196,7 +212,7 @@ export default {
         apply() {
             this.updateOutput();
 
-            setTimeout(() => this.loadPsv());
+            setTimeout(() => this.loadViewer());
         },
 
         computePanoData(width, height) {
@@ -237,11 +253,11 @@ export default {
 <?xpacket end="r"?>`;
         },
 
-        loadPsv() {
-            if (this.psv) {
-                this.psv.setPanorama(this.imageData, { panoData: this.panoData });
+        loadViewer() {
+            if (this.viewer) {
+                this.viewer.setPanorama(this.imageData, { panoData: this.panoData });
             } else {
-                this.psv = new PhotoSphereViewer.Viewer({
+                this.viewer = new this.Viewer({
                     panorama: this.imageData,
                     container: 'viewer',
                     loadingImg: 'https://photo-sphere-viewer-data.netlify.app/assets/loader.gif',

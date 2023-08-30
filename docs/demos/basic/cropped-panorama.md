@@ -12,11 +12,11 @@ title: PSV Cropped Demo
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-new PhotoSphereViewer.Viewer({
+new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere-cropped.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
-    adapter: [PhotoSphereViewer.EquirectangularAdapter, {
+    adapter: [EquirectangularAdapter, {
         backgroundColor: '#77addb',
         interpolateBackground: true,
     }],

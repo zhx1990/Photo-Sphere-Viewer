@@ -12,7 +12,7 @@ title: PSV Overlay Demo
 ```js{7-8}
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-new PhotoSphereViewer.Viewer({
+new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',

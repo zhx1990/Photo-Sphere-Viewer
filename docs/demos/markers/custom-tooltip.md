@@ -16,13 +16,13 @@ packages:
 ```js{12-17}
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
 
     plugins: [
-        [PhotoSphereViewer.MarkersPlugin, {
+        [MarkersPlugin, {
             markers: [{
                 id: 'custom-tooltip',
                 tooltip: {
@@ -40,7 +40,7 @@ const viewer = new PhotoSphereViewer.Viewer({
     ],
 });
 
-const markersPlugin = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
+const markersPlugin = viewer.getPlugin(MarkersPlugin);
 
 viewer.addEventListener('ready', () => {
     viewer

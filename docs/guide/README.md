@@ -26,7 +26,7 @@ You can also [download the latest release](https://github.com/mistic100/Photo-Sp
 
 ## Dependencies
 
--   [Three.js](https://threejs.org) (use `build/three.min.js` file)
+-   [Three.js](https://threejs.org)
 
 ## Your first viewer
 
@@ -34,7 +34,9 @@ Include all JS & CSS files in your page manually or with your favorite bundler a
 
 ::::: tabs
 
-:::: tab Direct import
+:::: tab Import from a CDN
+
+Importing the library from a CDN (or static files) requires the use of an [import map](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script/type/importmap) and declare your script tag with `type="module"`.
 
 ```html
 <head>
@@ -44,14 +46,22 @@ Include all JS & CSS files in your page manually or with your favorite bundler a
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.css" />
 </head>
 
-<script src="https://cdn.jsdelivr.net/npm/three/build/three.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.min.js"></script>
-
 <!-- the viewer container must have a defined size -->
 <div id="viewer" style="width: 100vw; height: 100vh;"></div>
 
-<script>
-    const viewer = new PhotoSphereViewer.Viewer({
+<script type="importmap">
+    {
+        "imports": {
+            "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+            "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core/index.module.js"
+        }
+    }
+</script>
+
+<script type="module">
+    import { Viewer } from '@photo-sphere-viewer/core';
+
+    const viewer = new Viewer({
         container: document.querySelector('#viewer'),
         panorama: 'path/to/panorama.jpg',
     });
@@ -60,7 +70,9 @@ Include all JS & CSS files in your page manually or with your favorite bundler a
 
 ::::
 
-:::: tab ES import
+:::: tab Install with NPM and a build tool
+
+We will not detail more this section as it is highly dependent on which build tool you use.
 
 ```html
 <head>
@@ -101,7 +113,7 @@ title: PSV Basic Demo
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',

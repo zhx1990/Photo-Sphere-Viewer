@@ -22,7 +22,7 @@ const animatedValues = {
     fisheye: { start: 2, end: 0 },
 };
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -42,7 +42,7 @@ const viewer = new PhotoSphereViewer.Viewer({
         'fullscreen',
     ],
     plugins: [
-        [PhotoSphereViewer.AutorotatePlugin, {
+        [AutorotatePlugin, {
             autostartDelay: null,
             autostartOnIdle: false,
             autorotatePitch: animatedValues.pitch.end,

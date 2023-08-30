@@ -12,7 +12,7 @@ title: PSV Basic Demo
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-new PhotoSphereViewer.Viewer({
+new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
 });

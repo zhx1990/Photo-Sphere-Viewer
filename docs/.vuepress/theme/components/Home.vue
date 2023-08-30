@@ -70,23 +70,40 @@ export default {
 
     data: () => ({
         loaded: false,
+        viewer: null,
     }),
 
     mounted() {
-        const viewer = new PhotoSphereViewer.Viewer({
-            container: 'photosphere',
-            loadingTxt: '',
-            defaultPitch: 0.1,
-            mousewheel: false,
-            navbar: false,
-        });
-        viewer.setPanorama('https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg', { showLoader: false });
-        viewer.addEventListener('ready', () => {
-            this.loaded = true;
-            viewer.dynamics.position.roll({ yaw: false }, 0.2);
-        }, { once: true });
+        // ugly hack to load PSV from jsdelivr as an ES module
+        window.__viewer = this;
+
+        window.__s = document.createElement('script');
+        __s.type = 'module';
+        __s.text = `
+import { Viewer } from '@photo-sphere-viewer/core';
+__viewer.init(Viewer);
+__s.remove();
+`;
+        document.body.appendChild(__s);
+    },
+    beforeDestroy() {
+        this.viewer?.destroy();
     },
     methods: {
+        init(Viewer) {
+            this.viewer = new Viewer({
+                container: 'photosphere',
+                loadingTxt: '',
+                defaultPitch: 0.1,
+                mousewheel: false,
+                navbar: false,
+            });
+            this.viewer.setPanorama('https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg', { showLoader: false });
+            this.viewer.addEventListener('ready', () => {
+                this.loaded = true;
+                this.viewer.dynamics.position.roll({ yaw: false }, 0.2);
+            }, { once: true });
+        },
         scrollDown() {
             window.scroll({ top: window.innerHeight, left: 0, behavior: 'smooth' });
         },

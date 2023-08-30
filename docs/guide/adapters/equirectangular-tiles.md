@@ -37,9 +37,9 @@ packages:
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
-    adapter: PhotoSphereViewer.EquirectangularTilesAdapter,
+    adapter: EquirectangularTilesAdapter,
     panorama: {
         width: 6656,
         cols: 16,

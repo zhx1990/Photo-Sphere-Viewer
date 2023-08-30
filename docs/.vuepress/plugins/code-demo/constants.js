@@ -5,7 +5,7 @@ import ICON_JSFIDDLE from '!raw-loader!./icons/jsfiddle.svg';
 export const SERVICES = [
     // https://blog.codepen.io/documentation/api/prefill
     'codepen',
-    // https://docs.jsfiddle.net/api/display-a-fiddle-from-pos
+    // https://docs.jsfiddle.net/api/display-a-fiddle-from-post
     'jsfiddle',
     // https://codesandbox.io/docs/importing#define-api
     'codesandbox',

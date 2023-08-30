@@ -20,7 +20,7 @@ const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 const BUTTON_ID = 'panel-button';
 const PANEL_ID = 'custom-panel';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',

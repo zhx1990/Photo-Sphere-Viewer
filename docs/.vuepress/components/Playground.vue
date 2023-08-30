@@ -57,7 +57,7 @@
 
 <template>
     <div class="playground-container">
-        <div id="form">
+        <div id="form" v-if="Viewer">
             <md-card v-show="!editMarkers">
                 <md-card-area>
                     <md-tabs md-elevation="1" class="md-primary">
@@ -264,35 +264,30 @@
                                         Move inertia
                                     </md-checkbox>
                                 </div>
+                                <md-field class="md-layout-item md-size-33">
+                                    <label>Canvas background</label>
+                                    <v-swatches
+                                        shapes="circles"
+                                        swatch-size="32"
+                                        row-length="8"
+                                        v-model="adapterOptions.backgroundColor"
+                                        :disabled="!imageData"
+                                    >
+                                        <md-input
+                                            slot="trigger"
+                                            :value="adapterOptions.backgroundColor"
+                                            :disabled="!imageData"
+                                        />
+                                    </v-swatches>
+                                </md-field>
                                 <div class="md-layout-item md-size-33">
-                                    <div class="md-layout">
-                                        <md-field class="md-layout-item md-size-75">
-                                            <label>Canvas background</label>
-                                            <v-swatches
-                                                shapes="circles"
-                                                swatch-size="32"
-                                                row-length="8"
-                                                v-model="canvasBackground"
-                                                :disabled="!imageData"
-                                            >
-                                                <md-input
-                                                    slot="trigger"
-                                                    :value="canvasBackground"
-                                                    :disabled="!imageData"
-                                                />
-                                            </v-swatches>
-                                        </md-field>
-                                        <div class="md-layout-item md-size-25">
-                                            <md-button
-                                                class="md-primary md-raised"
-                                                style="margin: 10px 0 0 0; min-width: 0"
-                                                :disabled="!imageData"
-                                                v-on:click="canvasBackground = 'auto'"
-                                            >
-                                                auto
-                                            </md-button>
-                                        </div>
-                                    </div>
+                                    <md-checkbox
+                                        class="md-primary"
+                                        v-model="adapterOptions.interpolateBackground"
+                                        :disabled="!imageData"
+                                    >
+                                        Interpolate background
+                                    </md-checkbox>
                                 </div>
                             </div>
                         </md-tab>
@@ -639,61 +634,32 @@
 </template>
 
 <script>
-const { cloneDeep, omit, debounce, isEqual, pickBy, range, size } = require('lodash');
+const { cloneDeep, omit, debounce, isEqual, pickBy, range } = require('lodash');
 import EDIT_SVG from '!raw-loader!./edit.svg';
 
 const DEFAULT_IMAGE = 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg';
 
 const TEMP_ID = 'marker-temp';
-const DEFAULT_OPTIONS = omit(PhotoSphereViewer.DEFAULTS, [
-    'panorama',
-    'panoData',
-    'sphereCorrection',
-    'container',
-    'plugins',
-    'navbar',
-    'loadingImg',
-]);
-
-const DEFAULT_SPHERE_CORRECTION = { pan: 0, tilt: 0, roll: 0 };
-const DEFAULT_NAVBAR = [
-    {
-        code: 'zoom',
-        label: PhotoSphereViewer.DEFAULTS.lang.zoom,
-        enabled: true,
-    },
-    {
-        code: 'move',
-        label: 'Move',
-        enabled: true,
-    },
-    {
-        code: 'download',
-        label: PhotoSphereViewer.DEFAULTS.lang.download,
-        enabled: true,
-    },
-    {
-        code: 'caption',
-        label: 'Caption',
-        enabled: true,
-    },
-    {
-        code: 'fullscreen',
-        label: PhotoSphereViewer.DEFAULTS.lang.fullscreen,
-        enabled: true,
-    },
-];
 
 export default {
     data: () => ({
+        Viewer: null,
+        EquirectangularAdapter: null,
+        MarkersPlugin: null,
+        DEFAULT_OPTIONS: null,
+        DEFAULT_ADAPTER_OPTIONS: null,
+        DEFAULT_SPHERE_CORRECTION: null,
+        DEFAULT_NAVBAR: null,
+
         viewer: null,
         markers: null,
         file: null,
         imageData: null,
         error: false,
-        sphereCorrection: cloneDeep(DEFAULT_SPHERE_CORRECTION),
-        options: cloneDeep(DEFAULT_OPTIONS),
-        canvasBackground: '#000',
+        sphereCorrection: {},
+        options: {},
+        navbar: [],
+        adapterOptions: {},
         panoData: {
             fullWidth: null,
             fullHeight: null,
@@ -702,7 +668,6 @@ export default {
             croppedX: null,
             croppedY: null,
         },
-        navbar: cloneDeep(DEFAULT_NAVBAR),
         editMarkers: false,
         markersDialog: null,
         markersDialogContent: null,
@@ -740,7 +705,7 @@ export default {
     }),
 
     beforeDestroy() {
-        this.viewer.destroy();
+        this.viewer?.destroy();
     },
 
     created() {
@@ -754,20 +719,18 @@ export default {
     },
 
     mounted() {
-        const markersJs = document.createElement('script');
-        markersJs.setAttribute('src', 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5/index.js');
-        document.head.appendChild(markersJs);
+        // ugly hack to load PSV from jsdelivr as an ES module
+        window.__viewer = this;
 
-        const markersCss = document.createElement('link');
-        markersCss.setAttribute('rel', 'stylesheet');
-        markersCss.setAttribute('href', 'https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin@5/index.css');
-        document.head.appendChild(markersCss);
-
-        this.oldOptions = cloneDeep(this.options);
-
-        this._applyOptions = debounce(() => this.applyOptions(), 200);
-
-        markersJs.onload = () => this.initViewer();
+        window.__s = document.createElement('script');
+        __s.type = 'module';
+        __s.text = `
+import { Viewer, DEFAULTS, EquirectangularAdapter } from '@photo-sphere-viewer/core';
+import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+__viewer.init({ Viewer, DEFAULTS, EquirectangularAdapter, MarkersPlugin });
+__s.remove();
+`;
+        document.body.appendChild(__s);
     },
 
     watch: {
@@ -777,9 +740,10 @@ export default {
                 this._applyOptions();
             },
         },
-        canvasBackground: {
+        adapterOptions: {
+            deep: true,
             handler() {
-                this.applyCanvasBackground();
+                this.applyAdapterOptions();
             },
         },
         sphereCorrection: {
@@ -803,19 +767,72 @@ export default {
     },
 
     methods: {
+        init({ Viewer, DEFAULTS, EquirectangularAdapter, MarkersPlugin }) {
+            this.Viewer = Viewer;
+            this.EquirectangularAdapter = EquirectangularAdapter;
+            this.MarkersPlugin = MarkersPlugin;
+
+            this.DEFAULT_OPTIONS = omit(DEFAULTS, [
+                'panorama',
+                'panoData',
+                'sphereCorrection',
+                'container',
+                'plugins',
+                'navbar',
+                'loadingImg',
+            ]);
+            this.DEFAULT_ADAPTER_OPTIONS = { backgroundColor: '#000', interpolateBackground: true };
+            this.DEFAULT_SPHERE_CORRECTION = { pan: 0, tilt: 0, roll: 0 };
+            this.DEFAULT_NAVBAR = [
+                {
+                    code: 'zoom',
+                    label: DEFAULTS.lang.zoom,
+                    enabled: true,
+                },
+                {
+                    code: 'move',
+                    label: 'Move',
+                    enabled: true,
+                },
+                {
+                    code: 'download',
+                    label: DEFAULTS.lang.download,
+                    enabled: true,
+                },
+                {
+                    code: 'caption',
+                    label: 'Caption',
+                    enabled: true,
+                },
+                {
+                    code: 'fullscreen',
+                    label: DEFAULTS.lang.fullscreen,
+                    enabled: true,
+                },
+            ];
+
+            
+            this.sphereCorrection = cloneDeep(this.DEFAULT_SPHERE_CORRECTION);
+            this.options = cloneDeep(this.DEFAULT_OPTIONS);
+            this.adapterOptions = cloneDeep(this.DEFAULT_ADAPTER_OPTIONS);
+            this.navbar = cloneDeep(this.DEFAULT_NAVBAR);
+            this.oldOptions = cloneDeep(this.options);
+
+            this._applyOptions = debounce(() => this.applyOptions(), 200);
+
+            this.initViewer();
+        },
         initViewer() {
-            this.viewer = new PhotoSphereViewer.Viewer({
+            this.viewer = new this.Viewer({
                 container: 'viewer',
                 loadingImg: 'https://photo-sphere-viewer-data.netlify.app/assets/loader.gif',
-                adapter: [PhotoSphereViewer.EquirectangularAdapter, {
-                    canvasBackground: this.canvasBackground,
-                }],
-                plugins: [PhotoSphereViewer.MarkersPlugin],
+                adapter: [this.EquirectangularAdapter, this.adapterOptions],
+                plugins: [this.MarkersPlugin],
             });
 
             this.applyNavbar();
 
-            this.markers = this.viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
+            this.markers = this.viewer.getPlugin(this.MarkersPlugin);
 
             this.viewer.addEventListener('click', ({ data }) => this.onClick(data));
             this.viewer.addEventListener('dblclick', ({ data }) => this.onDblClick(data));
@@ -931,9 +948,9 @@ export default {
             this.oldOptions = cloneDeep(this.options);
         },
 
-        applyCanvasBackground() {
-            if (this.viewer) {
-                this.viewer.adapter.config.canvasBackground = this.canvasBackground;
+        applyAdapterOptions() {
+            if (this.viewer && this.imageData) {
+                Object.assign(this.viewer.adapter.config, this.adapterOptions);
                 this.viewer.setPanorama(this.imageData, { panoData: this.viewer.state.panoData });
             }
         },
@@ -954,16 +971,18 @@ export default {
         },
 
         reset() {
-            this.viewer.destroy();
+            this.viewer?.destroy();
             this.viewer = null;
             this.markers = null;
 
             this.file = null;
             this.imageData = null;
             this.markersList = [];
-            this.options = cloneDeep(DEFAULT_OPTIONS);
-            this.sphereCorrection = cloneDeep(DEFAULT_SPHERE_CORRECTION);
-            this.navbar = cloneDeep(DEFAULT_NAVBAR);
+            this.options = cloneDeep(this.DEFAULT_OPTIONS);
+            this.adapterOptions = cloneDeep(this.DEFAULT_ADAPTER_OPTIONS);
+            this.sphereCorrection = cloneDeep(this.DEFAULT_SPHERE_CORRECTION);
+            this.navbar = cloneDeep(this.DEFAULT_NAVBAR);
+            this.oldOptions = cloneDeep(this.options);
 
             this.initViewer();
         },

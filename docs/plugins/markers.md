@@ -67,7 +67,7 @@ packages:
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -76,7 +76,7 @@ const viewer = new PhotoSphereViewer.Viewer({
     mousewheelCtrlKey: true,
 
     plugins: [
-        [PhotoSphereViewer.MarkersPlugin, {
+        [MarkersPlugin, {
             // list of markers
             markers: [
                 {
@@ -162,7 +162,7 @@ const viewer = new PhotoSphereViewer.Viewer({
     ],
 });
 
-const markersPlugin = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
+const markersPlugin = viewer.getPlugin(MarkersPlugin);
 
 /**
  * Create a new marker when the user clicks somewhere

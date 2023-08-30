@@ -82,7 +82,7 @@ packages:
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -91,7 +91,7 @@ const viewer = new PhotoSphereViewer.Viewer({
     mousewheelCtrlKey: true,
 
     plugins: [
-        [PhotoSphereViewer.AutorotatePlugin, {
+        [AutorotatePlugin, {
             autostartDelay: 1000,
             autorotatePitch: '5deg',
         }],
@@ -118,7 +118,7 @@ packages:
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
@@ -140,16 +140,16 @@ const viewer = new PhotoSphereViewer.Viewer({
     ],
 
     plugins: [
-        [PhotoSphereViewer.AutorotatePlugin, {
+        [AutorotatePlugin, {
             autostartDelay: 1000,
             autorotateSpeed: '3rpm',
         }],
-        PhotoSphereViewer.MarkersPlugin,
+        MarkersPlugin,
     ],
 });
 
-const autorotatePlugin = viewer.getPlugin(PhotoSphereViewer.AutorotatePlugin);
-const markersPlugin = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
+const autorotatePlugin = viewer.getPlugin(AutorotatePlugin);
+const markersPlugin = viewer.getPlugin(MarkersPlugin);
 
 viewer.addEventListener('ready', randomPoints, { once: true });
 

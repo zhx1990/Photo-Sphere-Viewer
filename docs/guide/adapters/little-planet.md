@@ -33,9 +33,9 @@ packages:
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
-    adapter: PhotoSphereViewer.LittlePlanetAdapter,
+    adapter: LittlePlanetAdapter,
     panorama: baseUrl + 'sphere.jpg',
     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
     loadingImg: baseUrl + 'loader.gif',

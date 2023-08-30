@@ -3,37 +3,13 @@ import { getParameters } from 'codesandbox-import-utils/lib/api/define';
 const ORG = '@photo-sphere-viewer/';
 const CDN_BASE = 'https://cdn.jsdelivr.net/npm/';
 const VERSION = '5';
-const THREE_PATH = CDN_BASE + 'three/build/three.min.js';
 
 function fullname(name) {
     return ORG + name;
 }
 
-function buildPath(name, version, type) {
-    return CDN_BASE + name + '@' + version + '/index.' + type;
-}
-
-export function getFullJs(js) {
-    return js;
-}
-
-export function getFullCss(css) {
-    return `
-html, body, #viewer {
-  margin: 0;
-  width: 100vw;
-  height: 100vh;
-  font-family: sans-serif;
-}
-
-${css}`.trim();
-}
-
-export function getFullHtml(html) {
-    return `
-<div id="viewer"></div>
-
-${html}`.trim();
+function buildPath({ name, version, type }) {
+    return CDN_BASE + name + '@' + version + '/' + (type === 'js' ? 'index.module.js' : 'index.css');
 }
 
 export function getFullPackages(version, packages) {
@@ -52,12 +28,59 @@ export function getFullPackages(version, packages) {
     ];
 }
 
-export function getAllResources(packages) {
-    return [
-        THREE_PATH,
-        ...packages.map(({ name, version }) => buildPath(name, version, 'js')),
-        ...packages.filter(({ style }) => style).map(({ name, version }) => buildPath(name, version, 'css')),
-    ];
+function getFullJs({ js, packages }) {
+    return `
+${packages
+    .filter(({ imports }) => imports)
+    .map(({ name, imports }) => `import { ${imports} } from '${name}';`)
+    .join('\n')}
+
+${js}
+`.trim();
+}
+
+function getFullCss({ css, packages, cdnImport }) {
+    return `
+${packages
+    .filter(({ style }) => style)
+    .map(({ name, version }) => `@import '${cdnImport ? buildPath({ name, version, type: 'css' }) : `../node_modules/${name}/index.css`}';`)
+    .join('\n')}
+
+html, body, #viewer {
+  margin: 0;
+  width: 100vw;
+  height: 100vh;
+  font-family: sans-serif;
+}
+
+${css}
+`.trim();
+}
+
+function getFullHtml({ html, packages, importMap }) {
+    let fullHtml = `
+<div id="viewer"></div>
+
+${html}
+`.trim();
+
+    if (importMap) {
+        fullHtml += `\n
+<script type="importmap">
+    {
+        "imports": {
+            "three": "${CDN_BASE}three/build/three.module.js",
+            ${packages
+                .filter(({ imports }) => imports)
+                .map(({ name, version }) => `"${name}": "${buildPath({ name, version, type: 'js' })}"`)
+                .join(',\n            ')}
+        }
+    }
+</script>
+`;
+    }
+
+    return fullHtml;
 }
 
 export function getIframeContent({ title, html, js, css, packages }) {
@@ -70,41 +93,36 @@ export function getIframeContent({ title, html, js, css, packages }) {
 
   <title>${title}</title>
 
-${getAllResources(packages)
-    .map((path) => {
-        if (path.endsWith('.js')) {
-            return `<script src="${path}"><\/script>`;
-        } else {
-            return `<link rel="stylesheet" href="${path}">`;
-        }
-    })
-    .join('\n')}
-
   <style>
-    ${css}
+    ${getFullCss({ css, packages, cdnImport: true })}
   </style>
 </head>
 
 <body>
-  ${html}
+  ${getFullHtml({ html, packages, importMap: true })}
 
-  <script>
-  ${js}
+  <script type="module">
+  ${getFullJs({ js, packages })}
   </script>
 </body>
 </html>`;
 }
 
-export function getCodePenValue({ title, js, css, html, packages }) {
-    const resources = getAllResources(packages);
+export function getJsFiddleValue({ title, js, css, html, packages }) {
+    return {
+        title: title,
+        html: getFullHtml({ html, packages, importMap: true }),
+        js: getFullJs({ js, packages }),
+        css: getFullCss({ css, packages, cdnImport: true }),
+    };
+}
 
+export function getCodePenValue({ title, js, css, html, packages }) {
     return JSON.stringify({
         title: title,
-        js: js,
-        css: css,
-        html: html,
-        js_external: resources.filter((path) => path.endsWith('.js')),
-        css_external: resources.filter((path) => path.endsWith('.css')),
+        html: getFullHtml({ html, packages, importMap: true }),
+        js: getFullJs({ js, packages }),
+        css: getFullCss({ css, packages, cdnImport: true }),
     });
 }
 
@@ -124,8 +142,8 @@ export function getCodeSandboxValue({ title, js, css, html, packages }) {
                         return deps;
                     }, {}),
                     devDependencies: {
-                        'parcel-bundler': '^2.8.0',
-                        'typescript': '^4.8',
+                        'parcel': '^2.9.0',
+                        'typescript': '^5.2.0',
                     },
                 },
             },
@@ -141,7 +159,7 @@ export function getCodeSandboxValue({ title, js, css, html, packages }) {
 </head>
 
 <body>
-    ${html}
+    ${getFullHtml({ html, packages, importMap: false })}
 
     <script src="src/index.ts"></script>
 </body>
@@ -149,24 +167,12 @@ export function getCodeSandboxValue({ title, js, css, html, packages }) {
             },
             'src/index.ts': {
                 isBinary: false,
-                content: `
-import './styles.css';
-${packages
-    .filter(({ imports }) => imports)
-    .map(({ name, imports }) => `import { ${imports} } from '${name}';`)
-    .join('\n')}
-
-${js.replace(/PhotoSphereViewer\./g, '')}`.trim(),
+                content: `import './styles.css';
+${getFullJs({ js, packages })}`,
             },
             'src/styles.css': {
                 isBinary: false,
-                content: `
-${packages
-    .filter(({ style }) => style)
-    .map(({ name }) => `@import '../node_modules/${name}/index.css';`)
-    .join('\n')}
-
-${css}`.trim(),
+                content: getFullCss({ css, packages, cdnImport: false }),
             },
         },
     });

@@ -59,9 +59,9 @@ packages:
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
-    adapter: [PhotoSphereViewer.EquirectangularVideoAdapter, {
+    adapter: [EquirectangularVideoAdapter, {
         muted: true,
     }],
     caption: 'Ayutthaya <b>&copy; meetle</b>',
@@ -71,7 +71,7 @@ const viewer = new PhotoSphereViewer.Viewer({
     navbar: 'video autorotate caption settings fullscreen',
 
     plugins: [
-        [PhotoSphereViewer.VideoPlugin, {
+        [VideoPlugin, {
             keypoints: [
                 { time: 0, position: { yaw: 0, pitch: 0 } },
                 { time: 5, position: { yaw: -Math.PI / 4, pitch: Math.PI / 8 } },
@@ -83,9 +83,9 @@ const viewer = new PhotoSphereViewer.Viewer({
                 { time: 35, position: { yaw: (-7 * Math.PI) / 4, pitch: -Math.PI / 8 } },
             ],
         }],
-        PhotoSphereViewer.AutorotatePlugin,
-        PhotoSphereViewer.SettingsPlugin,
-        [PhotoSphereViewer.ResolutionPlugin, {
+        AutorotatePlugin,
+        SettingsPlugin,
+        [ResolutionPlugin, {
             defaultResolution: 'HD',
             resolutions: [
                 {

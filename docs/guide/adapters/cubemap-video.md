@@ -42,9 +42,9 @@ packages:
 ```js
 const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     container: 'viewer',
-    adapter: [PhotoSphereViewer.CubemapVideoAdapter, {
+    adapter: [CubemapVideoAdapter, {
         muted: true,
     }],
     caption: 'Dreams of Dalí <b>&copy; The Dalí Museum</b>',
@@ -54,9 +54,9 @@ const viewer = new PhotoSphereViewer.Viewer({
     navbar: 'video caption settings fullscreen',
 
     plugins: [
-        PhotoSphereViewer.VideoPlugin,
-        PhotoSphereViewer.SettingsPlugin,
-        [PhotoSphereViewer.ResolutionPlugin, {
+        VideoPlugin,
+        SettingsPlugin,
+        [ResolutionPlugin, {
             defaultResolution: 'HD',
             resolutions: [
                 {

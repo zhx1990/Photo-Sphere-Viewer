@@ -48,7 +48,7 @@
 <script>
 import { SERVICES } from './constants';
 import ServiceButton from './ServiceButton';
-import { getFullCss, getFullHtml, getFullJs, getFullPackages, getIframeContent } from './utils';
+import { getFullPackages, getIframeContent } from './utils';
 
 export default {
     name: 'CodeDemo',
@@ -73,13 +73,13 @@ export default {
     },
     computed: {
         html() {
-            return getFullHtml(decodeURIComponent(this.rawHtml));
+            return decodeURIComponent(this.rawHtml);
         },
         js() {
-            return getFullJs(decodeURIComponent(this.rawJs));
+            return decodeURIComponent(this.rawJs);
         },
         css() {
-            return getFullCss(decodeURIComponent(this.rawCss));
+            return decodeURIComponent(this.rawCss);
         },
         packages() {
             return getFullPackages(this.version, JSON.parse(decodeURIComponent(this.rawPackages)));
