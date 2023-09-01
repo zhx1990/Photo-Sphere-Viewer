@@ -184,7 +184,7 @@ export class MapComponent extends AbstractComponent {
                 if (this.state.mousedown) {
                     this.__move(event.clientX, event.clientY);
                     e.stopPropagation();
-                } else if (!this.state.collapsed) {
+                } else if (e.target === this.canvas) {
                     this.__handleHotspots(event.clientX, event.clientY);
                 }
                 break;
@@ -217,7 +217,7 @@ export class MapComponent extends AbstractComponent {
                     this.state.mousedown = false;
                     e.stopPropagation();
                 }
-                if (!this.state.collapsed) {
+                if (e.target === this.canvas) {
                     this.__clickHotspot(mouse.clientX, mouse.clientY);
                 }
                 break;
@@ -567,17 +567,6 @@ export class MapComponent extends AbstractComponent {
      * Finds the hotspot under the mouse
      */
     private __findHotspot(clientX: number, clientY: number): string {
-        // ensure the cursor is above the canvas (circle shape)
-        if (!this.state.maximized) {
-            const radius = this.container.offsetWidth / 2;
-            const top = this.container.offsetTop;
-            const left = this.container.offsetLeft;
-
-            if (utils.distance({ x: clientX, y: clientY }, { x: left + radius, y: top + radius }) > radius) {
-                return null;
-            }
-        }
-
         const k = this.config.spotSize / 2;
 
         let hotspotId: string = null;
