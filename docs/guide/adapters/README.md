@@ -20,28 +20,37 @@ Official adapters are available in various `@photo-sphere-viewer/***-adapter` pa
 
 :::: tabs
 
-::: tab Direct import
+::: tab Import from a CDN
 
 ```html
-<!-- base imports of PSV and dependencies -->
+<script type="importmap">
+    {
+        "imports": {
+            // imports of PSV core and three
+            "@photo-sphere-viewer/cubemap-adapter": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/cubemap-adapter/index.module.js"
+        }
+    }
+</script>
 
-<script src="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/cubemap-adapter/index.min.js"></script>
-```
+<script type="module">
+    import { Viewer } from '@photo-sphere-viewer/core';
+    import { CubemapAdapter } from '@photo-sphere-viewer/cubemap-adapter';
 
-```js
-new PhotoSphereViewer.Viewer({
-    adapter: [PhotoSphereViewer.CubemapAdapter, {
-        // optional adapter config
-    }],
-    panorama: // specific to the adapter,
-});
+    new Viewer({
+        adapter: [CubemapAdapter, {
+            // optional adapter config
+        }],
+        panorama: // specific to the adapter,
+    });
+</script>
 ```
 
 :::
 
-::: tab ES import
+::: tab Install with NPM and a build tool
 
 ```js
+import { Viewer } from '@photo-sphere-viewer/core';
 import { CubemapAdapter } from '@photo-sphere-viewer/cubemap-adapter';
 
 new Viewer({

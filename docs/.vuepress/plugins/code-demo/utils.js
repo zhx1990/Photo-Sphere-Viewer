@@ -13,18 +13,22 @@ function buildPath({ name, version, type }) {
 }
 
 export function getFullPackages(version, packages) {
+    const core = packages.find(({ name }) => name === 'core');
+
     return [
         {
             name: fullname('core'),
             version: version || VERSION,
-            imports: 'Viewer',
+            imports: 'Viewer' + (core ? `, ${core.imports}` : ''),
             style: true,
         },
-        ...packages.map((pkg) => ({
-            ...pkg,
-            name: fullname(pkg.name),
-            version: version || VERSION,
-        })),
+        ...packages
+            .filter(({ name }) => name !== 'core')
+            .map((pkg) => ({
+                ...pkg,
+                name: fullname(pkg.name),
+                version: version || VERSION,
+            })),
     ];
 }
 
@@ -94,14 +98,32 @@ export function getIframeContent({ title, html, js, css, packages }) {
   <title>${title}</title>
 
   <style>
+    #loader {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: radial-gradient(#fff 0%, #fdfdfd 16%, #fbfbfb 33%, #f8f8f8 49%, #efefef 66%, #dfdfdf 82%, #bfbfbf 100%);
+        color: #555;
+        font-size: 2rem;
+        font-weight: 600;
+        text-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        z-index: 9999;
+    }
+  </style>
+
+  <style>
     ${getFullCss({ css, packages, cdnImport: true })}
   </style>
 </head>
 
 <body>
+  <div id="loader">Loading...</div>
   ${getFullHtml({ html, packages, importMap: true })}
 
   <script type="module">
+  document.querySelector('#loader').remove();
   ${getFullJs({ js, packages })}
   </script>
 </body>

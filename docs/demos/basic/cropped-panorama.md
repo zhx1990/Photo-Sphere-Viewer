@@ -7,6 +7,9 @@ Display cropped panorama by reading its XMP metadata or compute the position on 
 ```yaml
 autoload: true
 title: PSV Cropped Demo
+packages:
+    - name: core
+      imports: EquirectangularAdapter
 ```
 
 ```js

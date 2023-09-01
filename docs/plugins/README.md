@@ -10,22 +10,52 @@ Official plugins (listed on the left menu) are available in various `@photo-sphe
 
 ::::: tabs
 
-:::: tab Direct import
+:::: tab Import from a CDN
 
 ```html
-<!-- base imports of PSV and dependencies -->
+<head>
+    <!-- stylesheets of PSV core -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin/index.min.css" />
+</head>
 
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin/index.min.css" />
+<script type="importmap">
+    {
+        "imports": {
+            // imports of PSV core and three
+            "@photo-sphere-viewer/markers-plugin": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin/index.module.js"
+        }
+    }
+</script>
 
-<script src="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/markers-plugin/index.min.js"></script>
+<script type="module">
+    import { Viewer } from '@photo-sphere-viewer/core';
+    import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+
+    const viewer = new Viewer({
+        plugins: [
+            [MarkersPlugin, {
+                // optional plugin config
+            }],
+        ],
+    });
+</script>
 ```
 
 ::::
 
-:::: tab ES import
+:::: tab Install with NPM and a build tool
 
 ```js
+import { Viewer } from '@photo-sphere-viewer/core';
 import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+
+const viewer = new Viewer({
+    plugins: [
+        [MarkersPlugin, {
+            // optional plugin config
+        }],
+    ],
+});
 ```
 
 ::: tip Stylesheet
@@ -41,10 +71,10 @@ Import `@photo-sphere-viewer/markers-plugin/index.css` with the prefered way dep
 All plugins consists of a JavaScript class which must be provided to the `plugins` array. Some plugins will also take a configuration object provided in a nested array.
 
 ```js
-const viewer = new PhotoSphereViewer.Viewer({
+const viewer = new Viewer({
     plugins: [
-        PhotoSphereViewer.GyroscopePlugin,
-        [PhotoSphereViewer.MarkersPlugin, {
+        PluginWithoutConfig,
+        [PluginWithConfig, {
             option1: 'foo',
             option2: 'bar',
         }],
@@ -55,7 +85,7 @@ const viewer = new PhotoSphereViewer.Viewer({
 After initialization the plugin instance can be obtained with the `getPlugin` method, allowing to call methods on the plugin and subscribe to events.
 
 ```js
-const markersPlugin = viewer.getPlugin(PhotoSphereViewer.MarkersPlugin);
+const markersPlugin = viewer.getPlugin(MarkersPlugin);
 
 markersPlugin.addMarker(/* ... */);
 

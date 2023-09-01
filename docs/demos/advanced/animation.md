@@ -8,6 +8,8 @@ Use the `Animation` helper to create a cool intro.
 autoload: true
 title: PSV Intro Animation Demo
 packages:
+    - name: core
+      imports: utils
     - name: autorotate-plugin
       imports: AutorotatePlugin
 ```
@@ -50,7 +52,7 @@ const viewer = new Viewer({
     ],
 });
 
-const autorotate = viewer.getPlugin(PhotoSphereViewer.AutorotatePlugin);
+const autorotate = viewer.getPlugin(AutorotatePlugin);
 
 viewer.addEventListener('ready', intro, { once: true });
 
@@ -58,7 +60,7 @@ function intro() {
     autorotate.stop();
     viewer.navbar.hide();
 
-    new PhotoSphereViewer.utils.Animation({
+    new utils.Animation({
         properties: animatedValues,
         duration: 2500,
         easing: 'inOutQuad',
