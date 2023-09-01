@@ -770,7 +770,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
     }
 
     /**
-     * Changes global the mouse cursor
+     * Changes the global mouse cursor
      */
     setCursor(cursor: string) {
         this.state.cursorOverride = cursor;

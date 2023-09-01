@@ -191,29 +191,62 @@ Color of the cone of the compass, set to `null` to disable.
 
 Size of the cone of the compass.
 
-#### `spotColor`
+#### `spotStyle`
 
--   type: `string`
--   default: `white`
+-   type: `object`
 -   updatable: yes
 
-Color used when no `spotImage` is defined. The spot is always a circle.
+Style of hotspots.
 
-#### `spotImage`
+::: dialog "See details" "Map hotspot style"
 
--   type: `string`
--   default: `null`
--   updatable: yes
+The hotspots are represented by a circle with configurable size and color, but can also be an image.
 
-SVG or image URL used to represent hotspots.
+```ts
+{
+    /**
+     * Size of the hotspot
+     * @default 15
+     */
+    size?: number;
+    /**
+     * SVG or image URL used for hotspot
+     */
+    image?: string;
+    /**
+     * Color of the hotspot when no image is provided
+     * @default 'white'
+     */
+    color?: string;
+    /**
+     * Size on mouse hover
+     * @default null
+     */
+    hoverSize?: number;
+    /**
+     * SVG or image URL on mouse hover
+     * @default null
+     */
+    hoverImage?: string;
+    /**
+     * Color on mouse hover
+     * @default null
+     */
+    hoverColor?: string;
+    /**
+     * Size of the border shown on mouse hover
+     * @default 4
+     */
+    hoverBorderSize?: number;
+    /**
+     * Color of the border shown on mouse hover
+     * @default 'rgba(255, 255, 255, 0.6)'
+     */
+    hoverBorderColor?: string;
+}
+```
 
-#### `spotSize`
-
--   type: `number`
--   default: `15`
--   updatable: yes
-
-Size of the hotspots.
+:::
 
 #### `static`
 
@@ -286,9 +319,9 @@ Useful to react to clicks with the `select-hotspot` event.
 
 Configure the position of the hotspot on the map, either with a angle and a distance (in pixels on the map image) or absolute x/y coordinates (also in pixels on the map image).
 
-#### `color` / `image` / `size`
+#### `style`
 
-Allow to override the default `spotColor`, `spotImage` and `spotSize`.
+Allow to override the default `spotStyle`.
 
 #### `tooltip`
 

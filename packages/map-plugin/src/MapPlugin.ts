@@ -22,9 +22,19 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         pinSize: 35,
         coneColor: '#1E78E6',
         coneSize: 40,
-        spotColor: 'white',
+        spotColor: null,
         spotImage: null,
-        spotSize: 15,
+        spotSize: null,
+        spotStyle: {
+            size: 15,
+            image: null,
+            color: 'white',
+            hoverSize: null,
+            hoverImage: null,
+            hoverColor: null,
+            hoverBorderSize: 4,
+            hoverBorderColor: 'rgba(255, 255, 255, 0.6)',
+        },
         static: false,
         defaultZoom: 100,
         minZoom: 20,
@@ -38,6 +48,17 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
                 return rawConfig.compassImage;
             }
             return overlayImage;
+        },
+        spotStyle: (spotStyle, { rawConfig }) => {
+            [['spotColor', 'color'], ['spotImage', 'image'], ['spotSize', 'size']].forEach((oldName, newName) => {
+                // @ts-ignore
+                if (rawConfig[oldName]) {
+                    utils.logWarn(`map: "${oldName}" is deprecated, use "spotStyle.${newName}" instead`);
+                    // @ts-ignore
+                    spotStyle[newName] = rawConfig[oldName];
+                }
+            });
+            return spotStyle;
         },
         position: (position, { defValue }) => {
             return utils.cleanCssPosition(position, { allowCenter: false, cssOrder: true }) || defValue;
@@ -252,6 +273,13 @@ export class MapPlugin extends AbstractConfigurablePlugin<
      */
     clearHotspots() {
         this.setHotspots(null);
+    }
+
+    /**
+     * Changes the highlighted hotspot
+     */
+    setActiveHotspot(hotspotId: string) {
+        this.component.setActiveHotspot(hotspotId);
     }
 
     private __markersToHotspots(markers: Marker[]): MapHotspot[] {

@@ -1,26 +1,57 @@
 import { Point } from '@photo-sphere-viewer/core';
 
-export type MapHotspot = (Point | { yaw: number | string; distance: number }) & {
+export type MapHotspotStyle = {
+    /**
+     * Size of the hotspot
+     * @default 15
+     */
+    size?: number;
+    /**
+     * SVG or image URL used for hotspot
+     */
+    image?: string;
+    /**
+     * Color of the hotspot when no image is provided
+     * @default 'white'
+     */
+    color?: string;
+    /**
+     * Size on mouse hover
+     * @default null
+     */
+    hoverSize?: number;
+    /**
+     * SVG or image URL on mouse hover
+     * @default null
+     */
+    hoverImage?: string;
+    /**
+     * Color on mouse hover
+     * @default null
+     */
+    hoverColor?: string;
+    /**
+     * Size of the border shown on mouse hover
+     * @default 4
+     */
+    hoverBorderSize?: number;
+    /**
+     * Color of the border shown on mouse hover
+     * @default 'rgba(255, 255, 255, 0.6)'
+     */
+    hoverBorderColor?: string;
+};
+
+export type MapHotspot = (Point | { yaw: number | string; distance: number }) & MapHotspotStyle & {
     /**
      * Unique identifier for the {@link SelectHotspot} event
      */
     id?: string;
+
     /**
      * Tooltip visible on the map
      */
     tooltip?: string | { content: string; className?: string };
-    /**
-     * Override the default `spotSize`
-     */
-    size?: number;
-    /**
-     * Override the default `spotColor`
-     */
-    color?: string;
-    /**
-     * Override the default `spotImage`
-     */
-    image?: string;
 };
 
 export type MapPluginConfig = {
@@ -92,21 +123,24 @@ export type MapPluginConfig = {
     coneSize?: number;
 
     /**
-     * Color of the hotspots when no image is provided
-     * @default 'white'
+     * @deprecated use `spotStyle.color`
      */
     spotColor?: string;
 
     /**
-     * SVG or image URL used for hotspots
+     * @deprecated use `spotStyle.image`
      */
     spotImage?: string;
 
     /**
-     * Size of the hotspots
-     * @default 15
+     * @deprecated use `spotStyle.size`
      */
     spotSize?: number;
+
+    /**
+     * Default style of hotspots
+     */
+    spotStyle?: MapHotspotStyle,
 
     /**
      * Make the map static and rotate the pin instead

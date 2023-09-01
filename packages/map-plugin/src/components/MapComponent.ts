@@ -11,6 +11,7 @@ import {
     drawImageCentered,
     drawImageHighDpi,
     getImageHtml,
+    getStyle,
     ImageSource,
     loadImage,
     projectPoint,
@@ -94,6 +95,7 @@ export class MapComponent extends AbstractComponent {
 
         // map canvas
         this.canvas = document.createElement('canvas');
+        this.__setCursor('move');
         canvasContainer.appendChild(this.canvas);
 
         // overlay
@@ -295,8 +297,14 @@ export class MapComponent extends AbstractComponent {
     /**
      * Flag for render
      */
-    update() {
+    update(clear = true) {
         this.state.needsUpdate = true;
+
+        if (clear) {
+            // clear hotspots status
+            this.state.hotspotPos = {};
+            this.__resetHotspot();
+        }
     }
 
     /**
@@ -381,6 +389,14 @@ export class MapComponent extends AbstractComponent {
         this.update();
     }
 
+    /**
+     * Changes the highlighted hotspot
+     */
+    setActiveHotspot(hotspotId: string) {
+        this.state.hotspotId = hotspotId;
+        this.update(false);
+    }
+
     private render() {
         if (!this.config.center) {
             return;
@@ -391,10 +407,6 @@ export class MapComponent extends AbstractComponent {
         if (!mapImage) {
             return;
         }
-
-        // clear hotspots status
-        this.state.hotspotPos = {};
-        this.__resetHotspot();
 
         const yaw = this.viewer.getPosition().yaw;
         const zoom = Math.exp(this.state.zoom) / this.state.imgScale;
@@ -451,7 +463,10 @@ export class MapComponent extends AbstractComponent {
 
         // draw the hotspots
         [...this.config.hotspots, ...this.state.markers].forEach((hotspot: MapHotspot) => {
-            const image = this.__loadImage(hotspot.image || this.config.spotImage);
+            const isHover = this.state.hotspotId === hotspot.id;
+
+            const style = getStyle(this.config.spotStyle, hotspot, isHover);
+            const image = this.__loadImage(style.image);
 
             const hotspotPos = { ...offset };
             if ('yaw' in hotspot && 'distance' in hotspot) {
@@ -472,25 +487,33 @@ export class MapComponent extends AbstractComponent {
 
             const x = canvasVirtualCenterX - spotPos.x;
             const y = canvasVirtualCenterY - spotPos.y;
-            const size = hotspot.size || this.config.spotSize;
 
             // save absolute position on the viewer
             this.state.hotspotPos[hotspot.id] = {
                 x: x + canvasPos.x,
                 y: y + canvasPos.y,
-                s: size,
+                s: style.size,
             };
 
             context.save();
             context.translate(x * SYSTEM.pixelRatio, y * SYSTEM.pixelRatio);
             canvasShadow(context, PIN_SHADOW_OFFSET, PIN_SHADOW_OFFSET, PIN_SHADOW_BLUR);
             if (image) {
-                drawImageCentered(context, image, size);
+                drawImageCentered(context, image, style.size);
             } else {
-                context.fillStyle = hotspot.color || this.config.spotColor;
+                context.fillStyle = style.color;
                 context.beginPath();
-                context.arc(0, 0, (size * SYSTEM.pixelRatio) / 2, 0, 2 * Math.PI);
+                context.arc(0, 0, (style.size * SYSTEM.pixelRatio) / 2, 0, 2 * Math.PI);
                 context.fill();
+
+                if (style.borderColor && style.borderSize) {
+                    context.shadowColor = 'transparent';
+                    context.strokeStyle = style.borderColor;
+                    context.lineWidth = style.borderSize;
+                    context.beginPath();
+                    context.arc(0, 0, ((style.size + style.borderSize) * SYSTEM.pixelRatio) / 2, 0, 2 * Math.PI);
+                    context.stroke();
+                }
             }
             context.restore();
         });
@@ -567,7 +590,7 @@ export class MapComponent extends AbstractComponent {
      * Finds the hotspot under the mouse
      */
     private __findHotspot(clientX: number, clientY: number): string {
-        const k = this.config.spotSize / 2;
+        const k = this.config.spotStyle.size / 2;
 
         let hotspotId: string = null;
         for (const [id, { x, y }] of Object.entries(this.state.hotspotPos)) {
@@ -618,7 +641,8 @@ export class MapComponent extends AbstractComponent {
                 }
             }
 
-            this.state.hotspotId = hotspotId;
+            this.setActiveHotspot(hotspotId);
+            this.__setCursor(hotspotId ? 'pointer' : 'move');
         }
     }
 
@@ -650,6 +674,10 @@ export class MapComponent extends AbstractComponent {
         this.state.hotspotId = null;
     }
 
+    /**
+     * Loads an image and returns the result **synchronously**.
+     * If the image is not already loaded it returns `null` and schedules a new render when the image is ready.
+     */
     private __loadImage(url: string, isInit = false): ImageSource {
         if (!url) {
             return null;
@@ -678,7 +706,7 @@ export class MapComponent extends AbstractComponent {
                 }
 
                 this.state.images[url].loading = false;
-                this.update();
+                this.update(false);
 
                 if (isInit) {
                     this.show();
@@ -730,5 +758,9 @@ export class MapComponent extends AbstractComponent {
         if (z) {
             this.zoom(z / 10);
         }
+    }
+
+    private __setCursor(cursor: string) {
+        this.canvas.style.cursor = cursor;
     }
 }

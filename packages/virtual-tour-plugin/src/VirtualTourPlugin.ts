@@ -622,7 +622,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     }
 
     private __onEnterObject(mesh: Mesh, viewerPoint: Point) {
-        const link = mesh.userData[LINK_DATA];
+        const link: VirtualTourLink = mesh.userData[LINK_DATA];
 
         setMeshColor(mesh as any, link.arrowStyle?.hoverColor || this.config.arrowStyle.hoverColor);
 
@@ -642,6 +642,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     });
                 }
             });
+
+        this.map?.setActiveHotspot(LINK_ID + link.nodeId);
 
         this.viewer.needsUpdate();
         this.viewer.setCursor('pointer');
@@ -665,6 +667,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             this.state.currentTooltip.hide();
             this.state.currentTooltip = null;
         }
+
+        this.map?.setActiveHotspot(null);
 
         this.viewer.needsUpdate();
         this.viewer.setCursor(null);

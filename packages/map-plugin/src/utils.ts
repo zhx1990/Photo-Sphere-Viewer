@@ -1,4 +1,5 @@
 import { Point, SYSTEM } from '@photo-sphere-viewer/core';
+import { MapHotspotStyle } from './model';
 
 export function loadImage(src: string): HTMLImageElement {
     const image = document.createElement('img');
@@ -27,6 +28,26 @@ export function getImageHtml(src: string): string {
     } else {
         return src;
     }
+}
+
+export function getStyle(defaultStyle: MapHotspotStyle, style: MapHotspotStyle, isHover: boolean) {
+    return {
+        image: isHover
+            ? style.hoverImage ?? style.image ?? defaultStyle.hoverImage ?? defaultStyle.image
+            : style.image ?? defaultStyle.image,
+        size: isHover
+            ? style.hoverSize ?? style.size ?? defaultStyle.hoverSize ?? defaultStyle.size
+            : style.size ?? defaultStyle.size,
+        color: isHover
+            ? style.hoverColor ?? style.color ?? defaultStyle.hoverColor ?? defaultStyle.color
+            : style.color ?? defaultStyle.color,
+        borderColor: isHover 
+            ? style.hoverBorderColor ?? defaultStyle.hoverBorderColor 
+            : null,
+        borderSize: isHover 
+            ? style.hoverBorderSize ?? defaultStyle.hoverBorderSize 
+            : null,
+    };
 }
 
 export function unprojectPoint(pt: Point, yaw: number, zoom: number): Point {
