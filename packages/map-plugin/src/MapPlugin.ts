@@ -40,6 +40,12 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         minZoom: 20,
         maxZoom: 200,
         hotspots: [],
+        buttons: {
+            maximize: true,
+            close: true,
+            reset: true,
+            north: true,
+        },
     },
     {
         overlayImage: (overlayImage, { rawConfig }) => {
@@ -68,6 +74,9 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         defaultZoom: (defaultZoom) => Math.log(defaultZoom / 100),
         maxZoom: (maxZoom) => Math.log(maxZoom / 100),
         minZoom: (minZoom) => Math.log(minZoom / 100),
+        buttons: (buttons, { defValue }) => {
+            return { ...defValue, ...buttons };
+        },
     }
 );
 
@@ -86,8 +95,9 @@ export class MapPlugin extends AbstractConfigurablePlugin<
         'imageUrl',
         'center',
         'visibleOnLoad',
-        'hotspots',
         'defaultZoom',
+        'hotspots',
+        'buttons',
     ];
 
     private markers?: MarkersPlugin;

@@ -6,6 +6,7 @@ export class MapCompassButton extends AbstractMapButton {
     constructor(map: MapComponent) {
         super(map, ButtonPosition.VERTICAL);
 
+        this.container.title = this.viewer.config.lang['mapNorth'];
         this.container.innerHTML = icon;
         this.container.querySelector('svg').style.width = '80%';
 

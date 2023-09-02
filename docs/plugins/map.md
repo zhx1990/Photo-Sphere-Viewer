@@ -143,13 +143,13 @@ The size of the widget, can be declared in `px`, `rem`, `vh`, etc.
 
 Position of the widget, accepted positions are combinations of `top`, `bottom` and `left`, `right`.
 
-#### `visibleOnLoad`
+#### `static`
 
 -   type: `boolean`
--   default: `true`
--   updatable: no
+-   default: `false`
+-   updatable: yes
 
-Displays the map when loading the first panorama.
+If `true` the map will not rotate, only the central pin will, to indicate where the panorama is oriented.
 
 #### `overlayImage`
 
@@ -190,6 +190,14 @@ Color of the cone of the compass, set to `null` to disable.
 -   updatable: yes
 
 Size of the cone of the compass.
+
+#### `hotspots`
+
+-   type: `MapHotspot[]`
+-   default: `null`
+-   updatable: no, use `setHotspots()` method
+
+Small dots visible on the map. See bellow.
 
 #### `spotStyle`
 
@@ -248,14 +256,6 @@ The hotspots are represented by a circle with configurable size and color, but c
 
 :::
 
-#### `static`
-
--   type: `boolean`
--   default: `false`
--   updatable: yes
-
-If `true` the map will not rotate, only the central pin will, to indicate where the panorama is oriented.
-
 #### `defaultZoom`
 
 -   type: `number`
@@ -280,13 +280,21 @@ Maximum zoom level of the map.
 
 Minimum zoom level of the map.
 
-#### `hotspots`
+#### `visibleOnLoad`
 
--   type: `MapHotspot[]`
--   default: `null`
--   updatable: no, use `setHotspots()` method
+-   type: `boolean`
+-   default: `true`
+-   updatable: no
 
-Small dots visible on the map. See bellow.
+Displays the map when loading the first panorama.
+
+#### `buttons`
+
+-   type: `object`
+-   default: `{ north: true, maximize: true, close: true, reset: true }`
+-   updatable: no
+
+Configure which buttons are visible around the map.
 
 #### `lang`
 
@@ -298,6 +306,7 @@ lang: {
     map: 'Map',
     mapMaximize: 'Maximize',
     mapMinimize: 'Minimize',
+    mapNorth: 'Go to north',
     mapReset: 'Reset',
 }
 ```

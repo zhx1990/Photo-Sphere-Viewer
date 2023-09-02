@@ -4,6 +4,7 @@ import * as events from './events';
 DEFAULTS.lang['map'] = 'Map';
 DEFAULTS.lang['mapMaximize'] = 'Maximize';
 DEFAULTS.lang['mapMinimize'] = 'Minimize';
+DEFAULTS.lang['mapNorth'] = 'Go to north';
 DEFAULTS.lang['mapReset'] = 'Reset';
 
 export { MapPlugin } from './MapPlugin';

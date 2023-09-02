@@ -109,10 +109,18 @@ export class MapComponent extends AbstractComponent {
         this.container.addEventListener('transitionend', this);
 
         // sub-components
-        this.resetButton = new MapResetButton(this);
-        this.maximizeButton = new MapMaximizeButton(this);
-        this.closeButton = new MapCloseButton(this);
-        this.compassButton = new MapCompassButton(this);
+        if (this.config.buttons.reset) {
+            this.resetButton = new MapResetButton(this);
+        }
+        if (this.config.buttons.maximize) {
+            this.maximizeButton = new MapMaximizeButton(this);
+        }
+        if (this.config.buttons.close) {
+            this.closeButton = new MapCloseButton(this);
+        }
+        if (this.config.buttons.north) {
+            this.compassButton = new MapCompassButton(this);
+        }
         this.zoomToolbar = new MapZoomToolbar(this);
 
         // render loop
@@ -264,13 +272,13 @@ export class MapComponent extends AbstractComponent {
 
         this.overlay.innerHTML = getImageHtml(this.config.overlayImage);
 
-        this.resetButton.applyConfig();
-        this.closeButton.applyConfig();
-        this.compassButton.applyConfig();
-        this.maximizeButton.applyConfig();
+        this.resetButton?.applyConfig();
+        this.closeButton?.applyConfig();
+        this.compassButton?.applyConfig();
+        this.maximizeButton?.applyConfig();
 
         if (this.config.static) {
-            this.compassButton.rotate(0);
+            this.compassButton?.rotate(0);
             this.overlay.style.transform = '';
         }
 
@@ -351,7 +359,7 @@ export class MapComponent extends AbstractComponent {
             this.reset();
         }
 
-        this.closeButton.update();
+        this.closeButton?.update();
     }
 
     /**
@@ -370,7 +378,7 @@ export class MapComponent extends AbstractComponent {
             this.overlay.style.display = 'none';
         }
 
-        this.maximizeButton.update();
+        this.maximizeButton?.update();
     }
 
     /**
@@ -424,7 +432,7 @@ export class MapComponent extends AbstractComponent {
         // update UI
         if (!this.config.static) {
             this.overlay.style.transform = `rotate(${-yawAndRotation}rad)`;
-            this.compassButton.rotate(yawAndRotation);
+            this.compassButton?.rotate(yawAndRotation);
         }
         this.zoomToolbar.setText(this.state.zoom);
 

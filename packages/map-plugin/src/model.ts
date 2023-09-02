@@ -170,6 +170,20 @@ export type MapPluginConfig = {
      * Points of interest on the map
      */
     hotspots?: MapHotspot[];
+
+    /**
+     * Configuration of map buttons
+     */
+    buttons?: {
+        /** @default true */
+        maximize?: boolean;
+        /** @default true */
+        close?: boolean;
+        /** @default true */
+        reset?: boolean;
+        /** @default true */
+        north?: boolean;
+    },
 };
 
 export type ParsedMapPluginConfig = Omit<MapPluginConfig, 'position' | 'rotation'> & {
@@ -184,4 +198,5 @@ export type UpdatableMapPluginConfig = Omit<
     | 'visibleOnLoad' 
     | 'defaultZoom' 
     | 'hotspots'
+    | 'buttons'
 >;
