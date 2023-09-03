@@ -3,7 +3,6 @@ import { AbstractAdapter, CONSTANTS, EquirectangularAdapter, events, PSVError, u
 import {
     BufferAttribute,
     Frustum,
-    ImageLoader,
     MathUtils,
     Matrix4,
     Mesh,
@@ -132,7 +131,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
 
     private adapter: EquirectangularAdapter;
     private readonly queue = new Queue();
-    private readonly loader?: ImageLoader;
 
     constructor(viewer: Viewer, config: EquirectangularTilesAdapterConfig) {
         super(viewer);
@@ -150,12 +148,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
                 'EquirectangularTilesAdapter fallbacks to file loader because "requestHeaders" where provided. '
                 + 'Consider removing "requestHeaders" if you experience performances issues.'
             );
-        } else {
-            this.loader = new ImageLoader();
-            if (this.viewer.config.withCredentials) {
-                this.loader.setWithCredentials(true);
-                this.loader.setCrossOrigin('use-credentials');
-            }
         }
 
         this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
@@ -430,7 +422,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
      * Loads and draw a tile
      */
     private __loadTile(tile: EquirectangularTile, task: Task): Promise<any> {
-        return this.__loadImage(tile.url)
+        return this.viewer.textureLoader.loadImage(tile.url)
             .then((image: HTMLImageElement) => {
                 if (!task.isCancelled()) {
                     if (this.config.debug) {
@@ -452,16 +444,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
                     this.viewer.needsUpdate();
                 }
             });
-    }
-
-    private __loadImage(url: string): Promise<HTMLImageElement> {
-        if (this.loader) {
-            return new Promise((resolve, reject) => {
-                this.loader.load(url, resolve, undefined, reject);
-            });
-        } else {
-            return this.viewer.textureLoader.loadImage(url);
-        }
     }
 
     /**

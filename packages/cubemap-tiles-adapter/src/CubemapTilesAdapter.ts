@@ -5,7 +5,6 @@ import {
     BoxGeometry,
     BufferAttribute,
     Frustum,
-    ImageLoader,
     Matrix4,
     Mesh,
     MeshBasicMaterial,
@@ -85,7 +84,6 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
 
     private adapter: CubemapAdapter;
     private readonly queue = new Queue();
-    private readonly loader?: ImageLoader;
 
     constructor(viewer: Viewer, config: CubemapTilesAdapterConfig) {
         super(viewer);
@@ -97,12 +95,6 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
                 'CubemapTilesAdapter fallbacks to file loader because "requestHeaders" where provided. '
                 + 'Consider removing "requestHeaders" if you experience performances issues.'
             );
-        } else {
-            this.loader = new ImageLoader();
-            if (this.viewer.config.withCredentials) {
-                this.loader.setWithCredentials(true);
-                this.loader.setCrossOrigin('use-credentials');
-            }
         }
 
         this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
@@ -348,7 +340,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
      * Loads and draw a tile
      */
     private __loadTile(tile: CubemapTile, task: Task): Promise<any> {
-        return this.__loadImage(tile.url)
+        return this.viewer.textureLoader.loadImage(tile.url)
             .then((image) => {
                 if (!task.isCancelled()) {
                     if (this.config.debug) {
@@ -370,16 +362,6 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
                     this.viewer.needsUpdate();
                 }
             });
-    }
-
-    private __loadImage(url: string): Promise<HTMLImageElement> {
-        if (this.loader) {
-            return new Promise((resolve, reject) => {
-                this.loader.load(url, resolve, undefined, reject);
-            });
-        } else {
-            return this.viewer.textureLoader.loadImage(url);
-        }
     }
 
     /**

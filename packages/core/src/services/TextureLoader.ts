@@ -1,4 +1,4 @@
-import { FileLoader } from 'three';
+import { Cache, FileLoader, ImageLoader } from 'three';
 import { PSVError } from '../PSVError';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
@@ -7,7 +7,8 @@ import { AbstractService } from './AbstractService';
  * Image and texture loading system
  */
 export class TextureLoader extends AbstractService {
-    private readonly loader: FileLoader;
+    private readonly fileLoader: FileLoader;
+    private readonly imageLoader: ImageLoader;
 
     /**
      * @internal
@@ -15,11 +16,14 @@ export class TextureLoader extends AbstractService {
     constructor(viewer: Viewer) {
         super(viewer);
 
-        this.loader = new FileLoader();
-        this.loader.setResponseType('blob');
+        this.fileLoader = new FileLoader();
+        this.fileLoader.setResponseType('blob');
+
+        this.imageLoader = new ImageLoader();
+
         if (this.config.withCredentials) {
-            this.loader.setWithCredentials(true);
-            this.loader.setCrossOrigin('use-credentials');
+            this.fileLoader.setWithCredentials(true);
+            this.imageLoader.setCrossOrigin('use-credentials');
         }
     }
 
@@ -43,15 +47,20 @@ export class TextureLoader extends AbstractService {
      * Loads a Blob with FileLoader
      */
     loadFile(url: string, onProgress?: (p: number) => void): Promise<Blob> {
+        // unlikely case when the image has already been loaded with the ImageLoader
+        if (Cache.get(url) instanceof HTMLImageElement) {
+            Cache.remove(url);
+        }
+
         if (this.config.requestHeaders) {
-            this.loader.setRequestHeader(this.config.requestHeaders(url));
+            this.fileLoader.setRequestHeader(this.config.requestHeaders(url));
         }
 
         return new Promise((resolve, reject) => {
             let progress = 0;
             onProgress?.(progress);
 
-            this.loader.load(
+            this.fileLoader.load(
                 url,
                 (result) => {
                     progress = 100;
@@ -75,10 +84,24 @@ export class TextureLoader extends AbstractService {
     }
 
     /**
-     * Loads an Image using FileLoader to have progress events
+     * Loads an image with ImageLoader or with FileLoader if progress is tracked or if request headers are configured
      */
     loadImage(url: string, onProgress?: (p: number) => void): Promise<HTMLImageElement> {
-        return this.loadFile(url, onProgress).then((blob) => this.blobToImage(blob));
+        // unlikely case when the image has already been loaded with the FileLoader
+        const cached = Cache.get(url);
+        if (cached) {
+            if (cached instanceof Blob) {
+                return this.blobToImage(cached);
+            } else {
+                return Promise.resolve(cached);
+            }
+        }
+
+        if (!onProgress && !this.config.requestHeaders) {
+            return this.imageLoader.loadAsync(url);
+        } else {
+            return this.loadFile(url, onProgress).then((blob) => this.blobToImage(blob));
+        }
     }
 
     /**
