@@ -1,6 +1,6 @@
 import { Mesh, Vector3 } from 'three';
 import { SPHERE_RADIUS } from '../data/constants';
-import { PanoData, Size } from '../model';
+import { PanoData, Size, TextureData } from '../model';
 import type { Animation } from '../utils';
 
 /**
@@ -79,6 +79,16 @@ export class ViewerState {
         width: 0,
         height: 0,
     };
+
+    /**
+     * Current panorama texture displayed
+     */
+    textureData: TextureData;
+
+    /**
+     * Current overlay texture displayed
+     */
+    overlayData: TextureData;
 
     /**
      * panorama metadata, if supported

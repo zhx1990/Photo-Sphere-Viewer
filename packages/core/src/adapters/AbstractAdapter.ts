@@ -1,4 +1,4 @@
-import { Mesh, ShaderMaterial, ShaderMaterialParameters, Texture } from 'three';
+import { Mesh, ShaderMaterial, ShaderMaterialParameters } from 'three';
 import { PanoData, PanoDataProvider, TextureData } from '../model';
 import type { Viewer } from '../Viewer';
 
@@ -106,10 +106,10 @@ export abstract class AbstractAdapter<TPanorama, TTexture> {
         return new ShaderMaterial({
             uniforms: {
                 ...additionalUniforms,
-                [AbstractAdapter.OVERLAY_UNIFORMS.panorama]: { value: new Texture() },
-                [AbstractAdapter.OVERLAY_UNIFORMS.overlay]: { value: new Texture() },
+                [AbstractAdapter.OVERLAY_UNIFORMS.panorama]: { value: null },
+                [AbstractAdapter.OVERLAY_UNIFORMS.overlay]: { value: null },
                 [AbstractAdapter.OVERLAY_UNIFORMS.globalOpacity]: { value: 1.0 },
-                [AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity]: { value: 1.0 },
+                [AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity]: { value: 0.0 },
             },
 
             vertexShader:

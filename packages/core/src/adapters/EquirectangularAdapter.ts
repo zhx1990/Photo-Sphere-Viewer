@@ -294,13 +294,12 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
 
     setTexture(mesh: EquirectangularMesh, textureData: EquirectangularTexture) {
         this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.panorama, textureData.texture);
-        this.setOverlay(mesh, null, 1);
     }
 
     setOverlay(mesh: EquirectangularMesh, textureData: EquirectangularTexture, opacity: number) {
         this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity, opacity);
         if (!textureData) {
-            this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlay, new Texture());
+            this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlay, null);
         } else {
             this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlay, textureData.texture);
         }

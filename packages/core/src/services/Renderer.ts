@@ -29,6 +29,7 @@ import { PanoData, PanoramaOptions, Point, SphereCorrection, TextureData } from 
 import { Animation, isNil } from '../utils';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
+import type { AbstractAdapter } from '../adapters/AbstractAdapter';
 
 const vector2 = new Vector2();
 
@@ -229,6 +230,15 @@ export class Renderer extends AbstractService {
      * @internal
      */
     setTexture(textureData: TextureData) {
+        if ((this.viewer.adapter.constructor as typeof AbstractAdapter).supportsOverlay) {
+            this.setOverlay(null, 0);
+        }
+
+        if (this.state.textureData) {
+            this.viewer.adapter.disposeTexture(this.state.textureData);
+        }
+
+        this.state.textureData = textureData;
         this.state.panoData = textureData.panoData;
 
         this.viewer.adapter.setTexture(this.mesh, textureData);
@@ -241,7 +251,14 @@ export class Renderer extends AbstractService {
      * @internal
      */
     setOverlay(textureData: TextureData, opacity: number) {
+        if (this.state.overlayData) {
+            this.viewer.adapter.disposeTexture(this.state.overlayData);
+        }
+
+        this.state.overlayData = textureData;
+
         this.viewer.adapter.setOverlay(this.mesh, textureData, opacity);
+
         this.viewer.needsUpdate();
     }
 

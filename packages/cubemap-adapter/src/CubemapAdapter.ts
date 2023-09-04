@@ -264,15 +264,13 @@ void main() {
 
             this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.panorama, texture[i]);
         }
-
-        this.setOverlay(mesh, null, 0);
     }
 
     setOverlay(mesh: CubemapMesh, textureData: CubemapTexture, opacity: number) {
         for (let i = 0; i < 6; i++) {
             this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity, opacity);
             if (!textureData) {
-                this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlay, new Texture());
+                this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlay, null);
             } else {
                 this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlay, textureData.texture[i]);
             }
