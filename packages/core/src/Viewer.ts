@@ -6,6 +6,7 @@ import { Notification } from './components/Notification';
 import { Overlay } from './components/Overlay';
 import { Panel } from './components/Panel';
 import { Tooltip, TooltipConfig } from './components/Tooltip';
+import { Cache }  from './data/cache';
 import { CONFIG_PARSERS, DEFAULTS, getViewerConfig, READONLY_OPTIONS } from './data/config';
 import { DEFAULT_TRANSITION, IDS, VIEWER_DATA } from './data/constants';
 import { SYSTEM } from './data/system';
@@ -97,6 +98,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
     constructor(config: ViewerConfig) {
         super();
 
+        Cache.init();
         SYSTEM.load();
 
         this.state = new ViewerState();

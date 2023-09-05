@@ -1,7 +1,7 @@
 import type { Point, Position, Size, Tooltip, TooltipConfig, Viewer } from '@photo-sphere-viewer/core';
 import { CONSTANTS, PSVError, utils } from '@photo-sphere-viewer/core';
 import type { MarkersPlugin } from './MarkersPlugin';
-import { Group, MathUtils, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, TextureLoader, Vector3 } from 'three';
+import { Group, MathUtils, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, Texture, Vector3 } from 'three';
 import { DEFAULT_HOVER_SCALE, MARKER_DATA, SVG_NS } from './constants';
 import { MarkerConfig, ParsedMarkerConfig } from './model';
 import { getPolygonCenter, getPolylineCenter } from './utils';
@@ -34,7 +34,6 @@ export class Marker {
 
     /** @internal */
     tooltip?: Tooltip;
-    private loader?: TextureLoader;
 
     config: ParsedMarkerConfig;
 
@@ -91,11 +90,6 @@ export class Marker {
             this.domElement.appendChild(elt);
         } else if (this.is3d()) {
             this.element = this.__createMesh();
-            this.loader = new TextureLoader();
-            if (this.viewer.config.withCredentials) {
-                this.loader.setWithCredentials(true);
-                this.loader.setCrossOrigin('use-credentials');
-            }
         }
 
         if (!this.is3d()) {
@@ -647,13 +641,18 @@ export class Marker {
         switch (this.type) {
             case MarkerType.imageLayer:
                 if (this.definition !== this.config.imageLayer) {
-                    if (this.viewer.config.requestHeaders) {
-                        this.loader.setRequestHeader(this.viewer.config.requestHeaders(this.config.imageLayer));
-                    }
-                    mesh.material.map = this.loader.load(this.config.imageLayer, (texture) => {
-                        texture.anisotropy = 4;
-                        this.viewer.needsUpdate();
-                    });
+                    mesh.material.map?.dispose();
+
+                    mesh.material.map = new Texture();
+
+                    this.viewer.textureLoader.loadImage(this.config.imageLayer)
+                        .then((image) => {
+                            mesh.material.map.image = image;
+                            mesh.material.map.needsUpdate = true,
+                            mesh.material.map.anisotropy = 4;
+                            this.viewer.needsUpdate();
+                        });
+
                     this.definition = this.config.imageLayer;
                 }
 

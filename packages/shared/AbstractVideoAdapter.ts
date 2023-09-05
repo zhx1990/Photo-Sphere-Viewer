@@ -80,7 +80,7 @@ export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanora
 
         return this.__videoLoadPromise(video).then(() => {
             const texture = new VideoTexture(video);
-            return { panorama, texture };
+            return { panorama, texture, cacheKey: null };
         });
     }
 

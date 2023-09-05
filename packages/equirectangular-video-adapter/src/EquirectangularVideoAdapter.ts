@@ -44,7 +44,7 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<Equirectan
     }
 
     override loadTexture(panorama: EquirectangularVideoPanorama): Promise<EquirectangularTexture> {
-        return super.loadTexture(panorama).then(({ texture }) => {
+        return super.loadTexture(panorama).then(({ texture, cacheKey }) => {
             const video: HTMLVideoElement = texture.image;
             const panoData = {
                 fullWidth: video.videoWidth,
@@ -58,7 +58,7 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<Equirectan
                 poseRoll: 0,
             };
 
-            return { panorama, texture, panoData };
+            return { panorama, texture, panoData, cacheKey };
         });
     }
 
