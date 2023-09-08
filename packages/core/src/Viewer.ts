@@ -150,10 +150,12 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
         }
 
         // load panorama
-        if (this.config.panorama) {
-            this.setPanorama(this.config.panorama);
-        } else {
-            this.loader.show();
+        if (!this.state.loadingPromise) {
+            if (this.config.panorama) {
+                this.setPanorama(this.config.panorama);
+            } else {
+                this.loader.show();
+            }
         }
     }
 

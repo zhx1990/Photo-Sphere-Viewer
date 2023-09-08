@@ -289,9 +289,6 @@ void main() {
     }
 
     private __setUniform(mesh: CubemapMesh, index: number, uniform: string, value: any) {
-        if (mesh.material[index].uniforms[uniform].value instanceof Texture) {
-            mesh.material[index].uniforms[uniform].value.dispose();
-        }
         mesh.material[index].uniforms[uniform].value = value;
     }
 }

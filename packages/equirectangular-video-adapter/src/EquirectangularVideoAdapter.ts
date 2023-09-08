@@ -76,7 +76,6 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<Equirectan
     }
 
     setTexture(mesh: EquirectangularMesh, textureData: EquirectangularTexture) {
-        mesh.material.map?.dispose();
         mesh.material.map = textureData.texture;
 
         this.switchVideo(textureData.texture);

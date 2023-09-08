@@ -315,9 +315,6 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
     }
 
     private __setUniform(mesh: EquirectangularMesh, uniform: string, value: any) {
-        if (mesh.material.uniforms[uniform].value instanceof Texture) {
-            mesh.material.uniforms[uniform].value.dispose();
-        }
         mesh.material.uniforms[uniform].value = value;
     }
 

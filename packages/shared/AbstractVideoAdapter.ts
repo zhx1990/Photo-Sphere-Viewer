@@ -121,19 +121,14 @@ export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanora
         throw new PSVError('VideoAdapter does not support overlay');
     }
 
-    disposeTexture(textureData: AbstractVideoTexture) {
-        if (textureData.texture) {
-            const video: HTMLVideoElement = textureData.texture.image;
-            video.pause();
-            this.viewer.container.removeChild(video);
-        }
-        textureData.texture?.dispose();
+    disposeTexture(textureData: AbstractVideoTexture): void {
+        textureData.texture.dispose();
     }
 
     private __removeVideo() {
         if (this.video) {
             this.video.pause();
-            this.viewer.container.removeChild(this.video);
+            this.video.remove();
             delete this.video;
         }
     }
