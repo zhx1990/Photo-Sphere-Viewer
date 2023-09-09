@@ -281,6 +281,17 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
     }
 
     /**
+     * Request the scene to be continuously renderer (when using videos)
+     */
+    needsContinuousUpdate(enabled: boolean) {
+        if (enabled) {
+            this.state.continuousUpdateCount++;
+        } else if (this.state.continuousUpdateCount > 0) {
+            this.state.continuousUpdateCount--;
+        }
+    }
+
+    /**
      * Resizes the scene if the viewer is resized
      */
     autoSize() {

@@ -218,7 +218,7 @@ export class Renderer extends AbstractService {
         this.viewer.dispatchEvent(new BeforeRenderEvent(timestamp, elapsed));
         this.viewer.dynamics.update(elapsed);
 
-        if (this.state.needsUpdate) {
+        if (this.state.needsUpdate || this.state.continuousUpdateCount > 0) {
             (this.customRenderer || this.renderer).render(this.scene, this.camera);
             this.viewer.dispatchEvent(new RenderEvent());
             this.state.needsUpdate = false;

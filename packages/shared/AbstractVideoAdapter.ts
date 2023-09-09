@@ -1,5 +1,5 @@
 import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractAdapter, events, PSVError } from '@photo-sphere-viewer/core';
+import { AbstractAdapter, PSVError } from '@photo-sphere-viewer/core';
 import { BufferGeometry, Material, Mesh, VideoTexture } from 'three';
 
 export type AbstractVideoPanorama = {
@@ -39,24 +39,13 @@ export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanora
     constructor(viewer: Viewer) {
         super(viewer);
 
-        this.viewer.addEventListener(events.BeforeRenderEvent.type, this);
+        this.viewer.needsContinuousUpdate(true);
     }
 
     override destroy() {
-        this.viewer.removeEventListener(events.BeforeRenderEvent.type, this);
-
         this.__removeVideo();
 
         super.destroy();
-    }
-
-    /**
-     * @internal
-     */
-    handleEvent(e: Event) {
-        if (e instanceof events.BeforeRenderEvent) {
-            this.viewer.needsUpdate();
-        }
     }
 
     override supportsPreload(): boolean {
@@ -138,11 +127,11 @@ export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanora
         video.crossOrigin = this.viewer.config.withCredentials ? 'use-credentials' : 'anonymous';
         video.loop = true;
         video.playsInline = true;
-        video.style.display = 'none';
         video.muted = this.config.muted;
-        video.src = src;
         video.preload = 'metadata';
-
+        video.src = src;
+        
+        video.style.display = 'none';
         this.viewer.container.appendChild(video);
 
         return video;
