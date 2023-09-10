@@ -130,7 +130,7 @@ export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanora
         video.muted = this.config.muted;
         video.preload = 'metadata';
         video.src = src;
-        
+
         video.style.display = 'none';
         this.viewer.container.appendChild(video);
 

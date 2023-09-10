@@ -248,7 +248,7 @@ You can try markers live in [the playground](../playground.md).
 One, and only one, of these options is required for each marker.
 
 | Name             | Type                                     | Description                                                                   |
-| ---------------- | ---------------------------------------- | ------------------------------------------------------------------------------|
+| ---------------- | ---------------------------------------- | ----------------------------------------------------------------------------- |
 | `image`          | `string`                                 | Path to an image file. Requires `width` and `height` to be defined.           |
 | `imageLayer`     | `string`                                 | Path to an image file.                                                        |
 | `videoLayer`     | `string`                                 | Path to a video file.                                                         |
@@ -296,19 +296,19 @@ And `image` marker is rendered flat above the viewer but and `imageLayer` is ren
 The `element` marker accepts [Web Components](https://developer.mozilla.org/docs/Web/API/Web_components/Using_custom_elements).
 If your component has an `updateMarker()` method it will be called by the plugin on each render with a bunch of properties:
 
-- `marker`: reference to the marker object itself
-- `position`: computed 2D position in the viewport
-- `viewerPosition`: current camera orientation in yaw+pitch
-- `zoomLevel`: current zoom level
-- `viewerSize`: size of the viewport
-:::
+-   `marker`: reference to the marker object itself
+-   `position`: computed 2D position in the viewport
+-   `viewerPosition`: current camera orientation in yaw+pitch
+-   `zoomLevel`: current zoom level
+-   `viewerSize`: size of the viewport
+    :::
 
 ::: tip "Layers" positionning
 There is two ways to position `imageLayer` and `videoLayer` markers:
 
-- `position` (one value) + `size` + `anchor` (optional) + `orientation` (optional)
-- `position` with four values defining the corners of the image/video
-:::
+-   `position` (one value) + `size` + `anchor` (optional) + `orientation` (optional)
+-   `position` with four values defining the corners of the image/video
+    :::
 
 ### Options
 

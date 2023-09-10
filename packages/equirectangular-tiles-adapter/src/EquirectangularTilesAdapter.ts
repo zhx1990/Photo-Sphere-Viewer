@@ -428,7 +428,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
      * Loads and draw a tile
      */
     private __loadTile(tile: EquirectangularTile, task: Task): Promise<any> {
-        return this.viewer.textureLoader.loadImage(tile.url, null, this.viewer.state.textureData.cacheKey)
+        return this.viewer.textureLoader
+            .loadImage(tile.url, null, this.viewer.state.textureData.cacheKey)
             .then((image: HTMLImageElement) => {
                 if (!task.isCancelled()) {
                     if (this.config.debug) {

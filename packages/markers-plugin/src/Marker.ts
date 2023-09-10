@@ -1,6 +1,26 @@
-import type { ExtendedPosition, Point, Position, Size, Tooltip, TooltipConfig, Viewer } from '@photo-sphere-viewer/core';
+import type {
+    ExtendedPosition,
+    Point,
+    Position,
+    Size,
+    Tooltip,
+    TooltipConfig,
+    Viewer,
+} from '@photo-sphere-viewer/core';
 import { CONSTANTS, PSVError, utils } from '@photo-sphere-viewer/core';
-import { BufferGeometry, Group, MathUtils, Mesh, MeshBasicMaterial, Object3D, PlaneGeometry, RepeatWrapping, Texture, Vector3, VideoTexture } from 'three';
+import {
+    BufferGeometry,
+    Group,
+    MathUtils,
+    Mesh,
+    MeshBasicMaterial,
+    Object3D,
+    PlaneGeometry,
+    RepeatWrapping,
+    Texture,
+    Vector3,
+    VideoTexture,
+} from 'three';
 import type { MarkersPlugin } from './MarkersPlugin';
 import { DEFAULT_HOVER_SCALE, MARKER_DATA, SVG_NS } from './constants';
 import { MarkerConfig, ParsedMarkerConfig } from './model';
@@ -449,7 +469,7 @@ export class Marker {
             case MarkerType.element:
                 if (this.definition !== this.config.element) {
                     this.definition = this.config.element;
-                    element.childNodes.forEach(n => n.remove());
+                    element.childNodes.forEach((n) => n.remove());
                     element.appendChild(this.config.element);
                     this.config.element.style.display = 'block';
                 }
@@ -667,16 +687,15 @@ export class Marker {
                 v3.fromBufferAttribute(p, i);
                 return mesh.localToWorld(v3);
             });
-
         } else {
             if (this.config.position?.length !== 4) {
                 throw new PSVError('missing marker position');
             }
 
-            const positions = this.config.position.map(p => this.viewer.dataHelper.cleanPosition(p));
-            const positions3D = positions.map(p => this.viewer.dataHelper.sphericalCoordsToVector3(p));
+            const positions = this.config.position.map((p) => this.viewer.dataHelper.cleanPosition(p));
+            const positions3D = positions.map((p) => this.viewer.dataHelper.sphericalCoordsToVector3(p));
 
-            const centroid = getPolygonCenter(positions.map(({ yaw, pitch }) => ([yaw, pitch])));
+            const centroid = getPolygonCenter(positions.map(({ yaw, pitch }) => [yaw, pitch]));
             this.state.position = { yaw: centroid[0], pitch: centroid[1] };
 
             this.state.positions3D = positions3D;
@@ -736,7 +755,7 @@ export class Marker {
 
                             mesh.material.map.image = image;
                             mesh.material.map.anisotropy = 4;
-                            mesh.material.map.needsUpdate = true,
+                            mesh.material.map.needsUpdate = true;
                             this.viewer.needsUpdate();
                         });
 
@@ -760,7 +779,9 @@ export class Marker {
             return;
         }
 
-        const positions = (this.config.position as ExtendedPosition[]).map(p => this.viewer.dataHelper.cleanPosition(p));
+        const positions = (this.config.position as ExtendedPosition[]).map((p) => {
+            return this.viewer.dataHelper.cleanPosition(p);
+        });
 
         const w1 = utils.greatArcDistance(
             [positions[0].yaw, positions[0].pitch],
@@ -793,7 +814,7 @@ export class Marker {
         texture.wrapS = RepeatWrapping;
         texture.wrapT = RepeatWrapping;
         texture.repeat.set(1 - hMargin, 1 - vMargin);
-        texture.offset.set(hMargin / 2, vMargin / 2); 
+        texture.offset.set(hMargin / 2, vMargin / 2);
     }
 
     private __createMesh() {

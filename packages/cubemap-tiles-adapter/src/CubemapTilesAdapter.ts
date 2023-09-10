@@ -158,9 +158,9 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
             }));
         } else {
             return Promise.resolve({
-                panorama, 
+                panorama,
                 cacheKey: panorama.tileUrl('front', 0, 0, 0),
-                texture: null, 
+                texture: null,
             });
         }
     }
@@ -345,7 +345,8 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
      * Loads and draw a tile
      */
     private __loadTile(tile: CubemapTile, task: Task): Promise<any> {
-        return this.viewer.textureLoader.loadImage(tile.url, null, this.viewer.state.textureData.cacheKey)
+        return this.viewer.textureLoader
+            .loadImage(tile.url, null, this.viewer.state.textureData.cacheKey)
             .then((image) => {
                 if (!task.isCancelled()) {
                     if (this.config.debug) {

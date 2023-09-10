@@ -6,7 +6,6 @@ import type { Marker } from './Marker';
  */
 // eslint-disable-next-line @typescript-eslint/consistent-type-definitions
 export interface MarkerElement extends HTMLElement {
-
     updateMarker?(params: {
         marker: Marker;
         position: Point;
@@ -14,7 +13,6 @@ export interface MarkerElement extends HTMLElement {
         zoomLevel: number;
         viewerSize: Size;
     }): void;
-
 }
 
 /**

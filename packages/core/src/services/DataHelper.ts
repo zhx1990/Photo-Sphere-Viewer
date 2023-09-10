@@ -10,7 +10,16 @@ import {
     SphericalPosition,
 } from '../model';
 import { PSVError } from '../PSVError';
-import { AnimationOptions, applyEulerInverse, getAngle, getShortestArc, isExtendedPosition, isNil, parseAngle, speedToDuration } from '../utils';
+import {
+    AnimationOptions,
+    applyEulerInverse,
+    getAngle,
+    getShortestArc,
+    isExtendedPosition,
+    isNil,
+    parseAngle,
+    speedToDuration,
+} from '../utils';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
 
@@ -253,11 +262,9 @@ export class DataHelper extends AbstractService {
         if (point instanceof Vector3) {
             vector = point;
             viewerPoint = this.vector3ToViewerCoords(point);
-            
         } else if (isExtendedPosition(point)) {
             vector = this.sphericalCoordsToVector3(point, vector3);
             viewerPoint = this.vector3ToViewerCoords(vector);
-
         } else {
             return false;
         }

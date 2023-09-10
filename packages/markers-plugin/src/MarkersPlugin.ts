@@ -172,8 +172,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
                         case events.ObjectEnterEvent.type:
                             if (marker.config.style?.cursor) {
                                 this.viewer.setCursor(marker.config.style.cursor);
-                            }
-                            else if (marker.config.tooltip || marker.config.content) {
+                            } else if (marker.config.tooltip || marker.config.content) {
                                 this.viewer.setCursor('pointer');
                             }
                             this.__onEnterMarker(event, marker);
@@ -646,7 +645,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     private __applyScale(marker: Marker, {
         zoomLevel,
         viewerPosition,
-        mouseover
+        mouseover,
     }: {
         zoomLevel: number;
         viewerPosition: Position;
@@ -794,8 +793,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
             if (!marker.state.staticTooltip && marker.config.tooltip?.trigger === 'hover') {
                 marker.hideTooltip();
-            }
-            else if (marker.state.staticTooltip) {
+            } else if (marker.state.staticTooltip) {
                 marker.showTooltip();
             }
         }

@@ -2,14 +2,13 @@ import { Cache as ThreeCache } from 'three';
 import { logWarn } from '../utils';
 
 export const Cache = {
-
     enabled: true,
 
     maxItems: 10,
 
     ttl: 10 * 60,
 
-    items: {} as Record<string, { files: Record<string, HTMLImageElement | Blob>; lastAccess: number ;}>,
+    items: {} as Record<string, { files: Record<string, HTMLImageElement | Blob>; lastAccess: number }>,
 
     purgeInterval: null as ReturnType<typeof setInterval>,
 
@@ -61,5 +60,4 @@ export const Cache = {
                 }
             });
     },
-
 };
