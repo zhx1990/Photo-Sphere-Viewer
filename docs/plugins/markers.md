@@ -301,14 +301,16 @@ If your component has an `updateMarker()` method it will be called by the plugin
 -   `viewerPosition`: current camera orientation in yaw+pitch
 -   `zoomLevel`: current zoom level
 -   `viewerSize`: size of the viewport
-    :::
+
+:::
 
 ::: tip "Layers" positionning
 There is two ways to position `imageLayer` and `videoLayer` markers:
 
 -   `position` (one value) + `size` + `anchor` (optional) + `orientation` (optional)
 -   `position` with four values defining the corners of the image/video
-    :::
+
+:::
 
 ### Options
 
