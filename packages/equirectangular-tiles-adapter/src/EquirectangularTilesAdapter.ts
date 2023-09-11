@@ -149,6 +149,10 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
                 + 'Consider removing "requestHeaders" if you experience performances issues.'
             );
         }
+    }
+
+    override init() {
+        super.init();
 
         this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
         this.viewer.addEventListener(events.ZoomUpdatedEvent.type, this);
@@ -331,7 +335,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
         }
 
         const camera = this.viewer.renderer.camera;
-        camera.updateMatrixWorld();
         projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
         frustum.setFromProjectionMatrix(projScreenMatrix);
 

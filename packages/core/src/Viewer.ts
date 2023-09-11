@@ -123,6 +123,8 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
         this.dataHelper = new DataHelper(this);
         this.dynamics = new ViewerDynamics(this);
 
+        this.adapter.init?.();
+
         this.loader = new Loader(this);
         this.navbar = new Navbar(this);
         this.panel = new Panel(this);

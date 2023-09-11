@@ -38,6 +38,10 @@ export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanora
 
     constructor(viewer: Viewer) {
         super(viewer);
+    }
+
+    override init() {
+        super.init();
 
         this.viewer.needsContinuousUpdate(true);
     }

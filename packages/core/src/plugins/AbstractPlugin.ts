@@ -22,13 +22,13 @@ export abstract class AbstractPlugin<
      * Initializes the plugin
      */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    init() {}
+    init(): void {}
 
     /**
      * Destroys the plugin
      */
     // eslint-disable-next-line @typescript-eslint/no-empty-function
-    destroy() {}
+    destroy(): void {}
 }
 
 /**
