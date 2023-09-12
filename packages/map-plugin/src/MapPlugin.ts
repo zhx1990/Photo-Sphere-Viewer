@@ -55,12 +55,12 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
             }
             return overlayImage;
         },
-        spotStyle: (spotStyle, { rawConfig }) => {
+        spotStyle: (spotStyle, { rawConfig, defValue }) => {
             [
                 ['spotColor', 'color'],
                 ['spotImage', 'image'],
                 ['spotSize', 'size'],
-            ].forEach((oldName, newName) => {
+            ].forEach(([oldName, newName]) => {
                 // @ts-ignore
                 if (rawConfig[oldName]) {
                     utils.logWarn(`map: "${oldName}" is deprecated, use "spotStyle.${newName}" instead`);
@@ -68,7 +68,7 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
                     spotStyle[newName] = rawConfig[oldName];
                 }
             });
-            return spotStyle;
+            return { ...defValue, ...spotStyle };
         },
         position: (position, { defValue }) => {
             return utils.cleanCssPosition(position, { allowCenter: false, cssOrder: true }) || defValue;
