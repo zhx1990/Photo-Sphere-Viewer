@@ -109,6 +109,14 @@ Enable global scaling and customize for each marker.
 :::
 
 ::: item
+[![](../images/demos/marker-layer.jpg)](./markers/layers.md)
+
+### Layers markers
+
+`imageLayer` and `videoLayer` markers.
+:::
+
+::: item
 [![](../images/demos/polygon-pattern.jpg)](./markers/polygon-pattern.md)
 
 ### Polygon pattern
