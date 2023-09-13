@@ -711,6 +711,9 @@ export class Marker {
                 p.setY(i, v.y);
                 p.setZ(i, v.z);
             });
+            p.needsUpdate = true;
+
+            this.__setTextureWrap(mesh.material.map);
         }
 
         switch (this.type) {
@@ -732,7 +735,8 @@ export class Marker {
 
                     if (!utils.isExtendedPosition(this.config.position)) {
                         video.addEventListener('loadedmetadata', () => {
-                            this.__setTextureWrap(mesh.material.map, { width: video.videoWidth, height: video.videoHeight });
+                            mesh.material.map.userData[MARKER_DATA] = { width: video.videoWidth, height: video.videoHeight };
+                            this.__setTextureWrap(mesh.material.map);
                         }, { once: true });
                     }
 
@@ -750,7 +754,8 @@ export class Marker {
                     this.viewer.textureLoader.loadImage(this.config.imageLayer)
                         .then((image) => {
                             if (!utils.isExtendedPosition(this.config.position)) {
-                                this.__setTextureWrap(mesh.material.map, { width: image.width, height: image.height });
+                                mesh.material.map.userData[MARKER_DATA] = { width: image.width, height: image.height };
+                                this.__setTextureWrap(mesh.material.map);
                             }
 
                             mesh.material.map.image = image;
@@ -772,7 +777,12 @@ export class Marker {
     /**
      * For layers positionned by corners, applies offset to the texture in order to keep its proportions
      */
-    private __setTextureWrap(texture: Texture, imageSize: Size) {
+    private __setTextureWrap(texture: Texture) {
+        if (!texture) {
+            return;
+        }
+
+        const imageSize: Size = texture.userData[MARKER_DATA];
         if (!imageSize.height || !imageSize.width) {
             texture.repeat.set(1, 1);
             texture.offset.set(0, 0);
@@ -815,6 +825,7 @@ export class Marker {
         texture.wrapT = RepeatWrapping;
         texture.repeat.set(1 - hMargin, 1 - vMargin);
         texture.offset.set(hMargin / 2, vMargin / 2);
+        texture.needsUpdate = true;
     }
 
     private __createMesh() {
