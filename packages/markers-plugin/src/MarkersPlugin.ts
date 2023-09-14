@@ -348,6 +348,11 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
         if (render) {
             this.__afterChangerMarkers();
+
+            if (marker === this.state.hoveringMarker && marker.config.tooltip?.trigger === 'hover'
+                || marker.state.staticTooltip) {
+                marker.showTooltip();
+            }
         }
     }
 
@@ -602,7 +607,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
                     this.__applyScale(marker, {
                         zoomLevel,
                         viewerPosition,
-                        mouseover: null,
+                        mouseover: marker === this.state.hoveringMarker,
                     });
 
                     if (marker.type === MarkerType.element) {

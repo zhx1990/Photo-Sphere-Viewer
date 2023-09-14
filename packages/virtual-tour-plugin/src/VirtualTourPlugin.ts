@@ -541,7 +541,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     ...link.markerStyle,
                     tooltip: {
                         className: 'psv-virtual-tour-tooltip',
-                        content: link.name,
+                        content: link.name ? `<h3>${link.name}</h3>` : null,
                     },
                     position: position,
                     id: LINK_ID + link.nodeId,
