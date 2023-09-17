@@ -271,9 +271,10 @@ export class AutorotatePlugin extends AbstractConfigurablePlugin<
             return;
         }
 
-        this.__reset();
         this.__hideTooltip();
+        this.__reset();
 
+        this.viewer.stopAnimation();
         this.viewer.dynamics.position.stop();
         this.viewer.dynamics.zoom.stop();
 
@@ -312,27 +313,29 @@ export class AutorotatePlugin extends AbstractConfigurablePlugin<
         if (!utils.isNil(this.config.autorotateZoomLvl)) {
             p = this.viewer.animate({
                 zoom: this.config.autorotateZoomLvl,
-                // "2" is magic, and kinda related to the "PI/4" in animate()
+                // "2" is magic, and kinda related to the "PI/4" in getAnimationProperties()
                 speed: `${this.viewer.config.zoomSpeed * 2}rpm`,
             });
         } else {
-            p = Promise.resolve();
+            p = Promise.resolve(true);
         }
 
-        p.then(() => {
-            this.viewer.dynamics.position.roll(
-                {
-                    yaw: this.config.autorotateSpeed < 0,
-                },
-                Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
-            );
+        p.then((done) => {
+            if (done) {
+                this.viewer.dynamics.position.roll(
+                    {
+                        yaw: this.config.autorotateSpeed < 0,
+                    },
+                    Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
+                );
 
-            this.viewer.dynamics.position.goto(
-                {
-                    pitch: this.config.autorotatePitch ?? this.viewer.config.defaultPitch,
-                },
-                Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
-            );
+                this.viewer.dynamics.position.goto(
+                    {
+                        pitch: this.config.autorotatePitch ?? this.viewer.config.defaultPitch,
+                    },
+                    Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
+                );
+            }
         });
     }
 

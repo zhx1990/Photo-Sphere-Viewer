@@ -85,8 +85,11 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
             case events.BeforeRotateEvent.type:
             case events.BeforeAnimateEvent.type: {
                 const e2 = e as events.BeforeAnimateEvent;
-                const { rangedPosition } = this.__applyRanges(e2.position, e2.zoomLevel);
-                e2.position = rangedPosition;
+                const { rangedPosition, sidesReached } = this.__applyRanges(e2.position, e2.zoomLevel);
+                if (e2.position || Object.keys(sidesReached).length) {
+                    // only redefine position if initially provided or if changed
+                    e2.position = rangedPosition;
+                }
                 break;
             }
 
