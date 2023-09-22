@@ -22,7 +22,7 @@ const viewer = new Viewer({
     caption: 'Artist Workshop <b>&copy; Oliksiy Yakovlyev (HDRI Haven)</b> & Rick Astley',
     defaultYaw: 2.5,
     defaultPitch: 0.1,
-    navbar: false,//'zoom move caption fullscreen',
+    navbar: 'zoom move caption fullscreen',
 
     plugins: [
         [MarkersPlugin, {
@@ -123,10 +123,6 @@ function animateRick(time) {
         if (opacity === 0) {
             markers.updateMarker({ id: 'image', position: positions[Math.floor(Math.random() * positions.length)] });
             dir = 1;
-            // this is temporary because it is missing in PSV 5.4.1
-            const marker = markers.getMarker('image');
-            marker.threeElement.children[0].geometry.getAttribute('position').needsUpdate = true;
-            marker.__setTextureWrap(marker.threeElement.children[0].material.map, { width: 550, height: 400 });
         } else if (opacity === 1) {
             dir = -1;
             wait = 500;

@@ -783,7 +783,7 @@ export class Marker {
         }
 
         const imageSize: Size = texture.userData[MARKER_DATA];
-        if (!imageSize.height || !imageSize.width) {
+        if (!imageSize || !imageSize.height || !imageSize.width) {
             texture.repeat.set(1, 1);
             texture.offset.set(0, 0);
             return;
