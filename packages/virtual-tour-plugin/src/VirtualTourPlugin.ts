@@ -429,7 +429,9 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 }
 
                 this.arrowsRenderer?.clearArrows();
-                this.gallery?.hide();
+                if (this.gallery?.config.hideOnClick) {
+                    this.gallery.hide();
+                }
                 this.markers?.clearMarkers();
                 this.compass?.clearHotspots();
                 this.map?.minimize();

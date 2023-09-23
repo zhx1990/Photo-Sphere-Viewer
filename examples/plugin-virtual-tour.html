@@ -170,7 +170,10 @@
                 defaultYaw: '100deg',
                 plugins: [
                     MarkersPlugin,
-                    GalleryPlugin,
+                    [GalleryPlugin, {
+                        // visibleOnLoad: true,
+                        // hideOnClick: false,
+                    }],
                     [MapPlugin, {
                         static: true,
                         maxZoom: 150,
