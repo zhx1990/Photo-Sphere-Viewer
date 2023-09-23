@@ -111,6 +111,7 @@ export class Navbar extends AbstractComponent {
      * Shows the navbar
      */
     override show() {
+        this.viewer.container.classList.add('psv--has-navbar');
         this.container.classList.add('psv-navbar--open');
         this.state.visible = true;
     }
@@ -119,6 +120,7 @@ export class Navbar extends AbstractComponent {
      * Hides the navbar
      */
     override hide() {
+        this.viewer.container.classList.remove('psv--has-navbar');
         this.container.classList.remove('psv-navbar--open');
         this.state.visible = false;
     }

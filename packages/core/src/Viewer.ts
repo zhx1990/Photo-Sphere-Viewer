@@ -196,7 +196,6 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
         this.renderer.init();
 
         if (this.config.navbar) {
-            this.container.classList.add('psv--has-navbar');
             this.navbar.show();
         }
 
