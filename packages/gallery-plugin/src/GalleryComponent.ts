@@ -9,8 +9,10 @@ export class GalleryComponent extends AbstractComponent {
     protected override readonly state = {
         visible: true,
         mousedown: false,
-        initMouseX: null as number,
-        mouseX: null as number,
+        initMouse: null as number,
+        mouse: null as number,
+        itemMargin: null as number,
+        breakpoint: null as number,
     };
 
     private readonly observer: IntersectionObserver;
@@ -36,6 +38,9 @@ export class GalleryComponent extends AbstractComponent {
         this.items.className = 'psv-gallery-container';
         this.container.appendChild(this.items);
 
+        this.state.itemMargin = parseInt(utils.getStyleProperty(this.items, 'padding-left'), 10);
+        this.state.breakpoint = parseInt(utils.getStyleProperty(this.container, '--psv-gallery-breakpoint'), 10);
+
         this.observer = new IntersectionObserver(
             (entries) => {
                 entries.forEach((entry) => {
@@ -52,10 +57,10 @@ export class GalleryComponent extends AbstractComponent {
             }
         );
 
-        this.container.addEventListener('wheel', this);
-        this.container.addEventListener('mousedown', this);
-        this.container.addEventListener('mousemove', this);
-        this.container.addEventListener('click', this);
+        this.items.addEventListener('wheel', this);
+        this.items.addEventListener('mousedown', this);
+        this.items.addEventListener('mousemove', this);
+        this.items.addEventListener('click', this);
         window.addEventListener('mouseup', this);
 
         closeBtn.addEventListener('click', () => this.plugin.hide());
@@ -76,34 +81,49 @@ export class GalleryComponent extends AbstractComponent {
      */
     handleEvent(e: Event) {
         switch (e.type) {
-            case 'wheel':
-                this.container.scrollLeft += (e as WheelEvent).deltaY * 50;
-                e.preventDefault();
+            case 'wheel': {
+                if (window.innerWidth > this.state.breakpoint) {
+                    const evt = e as WheelEvent;
+                    const scrollAmount = this.plugin.config.thumbnailSize.width + this.state.itemMargin ?? 0;
+                    this.items.scrollLeft += (evt.deltaY / Math.abs(evt.deltaY)) * scrollAmount;
+                    e.preventDefault();
+                }
                 break;
+            }
 
             case 'mousedown':
                 this.state.mousedown = true;
-                this.state.initMouseX = (e as MouseEvent).clientX;
-                this.state.mouseX = (e as MouseEvent).clientX;
+                if (window.innerWidth > this.state.breakpoint) {
+                    this.state.initMouse = (e as MouseEvent).clientX;
+                } else {
+                    this.state.initMouse = (e as MouseEvent).clientY;
+                }
+                this.state.mouse = this.state.initMouse;
                 break;
 
             case 'mousemove':
                 if (this.state.mousedown) {
-                    const delta = this.state.mouseX - (e as MouseEvent).clientX;
-                    this.container.scrollLeft += delta;
-                    this.state.mouseX = (e as MouseEvent).clientX;
+                    if (window.innerWidth > this.state.breakpoint) {
+                        const delta = this.state.mouse - (e as MouseEvent).clientX;
+                        this.items.scrollLeft += delta;
+                        this.state.mouse = (e as MouseEvent).clientX;
+                    } else {
+                        const delta = this.state.mouse - (e as MouseEvent).clientY;
+                        this.items.scrollTop += delta;
+                        this.state.mouse = (e as MouseEvent).clientY;
+                    }
                 }
                 break;
 
             case 'mouseup':
                 this.state.mousedown = false;
-                this.state.mouseX = null;
+                this.state.mouse = null;
                 e.preventDefault();
                 break;
 
             case 'click':
                 // prevent click on drag
-                if (Math.abs(this.state.initMouseX - (e as MouseEvent).clientX) < 10) {
+                if (Math.abs(this.state.initMouse - (e as MouseEvent).clientX) < 10) {
                     const item = utils.getClosest(e.target as HTMLElement, `[data-${GALLERY_ITEM_DATA_KEY}]`);
                     if (item) {
                         this.plugin.__click(item.dataset[GALLERY_ITEM_DATA]);
