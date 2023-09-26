@@ -1,5 +1,5 @@
 import { ConfigChangedEvent, LoadProgressEvent } from '../events';
-import { getStyle } from '../utils';
+import { getStyleProperty } from '../utils';
 import type { Viewer } from '../Viewer';
 import { AbstractComponent } from './AbstractComponent';
 
@@ -33,10 +33,10 @@ export class Loader extends AbstractComponent {
         this.canvas.setAttribute('viewBox', `0 0 ${this.size} ${this.size}`);
         this.loader.appendChild(this.canvas);
 
-        this.textColor = getStyle(this.loader, 'color');
-        this.color = getStyle(this.canvas, 'color');
-        this.border = parseInt(getStyle(this.loader, 'outlineWidth'), 10);
-        this.thickness = parseInt(getStyle(this.canvas, 'outlineWidth'), 10);
+        this.textColor = getStyleProperty(this.loader, 'color');
+        this.color = getStyleProperty(this.canvas, 'color');
+        this.border = parseInt(getStyleProperty(this.loader, '--psv-loader-border'), 10);
+        this.thickness = parseInt(getStyleProperty(this.loader, '--psv-loader-tickness'), 10);
 
         this.viewer.addEventListener(ConfigChangedEvent.type, this);
 

@@ -1,7 +1,7 @@
 import { PSVError } from '../PSVError';
-import { addClasses, cleanCssPosition, getStyle, cssPositionIsOrdered } from '../utils';
 import type { Viewer } from '../Viewer';
 import { HideTooltipEvent, ShowTooltipEvent } from '../events';
+import { addClasses, cleanCssPosition, cssPositionIsOrdered, getStyleProperty } from '../utils';
 import { AbstractComponent } from './AbstractComponent';
 
 /**
@@ -180,8 +180,8 @@ export class Tooltip extends AbstractComponent {
         const rect = this.container.getBoundingClientRect();
         this.state.width = rect.right - rect.left;
         this.state.height = rect.bottom - rect.top;
-        this.state.arrow = parseInt(getStyle(this.arrow, 'borderTopWidth'), 10);
-        this.state.border = parseInt(getStyle(this.container, 'borderTopLeftRadius'), 10);
+        this.state.arrow = parseInt(getStyleProperty(this.arrow, 'border-top-width'), 10);
+        this.state.border = parseInt(getStyleProperty(this.container, 'border-top-left-radius'), 10);
 
         this.move(config ?? this.state.config);
     }

@@ -1,7 +1,7 @@
 import type { Navbar } from '../components/Navbar';
 import { SYSTEM } from '../data/system';
 import { ReadyEvent, ZoomUpdatedEvent } from '../events';
-import { getStyle, invertResolvableBoolean, Slider, SliderDirection, SliderUpdateData } from '../utils';
+import { Slider, SliderDirection, SliderUpdateData, getStyleProperty, invertResolvableBoolean } from '../utils';
 import { AbstractButton } from './AbstractButton';
 
 export class ZoomRangeButton extends AbstractButton {
@@ -31,7 +31,7 @@ export class ZoomRangeButton extends AbstractButton {
 
         this.slider = new Slider(this.container, SliderDirection.HORIZONTAL, (data) => this.__onSliderUpdate(data));
 
-        this.mediaMinWidth = parseInt(getStyle(this.container, 'maxWidth'), 10);
+        this.mediaMinWidth = parseInt(getStyleProperty(this.container, 'max-width'), 10);
 
         this.viewer.addEventListener(ZoomUpdatedEvent.type, this);
         if (this.viewer.state.ready) {

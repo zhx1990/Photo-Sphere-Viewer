@@ -1,6 +1,7 @@
 import { Euler, LinearFilter, LinearMipmapLinearFilter, MathUtils, Quaternion, Texture, Vector3 } from 'three';
 import { PSVError } from '../PSVError';
 import { ExtendedPosition, Point, ResolvableBoolean } from '../model';
+import { getStyleProperty } from './browser';
 import { wrap } from './math';
 import { clone, isPlainObject } from './misc';
 
@@ -436,7 +437,7 @@ export function getConfigParser<T extends Record<string, any>, U extends T = T>(
  * Checks if a stylesheet is loaded by the presence of a CSS variable
  */
 export function checkStylesheet(element: HTMLElement, name: string) {
-    if (window.getComputedStyle(element).getPropertyValue(`--psv-${name}-loaded`) !== 'true') {
+    if (getStyleProperty(element, `--psv-${name}-loaded`) !== 'true') {
         console.error(`PhotoSphereViewer: stylesheet "@photo-sphere-viewer/${name}/index.css" is not loaded`);
     }
 }
