@@ -51,7 +51,6 @@ export class Marker {
      * The final description of the marker. Either text content, image, url, SVG attributes, etc.
      */
     definition: any;
-    visible = true;
 
     /** @internal */
     tooltip?: Tooltip;
@@ -389,8 +388,9 @@ export class Marker {
                 ...this.config.hoverScale,
             };
         }
-
-        this.visible = this.config.visible !== false;
+        if (utils.isNil(this.config.visible)) {
+            this.config.visible = true;
+        }
 
         this.state.anchor = utils.parsePoint(this.config.anchor);
 
@@ -844,10 +844,10 @@ export class Marker {
         Object.defineProperty(element, 'visible', {
             enumerable: true,
             get: function (this: Object3D) {
-                return (this.children[0].userData[MARKER_DATA] as Marker).visible;
+                return (this.children[0].userData[MARKER_DATA] as Marker).state.visible;
             },
             set: function (this: Object3D, visible: boolean) {
-                (this.children[0].userData[MARKER_DATA] as Marker).visible = visible;
+                (this.children[0].userData[MARKER_DATA] as Marker).state.visible = visible;
             },
         });
 

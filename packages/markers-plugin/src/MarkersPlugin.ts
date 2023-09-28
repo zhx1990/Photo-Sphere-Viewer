@@ -75,6 +75,8 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         showAllTooltips: false,
         currentMarker: null as Marker,
         hoveringMarker: null as Marker,
+        // require a 2nd render (only the scene) when 3d markers visibility changes
+        needsReRender: false,
     };
 
     private readonly container: HTMLElement;
@@ -222,9 +224,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      */
     showAllMarkers() {
         this.state.visible = true;
-
         this.renderMarkers();
-
         this.dispatchEvent(new ShowMarkersEvent());
     }
 
@@ -233,9 +233,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      */
     hideAllMarkers() {
         this.state.visible = false;
-
         this.renderMarkers();
-
         this.dispatchEvent(new HideMarkersEvent());
     }
 
@@ -488,8 +486,8 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      */
     toggleMarker(markerId: string | MarkerConfig, visible?: boolean) {
         const marker = this.getMarker(markerId);
-        marker.visible = visible === null ? !marker.visible : visible;
-        this.viewer.needsUpdate();
+        marker.config.visible = utils.isNil(visible) ? !marker.config.visible : visible;
+        this.renderMarkers();
     }
 
     /**
@@ -532,7 +530,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     showMarkersList() {
         let markers: Marker[] = [];
         Object.values(this.markers).forEach((marker) => {
-            if (marker.visible && !marker.config.hideList) {
+            if (marker.state.visible && !marker.config.hideList) {
                 markers.push(marker);
             }
         });
@@ -572,11 +570,16 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      * Updates the visibility and the position of all markers
      */
     renderMarkers() {
+        if (this.state.needsReRender) {
+            this.state.needsReRender = false;
+            return;
+        }
+
         const zoomLevel = this.viewer.getZoomLevel();
         const viewerPosition = this.viewer.getPosition();
 
         Object.values(this.markers).forEach((marker) => {
-            let isVisible = this.state.visible && marker.visible;
+            let isVisible = this.state.visible && marker.config.visible;
             let visibilityChanged = false;
             let position: Point = null;
 
@@ -640,8 +643,16 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
             if (visibilityChanged) {
                 this.dispatchEvent(new MarkerVisibilityEvent(marker, isVisible));
+
+                if (marker.is3d()) {
+                    this.state.needsReRender = true;
+                }
             }
         });
+
+        if (this.state.needsReRender) {
+            this.viewer.needsUpdate();
+        }
     }
 
     /**
