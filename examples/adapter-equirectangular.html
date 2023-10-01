@@ -101,10 +101,8 @@
                         content: '🔀',
                         onClick: () => {
                             viewer.animate({
-                                position: {
-                                    yaw: (((Math.random() - 0.5) * 3) / 2) * Math.PI,
-                                    pitch: (((Math.random() - 0.5) * 3) / 4) * Math.PI,
-                                },
+                                yaw: (((Math.random() - 0.5) * 3) / 2) * Math.PI,
+                                pitch: (((Math.random() - 0.5) * 3) / 4) * Math.PI,
                                 zoom: Math.random() * 60 + 20,
                                 speed: 1500,
                             });

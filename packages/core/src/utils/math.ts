@@ -68,8 +68,14 @@ export function getAngle(position1: Position, position2: Position): number {
  * Returns the distance between two points on a sphere of radius one
  * @link http://www.movable-type.co.uk/scripts/latlong.html
  */
-export function greatArcDistance([lon1, lat1]: [number, number], [lon2, lat2]: [number, number]): number {
-    const x = (lon2 - lon1) * Math.cos((lat1 + lat2) / 2);
-    const y = lat2 - lat1;
+export function greatArcDistance([yaw1, pitch1]: [number, number], [yaw2, pitch2]: [number, number]): number {
+    // if yaw delta is > PI, apply an offset to only consider the shortest arc
+    if (yaw1 - yaw2 > Math.PI) {
+        yaw1 -= 2 * Math.PI;
+    } else if (yaw1 - yaw2 < -Math.PI) {
+        yaw1 += 2 * Math.PI;
+    }
+    const x = (yaw2 - yaw1) * Math.cos((pitch1 + pitch2) / 2);
+    const y = pitch2 - pitch1;
     return Math.sqrt(x * x + y * y);
 }

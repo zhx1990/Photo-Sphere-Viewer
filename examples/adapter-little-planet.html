@@ -57,8 +57,10 @@
                             return () => {
                                 i = 1 - i;
                                 viewer.setPanorama(panos[i].url, {
-                                    yaw: 0,
-                                    pitch: 0,
+                                    position: {
+                                        yaw: 0,
+                                        pitch: 0,
+                                    },
                                     zoom: 50,
                                     caption: panos[i].caption,
                                     description: panos[i].description,
