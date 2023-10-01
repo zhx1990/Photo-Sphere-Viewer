@@ -27,6 +27,10 @@ viewer.addEventListener('ready', () => {
 
 This section describes the most useful methods available.
 
+::: tip Positions definitions
+Some methods takes positionnal arguments, this is either on combination `yaw` and `pitch` (radians or degrees) or `textureX` and `textureY` properties, corresponding to the pixel position on the source panorama file.
+:::
+
 ### `animate(options): Animation`
 
 Rotate and zoom the view with a smooth animation. You can change the position (`yaw`, `pitch` or `textureX`, `textureY`) and the zoom level (`zoom`).
@@ -48,6 +52,10 @@ viewer.animate({
 ### `destroy()`
 
 Remove the viewer from the page and free the memory used by Three.js.
+
+### `getPlugin(pluginId): PluginInstance`
+
+Return the instance of plugin, more details on [the dedicated page](../plugins/README.md).
 
 ### `getPosition(): Position`
 
@@ -109,6 +117,10 @@ viewer.setPanorama('image.jpg', {
 });
 ```
 
-### `zoom(level)` | `zoomIn()` | `zoomOut()`
+### `setOverlay(overlay[, opacity]): Promise`
+
+Change the current [overlay](./config.md#overlay) without changing the panorama.
+
+### `zoom(level)` | `zoomIn([step = 1])` | `zoomOut([step = 1])`
 
 Change the zoom level without animation.

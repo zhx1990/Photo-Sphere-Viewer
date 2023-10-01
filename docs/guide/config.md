@@ -6,10 +6,6 @@
 Photo Sphere Viewer uses a lot of angles for its configuration, most of them can be defined in radians by using a simple number (`3.5`) or in degrees using the "deg" suffix (`'55deg'`).
 :::
 
-::: tip Positions definitions
-Some methods takes positionnal arguments, this is either on combination `yaw` and `pitch` (radians or degrees) or `textureX` and `textureY` properties (corresponding to the pixel position on the source panorama file).
-:::
-
 ## Standard options
 
 #### `container` (required)
@@ -348,7 +344,7 @@ keyboardActions: {
 
 Configure keyboard actions. It is a map defining key code->action. (all the available actions are listed above)
 
-Since 5.0.2 you can configure an arbitrary callback to any key.
+You can also configure an arbitrary callback to any key.
 
 ```js
 keyboardActions: {
@@ -366,6 +362,10 @@ keyboardActions: {
   'f': (viewer) => viewer.toggleFullscreen(),
 },
 ```
+
+::: warning
+Keyboard actions will only be available in fullscreen by default, this can be changed with the [`keyboard` option](#keyboard).
+:::
 
 #### `rendererParameters`
 
