@@ -31,10 +31,12 @@ I forked the original Photo Sphere Viewer [by Jérémy Heleine](http://jeremyhel
 
 ## Sponsors
 
-[![Netlify](https://www.netlify.com/v3/img/components/full-logo-light.svg)](https://www.netlify.com)
+[![getsentry](https://avatars.githubusercontent.com/u/1396951?s=200)](https://github.com/getsentry "Sentry")
 
 </div>
 
 ::: slot footer
+[![Deploys by Netlify](https://www.netlify.com/v3/img/components/netlify-color-bg.svg)](https://www.netlify.com)
+
 Licensed under MIT License, documentation under CC BY 3.0
 :::

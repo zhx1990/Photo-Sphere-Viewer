@@ -58,7 +58,7 @@
 .sponsors a[title]::after {
   content: attr(title);
   position: absolute;
-  bottom: -1.5em;
+  top: 100%;
   left: 0;
   right: 0;
 }
@@ -66,8 +66,10 @@
   display: none !important;
 }
 .sponsors img {
-  height: 50px;
+  border-radius: 50%;
+  height: 80px;
 }
+
 
 /* options types + default */
 h4:not(.release-subtitle) + ul {
