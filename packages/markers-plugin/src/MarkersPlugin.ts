@@ -529,11 +529,13 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      */
     showMarkersList() {
         let markers: Marker[] = [];
-        Object.values(this.markers).forEach((marker) => {
-            if (marker.state.visible && !marker.config.hideList) {
-                markers.push(marker);
-            }
-        });
+        if (this.state.visible) {
+            Object.values(this.markers).forEach((marker) => {
+                if (marker.config.visible && !marker.config.hideList) {
+                    markers.push(marker);
+                }
+            });
+        }
 
         const e = new RenderMarkersListEvent(markers);
         this.dispatchEvent(e);
