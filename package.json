@@ -12,6 +12,7 @@
     "lint": "turbo run lint",
     "test": "turbo run test",
     "serve": "turbo run watch --parallel",
+    "serve:filter": "run() { turbo run watch --parallel --filter=$1... --filter=//; }; run",
     "npm-link": "turbo run npm-link --output-logs=new-only",
     "doc:build": "yarn doc:vuepress && yarn doc:typedoc",
     "doc:typedoc": "node ./build/generate-typedoc-readme.mjs && typedoc --plugin typedoc-plugin-extras --out public/api",

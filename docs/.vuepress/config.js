@@ -110,6 +110,7 @@ module.exports = {
                         },
                         'frameworks',
                         'changelog',
+                        'development',
                         'migration',
                     ],
                 },
