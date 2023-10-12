@@ -91,7 +91,7 @@ export class GalleryPlugin extends AbstractConfigurablePlugin<
         if (e instanceof events.PanoramaLoadedEvent) {
             const item = this.items.find((i) => utils.deepEqual(i.panorama, e.data.panorama));
             this.currentId = item?.id;
-            this.gallery.setActive(item?.id);
+            this.gallery.setActive(this.currentId);
         } else if (e instanceof events.ShowPanelEvent) {
             this.gallery.isVisible() && this.hide();
         }
@@ -151,6 +151,12 @@ export class GalleryPlugin extends AbstractConfigurablePlugin<
         }));
 
         this.gallery.setItems(this.items);
+
+        if (this.currentId) {
+            const item = this.items.find((i) => i.id === this.currentId);
+            this.currentId = item?.id;
+            this.gallery.setActive(this.currentId);
+        }
 
         this.__updateButton();
     }
