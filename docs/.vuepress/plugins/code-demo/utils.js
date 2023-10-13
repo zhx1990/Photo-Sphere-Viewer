@@ -53,9 +53,9 @@ ${packages
     .join('\n')}
 
 html, body, #viewer {
+  width: 100%;
+  height: 100%;
   margin: 0;
-  width: 100vw;
-  height: 100vh;
   font-family: sans-serif;
 }
 
