@@ -22,6 +22,10 @@ const viewer = new PhotoSphereViewer.Viewer({
 });
 ```
 
+## Example
+
+<ExternalLink href="/demos/plugin-stereo.html">Open in a new tab</ExternalLink>
+
 ## Configuration
 
 #### `lang`

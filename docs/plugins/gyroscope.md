@@ -27,6 +27,10 @@ The gyroscope API only works on HTTPS domains.
 There are known inconsistencies of orientation data accross devices. If the panorama is not displayed in the expected orientation, this plugin is not faulty.
 :::
 
+## Example
+
+<ExternalLink href="/demos/plugin-gyroscope.html">Open in a new tab</ExternalLink>
+
 ## Configuration
 
 #### `touchmove`

@@ -59,7 +59,7 @@ module.exports = {
             { text: 'Plugins', link: '/plugins/' },
             { text: 'Playground', link: '/playground' },
             { text: 'Demos', link: '/demos/' },
-            { text: 'API', link: 'https://photo-sphere-viewer.js.org/api/' },
+            { text: 'API', link: '/api/', target: '_blank' },
             {
                 text: 'v5',
                 ariaLavel: 'version',

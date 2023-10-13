@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PhotoSphereViewer - gyroscope demo</title>
+
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.css" />
+        
+        <style>
+            html, body, #viewer {
+                margin: 0;
+                width: 100vw;
+                height: 100vh;
+                font-family: sans-serif;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="viewer"></div>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "https://cdn.jsdelivr.net/npm/three/build/three.module.js",
+                    "@photo-sphere-viewer/core": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/core@5/index.module.js",
+                    "@photo-sphere-viewer/gyroscope-plugin": "https://cdn.jsdelivr.net/npm/@photo-sphere-viewer/gyroscope-plugin@5/index.module.js"
+                }
+            }
+        </script>
+
+        <script type="module">
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
+
+            const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+            const viewer = new Viewer({
+                container: 'viewer',
+                panorama: baseUrl + 'sphere.jpg',
+                caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+                loadingImg: baseUrl + 'loader.gif',
+                plugins: [
+                    GyroscopePlugin,
+                ],
+            });
+
+            window.viewer = viewer;
+        </script>
+    </body>
+</html>

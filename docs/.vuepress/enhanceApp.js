@@ -12,13 +12,4 @@ export default ({ Vue, router }) => {
     Vue.use(VueMaterial);
     Vue.component('v-swatches', VSwatches);
     Vue.component('vue-slider', VueSlider);
-
-    router.beforeEach((to, from, next) => {
-        if (/^\/api/.test(to.fullPath)) {
-            window.location.href = `${to.path}.html${to.hash}`;
-            next(false);
-        } else {
-            next();
-        }
-    });
 };
