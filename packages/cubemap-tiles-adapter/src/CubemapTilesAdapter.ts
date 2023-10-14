@@ -1,6 +1,6 @@
-import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
+import type { PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
-import { CubemapAdapter, CubemapFaces } from '@photo-sphere-viewer/cubemap-adapter';
+import { CubemapAdapter, CubemapData, CubemapFaces } from '@photo-sphere-viewer/cubemap-adapter';
 import {
     BoxGeometry,
     BufferAttribute,
@@ -18,7 +18,7 @@ import { CubemapMultiTilesPanorama, CubemapTilesAdapterConfig, CubemapTilesPanor
 import { checkPanoramaConfig, CubemapTileConfig, getTileConfig, getTileConfigByIndex, isTopOrBottom } from './utils';
 
 type CubemapMesh = Mesh<BoxGeometry, MeshBasicMaterial[]>;
-type CubemapTexture = TextureData<Texture[], CubemapTilesPanorama | CubemapMultiTilesPanorama>;
+type CubemapTexture = TextureData<Texture[], CubemapTilesPanorama | CubemapMultiTilesPanorama, CubemapData>;
 type CubemapTile = {
     face: number;
     col: number;
@@ -49,14 +49,24 @@ function prettyTileId(tile: CubemapTile) {
     return `${tileId(tile)}\n${CUBE_HASHMAP[tile.face]}`;
 }
 
-const getConfig = utils.getConfigParser<CubemapTilesAdapterConfig>({
-    flipTopBottom: false,
-    showErrorTile: true,
-    baseBlur: true,
-    antialias: true,
-    blur: false,
-    debug: false,
-});
+const getConfig = utils.getConfigParser<CubemapTilesAdapterConfig>(
+    {
+        flipTopBottom: null,
+        showErrorTile: true,
+        baseBlur: true,
+        antialias: true,
+        blur: false,
+        debug: false,
+    },
+    {
+        flipTopBottom(flipTopBottom) {
+            if (!utils.isNil(flipTopBottom)) {
+                utils.logWarn('CubemapTilesAdapter "flipTopBottom" option is deprecated, it must be defined on the panorama object');
+            }
+            return flipTopBottom;
+        },
+    }
+);
 
 const frustum = new Frustum();
 const projScreenMatrix = new Matrix4();
@@ -65,7 +75,11 @@ const vertexPosition = new Vector3();
 /**
  * Adapter for tiled cubemaps
  */
-export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | CubemapMultiTilesPanorama, Texture[]> {
+export class CubemapTilesAdapter extends AbstractAdapter<
+    CubemapTilesPanorama | CubemapMultiTilesPanorama,
+    Texture[],
+    CubemapData
+> {
     static override readonly id = 'cubemap-tiles';
     static override readonly supportsDownload = false;
     static override readonly supportsOverlay = false;
@@ -113,7 +127,9 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
 
         this.state.errorMaterial?.map?.dispose();
         this.state.errorMaterial?.dispose();
+        this.adapter?.destroy();
 
+        delete this.adapter;
         delete this.state.geom;
         delete this.state.errorMaterial;
 
@@ -137,6 +153,14 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
         return !!panorama.baseUrl;
     }
 
+    override textureCoordsToSphericalCoords(point: PanoramaPosition, data: CubemapData): Position {
+        return this.getAdapter().textureCoordsToSphericalCoords(point, data);
+    }
+
+    override sphericalCoordsToTextureCoords(position: Position, data: CubemapData): PanoramaPosition {
+        return this.getAdapter().sphericalCoordsToTextureCoords(position, data);
+    }
+
     override loadTexture(panorama: CubemapTilesPanorama | CubemapMultiTilesPanorama): Promise<CubemapTexture> {
         try {
             checkPanoramaConfig(panorama, { CUBE_SEGMENTS });
@@ -144,25 +168,26 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
             return Promise.reject(e);
         }
 
+        const firstTile = getTileConfig(panorama, 0, { CUBE_SEGMENTS });
+        const panoData: CubemapData = {
+            isCubemap: true,
+            flipTopBottom: panorama.flipTopBottom ?? this.config.flipTopBottom ?? false,
+            faceSize: firstTile.faceSize,
+        };
+
         if (panorama.baseUrl) {
-            if (!this.adapter) {
-                if (!CubemapAdapter) {
-                    throw new PSVError('CubemapTilesAdapter requires CubemapAdapter');
-                }
-
-                this.adapter = new CubemapAdapter(this.viewer, {
-                    blur: this.config.baseBlur,
-                });
-            }
-
-            return this.adapter.loadTexture(panorama.baseUrl).then((textureData) => ({
-                panorama,
-                cacheKey: textureData.cacheKey,
-                texture: textureData.texture,
-            }));
+            return this.getAdapter()
+                .loadTexture(panorama.baseUrl)
+                .then((textureData) => ({
+                    panorama,
+                    panoData,
+                    cacheKey: textureData.cacheKey,
+                    texture: textureData.texture,
+                }));
         } else {
             return Promise.resolve({
                 panorama,
+                panoData,
                 cacheKey: panorama.tileUrl('front', 0, 0, 0),
                 texture: null,
             });
@@ -189,16 +214,14 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
      * Applies the base texture and starts the loading of tiles
      */
     setTexture(mesh: CubemapMesh, textureData: CubemapTexture, transition: boolean) {
-        const { texture } = textureData;
-
         if (transition) {
             this.state.inTransition = true;
-            this.__setTexture(mesh, texture);
+            this.__setTexture(mesh, textureData);
             return;
         }
 
         this.__cleanup();
-        this.__setTexture(mesh, texture);
+        this.__setTexture(mesh, textureData);
 
         this.state.materials = mesh.material;
         this.state.geom = mesh.geometry;
@@ -213,11 +236,11 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
         setTimeout(() => this.__refresh());
     }
 
-    private __setTexture(mesh: CubemapMesh, texture: Texture[]) {
+    private __setTexture(mesh: CubemapMesh, { texture, panoData }: CubemapTexture) {
         for (let i = 0; i < 6; i++) {
             let material;
             if (texture) {
-                if (this.config.flipTopBottom && isTopOrBottom(i)) {
+                if (panoData.flipTopBottom && isTopOrBottom(i)) {
                     texture[i].center = new Vector2(0.5, 0.5);
                     texture[i].rotation = Math.PI;
                 }
@@ -240,13 +263,6 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
         }
     }
 
-    /**
-     * @throws {@link PSVError} always
-     */
-    setOverlay(): void {
-        throw new PSVError('EquirectangularTilesAdapter does not support overlay');
-    }
-
     disposeTexture(textureData: CubemapTexture) {
         textureData.texture?.forEach((texture) => texture.dispose());
     }
@@ -263,7 +279,8 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
         projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
         frustum.setFromProjectionMatrix(projScreenMatrix);
 
-        const panorama: CubemapTilesPanorama | CubemapMultiTilesPanorama = this.viewer.config.panorama;
+        const panorama: CubemapTilesPanorama | CubemapMultiTilesPanorama = this.viewer.state.textureData.panorama;
+        const panoData: CubemapData = this.viewer.state.textureData.panoData;
         const zoomLevel = this.viewer.getZoomLevel();
         const tileConfig = getTileConfig(panorama, zoomLevel, { CUBE_SEGMENTS });
 
@@ -296,7 +313,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
                         config,
                         url: null,
                     };
-                    if (this.config.flipTopBottom && isTopOrBottom(face)) {
+                    if (panoData.flipTopBottom && isTopOrBottom(face)) {
                         col = config.nbTiles - col - 1;
                         row = config.nbTiles - row - 1;
                     }
@@ -377,6 +394,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
      * Applies a new texture to the faces
      */
     private __swapMaterial(tile: CubemapTile, material: MeshBasicMaterial, isError: boolean) {
+        const panoData = this.viewer.state.textureData.panoData as CubemapData;
         const uvs = this.state.geom.getAttribute(ATTR_UV) as BufferAttribute;
 
         for (let c = 0; c < tile.config.facesByTile; c++) {
@@ -408,7 +426,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
                 let left = c / tile.config.facesByTile;
                 let right = (c + 1) / tile.config.facesByTile;
 
-                if (this.config.flipTopBottom && isTopOrBottom(tile.face)) {
+                if (panoData.flipTopBottom && isTopOrBottom(tile.face)) {
                     top = 1 - top;
                     bottom = 1 - bottom;
                     left = 1 - left;
@@ -441,5 +459,22 @@ export class CubemapTilesAdapter extends AbstractAdapter<CubemapTilesPanorama | 
             mat?.dispose();
         });
         this.state.materials.length = 0;
+    }
+
+    /**
+     * @internal
+     */
+    getAdapter() {
+        if (!this.adapter) {
+            if (!CubemapAdapter) {
+                throw new PSVError('CubemapTilesAdapter requires CubemapAdapter');
+            }
+
+            this.adapter = new CubemapAdapter(this.viewer, {
+                blur: this.config.baseBlur,
+                flipTopBottom: this.config.flipTopBottom,
+            });
+        }
+        return this.adapter;
     }
 }

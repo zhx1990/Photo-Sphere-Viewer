@@ -25,10 +25,10 @@ type AbstractVideoTexture = TextureData<VideoTexture>;
 /**
  * Base video adapters class
  */
-export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanorama> extends AbstractAdapter<
-    TPanorama,
-    VideoTexture
-> {
+export abstract class AbstractVideoAdapter<
+    TPanorama extends AbstractVideoPanorama,
+    TData
+> extends AbstractAdapter<TPanorama, VideoTexture, TData> {
     static override readonly supportsDownload = false;
     static override readonly supportsOverlay = false;
 
@@ -73,7 +73,7 @@ export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanora
 
         return this.__videoLoadPromise(video).then(() => {
             const texture = new VideoTexture(video);
-            return { panorama, texture, cacheKey: null };
+            return { panorama, texture };
         });
     }
 
@@ -108,10 +108,6 @@ export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanora
     setTextureOpacity(mesh: AbstractVideoMesh, opacity: number) {
         mesh.material.opacity = opacity;
         mesh.material.transparent = opacity < 1;
-    }
-
-    setOverlay() {
-        throw new PSVError('VideoAdapter does not support overlay');
     }
 
     disposeTexture(textureData: AbstractVideoTexture): void {

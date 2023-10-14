@@ -1,13 +1,15 @@
 import { Mesh, ShaderMaterial, ShaderMaterialParameters } from 'three';
-import { PanoData, PanoDataProvider, TextureData } from '../model';
+import { PanoData, PanoDataProvider, PanoramaPosition, Position, TextureData } from '../model';
 import type { Viewer } from '../Viewer';
+import { PSVError } from '../PSVError';
 
 /**
  * Base class for adapters
  * @template TPanorama type of the panorama object
  * @template TTexture type of the loaded texture
+ * @template TData type of the panorama metadata
  */
-export abstract class AbstractAdapter<TPanorama, TTexture> {
+export abstract class AbstractAdapter<TPanorama, TTexture, TData> {
     /**
      * Unique identifier of the adapter
      */
@@ -40,7 +42,7 @@ export abstract class AbstractAdapter<TPanorama, TTexture> {
     /**
      * Indicates if the adapter supports transitions between panoramas
      */
-    // @ts-ignore unused paramater
+    // @ts-ignore unused parameter
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     supportsTransition(panorama: TPanorama): boolean {
         return false;
@@ -49,10 +51,30 @@ export abstract class AbstractAdapter<TPanorama, TTexture> {
     /**
      * Indicates if the adapter supports preload of a panorama
      */
-    // @ts-ignore unused paramater
+    // @ts-ignore unused parameter
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     supportsPreload(panorama: TPanorama): boolean {
         return false;
+    }
+
+    /**
+     * Converts pixel texture coordinates to spherical radians coordinates
+     * @throws {@link PSVError} when the current adapter does not support texture coordinates
+     */
+    // @ts-ignore unused parameter
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    textureCoordsToSphericalCoords(point: PanoramaPosition, data: TData): Position {
+        throw new PSVError('Current adapter does not support texture coordinates.');
+    }
+
+    /**
+     * Converts spherical radians coordinates to pixel texture coordinates
+     * @throws {@link PSVError} when the current adapter does not support texture coordinates
+     */
+    // @ts-ignore unused parameter
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    sphericalCoordsToTextureCoords(position: Position, data: TData): PanoramaPosition {
+        throw new PSVError('Current adapter does not support texture coordinates.');
     }
 
     /**
@@ -62,7 +84,7 @@ export abstract class AbstractAdapter<TPanorama, TTexture> {
         panorama: TPanorama,
         newPanoData?: PanoData | PanoDataProvider,
         useXmpPanoData?: boolean
-    ): Promise<TextureData<TTexture, TPanorama>>;
+    ): Promise<TextureData<TTexture, TPanorama, TData>>;
 
     /**
      * Creates the mesh
@@ -72,7 +94,7 @@ export abstract class AbstractAdapter<TPanorama, TTexture> {
     /**
      * Applies the texture to the mesh
      */
-    abstract setTexture(mesh: Mesh, textureData: TextureData<TTexture, TPanorama>, transition?: boolean): void;
+    abstract setTexture(mesh: Mesh, textureData: TextureData<TTexture, TPanorama, TData>, transition?: boolean): void;
 
     /**
      * Changes the opacity of the mesh
@@ -82,12 +104,16 @@ export abstract class AbstractAdapter<TPanorama, TTexture> {
     /**
      * Clear a loaded texture from memory
      */
-    abstract disposeTexture(textureData: TextureData<TTexture, TPanorama>): void;
+    abstract disposeTexture(textureData: TextureData<TTexture, TPanorama, TData>): void;
 
     /**
      * Applies the overlay to the mesh
      */
-    abstract setOverlay(mesh: Mesh, textureData: TextureData<TTexture, TPanorama>, opacity: number): void;
+    // @ts-ignore unused parameter
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    setOverlay(mesh: Mesh, textureData: TextureData<TTexture, TPanorama, TData>, opacity: number): void {
+        throw new PSVError('Current adapter does not support overlay');
+    }
 
     /**
      * @internal
@@ -149,7 +175,7 @@ void main() {
 }
 
 // prettier-ignore
-export type AdapterConstructor = (new (viewer: Viewer, config?: any) => AbstractAdapter<any, any>);
+export type AdapterConstructor = (new (viewer: Viewer, config?: any) => AbstractAdapter<any, any, any>);
 
 /**
  * Returns the adapter constructor from the imported object

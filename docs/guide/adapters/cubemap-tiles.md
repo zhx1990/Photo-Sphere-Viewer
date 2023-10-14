@@ -72,11 +72,11 @@ const viewer = new Viewer({
 
 :::
 
+::: tip Positions definitions
+With this adapter, pixel positions require an additional `textureFace` attribute (example: `{ textureFace: 'front', textureX: 200, textureY: 800 }`). The position refers to the full size of the face (first level when using multi-levels tiles).
+:::
+
 ## Configuration
-
-#### `flipTopBottom`
-
-See the [cubemap adapter configuration](./cubemap.md#fliptopbottom).
 
 #### `baseBlur`
 
@@ -128,9 +128,13 @@ Number of columns and rows on a face. Each tile must be square. Must be power of
 Function used to build the URL of a tile. `face` will be one of `'left'|'front'|'right'|'back'|'top'|'bottom'`.
 If the function returns `null` the corresponding tile will not be loaded.
 
+#### `flipTopBottom`
+
+See the [cubemap adapter configuration](./cubemap.md#panorama-options).
+
 #### `baseUrl` (recommended)
 
--   type: `string[] | Record<string, string>`
+-   type: `any`
 
 URL of a low resolution complete panorama image to display while the tiles are loading. It accepts the same format as the standard [cubemap adapter](./cubemap.md#panorama-options).
 
@@ -171,9 +175,13 @@ levels: [
 Function used to build the URL of a tile. `face` will be one of `'left'|'front'|'right'|'back'|'top'|'bottom'`.
 If the function returns `null` the corresponding tile will not be loaded.
 
+#### `flipTopBottom`
+
+See the [cubemap adapter configuration](./cubemap.md#panorama-options).
+
 #### `baseUrl` (recommended)
 
--   type: `string[] | Record<string, string>`
+-   type: `any`
 
 URL of a low resolution complete panorama image to display while the tiles are loading. It accepts the same format as the standard [cubemap adapter](./cubemap.md#panorama-options).
 

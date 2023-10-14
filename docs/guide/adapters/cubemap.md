@@ -56,14 +56,9 @@ const viewer = new Viewer({
 
 :::
 
-## Configuration
-
-#### `flipTopBottom`
-
--   type: `boolean`
--   default: `false`
-
-Set to `true` if the top and bottom faces are not correctly oriented.
+::: tip Positions definitions
+With this adapter, pixel positions require an additional `textureFace` attribute (example: `{ textureFace: 'front', textureX: 200, textureY: 800 }`).
+:::
 
 ## Panorama options
 
@@ -97,7 +92,9 @@ panorama: {
 // Alternatively
 panorama: {
   type: 'separate',
-  paths: /* array or object */
+  paths: /* array or object */,
+  // optional, set to `true` if the top and bottom faces are not correctly oriented
+  flipTopBottom: false,
 }
 ```
 
@@ -111,7 +108,10 @@ All faces are in a single file arranged in an horizontal stripe. The default str
 panorama: {
   type: 'stripe',
   path: 'path/to/panorama.jpg',
-  order: ['left', 'right', 'top', 'bottom', 'back', 'front'] // optional
+  // optional, set to `true` if the top and bottom faces are not correctly oriented
+  flipTopBottom: false,
+  // optional, change order of the faces on the stripe
+  order: ['left', 'right', 'top', 'bottom', 'back', 'front'],
 }
 ```
 

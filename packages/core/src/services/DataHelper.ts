@@ -7,7 +7,6 @@ import {
     Point,
     Position,
     SphereCorrection,
-    SphericalPosition,
 } from '../model';
 import { PSVError } from '../PSVError';
 import {
@@ -110,20 +109,12 @@ export class DataHelper extends AbstractService {
      * @throws {@link PSVError} when the current adapter does not support texture coordinates
      */
     textureCoordsToSphericalCoords(point: PanoramaPosition): Position {
-        const panoData = this.state.panoData;
-        if (!panoData) {
-            throw new PSVError('Current adapter does not support texture coordinates.');
+        if (!this.state.textureData?.panoData) {
+            throw new PSVError('Current adapter does not support texture coordinates or no texture has been loaded');
         }
 
-        const relativeX = ((point.textureX + panoData.croppedX) / panoData.fullWidth) * Math.PI * 2;
-        const relativeY = ((point.textureY + panoData.croppedY) / panoData.fullHeight) * Math.PI;
+        const result = this.viewer.adapter.textureCoordsToSphericalCoords(point, this.state.textureData.panoData);
 
-        const result: Position = {
-            yaw: relativeX >= Math.PI ? relativeX - Math.PI : relativeX + Math.PI,
-            pitch: Math.PI / 2 - relativeY,
-        };
-
-        // Apply panoData pose and sphereCorrection
         if (
             !EULER_ZERO.equals(this.viewer.renderer.panoramaPose) 
             || !EULER_ZERO.equals(this.viewer.renderer.sphereCorrection)
@@ -142,12 +133,10 @@ export class DataHelper extends AbstractService {
      * @throws {@link PSVError} when the current adapter does not support texture coordinates
      */
     sphericalCoordsToTextureCoords(position: Position): PanoramaPosition {
-        const panoData = this.state.panoData;
-        if (!panoData) {
-            throw new PSVError('Current adapter does not support texture coordinates.');
+        if (!this.state.textureData?.panoData) {
+            throw new PSVError('Current adapter does not support texture coordinates or no texture has been loaded');
         }
 
-        // Apply panoData pose and sphereCorrection
         if (
             !EULER_ZERO.equals(this.viewer.renderer.panoramaPose) 
             || !EULER_ZERO.equals(this.viewer.renderer.sphereCorrection)
@@ -158,18 +147,7 @@ export class DataHelper extends AbstractService {
             position = this.vector3ToSphericalCoords(vector3);
         }
 
-        const relativeLong = (position.yaw / Math.PI / 2) * panoData.fullWidth;
-        const relativeLat = (position.pitch / Math.PI) * panoData.fullHeight;
-
-        return {
-            textureX:
-                Math.round(
-                    position.yaw < Math.PI
-                        ? relativeLong + panoData.fullWidth / 2
-                        : relativeLong - panoData.fullWidth / 2
-                ) - panoData.croppedX,
-            textureY: Math.round(panoData.fullHeight / 2 - relativeLat) - panoData.croppedY,
-        };
+        return this.viewer.adapter.sphericalCoordsToTextureCoords(position, this.state.textureData.panoData);
     }
 
     /**
@@ -282,16 +260,14 @@ export class DataHelper extends AbstractService {
      * Converts pixel position to angles if present and ensure boundaries
      */
     cleanPosition(position: ExtendedPosition): Position {
-        if (
-            (position as PanoramaPosition).textureX !== undefined 
-            && (position as PanoramaPosition).textureY !== undefined
-        ) {
-            return this.textureCoordsToSphericalCoords(position as PanoramaPosition);
+        if ('yaw' in position && 'pitch' in position) {
+            return {
+                yaw: parseAngle(position.yaw),
+                pitch: parseAngle(position.pitch, !this.state.littlePlanet),
+            };
+        } else {
+            return this.textureCoordsToSphericalCoords(position);
         }
-        return {
-            yaw: parseAngle((position as SphericalPosition).yaw),
-            pitch: parseAngle((position as SphericalPosition).pitch, !this.state.littlePlanet),
-        };
     }
 
     /**

@@ -1,4 +1,3 @@
-import type { EquirectangularAdapterConfig } from '@photo-sphere-viewer/core';
 import type { AbstractVideoAdapterConfig, AbstractVideoPanorama } from '../../shared/AbstractVideoAdapter';
 
 /**
@@ -6,4 +5,10 @@ import type { AbstractVideoAdapterConfig, AbstractVideoPanorama } from '../../sh
  */
 export type EquirectangularVideoPanorama = AbstractVideoPanorama;
 
-export type EquirectangularVideoAdapterConfig = Omit<EquirectangularAdapterConfig, 'useXmpData' | 'backgroundColor' | 'interpolateBackground' | 'blur'> & AbstractVideoAdapterConfig;
+export type EquirectangularVideoAdapterConfig = AbstractVideoAdapterConfig & {
+    /**
+     * number of faces of the sphere geometry, higher values may decrease performances
+     * @default 64
+     */
+    resolution?: number;
+};

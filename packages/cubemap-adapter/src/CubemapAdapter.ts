@@ -1,9 +1,10 @@
-import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
+import type { PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '@photo-sphere-viewer/core';
-import { BoxGeometry, Mesh, ShaderMaterial, Texture } from 'three';
+import { BoxGeometry, MathUtils, Mesh, ShaderMaterial, Texture, Vector3 } from 'three';
 import {
     Cubemap,
     CubemapAdapterConfig,
+    CubemapData,
     CubemapFaces,
     CubemapNet,
     CubemapPanorama,
@@ -13,17 +14,30 @@ import {
 import { cleanCubemap, cleanCubemapArray, isCubemap } from './utils';
 
 type CubemapMesh = Mesh<BoxGeometry, ShaderMaterial[]>;
-type CubemapTexture = TextureData<Texture[], CubemapPanorama>;
+type CubemapTexture = TextureData<Texture[], CubemapPanorama, CubemapData>;
 
-const getConfig = utils.getConfigParser<CubemapAdapterConfig>({
-    flipTopBottom: false,
-    blur: false,
-});
+const getConfig = utils.getConfigParser<CubemapAdapterConfig>(
+    {
+        flipTopBottom: null,
+        blur: false,
+    },
+    {
+        flipTopBottom(flipTopBottom) {
+            if (!utils.isNil(flipTopBottom)) {
+                utils.logWarn('CubemapPanorama "flipTopBottom" option is deprecated, it must be defined on the panorama object');
+            }
+            return flipTopBottom;
+        },
+    }
+);
+
+const EPS = 0.000001;
+const ORIGIN = new Vector3();
 
 /**
  * Adapter for cubemaps
  */
-export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> {
+export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], CubemapData> {
     static override readonly id = 'cubemap';
     static override readonly supportsDownload = false;
     static override readonly supportsOverlay = true;
@@ -44,6 +58,102 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
         return true;
     }
 
+    /**
+     * {@link https://github.com/bhautikj/vrProjector/blob/master/vrProjector/CubemapProjection.py#L130}
+     */
+    override textureCoordsToSphericalCoords(point: PanoramaPosition, data: CubemapData): Position {
+        if (utils.isNil(point.textureX) || utils.isNil(point.textureY) || utils.isNil(point.textureFace)) {
+            throw new PSVError(`Texture position is missing 'textureX', 'textureY' or 'textureFace'`);
+        }
+
+        const u = 2 * (point.textureX / data.faceSize - 0.5);
+        const v = 2 * (point.textureY / data.faceSize - 0.5);
+
+        function yawPitch(x: number, y: number, z: number): [number, number] {
+            const dv = Math.sqrt(x * x + y * y + z * z);
+            return [Math.atan2(y / dv, x / dv), -Math.asin(z / dv)];
+        }
+
+        let yaw: number;
+        let pitch: number;
+        switch (point.textureFace) {
+            case 'front':
+                [yaw, pitch] = yawPitch(1, u, v);
+                break;
+            case 'right':
+                [yaw, pitch] = yawPitch(-u, 1, v);
+                break;
+            case 'left':
+                [yaw, pitch] = yawPitch(u, -1, v);
+                break;
+            case 'back':
+                [yaw, pitch] = yawPitch(-1, -u, v);
+                break;
+            case 'bottom':
+                [yaw, pitch] = data.flipTopBottom ? yawPitch(-v, u, 1) : yawPitch(v, -u, 1);
+                break;
+            case 'top':
+                [yaw, pitch] = data.flipTopBottom ? yawPitch(v, u, -1) : yawPitch(-v, -u, -1);
+                break;
+        }
+
+        return { yaw, pitch };
+    }
+
+    override sphericalCoordsToTextureCoords(position: Position, data: CubemapData): PanoramaPosition {
+        // @ts-ignore
+        const raycaster = this.viewer.renderer.raycaster;
+        // @ts-ignore
+        const mesh = this.viewer.renderer.mesh;
+        raycaster.set(ORIGIN, this.viewer.dataHelper.sphericalCoordsToVector3(position));
+        const point = raycaster.intersectObject(mesh)[0].point.multiplyScalar(1 / CONSTANTS.SPHERE_RADIUS);
+
+        function mapUV(x: number, a1: number, a2: number): number {
+            return Math.round(MathUtils.mapLinear(x, a1, a2, 0, data.faceSize));
+        }
+
+        let textureFace: CubemapFaces;
+        let textureX: number;
+        let textureY: number;
+        if (1 - Math.abs(point.z) < EPS) {
+            if (point.z > 0) {
+                textureFace = 'front';
+                textureX = mapUV(point.x, 1, -1);
+                textureY = mapUV(point.y, 1, -1);
+            } else {
+                textureFace = 'back';
+                textureX = mapUV(point.x, -1, 1);
+                textureY = mapUV(point.y, 1, -1);
+            }
+        } else if (1 - Math.abs(point.x) < EPS) {
+            if (point.x > 0) {
+                textureFace = 'left';
+                textureX = mapUV(point.z, -1, 1);
+                textureY = mapUV(point.y, 1, -1);
+            } else {
+                textureFace = 'right';
+                textureX = mapUV(point.z, 1, -1);
+                textureY = mapUV(point.y, 1, -1);
+            }
+        } else {
+            if (point.y > 0) {
+                textureFace = 'top';
+                textureX = mapUV(point.x, -1, 1);
+                textureY = mapUV(point.z, 1, -1);
+            } else {
+                textureFace = 'bottom';
+                textureX = mapUV(point.x, -1, 1);
+                textureY = mapUV(point.z, -1, 1);
+            }
+            if (data.flipTopBottom) {
+                textureX = data.faceSize - textureX;
+                textureY = data.faceSize - textureY;
+            }
+        }
+
+        return { textureFace, textureX, textureY };
+    }
+
     async loadTexture(panorama: CubemapPanorama): Promise<CubemapTexture> {
         if (this.viewer.config.fisheye) {
             utils.logWarn('fisheye effect with cubemap texture can generate distorsion');
@@ -59,40 +169,45 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
             cleanPanorama = panorama as any;
         }
 
-        let texture: Texture[];
-        let cacheKey: string;
+        let result: { textures: Texture[], flipTopBottom: boolean, cacheKey: string };
         switch (cleanPanorama.type) {
-            case 'separate': {
-                let paths: string[];
-                if (Array.isArray(cleanPanorama.paths)) {
-                    paths = cleanCubemapArray(cleanPanorama.paths as string[]);
-                } else {
-                    paths = cleanCubemap(cleanPanorama.paths as Cubemap);
-                }
-
-                cacheKey = paths[0];
-                texture = await this.loadTexturesSeparate(paths, cacheKey);
+            case 'separate':
+                result = await this.loadTexturesSeparate(cleanPanorama);
                 break;
-            }
 
             case 'stripe':
-                cacheKey = cleanPanorama.path;
-                texture = await this.loadTexturesStripe(cleanPanorama.path, cleanPanorama.order, cacheKey);
+                result = await this.loadTexturesStripe(cleanPanorama);
                 break;
 
             case 'net':
-                cacheKey = cleanPanorama.path;
-                texture = await this.loadTexturesNet(cleanPanorama.path, cacheKey);
+                result = await this.loadTexturesNet(cleanPanorama);
                 break;
 
             default:
                 throw new PSVError('Invalid cubemap panorama, are you using the right adapter?');
         }
 
-        return { panorama, texture, cacheKey };
+        return {
+            panorama,
+            texture: result.textures,
+            cacheKey: result.cacheKey,
+            panoData: {
+                isCubemap: true,
+                flipTopBottom: result.flipTopBottom,
+                faceSize: (result.textures[0].image as HTMLImageElement | HTMLCanvasElement).width
+            },
+        };
     }
 
-    private loadTexturesSeparate(paths: string[], cacheKey: string): Promise<Texture[]> {
+    private async loadTexturesSeparate(panorama: CubemapSeparate) {
+        let paths: string[];
+        if (Array.isArray(panorama.paths)) {
+            paths = cleanCubemapArray(panorama.paths as string[]);
+        } else {
+            paths = cleanCubemap(panorama.paths as Cubemap);
+        }
+
+        const cacheKey = paths[0];
         const promises: Array<Promise<Texture>> = [];
         const progress = [0, 0, 0, 0, 0, 0];
 
@@ -107,7 +222,11 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
             );
         }
 
-        return Promise.all(promises);
+        return {
+            textures: await Promise.all(promises),
+            cacheKey,
+            flipTopBottom: panorama.flipTopBottom ?? this.config.flipTopBottom ?? false,
+        };
     }
 
     private createCubemapTexture(img: HTMLImageElement): Texture {
@@ -137,12 +256,13 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
         return utils.createTexture(img);
     }
 
-    private async loadTexturesStripe(
-        path: string,
-        order: CubemapStripe['order'] = ['left', 'front', 'right', 'back', 'top', 'bottom'],
-        cacheKey: string
-    ): Promise<Texture[]> {
-        const img = await this.viewer.textureLoader.loadImage(path, (p) => this.viewer.loader.setProgress(p), cacheKey);
+    private async loadTexturesStripe(panorama: CubemapStripe) {
+        if (!panorama.order) {
+            panorama.order = ['left', 'front', 'right', 'back', 'top', 'bottom'];
+        }
+
+        const cacheKey = panorama.path;
+        const img = await this.viewer.textureLoader.loadImage(panorama.path, (p) => this.viewer.loader.setProgress(p), cacheKey);
 
         if (img.width !== img.height * 6) {
             utils.logWarn('Invalid cubemap image, the width should be six times the height');
@@ -172,14 +292,19 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
                 tileWidth, tileWidth
             );
 
-            textures[order[i]] = utils.createTexture(buffer);
+            textures[panorama.order[i]] = utils.createTexture(buffer);
         }
 
-        return cleanCubemap(textures);
+        return {
+            textures: cleanCubemap(textures),
+            cacheKey,
+            flipTopBottom: panorama.flipTopBottom ?? this.config.flipTopBottom ?? false,
+        };
     }
 
-    private async loadTexturesNet(path: string, cacheKey: string): Promise<Texture[]> {
-        const img = await this.viewer.textureLoader.loadImage(path, (p) => this.viewer.loader.setProgress(p), cacheKey);
+    private async loadTexturesNet(panorama: CubemapNet) {
+        const cacheKey = panorama.path;
+        const img = await this.viewer.textureLoader.loadImage(panorama.path, (p) => this.viewer.loader.setProgress(p), cacheKey);
 
         if (img.width / 4 !== img.height / 3) {
             utils.logWarn('Invalid cubemap image, the width should be 4/3rd of the height');
@@ -221,12 +346,16 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[]> 
             textures[i] = utils.createTexture(buffer);
         }
 
-        return textures;
+        return {
+            textures,
+            cacheKey,
+            flipTopBottom: true,
+        };
     }
 
     createMesh(scale = 1): CubemapMesh {
         const cubeSize = CONSTANTS.SPHERE_RADIUS * 2 * scale;
-        const geometry = new BoxGeometry(cubeSize, cubeSize, cubeSize).scale(1, 1, -1) as BoxGeometry;
+        const geometry = new BoxGeometry(cubeSize, cubeSize, cubeSize).scale(1, 1, -1);
 
         const materials = [];
         for (let i = 0; i < 6; i++) {
@@ -258,12 +387,10 @@ void main() {
     }
 
     setTexture(mesh: CubemapMesh, textureData: CubemapTexture) {
-        const { texture, panorama } = textureData;
-        const isNet = (panorama as CubemapNet).type === 'net';
-        const flipTopBottom = isNet ? !this.config.flipTopBottom : this.config.flipTopBottom;
+        const { texture, panoData } = textureData;
 
         for (let i = 0; i < 6; i++) {
-            if (flipTopBottom && (i === 2 || i === 3)) {
+            if (panoData.flipTopBottom && (i === 2 || i === 3)) {
                 this.__setUniform(mesh, i, 'rotation', Math.PI);
             }
 
@@ -271,7 +398,7 @@ void main() {
         }
     }
 
-    setOverlay(mesh: CubemapMesh, textureData: CubemapTexture, opacity: number) {
+    override setOverlay(mesh: CubemapMesh, textureData: CubemapTexture, opacity: number) {
         for (let i = 0; i < 6; i++) {
             this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity, opacity);
             if (!textureData) {

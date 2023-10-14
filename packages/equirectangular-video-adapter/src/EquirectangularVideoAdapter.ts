@@ -1,11 +1,11 @@
-import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
-import { CONSTANTS, PSVError, utils } from '@photo-sphere-viewer/core';
+import type { PanoData, PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
+import { CONSTANTS, EquirectangularAdapter, PSVError, utils } from '@photo-sphere-viewer/core';
 import { MathUtils, Mesh, MeshBasicMaterial, SphereGeometry, VideoTexture } from 'three';
 import { AbstractVideoAdapter } from '../../shared/AbstractVideoAdapter';
 import { EquirectangularVideoAdapterConfig, EquirectangularVideoPanorama } from './model';
 
 type EquirectangularMesh = Mesh<SphereGeometry, MeshBasicMaterial>;
-type EquirectangularTexture = TextureData<VideoTexture, EquirectangularVideoPanorama>;
+type EquirectangularTexture = TextureData<VideoTexture, EquirectangularVideoPanorama, PanoData>;
 
 const getConfig = utils.getConfigParser<EquirectangularVideoAdapterConfig>(
     {
@@ -26,13 +26,18 @@ const getConfig = utils.getConfigParser<EquirectangularVideoAdapterConfig>(
 /**
  * Adapter for equirectangular videos
  */
-export class EquirectangularVideoAdapter extends AbstractVideoAdapter<EquirectangularVideoPanorama> {
+export class EquirectangularVideoAdapter extends AbstractVideoAdapter<
+    EquirectangularVideoPanorama,
+    PanoData
+> {
     static override readonly id = 'equirectangular-video';
 
     protected override readonly config: EquirectangularVideoAdapterConfig;
 
     private readonly SPHERE_SEGMENTS: number;
     private readonly SPHERE_HORIZONTAL_SEGMENTS: number;
+
+    private adapter: EquirectangularAdapter;
 
     constructor(viewer: Viewer, config: EquirectangularVideoAdapterConfig) {
         super(viewer);
@@ -43,10 +48,27 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<Equirectan
         this.SPHERE_HORIZONTAL_SEGMENTS = this.SPHERE_SEGMENTS / 2;
     }
 
+    override destroy(): void {
+        this.adapter?.destroy();
+
+        delete this.adapter;
+
+        super.destroy();
+    }
+
+    override textureCoordsToSphericalCoords(point: PanoramaPosition, data: PanoData): Position {
+        return this.getAdapter().textureCoordsToSphericalCoords(point, data);
+    }
+
+    override sphericalCoordsToTextureCoords(position: Position, data: PanoData): PanoramaPosition {
+        return this.getAdapter().sphericalCoordsToTextureCoords(position, data);
+    }
+
     override loadTexture(panorama: EquirectangularVideoPanorama): Promise<EquirectangularTexture> {
-        return super.loadTexture(panorama).then(({ texture, cacheKey }) => {
+        return super.loadTexture(panorama).then(({ texture }) => {
             const video: HTMLVideoElement = texture.image;
-            const panoData = {
+            const panoData: PanoData = {
+                isEquirectangular: true,
                 fullWidth: video.videoWidth,
                 fullHeight: video.videoHeight,
                 croppedWidth: video.videoWidth,
@@ -58,7 +80,7 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<Equirectan
                 poseRoll: 0,
             };
 
-            return { panorama, texture, panoData, cacheKey };
+            return { panorama, texture, panoData };
         });
     }
 
@@ -68,7 +90,7 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<Equirectan
             this.SPHERE_SEGMENTS,
             this.SPHERE_HORIZONTAL_SEGMENTS,
             -Math.PI / 2
-        ).scale(-1, 1, 1) as SphereGeometry;
+        ).scale(-1, 1, 1);
 
         const material = new MeshBasicMaterial();
 
@@ -79,5 +101,18 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<Equirectan
         mesh.material.map = textureData.texture;
 
         this.switchVideo(textureData.texture);
+    }
+
+    /**
+     * @internal
+     */
+    getAdapter() {
+        if (!this.adapter) {
+            this.adapter = new EquirectangularAdapter(this.viewer, { 
+                interpolateBackground: false, 
+                resolution: this.config.resolution,
+            });
+        }
+        return this.adapter;
     }
 }

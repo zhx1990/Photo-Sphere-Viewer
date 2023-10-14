@@ -48,23 +48,25 @@
                     caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
                 },
                 {
-                    url: [
-                        baseUrl + 'cubemap-test/1.png',
-                        baseUrl + 'cubemap-test/2.png',
-                        baseUrl + 'cubemap-test/3.png',
-                        baseUrl + 'cubemap-test/4.png',
-                        baseUrl + 'cubemap-test/5.png',
-                        baseUrl + 'cubemap-test/6.png',
-                    ],
+                    url: {
+                        type: 'separate',
+                        paths: [
+                            baseUrl + 'cubemap-test/1.png',
+                            baseUrl + 'cubemap-test/2.png',
+                            baseUrl + 'cubemap-test/3.png',
+                            baseUrl + 'cubemap-test/4.png',
+                            baseUrl + 'cubemap-test/5.png',
+                            baseUrl + 'cubemap-test/6.png',
+                        ],
+                        // flipTopBottom: true,
+                    },
                     caption: 'Test cubemap',
                 },
             ];
 
             const viewer = new Viewer({
                 container: 'photosphere',
-                adapter: [CubemapAdapter, {
-                    // flipTopBottom: true,
-                }],
+                adapter: CubemapAdapter,
                 panorama: panos[0].url,
                 caption: panos[0].caption,
                 loadingImg: baseUrl + 'loader.gif',
@@ -80,8 +82,10 @@
                             return () => {
                                 i = 1 - i;
                                 viewer.setPanorama(panos[i].url, {
-                                    yaw: 0,
-                                    pitch: 0,
+                                    position: {
+                                        yaw: 0,
+                                        pitch: 0,
+                                    },
                                     zoom: 50,
                                     caption: panos[i].caption,
                                 });

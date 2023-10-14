@@ -82,6 +82,10 @@ const viewer = new Viewer({
 
 :::
 
+::: tip Positions definitions
+This adapter does not support pixel positions, only `yaw`+`pitch`.
+:::
+
 ## Configuration
 
 #### `autoplay`
@@ -98,13 +102,6 @@ Automatically starts the video on load.
 
 Mute the video by default.
 
-#### `equiangular`
-
--   type: `boolean`
--   default: `true`
-
-Set to `true` when using an equiangular cubemap (EAC), which is the format used by Youtube. Set to `false` when using a standard cubemap.
-
 ## Panorama options
 
 When using this adapter, the `panorama` option and the `setPanorama()` method accept an object to configure the video.
@@ -114,6 +111,13 @@ When using this adapter, the `panorama` option and the `setPanorama()` method ac
 -   type: `string`
 
 Path of the video file. The video must not be larger than 4096 pixels or it won't be displayed on handled devices.
+
+#### `equiangular`
+
+-   type: `boolean`
+-   default: `true`
+
+Set to `true` when using an equiangular cubemap (EAC), which is the format used by Youtube. Set to `false` when using a standard cubemap.
 
 ### Video format
 

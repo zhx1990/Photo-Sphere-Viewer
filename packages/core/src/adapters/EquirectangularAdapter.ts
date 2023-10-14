@@ -3,7 +3,7 @@ import { PSVError } from '../PSVError';
 import type { Viewer } from '../Viewer';
 import { SPHERE_RADIUS } from '../data/constants';
 import { SYSTEM } from '../data/system';
-import { PanoData, PanoDataProvider, TextureData } from '../model';
+import { PanoData, PanoDataProvider, PanoramaPosition, Position, TextureData } from '../model';
 import { createTexture, firstNonNull, getConfigParser, getXMPValue, isNil, logWarn } from '../utils';
 import { AbstractAdapter } from './AbstractAdapter';
 import { interpolationWorkerSrc } from './interpolationWorker';
@@ -39,7 +39,7 @@ export type EquirectangularAdapterConfig = {
 };
 
 type EquirectangularMesh = Mesh<BufferGeometry, ShaderMaterial>;
-type EquirectangularTexture = TextureData<Texture, string>;
+type EquirectangularTexture = TextureData<Texture, string, PanoData>;
 
 const getConfig = getConfigParser<EquirectangularAdapterConfig>(
     {
@@ -62,7 +62,7 @@ const getConfig = getConfigParser<EquirectangularAdapterConfig>(
 /**
  * Adapter for equirectangular panoramas
  */
-export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
+export class EquirectangularAdapter extends AbstractAdapter<string, Texture, PanoData> {
     static override readonly id: string = 'equirectangular';
     static override readonly supportsDownload: boolean = true;
     static override readonly supportsOverlay: boolean = true;
@@ -112,6 +112,33 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         super.destroy();
     }
 
+    override textureCoordsToSphericalCoords(point: PanoramaPosition, data: PanoData): Position {
+        if (isNil(point.textureX) || isNil(point.textureY)) {
+            throw new PSVError(`Texture position is missing 'textureX' or 'textureY'`);
+        }
+
+        const relativeX = ((point.textureX + data.croppedX) / data.fullWidth) * Math.PI * 2;
+        const relativeY = ((point.textureY + data.croppedY) / data.fullHeight) * Math.PI;
+
+        return {
+            yaw: relativeX >= Math.PI ? relativeX - Math.PI : relativeX + Math.PI,
+            pitch: Math.PI / 2 - relativeY,
+        };
+    }
+
+    override sphericalCoordsToTextureCoords(position: Position, data: PanoData): PanoramaPosition {
+        const relativeLong = (position.yaw / Math.PI / 2) * data.fullWidth;
+        const relativeLat = (position.pitch / Math.PI) * data.fullHeight;
+
+        return {
+            textureX:
+                Math.round(
+                    position.yaw < Math.PI ? relativeLong + data.fullWidth / 2 : relativeLong - data.fullWidth / 2
+                ) - data.croppedX,
+            textureY: Math.round(data.fullHeight / 2 - relativeLat) - data.croppedY,
+        };
+    }
+
     async loadTexture(
         panorama: string,
         newPanoData: PanoData | PanoDataProvider,
@@ -132,7 +159,8 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
             newPanoData = this.__defaultPanoData(img);
         }
 
-        const panoData = {
+        const panoData: PanoData = {
+            isEquirectangular: true,
             fullWidth: firstNonNull(newPanoData?.fullWidth, xmpPanoData?.fullWidth, img.width),
             fullHeight: firstNonNull(newPanoData?.fullHeight, xmpPanoData?.fullHeight, img.height),
             croppedWidth: firstNonNull(newPanoData?.croppedWidth, xmpPanoData?.croppedWidth, img.width),
@@ -183,6 +211,7 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
 
         if (a !== -1 && b !== -1 && data.includes('GPano:')) {
             return {
+                isEquirectangular: true,
                 fullWidth: getXMPValue(data, 'FullPanoWidthPixels'),
                 fullHeight: getXMPValue(data, 'FullPanoHeightPixels'),
                 croppedWidth: getXMPValue(data, 'CroppedAreaImageWidthPixels'),
@@ -290,7 +319,7 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
             this.SPHERE_SEGMENTS,
             this.SPHERE_HORIZONTAL_SEGMENTS,
             -Math.PI / 2
-        ).scale(-1, 1, 1) as SphereGeometry;
+        ).scale(-1, 1, 1);
 
         const material = AbstractAdapter.createOverlayMaterial();
 
@@ -301,7 +330,7 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.panorama, textureData.texture);
     }
 
-    setOverlay(mesh: EquirectangularMesh, textureData: EquirectangularTexture, opacity: number) {
+    override setOverlay(mesh: EquirectangularMesh, textureData: EquirectangularTexture, opacity: number) {
         this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity, opacity);
         if (!textureData) {
             this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlay, null);
@@ -330,6 +359,7 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture> {
         const croppedY = Math.round((fullHeight - img.height) / 2);
 
         return {
+            isEquirectangular: true,
             fullWidth: fullWidth,
             fullHeight: fullHeight,
             croppedWidth: img.width,

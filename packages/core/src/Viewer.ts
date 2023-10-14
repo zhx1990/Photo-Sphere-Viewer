@@ -28,6 +28,7 @@ import {
     AnimateOptions,
     CssSize,
     ExtendedPosition,
+    PanoData,
     PanoramaOptions,
     ParsedViewerConfig,
     Position,
@@ -72,7 +73,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
     readonly container: HTMLElement;
 
     /** @internal */
-    readonly adapter: AbstractAdapter<any, any>;
+    readonly adapter: AbstractAdapter<any, any, any>;
     /** @internal */
     readonly plugins: Record<string, AbstractPlugin<any>> = {};
     /** @internal */
@@ -479,16 +480,19 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                 .loadTexture(
                     path,
                     (image) => {
-                        const p = this.state.panoData;
-                        const r = image.width / p.croppedWidth;
-                        return {
-                            fullWidth: r * p.fullWidth,
-                            fullHeight: r * p.fullHeight,
-                            croppedWidth: r * p.croppedWidth,
-                            croppedHeight: r * p.croppedHeight,
-                            croppedX: r * p.croppedX,
-                            croppedY: r * p.croppedY,
-                        };
+                        if ((this.state.textureData.panoData as PanoData).isEquirectangular) {
+                            const p = this.state.textureData.panoData as PanoData;
+                            const r = image.width / p.croppedWidth;
+                            return {
+                                isEquirectangular: true,
+                                fullWidth: r * p.fullWidth,
+                                fullHeight: r * p.fullHeight,
+                                croppedWidth: r * p.croppedWidth,
+                                croppedHeight: r * p.croppedHeight,
+                                croppedX: r * p.croppedX,
+                                croppedY: r * p.croppedY,
+                            };
+                        }
                     },
                     false
                 )

@@ -20,6 +20,11 @@ export type CubemapTilesPanorama = {
      * function to build a tile url
      */
     tileUrl: (face: keyof Cubemap, col: number, row: number) => string | null;
+    /**
+     * Set to true if the top and bottom faces are not correctly oriented
+     * @default false
+     */
+    flipTopBottom?: boolean;
 };
 
 export type CubemapTileLevel = {
@@ -53,6 +58,11 @@ export type CubemapMultiTilesPanorama = {
      * function to build a tile url
      */
     tileUrl: (face: keyof Cubemap, col: number, row: number, level: number) => string | null;
+    /**
+     * Set to true if the top and bottom faces are not correctly oriented
+     * @default false
+     */
+    flipTopBottom?: boolean;
 };
 
 export type CubemapTilesAdapterConfig = CubemapAdapterConfig & {

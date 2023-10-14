@@ -64,6 +64,7 @@ export type SphericalPosition = {
 export type PanoramaPosition = {
     textureX: number;
     textureY: number;
+    textureFace?: string;
 };
 
 /**
@@ -89,6 +90,7 @@ export type AnimateOptions = Partial<ExtendedPosition> & {
  * Crop information of an equirectangular panorama
  */
 export type PanoData = {
+    isEquirectangular: true;
     fullWidth: number;
     fullHeight: number;
     croppedWidth: number;
@@ -161,23 +163,23 @@ export type PanoramaOptions = Partial<ExtendedPosition> & {
 /**
  * Result of {@link AbstractAdapter.loadTexture}
  */
-export type TextureData<T = Texture | Texture[] | Record<string, Texture>, P = any> = {
+export type TextureData<TTexture = Texture | Texture[] | Record<string, Texture>, TPanorama = any, TData = any> = {
     /**
      * Actual texture or list of textures
      */
-    texture: T;
-    /**
-     * Equirectangular pano data
-     */
-    panoData?: PanoData;
+    texture: TTexture;
     /**
      * Original panorama definition
      */
-    panorama: P;
+    panorama: TPanorama;
+    /**
+     * Panorama metadata
+     */
+    panoData?: TData;
     /**
      * Key used in the loader cache
      */
-    cacheKey: string;
+    cacheKey?: string;
 };
 
 /**
@@ -220,6 +222,10 @@ export type ClickData = {
      * position on the texture, if applicable
      */
     textureY?: number;
+    /**
+     * position on the texture, if applicable
+     */
+    textureFace?: string;
     /**
      * Original element which received the click
      */

@@ -29,6 +29,8 @@ This section describes the most useful methods available.
 
 ::: tip Positions definitions
 Some methods takes positionnal arguments, this is either on combination `yaw` and `pitch` (radians or degrees) or `textureX` and `textureY` properties, corresponding to the pixel position on the source panorama file.
+
+When using a [cubemap](./adapters/cubemap.md) you will also have to provide `textureFace`.
 :::
 
 ### `animate(options): Animation`

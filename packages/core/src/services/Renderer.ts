@@ -241,7 +241,6 @@ export class Renderer extends AbstractService {
         }
 
         this.state.textureData = textureData;
-        this.state.panoData = textureData.panoData;
 
         this.viewer.adapter.setTexture(this.mesh, textureData);
 

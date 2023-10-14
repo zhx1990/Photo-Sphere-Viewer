@@ -59,6 +59,10 @@ const viewer = new Viewer({
 
 :::
 
+::: tip Positions definitions
+With this adapter, pixel positions refer to the full size of the panorama (first level when using multi-levels tiles).
+:::
+
 ## Configuration
 
 #### `baseBlur`

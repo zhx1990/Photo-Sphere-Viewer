@@ -1,4 +1,4 @@
-import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
+import type { PanoData, PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, CONSTANTS, EquirectangularAdapter, events, PSVError, utils } from '@photo-sphere-viewer/core';
 import {
     BufferAttribute,
@@ -53,7 +53,11 @@ import { checkPanoramaConfig, getTileConfig, EquirectangularTileConfig, getTileC
  */
 
 type EquirectangularMesh = Mesh<SphereGeometry, MeshBasicMaterial[]>;
-type EquirectangularTexture = TextureData<Texture, EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama>;
+type EquirectangularTexture = TextureData<
+    Texture,
+    EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama,
+    PanoData
+>;
 type EquirectangularTile = {
     row: number;
     col: number;
@@ -104,7 +108,8 @@ const vertexPosition = new Vector3();
  */
 export class EquirectangularTilesAdapter extends AbstractAdapter<
     EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama,
-    Texture
+    Texture,
+    PanoData
 > {
     static override readonly id = 'equirectangular-tiles';
     static override readonly supportsDownload = false;
@@ -166,7 +171,9 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
 
         this.state.errorMaterial?.map?.dispose();
         this.state.errorMaterial?.dispose();
+        this.adapter?.destroy();
 
+        delete this.adapter;
         delete this.state.geom;
         delete this.state.errorMaterial;
 
@@ -190,6 +197,14 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
         return !!panorama.baseUrl;
     }
 
+    override textureCoordsToSphericalCoords(point: PanoramaPosition, data: PanoData): Position {
+        return this.getAdapter().textureCoordsToSphericalCoords(point, data);
+    }
+
+    override sphericalCoordsToTextureCoords(position: Position, data: PanoData): PanoramaPosition {
+        return this.getAdapter().sphericalCoordsToTextureCoords(position, data);
+    }
+
     override loadTexture(
         panorama: EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama
     ): Promise<EquirectangularTexture> {
@@ -200,7 +215,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
         }
 
         const firstTile = getTileConfig(panorama, 0, this);
-        const panoData = {
+        const panoData: PanoData = {
+            isEquirectangular: true,
             fullWidth: firstTile.width,
             fullHeight: firstTile.width / 2,
             croppedWidth: firstTile.width,
@@ -213,21 +229,14 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
         };
 
         if (panorama.baseUrl) {
-            if (!this.adapter) {
-                this.adapter = new EquirectangularAdapter(this.viewer, {
-                    backgroundColor: this.config.backgroundColor,
-                    interpolateBackground: false,
-                    blur: this.config.baseBlur,
-                    useXmpData: false,
-                });
-            }
-
-            return this.adapter.loadTexture(panorama.baseUrl, panorama.basePanoData).then((textureData) => ({
-                panorama,
-                panoData,
-                cacheKey: textureData.cacheKey,
-                texture: textureData.texture,
-            }));
+            return this.getAdapter()
+                .loadTexture(panorama.baseUrl, panorama.basePanoData)
+                .then((textureData) => ({
+                    panorama,
+                    panoData,
+                    cacheKey: textureData.cacheKey,
+                    texture: textureData.texture,
+                }));
         } else {
             return Promise.resolve({
                 panorama,
@@ -313,13 +322,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
     setTextureOpacity(mesh: EquirectangularMesh, opacity: number) {
         mesh.material[0].opacity = opacity;
         mesh.material[0].transparent = opacity < 1;
-    }
-
-    /**
-     * @throws {@link PSVError} always
-     */
-    setOverlay() {
-        throw new PSVError('EquirectangularTilesAdapter does not support overlay');
     }
 
     disposeTexture(textureData: TextureData<Texture>) {
@@ -540,5 +542,19 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
             mat?.dispose();
         });
         this.state.materials.length = 0;
+    }
+
+    /**
+     * @internal
+     */
+    getAdapter() {
+        if (!this.adapter) {
+            this.adapter = new EquirectangularAdapter(this.viewer, {
+                backgroundColor: this.config.backgroundColor,
+                interpolateBackground: false,
+                blur: this.config.baseBlur,
+            });
+        }
+        return this.adapter;
     }
 }
