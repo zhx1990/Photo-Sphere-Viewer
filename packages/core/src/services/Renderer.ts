@@ -259,8 +259,7 @@ export class Renderer extends AbstractService {
     }
 
     /**
-     * Applies the overlay to the mesh
-     * @internal
+     * @deprecated
      */
     setOverlay(textureData: TextureData, opacity: number) {
         if (this.state.overlayData) {
