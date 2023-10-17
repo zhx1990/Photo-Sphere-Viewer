@@ -12,7 +12,7 @@ body:
 
         Consider searching [the documentation](https://photo-sphere-viewer.js.org/guide/) to find the solution by yourself.
 
-        Use [markdown codeblocks](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks) when posting code samples.
+        Use [markdown codeblocks](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks) when posting code samples, **do not use screenshots**!
   - id: description
     type: textarea
     attributes:

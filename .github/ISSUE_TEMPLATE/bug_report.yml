@@ -10,9 +10,9 @@ body:
 
         **Please use English or French**, I don't speak other languages.
 
-        Use [markdown codeblocks](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks) when posting code samples.
+        Use [markdown codeblocks](https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-and-highlighting-code-blocks) when posting code samples, **do not use screenshots**!
 
-        You can quickly create a demo by forking the [basic demo](https://photo-sphere-viewer.js.org/demos/basic/1-zero-config.html) to jsFiddle, Codepen or CodeSandbox.
+        You can quickly create a demo by forking the [basic demo](https://photo-sphere-viewer.js.org/demos/basic/0-config.html) to jsFiddle, Codepen or CodeSandbox.
   - id: description
     type: textarea
     attributes:
