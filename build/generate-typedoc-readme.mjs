@@ -50,11 +50,11 @@ Documentation : ${pkg.homepage}
     const destFile = path.join(distDir, DIST_FILE);
 
     const content = `
-[Main documentation](https://photo-sphere-viewer.js.org)
-
 # Core
 
-- [Core](modules/Core.html)
+- [Viewer](classes/Core.Viewer.html)
+- [events](modules/Core.events.html)
+- [utils](modules/Core.utils.html)
 
 # Plugins
 

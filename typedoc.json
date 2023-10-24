@@ -13,8 +13,9 @@
   "validation": {
     "notExported": false
   },
-  "sidebarLinks": {
-    "📃 Main documentation": "https://photo-sphere-viewer.js.org"
+  "navigationLinks": {
+    "Main documentation": "https://photo-sphere-viewer.js.org",
+    "GitHub": "https://github.com/mistic100/Photo-Sphere-Viewer"
   },
   "visibilityFilters": {
     "protected": true,
