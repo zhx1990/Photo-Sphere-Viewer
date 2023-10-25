@@ -1,6 +1,6 @@
 import type { Point, Position, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractConfigurablePlugin, PSVError, events, utils } from '@photo-sphere-viewer/core';
-import { Vector3 } from 'three';
+import { Object3D, Vector3 } from 'three';
 import { Marker, MarkerType } from './Marker';
 import { MarkersButton } from './MarkersButton';
 import { MarkersListButton } from './MarkersListButton';
@@ -764,9 +764,20 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     /**
      * Returns the marker associated to an event target
      */
-    private __getTargetMarker(target: HTMLElement, closest = false): Marker {
-        const target2 = closest ? utils.getClosest(target, '.psv-marker') : target;
-        return target2 ? (target2 as any)[MARKER_DATA] : undefined;
+    private __getTargetMarker(target: HTMLElement, closest?: boolean): Marker;
+    private __getTargetMarker(target: Object3D[]): Marker;
+    private __getTargetMarker(target: HTMLElement | Object3D[], closest = false): Marker {
+        if (target instanceof Node) {
+            const target2 = closest ? utils.getClosest(target, '.psv-marker') : target;
+            return target2 ? (target2 as any)[MARKER_DATA] : undefined;
+        } else if (Array.isArray(target)) {
+            return target
+                .map((o) => o.userData[MARKER_DATA] as Marker)
+                .filter((m) => !!m)
+                .sort((a, b) => b.config.zIndex - a.config.zIndex)[0];
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -832,11 +843,11 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      * Handles mouse click events, select the marker and open the panel if necessary
      */
     private __onClick(e: events.ClickEvent | events.DoubleClickEvent, dblclick: boolean) {
-        let marker = e.data.objects.find((o) => o.userData[MARKER_DATA])?.userData[MARKER_DATA];
+        const threeMarker = this.__getTargetMarker(e.data.objects);
+        const stdMarker = this.__getTargetMarker(e.data.target, true);
 
-        if (!marker) {
-            marker = this.__getTargetMarker(e.data.target, true);
-        }
+        // give priority to standard markers which are always on top of Three markers
+        const marker = stdMarker || threeMarker;
 
         if (this.state.currentMarker && this.state.currentMarker !== marker) {
             this.dispatchEvent(new UnselectMarkerEvent(this.state.currentMarker));

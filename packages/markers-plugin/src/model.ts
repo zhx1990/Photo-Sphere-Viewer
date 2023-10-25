@@ -115,6 +115,11 @@ export type MarkerConfig = {
      */
     opacity?: number;
     /**
+     * Drawing order
+     * @default 1
+     */
+    zIndex?: number;
+    /**
      * CSS class(es) added to the marker element (ignored for `imageLayer`, `videoLayer`)
      */
     className?: string;

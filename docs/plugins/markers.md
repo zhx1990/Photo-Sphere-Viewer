@@ -427,6 +427,19 @@ _(This option is ignored for polygons, polylines and `imageLayer` markers)._
 
 Opacity of the marker.
 
+#### `zIndex`
+
+-   type: `number`
+-   default: `1`
+
+Ordering of the marker.
+
+_(This option is ignored for polygons and polylines markers)._
+
+::: warning
+`imageLayer` and `videoLayer` are always renderer first, then `polygon` and `polyline`, then standard markers.
+:::
+
 #### `className`
 
 -   type: `string`

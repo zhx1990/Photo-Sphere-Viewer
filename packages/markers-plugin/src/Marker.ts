@@ -391,6 +391,12 @@ export class Marker {
         if (utils.isNil(this.config.visible)) {
             this.config.visible = true;
         }
+        if (utils.isNil(this.config.zIndex)) {
+            this.config.zIndex = 1;
+        }
+        if (utils.isNil(this.config.opacity)) {
+            this.config.opacity = 1;
+        }
 
         this.state.anchor = utils.parsePoint(this.config.anchor);
 
@@ -418,7 +424,8 @@ export class Marker {
             }
 
             // apply style
-            element.style.opacity = `${this.config.opacity ?? 1}`;
+            element.style.opacity = `${this.config.opacity}`;
+            element.style.zIndex = `${30 + this.config.zIndex}`; // 30 is the base z-index in the stylesheet
             if (this.config.style) {
                 Object.assign(element.style, this.config.style);
             }
@@ -771,7 +778,8 @@ export class Marker {
             // no default
         }
 
-        mesh.material.opacity = this.config.opacity ?? 1;
+        mesh.material.opacity = this.config.opacity;
+        mesh.renderOrder = 1000 + this.config.zIndex;
     }
 
     /**
