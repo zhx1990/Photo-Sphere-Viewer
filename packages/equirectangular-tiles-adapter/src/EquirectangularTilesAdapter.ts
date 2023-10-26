@@ -1,10 +1,8 @@
 import type { PanoData, PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractAdapter, CONSTANTS, EquirectangularAdapter, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import { AbstractAdapter, CONSTANTS, EquirectangularAdapter, PSVError, events, utils } from '@photo-sphere-viewer/core';
 import {
     BufferAttribute,
-    Frustum,
     MathUtils,
-    Matrix4,
     Mesh,
     MeshBasicMaterial,
     SphereGeometry,
@@ -18,7 +16,7 @@ import {
     EquirectangularTilesAdapterConfig,
     EquirectangularTilesPanorama,
 } from './model';
-import { checkPanoramaConfig, getTileConfig, EquirectangularTileConfig, getTileConfigByIndex } from './utils';
+import { EquirectangularTileConfig, checkPanoramaConfig, getTileConfig, getTileConfigByIndex } from './utils';
 
 /* the faces of the top and bottom rows are made of a single triangle (3 vertices)
  * all other faces are made of two triangles (6 vertices)
@@ -99,8 +97,6 @@ const getConfig = utils.getConfigParser<EquirectangularTilesAdapterConfig>(
     }
 );
 
-const frustum = new Frustum();
-const projScreenMatrix = new Matrix4();
 const vertexPosition = new Vector3();
 
 /**
@@ -336,10 +332,6 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
             return;
         }
 
-        const camera = this.viewer.renderer.camera;
-        projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-        frustum.setFromProjectionMatrix(projScreenMatrix);
-
         const panorama: EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama = this.viewer.config.panorama;
         const zoomLevel = this.viewer.getZoomLevel();
         const tileConfig = getTileConfig(panorama, zoomLevel, this);
@@ -351,7 +343,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
             vertexPosition.fromBufferAttribute(verticesPosition, i);
             vertexPosition.applyEuler(this.viewer.renderer.sphereCorrection);
 
-            if (frustum.containsPoint(vertexPosition)) {
+            if (this.viewer.renderer.isObjectVisible(vertexPosition)) {
                 // compute position of the segment (3 or 6 vertices)
                 let segmentIndex;
                 if (i < this.SPHERE_SEGMENTS * NB_VERTICES_BY_SMALL_FACE) {

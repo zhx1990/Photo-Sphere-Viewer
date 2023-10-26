@@ -1,18 +1,21 @@
 import {
+    Box3,
     Euler,
+    Frustum,
     Group,
     Intersection,
+    LinearSRGBColorSpace,
+    Matrix4,
     Mesh,
     Object3D,
     PerspectiveCamera,
     Raycaster,
-    Renderer as ThreeRenderer,
     Scene,
+    Renderer as ThreeRenderer,
     Vector2,
-    WebGLRenderer,
-    WebGLRenderTarget,
-    LinearSRGBColorSpace,
     Vector3,
+    WebGLRenderTarget,
+    WebGLRenderer,
 } from 'three';
 import { SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
 import { SYSTEM } from '../data/system';
@@ -32,6 +35,8 @@ import { AbstractService } from './AbstractService';
 import type { AbstractAdapter } from '../adapters/AbstractAdapter';
 
 const vector2 = new Vector2();
+const matrix4 = new Matrix4();
+const box3 = new Box3();
 
 export type CustomRenderer = Pick<ThreeRenderer, 'render'> & {
     getIntersections?(raycaster: Raycaster, vector: Vector2): Array<Intersection<Mesh>>;
@@ -48,9 +53,11 @@ export class Renderer extends AbstractService {
     private readonly mesh: Mesh;
     private readonly meshContainer: Group;
     private readonly raycaster: Raycaster;
+    private readonly frustum: Frustum;
     private readonly container: HTMLElement;
 
     private timestamp?: number;
+    private frustumNeedsUpdate = true;
     private customRenderer?: CustomRenderer;
 
     get panoramaPose(): Euler {
@@ -86,6 +93,7 @@ export class Renderer extends AbstractService {
         this.scene.add(this.meshContainer);
 
         this.raycaster = new Raycaster();
+        this.frustum = new Frustum();
 
         this.container = document.createElement('div');
         this.container.className = 'psv-canvas-container';
@@ -183,6 +191,7 @@ export class Renderer extends AbstractService {
         this.camera.aspect = this.state.aspect;
         this.camera.updateProjectionMatrix();
         this.viewer.needsUpdate();
+        this.frustumNeedsUpdate = true;
     }
 
     /**
@@ -192,6 +201,7 @@ export class Renderer extends AbstractService {
         this.camera.fov = this.state.vFov;
         this.camera.updateProjectionMatrix();
         this.viewer.needsUpdate();
+        this.frustumNeedsUpdate = true;
     }
 
     /**
@@ -208,6 +218,7 @@ export class Renderer extends AbstractService {
         }
         this.camera.updateMatrixWorld();
         this.viewer.needsUpdate();
+        this.frustumNeedsUpdate = true;
     }
 
     /**
@@ -400,6 +411,38 @@ export class Renderer extends AbstractService {
         }
 
         return intersections;
+    }
+
+    /**
+     * Checks if an object/point is currently visible
+     */
+    isObjectVisible(value: Object3D | Vector3): boolean {
+        if (!value) {
+            return false;
+        }
+
+        if (this.frustumNeedsUpdate) {
+            matrix4.multiplyMatrices(this.camera.projectionMatrix, this.camera.matrixWorldInverse);
+            this.frustum.setFromProjectionMatrix(matrix4);
+            this.frustumNeedsUpdate = false;
+        }
+
+        if ((value as Vector3).isVector3) {
+            return this.frustum.containsPoint(value as Vector3);
+        } else if ((value as Mesh).isMesh && (value as Mesh).geometry) {
+            // Frustum.intersectsObject uses the boundingSphere by default
+            // for better precision we prefer the boundingBox
+            const mesh = value as Mesh;
+            if (!mesh.geometry.boundingBox) {
+                mesh.geometry.computeBoundingBox();
+            }
+            box3.copy(mesh.geometry.boundingBox).applyMatrix4(mesh.matrixWorld);
+            return this.frustum.intersectsBox(box3);
+        } else if ((value as Object3D).isObject3D) {
+            return this.frustum.intersectsObject(value as Object3D);
+        } else {
+            return false;
+        }
     }
 
     /**

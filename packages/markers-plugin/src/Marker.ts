@@ -69,14 +69,13 @@ export class Marker {
         return !this.is3d() ? this.element : null;
     }
 
-    get threeElement(): Object3D {
+    get threeElement(): Mesh<BufferGeometry, MeshBasicMaterial> {
         return this.is3d() ? this.element : null;
     }
 
     get video(): HTMLVideoElement {
         if (this.type === MarkerType.videoLayer) {
-            const mesh = this.threeElement.children[0] as Mesh<BufferGeometry, MeshBasicMaterial>;
-            return mesh.material.map.image;
+            return this.threeElement.material.map.image;
         } else {
             utils.logWarn(`Marker ${this.id} is not a video marker`);
         }
@@ -148,7 +147,7 @@ export class Marker {
         this.hideTooltip();
 
         if (this.is3d()) {
-            delete this.threeElement.children[0].userData[MARKER_DATA];
+            delete this.threeElement.userData[MARKER_DATA];
         } else {
             delete this.element[MARKER_DATA];
         }
@@ -655,8 +654,8 @@ export class Marker {
      * Updates a 3D marker
      */
     private __update3d() {
-        const element = this.threeElement;
-        const mesh = element.children[0] as Mesh<BufferGeometry, MeshBasicMaterial>;
+        const mesh = this.threeElement;
+        const group = mesh.parent;
 
         this.state.dynamicSize = false;
 
@@ -669,24 +668,24 @@ export class Marker {
             this.state.size = this.config.size;
 
             mesh.position.set(0.5 - this.state.anchor.x, this.state.anchor.y - 0.5, 0);
-            this.viewer.dataHelper.sphericalCoordsToVector3(this.state.position, element.position);
+            this.viewer.dataHelper.sphericalCoordsToVector3(this.state.position, group.position);
 
-            element.lookAt(0, element.position.y, 0);
+            group.lookAt(0, group.position.y, 0);
             switch (this.config.orientation) {
                 case 'horizontal':
-                    element.rotateX(this.state.position.pitch < 0 ? -Math.PI / 2 : Math.PI / 2);
+                    group.rotateX(this.state.position.pitch < 0 ? -Math.PI / 2 : Math.PI / 2);
                     break;
                 case 'vertical-left':
-                    element.rotateY(-Math.PI * 0.4);
+                    group.rotateY(-Math.PI * 0.4);
                     break;
                 case 'vertical-right':
-                    element.rotateY(Math.PI * 0.4);
+                    group.rotateY(Math.PI * 0.4);
                     break;
                 // no default
             }
 
             // 100 is magic number that gives a coherent size at default zoom level
-            element.scale.set(this.config.size.width / 100, this.config.size.height / 100, 1);
+            group.scale.set(this.config.size.width / 100, this.config.size.height / 100, 1);
 
             const p = mesh.geometry.getAttribute('position');
             this.state.positions3D = [0, 1, 3, 2].map((i) => {
@@ -780,6 +779,7 @@ export class Marker {
 
         mesh.material.opacity = this.config.opacity;
         mesh.renderOrder = 1000 + this.config.zIndex;
+        mesh.geometry.boundingBox = null; // reset box for Renderer.isObjectVisible
     }
 
     /**
@@ -845,11 +845,11 @@ export class Marker {
         const geometry = new PlaneGeometry(1, 1);
         const mesh = new Mesh(geometry, material);
         mesh.userData = { [MARKER_DATA]: this };
-        const element = new Group().add(mesh);
+        const group = new Group().add(mesh);
 
         // overwrite the visible property to be tied to the Marker instance
         // and do it without context bleed
-        Object.defineProperty(element, 'visible', {
+        Object.defineProperty(group, 'visible', {
             enumerable: true,
             get: function (this: Object3D) {
                 return (this.children[0].userData[MARKER_DATA] as Marker).state.visible;
@@ -859,7 +859,7 @@ export class Marker {
             },
         });
 
-        return element;
+        return mesh;
     }
 
     /**

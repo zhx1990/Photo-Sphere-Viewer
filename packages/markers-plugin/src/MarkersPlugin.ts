@@ -298,7 +298,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         if (marker.isPoly()) {
             this.svgContainer.appendChild(marker.domElement);
         } else if (marker.is3d()) {
-            this.viewer.renderer.addObject(marker.threeElement);
+            this.viewer.renderer.addObject(marker.threeElement.parent);
         } else {
             this.container.appendChild(marker.domElement);
         }
@@ -363,7 +363,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         if (marker.isPoly()) {
             this.svgContainer.removeChild(marker.domElement);
         } else if (marker.is3d()) {
-            this.viewer.renderer.removeObject(marker.threeElement);
+            this.viewer.renderer.removeObject(marker.threeElement.parent);
         } else {
             this.container.removeChild(marker.domElement);
         }
@@ -678,12 +678,12 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     }
 
     /**
-     * Determines if a point marker is visible<br>
+     * Determines if a marker is visible<br>
      * It tests if the point is in the general direction of the camera, then check if it's in the viewport
      */
     private __isMarkerVisible(marker: Marker, position: Point): boolean {
         if (marker.is3d()) {
-            return marker.state.positions3D.some((vector) => this.viewer.dataHelper.isPointVisible(vector));
+            return this.viewer.renderer.isObjectVisible(marker.threeElement);
         } else {
             return (
                 marker.state.positions3D[0].dot(this.viewer.state.direction) > 0
@@ -877,9 +877,9 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
             if (this.markers[marker.id]) {
                 if (marker.config.tooltip?.trigger === 'click') {
                     if (marker.tooltip) {
-                        this.hideMarkerTooltip(marker);
+                        this.hideMarkerTooltip(marker.id);
                     } else {
-                        this.showMarkerTooltip(marker);
+                        this.showMarkerTooltip(marker.id);
                     }
                 } else {
                     this.showMarkerPanel(marker.id);

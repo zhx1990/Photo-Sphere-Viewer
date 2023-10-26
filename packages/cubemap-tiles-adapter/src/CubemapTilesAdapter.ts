@@ -1,11 +1,9 @@
 import type { PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
-import { AbstractAdapter, CONSTANTS, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import { AbstractAdapter, CONSTANTS, PSVError, events, utils } from '@photo-sphere-viewer/core';
 import { CubemapAdapter, CubemapData, CubemapFaces } from '@photo-sphere-viewer/cubemap-adapter';
 import {
     BoxGeometry,
     BufferAttribute,
-    Frustum,
-    Matrix4,
     Mesh,
     MeshBasicMaterial,
     Texture,
@@ -15,7 +13,7 @@ import {
 import { Queue, Task } from '../../shared/Queue';
 import { buildDebugTexture, buildErrorMaterial, createWireFrame } from '../../shared/tiles-utils';
 import { CubemapMultiTilesPanorama, CubemapTilesAdapterConfig, CubemapTilesPanorama } from './model';
-import { checkPanoramaConfig, CubemapTileConfig, getTileConfig, getTileConfigByIndex, isTopOrBottom } from './utils';
+import { CubemapTileConfig, checkPanoramaConfig, getTileConfig, getTileConfigByIndex, isTopOrBottom } from './utils';
 
 type CubemapMesh = Mesh<BoxGeometry, MeshBasicMaterial[]>;
 type CubemapTexture = TextureData<Texture[], CubemapTilesPanorama | CubemapMultiTilesPanorama, CubemapData>;
@@ -68,8 +66,6 @@ const getConfig = utils.getConfigParser<CubemapTilesAdapterConfig>(
     }
 );
 
-const frustum = new Frustum();
-const projScreenMatrix = new Matrix4();
 const vertexPosition = new Vector3();
 
 /**
@@ -275,10 +271,6 @@ export class CubemapTilesAdapter extends AbstractAdapter<
             return;
         }
 
-        const camera = this.viewer.renderer.camera;
-        projScreenMatrix.multiplyMatrices(camera.projectionMatrix, camera.matrixWorldInverse);
-        frustum.setFromProjectionMatrix(projScreenMatrix);
-
         const panorama: CubemapTilesPanorama | CubemapMultiTilesPanorama = this.viewer.state.textureData.panorama;
         const panoData: CubemapData = this.viewer.state.textureData.panoData;
         const zoomLevel = this.viewer.getZoomLevel();
@@ -291,7 +283,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<
             vertexPosition.fromBufferAttribute(verticesPosition, i);
             vertexPosition.applyEuler(this.viewer.renderer.sphereCorrection);
 
-            if (frustum.containsPoint(vertexPosition)) {
+            if (this.viewer.renderer.isObjectVisible(vertexPosition)) {
                 const face = Math.floor(i / NB_VERTICES_BY_PLANE);
 
                 // compute position of the segment (6 vertices)
