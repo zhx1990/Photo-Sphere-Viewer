@@ -31,6 +31,7 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
         startNodeId: null,
         preload: false,
         transitionOptions: {
+            showLoader: true,
             speed: '20rpm',
             fadeIn: true,
             rotation: true,
@@ -393,9 +394,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 }
 
                 const transitionOptions: VirtualTourTransitionOptions = {
-                    speed: (getConfig.defaults.transitionOptions as any).speed,
-                    fadeIn: (getConfig.defaults.transitionOptions as any).fadeIn,
-                    rotation: (getConfig.defaults.transitionOptions as any).rotation,
+                    ...getConfig.defaults.transitionOptions,
                     rotateTo: fromLinkPosition,
                     ...(typeof this.config.transitionOptions === 'function'
                         ? this.config.transitionOptions(node, fromNode, fromLink)
@@ -419,7 +418,9 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     throw utils.getAbortError();
                 }
 
-                this.viewer.loader.show();
+                if (transitionOptions.showLoader) {
+                    this.viewer.loader.show();
+                }
 
                 this.state.currentNode = node;
 
@@ -443,6 +444,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                         panoData: node.panoData,
                         sphereCorrection: node.sphereCorrection,
                         transition: !transitionOptions.fadeIn ? false : transitionOptions.rotation ? true : 'fade-only',
+                        showLoader: transitionOptions.showLoader,
                         speed: transitionOptions.speed,
                         position: transitionOptions.rotateTo,
                         zoom: transitionOptions.zoomTo,

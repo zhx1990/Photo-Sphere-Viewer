@@ -64,6 +64,11 @@ export type VirtualTourMarkerStyle = Omit<
  */
 export type VirtualTourTransitionOptions = {
     /**
+     * Show the loader while loading the new panorama
+     * @default true
+     */
+    showLoader?: boolean;
+    /**
      * Speed or duration of the transition between nodes
      * @default '20rpm'
      */
@@ -216,10 +221,10 @@ export type VirtualTourPluginConfig = {
 
     /**
      * Configuration of the transition between nodes. Can be a callback.
-     * @default `{ speed: '20rpm', fadeIn: true, rotation: true }`
+     * @default `{ showLoader: true, speed: '20rpm', fadeIn: true, rotation: true }`
      */
     transitionOptions?:
-        | Pick<VirtualTourTransitionOptions, 'speed' | 'fadeIn' | 'rotation'>
+        | Pick<VirtualTourTransitionOptions, 'showLoader' | 'speed' | 'fadeIn' | 'rotation'>
         | ((
               toNode: VirtualTourNode,
               fromNode?: VirtualTourNode,
