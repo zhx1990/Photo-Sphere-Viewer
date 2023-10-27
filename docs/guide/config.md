@@ -202,7 +202,7 @@ Requires two fingers to rotate the panorama. This allows standard touch-scroll n
 
 #### ~~`overlay`~~
 
-This option will be removed in a future version, please migrate to the [Overlays plugin](../plugins/overlays.md).
+Deprecated: please migrate to the [Overlays plugin](../plugins/overlays.md).
 
 #### `sphereCorrection`
 

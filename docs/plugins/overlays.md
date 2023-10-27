@@ -53,13 +53,116 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ## Example
 
-TODO
+::: code-demo
+
+```yaml
+title: PSV Overlay Demo
+version: 5.5.0-alpha.1
+packages:
+    - name: overlays-plugin
+      imports: OverlaysPlugin
+```
+
+```js
+const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+const viewer = new Viewer({
+    container: 'viewer',
+    panorama: baseUrl + 'sphere.jpg',
+    caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    loadingImg: baseUrl + 'loader.gif',
+    touchmoveTwoFingers: true,
+    mousewheelCtrlKey: true,
+
+    plugins: [
+        [OverlaysPlugin, {
+            overlays: [
+                {
+                    id: 'xray',
+                    path: baseUrl + 'sphere-overlay.png',
+                    opacity: .8,
+                    zIndex: 1,
+                },
+                {
+                    path: baseUrl + 'pictos/tent.png',
+                    opacity: 1,
+                    yaw: -0.5,
+                    pitch: 0.1,
+                    width: 0.4,
+                    height: 0.3,
+                    zIndex: 2,
+                },
+            ],
+        }],
+    ],
+});
+```
+
+:::
 
 ### Comparison with markers
 
-This example show the difference between a positionned overlay and `image` and `imageLayer` markers.
+This example show the difference between (from left to right) a positionned overlay, a `image` marker and a `imageLayer` marker.
 
-TODO
+For small images, overlays and `imageLayer` markers are almost identical.
+
+::: code-demo
+
+```yaml
+title: PSV Overlay Demo
+version: 5.5.0-alpha.1
+packages:
+    - name: overlays-plugin
+      imports: OverlaysPlugin
+    - name: markers-plugin
+      imports: MarkersPlugin
+      style: true
+```
+
+```js
+const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+const viewer = new Viewer({
+    container: 'viewer',
+    panorama: baseUrl + 'sphere.jpg',
+    caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+    loadingImg: baseUrl + 'loader.gif',
+    touchmoveTwoFingers: true,
+    mousewheelCtrlKey: true,
+
+    plugins: [
+        [OverlaysPlugin, {
+            overlays: [
+                {
+                    path: baseUrl + 'pictos/tent.png',
+                    yaw: -0.7,
+                    pitch: 0.05,
+                    width: 0.326,
+                    height: 0.256,
+                },
+            ],
+        }],
+        [MarkersPlugin, {
+            markers: [
+                {
+                    id: 'image',
+                    image: baseUrl + 'pictos/tent.png',
+                    position: { yaw: 0, pitch: -0.1 },
+                    size: { width: 200, height: 158 },
+                },
+                {
+                    id: 'imageLayer',
+                    imageLayer: baseUrl + 'pictos/tent.png',
+                    position: { yaw: 0.5, pitch: -0.1 },
+                    size: { width: 326, height: 256 },
+                },
+            ],
+        }],
+    ],
+});
+```
+
+:::
 
 ## Configuration
 
