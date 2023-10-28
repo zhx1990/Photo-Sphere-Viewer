@@ -328,6 +328,13 @@
                         >
                             Click on the viewer the {{ markerForm.saved ? 'move' : 'place' }} the marker.
                         </span>
+                        <span v-else-if="markerForm.type === 'imageLayer2'">
+                            {{
+                                markerForm.saved
+                                    ? 'The marker position cannot be edited.'
+                                    : 'Click on the viewer to place the four corners.'
+                            }}
+                        </span>
                         <span v-else-if="markerForm.type === 'polygon' || markerForm.type === 'polyline'">
                             {{
                                 markerForm.saved
@@ -387,7 +394,7 @@
 
                         <div
                             class="md-layout md-gutter"
-                            v-if="markerForm.type === 'image' || markerForm.type === 'imageLayer'"
+                            v-if="markerForm.type === 'image' || markerForm.type === 'imageLayer' || markerForm.type === 'imageLayer2'"
                         >
                             <md-button
                                 v-if="markerForm.type === 'image'"
@@ -402,8 +409,8 @@
                                 v-if="markerForm.type === 'image'"
                                 class="md-icon-button md-raised"
                                 style="margin: 15px 0 0 15px"
-                                v-bind:class="{ 'md-primary': markerForm[markerForm.type] === PIN_BLUE_URL }"
-                                v-on:click="markerForm[markerForm.type] = PIN_BLUE_URL"
+                                v-bind:class="{ 'md-primary': markerForm.image === PIN_BLUE_URL }"
+                                v-on:click="markerForm.image = PIN_BLUE_URL"
                             >
                                 <img v-bind:src="PIN_BLUE_URL" width="32px" />
                             </md-button>
@@ -415,6 +422,15 @@
                                 v-on:click="markerForm.imageLayer = TARGET_URL"
                             >
                                 <img v-bind:src="TARGET_URL" width="32px" />
+                            </md-button>
+                            <md-button
+                                v-if="markerForm.type === 'imageLayer2'"
+                                class="md-icon-button md-raised"
+                                style="margin: 15px 0 0 15px"
+                                v-bind:class="{ 'md-primary': markerForm.imageLayer2 === TENT_URL }"
+                                v-on:click="markerForm.imageLayer2 = TENT_URL"
+                            >
+                                <img v-bind:src="TENT_URL" width="32px" />
                             </md-button>
                             <div class="md-layout-item">
                                 <md-field>
@@ -591,7 +607,8 @@
 
                             <md-menu-content>
                                 <md-menu-item v-on:click="newMarker('image')">Image</md-menu-item>
-                                <md-menu-item v-on:click="newMarker('imageLayer')">Image layer</md-menu-item>
+                                <md-menu-item v-on:click="newMarker('imageLayer')">Image layer (position)</md-menu-item>
+                                <md-menu-item v-on:click="newMarker('imageLayer2')">Image layer (corners)</md-menu-item>
                                 <md-menu-item v-on:click="newMarker('html')">Text</md-menu-item>
                                 <md-menu-item v-on:click="newMarker('polygon')">Polygon</md-menu-item>
                                 <md-menu-item v-on:click="newMarker('polyline')">Polyline</md-menu-item>
@@ -679,8 +696,10 @@ export default {
             id: null,
             type: null,
             position: { yaw: null, pitch: null },
+            positions: null,
             image: null,
             imageLayer: null,
+            imageLayer2: null,
             html: null,
             polygon: null,
             polyline: null,
@@ -717,6 +736,7 @@ export default {
         this.PIN_RED_URL = 'https://photo-sphere-viewer-data.netlify.app/assets/pictos/pin-red.png';
         this.PIN_BLUE_URL = 'https://photo-sphere-viewer-data.netlify.app/assets/pictos/pin-blue.png';
         this.TARGET_URL = 'https://photo-sphere-viewer-data.netlify.app/assets/pictos/target.png';
+        this.TENT_URL = 'https://photo-sphere-viewer-data.netlify.app/assets/pictos/tent.png';
         this.FONT_SIZES = range(10, 31).map((i) => `${i}px`);
         this.FONT_SIZES_2 = range(10, 31, 5).map((i) => `${i}px`);
     },
@@ -1015,6 +1035,10 @@ __s.remove();
                     this.markerForm.imageLayer = this.TARGET_URL;
                     this.markerForm.size = { width: 120, height: 120 };
                     break;
+                case 'imageLayer2':
+                    this.markerForm.imageLayer2 = this.TENT_URL;
+                    this.markerForm.positions = [];
+                    break;
                 case 'html':
                     this.markerForm.html = 'Test content';
                     this.markerForm.style.fontSize = '15px';
@@ -1040,6 +1064,12 @@ __s.remove();
                 !this.markerForm.saved &&
                 (this.markerForm.type === 'polygon' || this.markerForm.type === 'polyline') &&
                 this.markerForm[this.markerForm.type].length > 0
+            ) {
+                this.markers.removeMarker(TEMP_ID);
+            }
+            if (!this.markerForm.saved && 
+                this.markerForm.type === 'imageLayer2' && 
+                this.markerForm.positions.length > 0
             ) {
                 this.markers.removeMarker(TEMP_ID);
             }
@@ -1076,11 +1106,24 @@ __s.remove();
                 this.markers.addMarker(this.getMarkerConfig());
             }
 
+            if (!this.markerForm.saved && 
+                this.markerForm.type === 'imageLayer2' && 
+                this.markerForm.positions.length === 4
+            ) {
+                this.markers.addMarker(this.getMarkerConfig());
+            }
+
             this.cancelMarker();
         },
 
         getMarkerConfig() {
             const config = cloneDeep(this.markerForm);
+            if (config.type === 'imageLayer2') {
+                config.imageLayer = config.imageLayer2;
+                config.position = config.positions.map(([yaw, pitch]) => ({ yaw, pitch }));
+                delete config.imageLayer2;
+                delete config.positions;
+            }
             if (config.size.width === null && config.size.height === null) {
                 delete config.size;
             }
@@ -1108,6 +1151,42 @@ __s.remove();
                             id: this.markerForm.id,
                             position: { yaw, pitch },
                         });
+                    }
+                    break;
+
+                case 'imageLayer2':
+                    if (this.markerForm.saved) {
+                        return;
+                    }
+                    this.markerForm.positions.push([yaw, pitch]);
+                    switch (this.markerForm.positions.length) {
+                        case 1:
+                            this.markers.addMarker({
+                                id: TEMP_ID,
+                                hideList: true,
+                                position: { yaw, pitch },
+                                anchor: 'center center',
+                                circle: 2,
+                                svgStyle: {
+                                    fill: 'yellow',
+                                },
+                            });
+                            break;
+                        case 4:
+                            this.completeMarker();
+                            break;
+                        default:
+                            this.markers.removeMarker(TEMP_ID, false);
+                            this.markers.addMarker({
+                                id: TEMP_ID,
+                                hideList: true,
+                                polyline: this.markerForm.positions,
+                                svgStyle: {
+                                    strokeWidth: 2,
+                                    stroke: 'yellow',
+                                },
+                            });
+                            break;
                     }
                     break;
 
@@ -1202,12 +1281,22 @@ __s.remove();
             }
 
             this.cancelMarker();
-            Object.assign(this.markerForm, cloneDeep(marker.config));
-            if (!this.markerForm.size) {
-                this.markerForm.size = { width: null, height: null };
+
+            const config = cloneDeep(marker.config);
+            if (Array.isArray(config.position)) {
+                config.type = 'imageLayer2';
+                config.imageLayer2 = config.imageLayer;
+                config.positions = config.position.map(({ yaw, pitch }) => ([yaw, pitch]));
+                config.position = { yaw: null, pitch: null };
+            } else {
+                config.type = marker.type;
             }
+            if (!config.size) {
+                config.size = { width: null, height: null };
+            }
+
+            Object.assign(this.markerForm, config);
             this.markerForm.saved = true;
-            this.markerForm.type = marker.type;
         },
 
         updateMarker() {
@@ -1231,7 +1320,11 @@ __s.remove();
                 .map((marker) => {
                     const m = {};
                     m.id = marker.id;
-                    m[marker.type] = marker.config[marker.type];
+                    if (marker.type === 'imageLayer2') {
+                        m.imageLayer = marker.config.imageLayer;
+                    } else {
+                        m[marker.type] = marker.config[marker.type];
+                    }
                     if (marker.type !== 'polygon' && marker.type !== 'polyline') {
                         m.position = marker.config.position;
                     }
@@ -1269,7 +1362,7 @@ __s.remove();
                 JSON.stringify(
                     content,
                     (k, v) => {
-                        if (k === 'polyline' || k === 'polygon') {
+                        if (k === 'polyline' || k === 'polygon' || k === 'position' && Array.isArray(v)) {
                             return JSON.stringify(v);
                         } else {
                             return v;
@@ -1278,7 +1371,10 @@ __s.remove();
                     2
                 )
                     .replace(/\"\[/g, '[')
-                    .replace(/\]\"/g, ']');
+                    .replace(/\]\"/g, ']')
+                    .replace(/{\\"/g, '{"')
+                    .replace(/\\":/g, '":')
+                    .replace(/,\\"/g, ',"');
             this.markersDialog = true;
         },
 
