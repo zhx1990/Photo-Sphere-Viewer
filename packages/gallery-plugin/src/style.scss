@@ -129,8 +129,7 @@ $psv-gallery-breakpoint: 500px !default;
             height: calc(100% - #{$psv-panel-close-button-size});
             margin-top: $psv-panel-close-button-size;
             padding: 0 0 0 $psv-gallery-padding;
-            overflow-x: hidden;
-            overflow-y: auto;
+            overflow: hidden auto;
         }
 
         &-item {
