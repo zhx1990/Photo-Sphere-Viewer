@@ -1,4 +1,5 @@
 import type { ExtendedPosition, Point, Position, Size } from '@photo-sphere-viewer/core';
+import { ColorRepresentation } from 'three';
 import type { Marker } from './Marker';
 
 /**
@@ -131,6 +132,19 @@ export type MarkerConfig = {
      * SVG properties to set on the marker (fill, stroke, etc.) (only for SVG markers)
      */
     svgStyle?: Record<string, string>;
+    /**
+     * Will make a color of the image/video transparent (only for `imagerLayer`, `videoLayer`)
+     */
+    chromaKey?: {
+        /** @default false */
+        enabled: boolean;
+        /** @default 0x00ff00 */
+        color?: ColorRepresentation | { r: number; g: number; b: number };
+        /** @default 0.2 */
+        similarity?: number;
+        /** @default 0.2 */
+        smoothness?: number;
+    };
     /**
      * Defines where the marker is placed toward its defined position
      * @default 'center center'

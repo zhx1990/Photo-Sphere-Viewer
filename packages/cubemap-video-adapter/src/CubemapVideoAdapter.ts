@@ -1,11 +1,21 @@
 import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { CONSTANTS, utils } from '@photo-sphere-viewer/core';
-import { BoxGeometry, BufferAttribute, Mesh, ShaderMaterial, Vector2, VideoTexture } from 'three';
+import { BoxGeometry, BufferAttribute, Mesh, ShaderMaterial, Texture, Vector2, VideoTexture } from 'three';
 import { AbstractVideoAdapter } from '../../shared/AbstractVideoAdapter';
 import { CubemapVideoAdapterConfig, CubemapVideoPanorama } from './model';
+import equiangularFragment from './shaders/equiangular.fragment.glsl';
+import equiangularVertex from './shaders/equiangular.vertex.glsl';
 
 type CubemapMesh = Mesh<BoxGeometry, ShaderMaterial>;
 type CubemapTexture = TextureData<VideoTexture, CubemapVideoPanorama>;
+
+type ShaderUniforms = {
+    mapped: { value: Texture },
+    equiangular: { value: boolean },
+    contCorrect: { value: number },
+    faceWH: { value: Vector2 },
+    vidWH: { value: Vector2 },
+};
 
 const getConfig = utils.getConfigParser<CubemapVideoAdapterConfig>(
     {
@@ -126,7 +136,6 @@ export class CubemapVideoAdapter extends AbstractVideoAdapter<CubemapVideoPanora
         uvs.setXY(34, c, B);
         uvs.setXY(35, c, A);
 
-        // shamelessly copied from https://github.com/videojs/videojs-vr
         const material = new ShaderMaterial({
             uniforms: {
                 mapped: { value: null },
@@ -134,31 +143,9 @@ export class CubemapVideoAdapter extends AbstractVideoAdapter<CubemapVideoPanora
                 contCorrect: { value: 1 },
                 faceWH: { value: new Vector2(1 / 3, 1 / 2) },
                 vidWH: { value: new Vector2(1, 1) },
-            },
-            vertexShader: `
-varying vec2 vUv;
-void main() {
-  vUv = uv;
-  gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.);
-}`,
-            fragmentShader: `
-varying vec2 vUv;
-uniform sampler2D mapped;
-uniform bool equiangular;
-uniform float contCorrect;
-uniform vec2 faceWH;
-uniform vec2 vidWH;
-
-const float PI = 3.1415926535897932384626433832795;
-
-void main() {
-  vec2 corner = vUv - mod(vUv, faceWH) + vec2(0, contCorrect / vidWH.y);
-  vec2 faceWHadj = faceWH - vec2(0, contCorrect * 2. / vidWH.y);
-  vec2 p = (vUv - corner) / faceWHadj - .5;
-  vec2 q = equiangular ? 2. / PI * atan(2. * p) + .5 : p + .5;
-  vec2 eUv = corner + q * faceWHadj;
-  gl_FragColor = texture2D(mapped, eUv);
-}`,
+            } as ShaderUniforms,
+            vertexShader: equiangularVertex,
+            fragmentShader: equiangularFragment,
         });
 
         return new Mesh(geometry, material);
@@ -167,10 +154,11 @@ void main() {
     setTexture(mesh: CubemapMesh, textureData: CubemapTexture) {
         const { panorama, texture } = textureData;
         const video: HTMLVideoElement = texture.image;
+        const uniforms = mesh.material.uniforms as ShaderUniforms;
 
-        mesh.material.uniforms.mapped.value = texture;
-        mesh.material.uniforms.equiangular.value = panorama.equiangular;
-        mesh.material.uniforms.vidWH.value.set(video.videoWidth, video.videoHeight);
+        uniforms.mapped.value = texture;
+        uniforms.equiangular.value = panorama.equiangular;
+        uniforms.vidWH.value.set(video.videoWidth, video.videoHeight);
 
         this.switchVideo(textureData.texture);
     }

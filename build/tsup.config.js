@@ -70,6 +70,7 @@ ${
                 };
                 options.loader = {
                     '.svg': 'text',
+                    '.glsl': 'text',
                 };
             },
             clean: true,

@@ -482,6 +482,40 @@ svgStyle: {
 You can define complex SVG backgrounds such as images by using a pattern definition. [See demo](../demos/markers/polygon-pattern.md).
 :::
 
+#### `chromaKey`
+
+-   type: `object`
+-   default: `{ enabled: false }`
+
+Will make a color of the image/video transparent.
+
+::: dialog "See details" "Marker chroma key"
+
+The `chromaKey` marker option allows to define a color which will be transparent (green screen/blue screen).
+
+```ts
+chromaKey: {
+    /**
+     * Enable the option
+     */
+    enabled: true,
+    /**
+     * Select which color to make transparent (default is green)
+     */
+    color: 0x00ff00,
+    color: { r: 0, g: 255, 0 },
+    /**
+     * Customize the color detection (default is 0.2 / 0.2)
+     */
+    similarity: 0.2,
+    smoothness: 0.2,
+}
+```
+
+:::
+
+_(This option is only applicable to `imagerLayer` and `videoLayer`)._
+
 #### `anchor`
 
 -   type: `string`
