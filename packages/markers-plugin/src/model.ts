@@ -1,6 +1,6 @@
 import type { ExtendedPosition, Point, Position, Size } from '@photo-sphere-viewer/core';
 import { ColorRepresentation } from 'three';
-import type { Marker } from './Marker';
+import type { Marker } from './markers/Marker';
 
 /**
  * Custom Web Component interface for `element` markers

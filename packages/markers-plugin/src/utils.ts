@@ -4,9 +4,8 @@ import { Vector3 } from 'three';
 /**
  * Returns intermediary point between two points on the sphere
  * {@link http://www.movable-type.co.uk/scripts/latlong.html}
- * @internal
  */
-export function greatArcIntermediaryPoint(p1: [number, number], p2: [number, number], f: number): [number, number] {
+function greatArcIntermediaryPoint(p1: [number, number], p2: [number, number], f: number): [number, number] {
     const [λ1, φ1] = p1;
     const [λ2, φ2] = p2;
 

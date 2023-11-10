@@ -1,5 +1,5 @@
 import { utils } from '@photo-sphere-viewer/core';
-import type { Marker } from './Marker';
+import type { Marker } from './markers/Marker';
 import icon from './icons/pin-list.svg';
 
 /**

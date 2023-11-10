@@ -1,5 +1,5 @@
 import { TypedEvent } from '@photo-sphere-viewer/core';
-import type { Marker } from './Marker';
+import type { Marker } from './markers/Marker';
 import type { MarkersPlugin } from './MarkersPlugin';
 
 /**

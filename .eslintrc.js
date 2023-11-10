@@ -19,6 +19,7 @@ module.exports = {
         '@typescript-eslint/prefer-for-of': 'error',
         '@typescript-eslint/array-type': ['error', { default: 'array-simple' }],
         '@typescript-eslint/consistent-type-definitions': ['error', 'type'],
+        '@typescript-eslint/class-literal-property-style': 'off',
     },
     ignorePatterns: ['**/dist/**/*', '*.js'],
 };

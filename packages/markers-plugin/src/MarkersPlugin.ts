@@ -1,7 +1,6 @@
-import type { Point, Position, Viewer } from '@photo-sphere-viewer/core';
+import type { Point, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractConfigurablePlugin, PSVError, events, utils } from '@photo-sphere-viewer/core';
-import { Object3D, Vector3 } from 'three';
-import { Marker, MarkerType } from './Marker';
+import { Object3D } from 'three';
 import { MarkersButton } from './MarkersButton';
 import { MarkersListButton } from './MarkersListButton';
 import {
@@ -26,8 +25,14 @@ import {
     ShowMarkersEvent,
     UnselectMarkerEvent,
 } from './events';
+import { AbstractStandardMarker } from './markers/AbstractStandardMarker';
+import { Marker } from './markers/Marker';
+import { getMarkerType } from './MarkerType';
 import { MarkerConfig, MarkersPluginConfig, ParsedMarkersPluginConfig, UpdatableMarkersPluginConfig } from './model';
-import { getGreatCircleIntersection } from './utils';
+import { MarkerNormal } from './markers/MarkerNormal';
+import { Marker3D } from './markers/Marker3D';
+import { MarkerPolygon } from './markers/MarkerPolygon';
+import { MarkerSvg } from './markers/MarkerSvg';
 
 const getConfig = utils.getConfigParser<MarkersPluginConfig, ParsedMarkersPluginConfig>(
     {
@@ -54,6 +59,33 @@ const getConfig = utils.getConfigParser<MarkersPluginConfig, ParsedMarkersPlugin
         },
     }
 );
+
+function getMarkerCtor(config: MarkerConfig): typeof Marker {
+    const type = getMarkerType(config, false);
+
+    switch (type) {
+        case 'image':
+        case 'html':
+        case 'element':
+            return MarkerNormal;
+        case 'imageLayer':
+        case 'videoLayer':
+            return Marker3D;
+        case 'polygon':
+        case 'polyline':
+        case 'polygonPixels':
+        case 'polylinePixels':
+            return MarkerPolygon;
+        case 'square':
+        case 'rect':
+        case 'circle':
+        case 'ellipse':
+        case 'path':
+            return MarkerSvg;
+        default:
+            throw new PSVError('invalid marker type');
+    }
+}
 
 /**
  * Displays various markers on the viewer
@@ -293,7 +325,8 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
             throw new PSVError(`marker "${config.id}" already exists`);
         }
 
-        const marker = new Marker(this.viewer, this, config);
+        // @ts-ignore
+        const marker = new (getMarkerCtor(config))(this.viewer, this, config);
 
         if (marker.isPoly()) {
             this.svgContainer.appendChild(marker.domElement);
@@ -496,7 +529,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     showMarkerPanel(markerId: string | MarkerConfig) {
         const marker = this.getMarker(markerId);
 
-        if (marker?.config?.content) {
+        if (marker.config.content) {
             this.viewer.panel.show({
                 id: ID_PANEL_MARKER,
                 content: marker.config.content,
@@ -579,57 +612,21 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
         const zoomLevel = this.viewer.getZoomLevel();
         const viewerPosition = this.viewer.getPosition();
+        const hoveringMarker = this.state.hoveringMarker;
 
         Object.values(this.markers).forEach((marker) => {
             let isVisible = this.state.visible && marker.config.visible;
             let visibilityChanged = false;
             let position: Point = null;
 
-            if (isVisible && marker.is3d()) {
-                position = this.__getMarkerPosition(marker);
-                isVisible = this.__isMarkerVisible(marker, position);
-            } else if (isVisible && marker.isPoly()) {
-                const positions = this.__getPolyPositions(marker);
-                isVisible = positions.length > (marker.isPolygon() ? 2 : 1);
-
-                if (isVisible) {
-                    position = this.__getMarkerPosition(marker);
-
-                    const points = positions.map((pos) => pos.x - position.x + ',' + (pos.y - position.y)).join(' ');
-
-                    marker.domElement.setAttributeNS(null, 'points', points);
-                    marker.domElement.setAttributeNS(null, 'transform', `translate(${position.x} ${position.y})`);
-                }
-            } else if (isVisible) {
-                marker.updateSize();
-
-                position = this.__getMarkerPosition(marker);
-                isVisible = this.__isMarkerVisible(marker, position);
-
-                if (isVisible) {
-                    marker.domElement.style.translate = `${position.x}px ${position.y}px 0px`;
-
-                    this.__applyScale(marker, {
-                        zoomLevel,
-                        viewerPosition,
-                        mouseover: marker === this.state.hoveringMarker,
-                    });
-
-                    if (marker.type === MarkerType.element) {
-                        marker.config.element.updateMarker?.({
-                            marker,
-                            position,
-                            viewerPosition,
-                            zoomLevel,
-                            viewerSize: this.viewer.state.size,
-                        });
-                    }
-                }
+            if (isVisible) {
+                position = marker.render({ viewerPosition, zoomLevel, hoveringMarker });
+                isVisible = !!position;
             }
 
             visibilityChanged = marker.state.visible !== isVisible;
             marker.state.visible = isVisible;
-            marker.state.position2D = isVisible ? position : null;
+            marker.state.position2D = position;
 
             if (!marker.is3d()) {
                 utils.toggleClass(marker.domElement, 'psv-marker--visible', isVisible);
@@ -655,110 +652,6 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         if (this.state.needsReRender) {
             this.viewer.needsUpdate();
         }
-    }
-
-    /**
-     * Computes and applies the scale to the marker
-     */
-    private __applyScale(marker: Marker, {
-        zoomLevel,
-        viewerPosition,
-        mouseover,
-    }: {
-        zoomLevel: number;
-        viewerPosition: Position;
-        mouseover: boolean;
-    }) {
-        if (mouseover !== null && marker.config.hoverScale) {
-            marker.domElement.style.transition = `scale ${marker.config.hoverScale.duration}ms ${marker.config.hoverScale.easing}`;
-        }
-
-        const scale = marker.getScale(zoomLevel, viewerPosition, mouseover);
-        marker.domElement.style.scale = `${scale}`;
-    }
-
-    /**
-     * Determines if a marker is visible<br>
-     * It tests if the point is in the general direction of the camera, then check if it's in the viewport
-     */
-    private __isMarkerVisible(marker: Marker, position: Point): boolean {
-        if (marker.is3d()) {
-            return this.viewer.renderer.isObjectVisible(marker.threeElement);
-        } else {
-            return (
-                marker.state.positions3D[0].dot(this.viewer.state.direction) > 0
-                && position.x + marker.state.size.width >= 0
-                && position.x - marker.state.size.width <= this.viewer.state.size.width
-                && position.y + marker.state.size.height >= 0
-                && position.y - marker.state.size.height <= this.viewer.state.size.height
-            );
-        }
-    }
-
-    /**
-     * Computes viewer coordinates of a marker
-     */
-    private __getMarkerPosition(marker: Marker): Point {
-        if (marker.isPoly() || marker.is3d()) {
-            return this.viewer.dataHelper.sphericalCoordsToViewerCoords(marker.state.position);
-        } else {
-            const position = this.viewer.dataHelper.vector3ToViewerCoords(marker.state.positions3D[0]);
-
-            position.x -= marker.state.size.width * marker.state.anchor.x;
-            position.y -= marker.state.size.height * marker.state.anchor.y;
-
-            return position;
-        }
-    }
-
-    /**
-     * Computes viewer coordinates of each point of a polygon/polyline<br>
-     * It handles points behind the camera by creating intermediary points suitable for the projector
-     */
-    private __getPolyPositions(marker: Marker): Point[] {
-        const nbVectors = marker.state.positions3D.length;
-
-        // compute if each vector is visible
-        const positions3D = marker.state.positions3D.map((vector) => {
-            return {
-                vector: vector,
-                visible: vector.dot(this.viewer.state.direction) > 0,
-            };
-        });
-
-        // get pairs of visible/invisible vectors for each invisible vector connected to a visible vector
-        const toBeComputed: Array<{ visible: Vector3; invisible: Vector3; index: number }> = [];
-        positions3D.forEach((pos, i) => {
-            if (!pos.visible) {
-                const neighbours = [
-                    i === 0 ? positions3D[nbVectors - 1] : positions3D[i - 1],
-                    i === nbVectors - 1 ? positions3D[0] : positions3D[i + 1],
-                ];
-
-                neighbours.forEach((neighbour) => {
-                    if (neighbour.visible) {
-                        toBeComputed.push({
-                            visible: neighbour.vector,
-                            invisible: pos.vector,
-                            index: i,
-                        });
-                    }
-                });
-            }
-        });
-
-        // compute intermediary vector for each pair (the loop is reversed for splice to insert at the right place)
-        toBeComputed.reverse().forEach((pair) => {
-            positions3D.splice(pair.index, 0, {
-                vector: getGreatCircleIntersection(pair.visible, pair.invisible, this.viewer.state.direction),
-                visible: true,
-            });
-        });
-
-        // translate vectors to screen pos
-        return positions3D
-            .filter((pos) => pos.visible)
-            .map((pos) => this.viewer.dataHelper.vector3ToViewerCoords(pos.vector));
     }
 
     /**
@@ -789,8 +682,8 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
             this.dispatchEvent(new EnterMarkerEvent(marker));
 
-            if (marker.isNormal() || marker.isSvg()) {
-                this.__applyScale(marker, {
+            if (marker instanceof AbstractStandardMarker) {
+                marker.applyScale({
                     zoomLevel: this.viewer.getZoomLevel(),
                     viewerPosition: this.viewer.getPosition(),
                     mouseover: true,
@@ -810,8 +703,8 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         if (marker) {
             this.dispatchEvent(new LeaveMarkerEvent(marker));
 
-            if (marker.isNormal() || marker.isSvg()) {
-                this.__applyScale(marker, {
+            if (marker instanceof AbstractStandardMarker) {
+                marker.applyScale({
                     zoomLevel: this.viewer.getZoomLevel(),
                     viewerPosition: this.viewer.getPosition(),
                     mouseover: false,
@@ -829,7 +722,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     }
 
     /**
-     * Handles mouse move events, refreshUi the tooltip for polygon markers
+     * Handles mouse move events, refresh the tooltip for polygon markers
      */
     private __onHoverMarker(e: MouseEvent, marker?: Marker) {
         if (marker && (marker.isPoly() || marker.is3d())) {

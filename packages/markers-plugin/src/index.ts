@@ -8,7 +8,8 @@ DEFAULTS.lang[MarkersListButton.id] = 'Markers list';
 registerButton(MarkersButton, 'caption:left');
 registerButton(MarkersListButton, 'caption:left');
 
-export type { Marker, MarkerType } from './Marker';
+export type { Marker, } from './markers/Marker';
+export type { MarkerType } from './MarkerType';
 export { MarkersPlugin } from './MarkersPlugin';
 export * from './model';
 export { events };
