@@ -1,7 +1,7 @@
 // https://www.8thwall.com/playground/chromakey-threejs
 
 uniform sampler2D map;
-
+uniform float alpha;
 uniform bool keying;
 uniform vec3 color;
 uniform float similarity;
@@ -25,10 +25,12 @@ void main(void) {
 
         float baseMask = chromaDist - similarity;
         float fullMask = pow(clamp(baseMask / smoothness, 0., 1.), 1.5);
-        gl_FragColor.a = fullMask;
+        gl_FragColor.a *= fullMask * alpha;
 
         float spillVal = pow(clamp(baseMask / spill, 0., 1.), 1.5);
         float desat = clamp(gl_FragColor.r * 0.2126 + gl_FragColor.g * 0.7152 + gl_FragColor.b * 0.0722, 0., 1.);
         gl_FragColor.rgb = mix(vec3(desat, desat, desat), gl_FragColor.rgb, spillVal);
+    } else {
+        gl_FragColor.a *= alpha;
     }
 }

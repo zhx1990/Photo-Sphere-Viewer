@@ -11,6 +11,7 @@ import type { CubemapAdapter, CubemapData } from '@photo-sphere-viewer/cubemap-a
 import type { CubemapTilesAdapter } from '@photo-sphere-viewer/cubemap-tiles-adapter';
 import type { EquirectangularTilesAdapter } from '@photo-sphere-viewer/equirectangular-tiles-adapter';
 import { BoxGeometry, Mesh, MeshBasicMaterial, SphereGeometry, Texture, Vector2, VideoTexture } from 'three';
+import { ChromaKeyMaterial } from '../../shared/ChromaKeyMaterial';
 import { OVERLAY_DATA } from './constants';
 import { OverlayClickEvent, OverlaysPluginEvents } from './events';
 import {
@@ -143,7 +144,7 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
     /**
      * Returns the controller of a video overlay
      */
-    getVideo(id: string) {
+    getVideo(id: string): HTMLVideoElement {
         if (!this.state.overlays[id]) {
             utils.logWarn(`Overlay "${id}" not found`);
             return null;
@@ -152,8 +153,8 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
             utils.logWarn(`Overlay "${id}" is not a video`);
             return null;
         }
-        const material = this.state.overlays[id].mesh.material as MeshBasicMaterial;
-        return material.map.image as HTMLVideoElement;
+        const material = this.state.overlays[id].mesh.material as ChromaKeyMaterial;
+        return material.map.image;
     }
 
     /**
@@ -167,14 +168,13 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
 
         const { config, mesh } = this.state.overlays[id];
 
-        if (config.mode === 'sphere' && config.type === 'video') {
-            const material = mesh.material as MeshBasicMaterial;
-            const video = material.map.image as HTMLVideoElement;
-            video.pause();
+        if (config.type === 'video') {
+            this.getVideo(id).pause();
             this.viewer.needsContinuousUpdate(false);
         }
 
         this.viewer.renderer.removeObject(mesh);
+        this.viewer.renderer.cleanScene(mesh);
         this.viewer.needsUpdate();
 
         delete this.state.overlays[id];
@@ -211,11 +211,10 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
             thetaLength
         ).scale(-1, 1, 1);
 
-        const material = new MeshBasicMaterial({
+        const material = new ChromaKeyMaterial({
             map,
-            transparent: true, // must always be transparent for renderOrder to be respected
-            opacity: config.opacity,
-            depthTest: false,
+            alpha: config.opacity,
+            chromaKey: config.chromaKey,
         });
 
         const mesh = new Mesh(geometry, material);
@@ -331,7 +330,7 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
         video.play();
 
         video.addEventListener('play', () => {
-            mesh.material.opacity = config.opacity;
+            (mesh.material as ChromaKeyMaterial).alpha = config.opacity;
         }, { once: true });
     }
 

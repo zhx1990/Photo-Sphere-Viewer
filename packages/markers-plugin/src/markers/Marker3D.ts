@@ -1,25 +1,12 @@
 import { ExtendedPosition, PSVError, Point, Size, utils, type Viewer } from '@photo-sphere-viewer/core';
-import { Color, Group, Mesh, Object3D, PlaneGeometry, ShaderMaterial, Texture, Vector2, Vector3, VideoTexture } from 'three';
+import { Group, Mesh, Object3D, PlaneGeometry, Texture, Vector3, VideoTexture } from 'three';
+import { ChromaKeyMaterial } from '../../../shared/ChromaKeyMaterial';
 import { MarkerType } from '../MarkerType';
 import { type MarkersPlugin } from '../MarkersPlugin';
 import { MARKER_DATA } from '../constants';
 import { MarkerConfig } from '../model';
-import chromaKeyFragment from '../shaders/chromaKey.fragment.glsl';
-import chromaKeyVertex from '../shaders/chromaKey.vertex.glsl';
 import { getPolygonCenter } from '../utils';
 import { Marker } from './Marker';
-
-type ShaderUniforms = {
-    map: { value: Texture },
-    repeat: { value: Vector2 },
-    offset: { value: Vector2 },
-    alpha: { value: number },
-    keying: { value: boolean },
-    color: { value: Color },
-    similarity: { value: number },
-    smoothness: { value: number },
-    spill: { value: number },
-};
 
 /**
  * @internal
@@ -28,7 +15,7 @@ export class Marker3D extends Marker {
 
     override get video(): HTMLVideoElement {
         if (this.type === MarkerType.videoLayer) {
-            return (this.threeElement.material.uniforms as ShaderUniforms).map.value.image;
+            return (this.threeElement.material as ChromaKeyMaterial).map.image;
         } else {
             return null;
         }
@@ -43,24 +30,7 @@ export class Marker3D extends Marker {
     }
 
     override createElement(): void {
-        const material = new ShaderMaterial({
-            transparent: true,
-            depthTest: false,
-            uniforms: {
-                map: { value: null },
-                repeat: { value: new Vector2(1, 1) },
-                offset: { value: new Vector2(0, 0) },
-                alpha: { value: 1 },
-                keying: { value: false },
-                color: { value: new Color(0x00ff00) },
-                similarity: { value: 0.2 },
-                smoothness: { value: 0.2 },
-                spill: { value: 0.1 },
-            } as ShaderUniforms,
-            vertexShader: chromaKeyVertex,
-            fragmentShader: chromaKeyFragment,
-        });
-
+        const material = new ChromaKeyMaterial({ alpha: 0 });
         const geometry = new PlaneGeometry(1, 1);
         const mesh = new Mesh(geometry, material);
         mesh.userData = { [MARKER_DATA]: this };
@@ -108,7 +78,7 @@ export class Marker3D extends Marker {
 
         const mesh = this.threeElement;
         const group = mesh.parent;
-        const uniforms = mesh.material.uniforms as ShaderUniforms;
+        const material = mesh.material as ChromaKeyMaterial;
 
         this.state.dynamicSize = false;
 
@@ -172,13 +142,13 @@ export class Marker3D extends Marker {
             });
             p.needsUpdate = true;
 
-            this.__setTextureWrap(mesh.material);
+            this.__setTextureWrap(material);
         }
 
         switch (this.type) {
             case MarkerType.videoLayer:
                 if (this.definition !== this.config.videoLayer) {
-                    uniforms.map.value?.dispose();
+                    material.map?.dispose();
 
                     const video = document.createElement('video');
                     video.crossOrigin = this.viewer.config.withCredentials ? 'use-credentials' : 'anonymous';
@@ -188,20 +158,19 @@ export class Marker3D extends Marker {
                     video.autoplay = true;
                     video.preload = 'metadata';
                     video.src = this.config.videoLayer;
-                    video.style.display = 'none';
-                    this.viewer.container.appendChild(video);
 
                     const texture = new VideoTexture(video);
-                    uniforms.map.value = texture;
-                    uniforms.alpha.value = 0;
+                    material.map = texture;
+                    material.alpha = 0;
+                    
+                    video.addEventListener('loadedmetadata', () => {
+                        material.alpha = this.config.opacity;
 
-                    if (!utils.isExtendedPosition(this.config.position)) {
-                        video.addEventListener('loadedmetadata', () => {
+                        if (!utils.isExtendedPosition(this.config.position)) {
                             mesh.material.userData[MARKER_DATA] = { width: video.videoWidth, height: video.videoHeight };
-                            uniforms.alpha.value = this.config.opacity;
-                            this.__setTextureWrap(mesh.material);
-                        }, { once: true });
-                    }
+                            this.__setTextureWrap(material);
+                        }
+                    }, { once: true });
 
                     video.play();
 
@@ -211,25 +180,25 @@ export class Marker3D extends Marker {
 
             case MarkerType.imageLayer:
                 if (this.definition !== this.config.imageLayer) {
-                    uniforms.map.value?.dispose();
+                    material.map?.dispose();
 
                     const texture = new Texture();
-                    uniforms.map.value = texture;
-                    uniforms.alpha.value = 0;
+                    material.map = texture;
+                    material.alpha = 0;
 
                     this.viewer.textureLoader.loadImage(this.config.imageLayer)
                         .then((image) => {
                             if (!utils.isExtendedPosition(this.config.position)) {
                                 mesh.material.userData[MARKER_DATA] = { width: image.width, height: image.height };
-                                this.__setTextureWrap(mesh.material);
+                                this.__setTextureWrap(material);
                             }
 
                             texture.image = image;
                             texture.anisotropy = 4;
                             texture.needsUpdate = true;
-                            this.viewer.needsUpdate();
+                            material.alpha = this.config.opacity;
 
-                            uniforms.alpha.value = this.config.opacity;
+                            this.viewer.needsUpdate();
                         });
 
                     this.definition = this.config.imageLayer;
@@ -239,35 +208,20 @@ export class Marker3D extends Marker {
             // no default
         }
 
+        material.chromaKey = this.config.chromaKey;
         mesh.renderOrder = 1000 + this.config.zIndex;
         mesh.geometry.boundingBox = null; // reset box for Renderer.isObjectVisible
-
-        uniforms.keying.value = this.config.chromaKey?.enabled === true;
-        if (this.config.chromaKey?.enabled) {
-            if (typeof this.config.chromaKey.color === 'object' && 'r' in this.config.chromaKey.color) {
-                uniforms.color.value.set(
-                    this.config.chromaKey.color.r / 255,
-                    this.config.chromaKey.color.g / 255,
-                    this.config.chromaKey.color.b / 255
-                );
-            } else {
-                uniforms.color.value.set(this.config.chromaKey.color ?? 0x00ff00);
-            }
-            uniforms.similarity.value = this.config.chromaKey.similarity ?? 0.2;
-            uniforms.smoothness.value = this.config.chromaKey.smoothness ?? 0.2;
-        }
     }
 
     /**
      * For layers positionned by corners, applies offset to the texture in order to keep its proportions
      */
-    private __setTextureWrap(material: ShaderMaterial) {
+    private __setTextureWrap(material: ChromaKeyMaterial) {
         const imageSize: Size = material.userData[MARKER_DATA];
-        const uniforms = material.uniforms as ShaderUniforms;
 
         if (!imageSize || !imageSize.height || !imageSize.width) {
-            uniforms.repeat.value.set(1, 1);
-            uniforms.offset.value.set(0, 0);
+            material.repeat.set(1, 1);
+            material.offset.set(0, 0);
             return;
         }
 
@@ -303,8 +257,8 @@ export class Marker3D extends Marker {
             vMargin = 1 / imageRatio - 1 / layerRatio;
         }
 
-        uniforms.repeat.value.set(1 - hMargin, 1 - vMargin);
-        uniforms.offset.value.set(hMargin / 2, vMargin / 2);
+        material.repeat.set(1 - hMargin, 1 - vMargin);
+        material.offset.set(hMargin / 2, vMargin / 2);
     }
 
 }

@@ -33,7 +33,7 @@
                 panorama: baseUrl + 'artist-workshop.jpg',
                 caption: 'Artist Workshop <b>&copy; Oliksiy Yakovlyev (HDRI Haven)</b> & Rick Astley',
                 loadingImg: baseUrl + 'loader.gif',
-                defaultYaw: 2.5,
+                defaultYaw: 2.45,
                 defaultPitch: 0.1,
                 plugins: [
                     [MarkersPlugin, {
@@ -51,6 +51,18 @@
                                     cursor: 'pointer',
                                 },
                                 tooltip: 'Play / Pause',
+                            });
+
+                            a.push({
+                                id: 'video-greenscreen',
+                                videoLayer: baseUrl + 'pictos/t-rex.mp4',
+                                position: { yaw: 1.7, pitch: -0.1 },
+                                size: { width: 300, height: 300 },
+                                zIndex: 100,
+                                chromaKey: {
+                                    enabled: true,
+                                    similarity: 0.3,
+                                },
                             });
 
                             [

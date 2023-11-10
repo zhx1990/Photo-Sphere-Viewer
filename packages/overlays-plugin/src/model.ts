@@ -1,5 +1,6 @@
 import type { AdapterConstructor } from '@photo-sphere-viewer/core';
 import type { CubemapPanorama } from '@photo-sphere-viewer/cubemap-adapter';
+import { ColorRepresentation } from 'three';
 
 export type BaseOverlayConfig = {
     id?: string;
@@ -38,6 +39,19 @@ export type SphereOverlayConfig = BaseOverlayConfig & {
      * @default PI
      */
     height?: number | string;
+    /**
+     * Will make a color of the image/video transparent
+     */
+    chromaKey?: {
+        /** @default false */
+        enabled: boolean;
+        /** @default 0x00ff00 */
+        color?: ColorRepresentation | { r: number; g: number; b: number };
+        /** @default 0.2 */
+        similarity?: number;
+        /** @default 0.2 */
+        smoothness?: number;
+    };
 };
 
 /**

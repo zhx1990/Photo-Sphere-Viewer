@@ -463,31 +463,33 @@ export class Renderer extends AbstractService {
      * @internal
      */
     cleanScene(object: any) {
-        object.traverse((item: any) => {
-            if (item.geometry) {
-                item.geometry.dispose();
+        const disposeMaterial = (material: any) => {
+            material.map?.dispose();
+
+            if (material.uniforms) {
+                Object.values(material.uniforms).forEach((uniform: any) => {
+                    uniform.value?.dispose?.();
+                });
             }
+
+            material.dispose();
+        };
+
+        object.traverse((item: any) => {
+            item.geometry?.dispose();
 
             if (item.material) {
                 if (Array.isArray(item.material)) {
                     item.material.forEach((material: any) => {
-                        if (material.map) {
-                            material.map.dispose();
-                        }
-
-                        material.dispose();
+                        disposeMaterial(material);
                     });
                 } else {
-                    if (item.material.map) {
-                        item.material.map.dispose();
-                    }
-
-                    item.material.dispose();
+                    disposeMaterial(item.material);
                 }
             }
 
-            if (item.dispose && !(item instanceof Scene)) {
-                item.dispose();
+            if (!(item instanceof Scene)) {
+                item.dispose?.();
             }
 
             if (item !== object) {
