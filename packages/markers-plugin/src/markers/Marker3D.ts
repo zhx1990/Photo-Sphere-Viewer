@@ -1,6 +1,7 @@
 import { ExtendedPosition, PSVError, Point, Size, utils, type Viewer } from '@photo-sphere-viewer/core';
-import { Group, Mesh, Object3D, PlaneGeometry, Texture, Vector3, VideoTexture } from 'three';
+import { BufferGeometry, Group, Mesh, Object3D, PlaneGeometry, ShaderMaterial, Texture, Vector3, VideoTexture } from 'three';
 import { ChromaKeyMaterial } from '../../../shared/ChromaKeyMaterial';
+import { createVideo } from '../../../shared/video-utils';
 import { MarkerType } from '../MarkerType';
 import { type MarkersPlugin } from '../MarkersPlugin';
 import { MARKER_DATA } from '../constants';
@@ -12,6 +13,10 @@ import { Marker } from './Marker';
  * @internal
  */
 export class Marker3D extends Marker {
+
+    override get threeElement(): Mesh<BufferGeometry, ShaderMaterial> {
+        return this.element;
+    }
 
     override get video(): HTMLVideoElement {
         if (this.type === MarkerType.videoLayer) {
@@ -59,6 +64,7 @@ export class Marker3D extends Marker {
         delete this.threeElement.userData[MARKER_DATA];
 
         if (this.type === MarkerType.videoLayer) {
+            this.video.pause();
             this.viewer.needsContinuousUpdate(false);
         }
 
@@ -150,14 +156,12 @@ export class Marker3D extends Marker {
                 if (this.definition !== this.config.videoLayer) {
                     material.map?.dispose();
 
-                    const video = document.createElement('video');
-                    video.crossOrigin = this.viewer.config.withCredentials ? 'use-credentials' : 'anonymous';
-                    video.loop = true;
-                    video.playsInline = true;
-                    video.muted = true;
-                    video.autoplay = true;
-                    video.preload = 'metadata';
-                    video.src = this.config.videoLayer;
+                    const video = createVideo({
+                        src: this.config.videoLayer,
+                        withCredentials: this.viewer.config.withCredentials,
+                        muted: true,
+                        autoplay: true,
+                    });
 
                     const texture = new VideoTexture(video);
                     material.map = texture;

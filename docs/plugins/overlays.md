@@ -102,7 +102,8 @@ const viewer = new Viewer({
 
 ::: tip Overlays vs. Markers
 Overlays seem very similar to image/video markers but serve different purposes:
-- Markers are for "small", generally interactive, elements
+- Markers are for "small" elements, generally interactive
+- Markers are highly configurable (style, tooltip, user events, etc.)
 - Overlays can cover the whole panorama
 - Overlays cannot have a tooltip, change size, etc. You can however listen to click events
 - Overlays are rendered over the panorama itself where markers are rendered flat over the viewer HTML element
@@ -164,6 +165,40 @@ Path to the image or video.
 -   type: `number | string`
 
 Definition of the position and size of the overlay, if none of the four properties are configured, the overlay will cover the full sphere, respecting the [panorama data](../guide/adapters/equirectangular.md#cropped-panorama) if applicable.
+
+#### `chromaKey`
+
+-   type: `object`
+-   default: `{ enabled: false }`
+
+Will make a color of the image/video transparent.
+
+::: dialog "See details" "Marker chroma key"
+
+The `chromaKey` marker option allows to define a color which will be transparent (green screen/blue screen).
+
+```ts
+chromaKey: {
+    /**
+     * Enable the option
+     */
+    enabled: true,
+    /**
+     * Select which color to make transparent (default is green)
+     */
+    color: 0x00ff00,
+    color: { r: 0, g: 255, 0 },
+    /**
+     * Customize the color detection (default is 0.2 / 0.2)
+     */
+    similarity: 0.2,
+    smoothness: 0.2,
+}
+```
+
+:::
+
+_(This option is only applicable to spherical overlays)._
 
 #### Cube overlays
 

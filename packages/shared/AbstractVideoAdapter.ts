@@ -1,6 +1,7 @@
 import type { TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, PSVError } from '@photo-sphere-viewer/core';
 import { BufferGeometry, Material, Mesh, VideoTexture } from 'three';
+import { createVideo } from './video-utils';
 
 export type AbstractVideoPanorama = {
     source: string;
@@ -69,7 +70,12 @@ export abstract class AbstractVideoAdapter<
             return Promise.reject(new PSVError('Video adapters require VideoPlugin to be loaded too.'));
         }
 
-        const video = this.__createVideo(panorama.source);
+        const video = createVideo({
+            src: panorama.source,
+            withCredentials: this.viewer.config.withCredentials,
+            muted: this.config.muted,
+            autoplay: false,
+        });
 
         return this.__videoLoadPromise(video).then(() => {
             const texture = new VideoTexture(video);
@@ -120,21 +126,6 @@ export abstract class AbstractVideoAdapter<
             this.video.remove();
             delete this.video;
         }
-    }
-
-    private __createVideo(src: string): HTMLVideoElement {
-        const video = document.createElement('video');
-        video.crossOrigin = this.viewer.config.withCredentials ? 'use-credentials' : 'anonymous';
-        video.loop = true;
-        video.playsInline = true;
-        video.muted = this.config.muted;
-        video.preload = 'metadata';
-        video.src = src;
-
-        video.style.display = 'none';
-        this.viewer.container.appendChild(video);
-
-        return video;
     }
 
     private __videoLoadPromise(video: HTMLVideoElement): Promise<void> {

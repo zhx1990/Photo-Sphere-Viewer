@@ -10,6 +10,10 @@ import { Marker } from './Marker';
  */
 export abstract class AbstractDomMarker extends Marker {
 
+    override get domElement(): HTMLElement | SVGElement {
+        return this.element;
+    }
+
     constructor(viewer: Viewer, plugin: MarkersPlugin, config: MarkerConfig) {
         super(viewer, plugin, config);
     }

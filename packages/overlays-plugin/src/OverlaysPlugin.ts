@@ -12,6 +12,7 @@ import type { CubemapTilesAdapter } from '@photo-sphere-viewer/cubemap-tiles-ada
 import type { EquirectangularTilesAdapter } from '@photo-sphere-viewer/equirectangular-tiles-adapter';
 import { BoxGeometry, Mesh, MeshBasicMaterial, SphereGeometry, Texture, Vector2, VideoTexture } from 'three';
 import { ChromaKeyMaterial } from '../../shared/ChromaKeyMaterial';
+import { createVideo } from '../../shared/video-utils';
 import { OVERLAY_DATA } from './constants';
 import { OverlayClickEvent, OverlaysPluginEvents } from './events';
 import {
@@ -20,6 +21,7 @@ import {
     OverlaysPluginConfig,
     ParsedOverlayConfig,
     SphereOverlayConfig,
+    UpdatableOverlaysPluginConfig,
 } from './model';
 
 const getConfig = utils.getConfigParser<OverlaysPluginConfig>({
@@ -34,12 +36,12 @@ const getConfig = utils.getConfigParser<OverlaysPluginConfig>({
 export class OverlaysPlugin extends AbstractConfigurablePlugin<
     OverlaysPluginConfig,
     OverlaysPluginConfig,
-    never,
+    UpdatableOverlaysPluginConfig,
     OverlaysPluginEvents
 > {
     static override readonly id = 'overlays';
     static override configParser = getConfig;
-    static override: Array<keyof OverlaysPluginConfig> = ['overlays', 'cubemapAdapter'];
+    static override readonlyOptions: Array<keyof OverlaysPluginConfig> = ['overlays', 'cubemapAdapter'];
 
     private readonly state = {
         overlays: {} as Record<string, { config: ParsedOverlayConfig; mesh: Mesh }>,
@@ -312,14 +314,12 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
      * Add a spherical video
      */
     private __addSphereVideoOverlay(config: SphereOverlayConfig & ParsedOverlayConfig) {
-        const video = document.createElement('video');
-        video.crossOrigin = this.viewer.config.withCredentials ? 'use-credentials' : 'anonymous';
-        video.loop = true;
-        video.playsInline = true;
-        video.muted = true;
-        video.autoplay = true;
-        video.preload = 'metadata';
-        video.src = config.path as string;
+        const video = createVideo({
+            src: config.path as string,
+            withCredentials: this.viewer.config.withCredentials,
+            muted: true,
+            autoplay: true,
+        });
 
         const mesh = this.__createSphereMesh({ ...config, opacity: 0 }, new VideoTexture(video));
 
@@ -329,7 +329,7 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
         this.viewer.needsContinuousUpdate(true);
         video.play();
 
-        video.addEventListener('play', () => {
+        video.addEventListener('loadedmetadata', () => {
             (mesh.material as ChromaKeyMaterial).alpha = config.opacity;
         }, { once: true });
     }

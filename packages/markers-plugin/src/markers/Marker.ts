@@ -31,11 +31,11 @@ export abstract class Marker {
     }
 
     get domElement(): HTMLElement | SVGElement {
-        return !this.is3d() ? this.element : null;
+        return null;
     }
 
     get threeElement(): Mesh<BufferGeometry, ShaderMaterial> {
-        return this.is3d() ? this.element : null;
+        return null;
     }
 
     get video(): HTMLVideoElement {
@@ -90,14 +90,14 @@ export abstract class Marker {
     }
 
     /**
-     * Checks if it is a 3D marker (imageLayer)
+     * Checks if it is a 3D marker (imageLayer, videoLayer)
      */
     is3d(): boolean {
         return false;
     }
 
     /**
-     * Checks if it is a normal marker (image or html)
+     * Checks if it is a normal marker (image, html, element)
      */
     isNormal(): boolean {
         return false;

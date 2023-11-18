@@ -86,3 +86,5 @@ export type OverlaysPluginConfig = {
      */
     cubemapAdapter?: AdapterConstructor;
 };
+
+export type UpdatableOverlaysPluginConfig = Omit<OverlaysPluginConfig, 'overlays' | 'cubemapAdapter'>;
