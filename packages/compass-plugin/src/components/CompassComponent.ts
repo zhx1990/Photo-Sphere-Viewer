@@ -195,7 +195,7 @@ export class CompassComponent extends AbstractComponent {
 
                 context[i === 0 ? 'moveTo' : 'lineTo'](c + Math.cos(a) * c * d, c + Math.sin(a) * c * d);
             });
-            if (marker.isPolygon()) {
+            if (marker.type.startsWith('polygon')) {
                 context.fillStyle = color;
                 context.fill();
             } else {

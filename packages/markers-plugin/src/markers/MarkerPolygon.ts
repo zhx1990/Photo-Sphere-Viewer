@@ -28,17 +28,9 @@ export class MarkerPolygon extends AbstractDomMarker {
     /**
      * Checks if it is a polygon/polyline using pixel coordinates
      */
-    private get isPolyPixels(): boolean {
+    private get isPixels(): boolean {
         return this.type === MarkerType.polygonPixels
             || this.type === MarkerType.polylinePixels;
-    }
-
-    /**
-     * Checks if it is a polygon/polyline using radian coordinates
-     */
-    private get isPolyAngles(): boolean {
-        return this.type === MarkerType.polygon
-            || this.type === MarkerType.polyline;
     }
 
     /**
@@ -110,7 +102,7 @@ export class MarkerPolygon extends AbstractDomMarker {
         }
 
         // convert texture coordinates to spherical coordinates
-        if (this.isPolyPixels) {
+        if (this.isPixels) {
             this.definition = (actualPoly as Array<[number, number]>).map((coord) => {
                 const sphericalCoords = this.viewer.dataHelper.textureCoordsToSphericalCoords({
                     textureX: coord[0],
