@@ -48,14 +48,6 @@ Display cropped panorama.
 Display the panorama with a fisheye effect.
 :::
 
-::: item
-[![](../images/demos/overlay.jpg)](./basic/overlay.md)
-
-### Overlay
-
-Display a secondary image above the panorama.
-:::
-
 ::::
 
 ## Advanced
@@ -91,6 +83,14 @@ Download a screenshot of the visible panorama.
 ## Markers
 
 :::: gallery
+
+::: item
+[![](../images/demos/chroma-key.jpg)](./markers/chroma-key.md)
+
+### Chroma key markers
+
+Make video markers partially transparent.
+:::
 
 ::: item
 [![](../images/demos/custom-marker.jpg)](./markers/custom-tooltip.md)

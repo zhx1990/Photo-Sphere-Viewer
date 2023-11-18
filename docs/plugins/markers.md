@@ -402,7 +402,7 @@ scale: {
 -   type: `boolean | number | { amount?: number, duration?: number, easing?: string }`
 -   default: `null`
 
-Overrides the [global `defaultHoverScale`](#defaulthoverscale). The configuration is merged with the default configuration of x2 scaling in 100ms with a linear easing. Defining `hoverScale: false` allows to disable the scaling for this marker.
+Overrides the [global `defaultHoverScale`](#defaulthoverscale). The configuration is merged with the default configuration of x2 scaling in 100ms with a linear easing. Defining `hoverScale: false` allows to disable the scaling for this marker. [See demo](../demos/markers/hover-scale.md).
 
 _(This option is ignored for polygons, polylines and `imageLayer` markers)._
 
@@ -487,7 +487,7 @@ You can define complex SVG backgrounds such as images by using a pattern definit
 -   type: `object`
 -   default: `{ enabled: false }`
 
-Will make a color of the image/video transparent.
+Will make a color of the image/video transparent. [See demo](../demos/markers/chroma-key.md).
 
 ::: dialog "See details" "Marker chroma key"
 
