@@ -201,6 +201,13 @@ Color of the navigation cone.
 
 Default color of hotspots.
 
+#### `className`
+
+-   type: `string`
+-   updatable: yes
+
+CSS class(es) added to the compass element.
+
 ## Methods
 
 #### `setHotspots(hotspots)`
