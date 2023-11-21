@@ -22,11 +22,42 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'yarn'
 
-      - name: turbo cache
+      - name: data
+        id: data
+        run: |
+          echo "YARN_CACHE_DIR=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
+      - name: yarn cache
+        id: yarn-cache-rw
         uses: actions/cache@v3
         if: github.ref_name == 'main'
+        with:
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          path: ${{ steps.data.outputs.YARN_CACHE_DIR }}
+
+      - name: yarn cache
+        id: yarn-cache-ro
+        uses: actions/cache/restore@v3
+        if: github.ref_name != 'main'
+        with:
+          key: yarn-${{ hashFiles('yarn.lock') }}
+          path: ${{ steps.data.outputs.YARN_CACHE_DIR }}
+
+      - name: turbo cache
+        id: turbo-cache-rw
+        uses: actions/cache@v3
+        if: github.ref_name == 'main'
+        with:
+          path: .turbo
+          key: turbo-${{ github.sha }}
+          restore-keys: |
+            turbo-
+
+      - name: turbo cache
+        id: turbo-cache-ro
+        uses: actions/cache/restore@v3
+        if: github.ref_name != 'main'
         with:
           path: .turbo
           key: turbo-${{ github.sha }}
