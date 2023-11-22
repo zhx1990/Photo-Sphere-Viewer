@@ -2,6 +2,7 @@ import { Mesh, ShaderMaterial, ShaderMaterialParameters } from 'three';
 import { PanoData, PanoDataProvider, PanoramaPosition, Position, TextureData } from '../model';
 import type { Viewer } from '../Viewer';
 import { PSVError } from '../PSVError';
+import { checkVersion } from '../utils';
 
 /**
  * Base class for adapters
@@ -14,6 +15,11 @@ export abstract class AbstractAdapter<TPanorama, TTexture, TData> {
      * Unique identifier of the adapter
      */
     static readonly id: string;
+    /**
+     * Expected version of the core
+     * DO NOT USE on custom adapters
+     */
+    static readonly VERSION: string;
 
     /**
      * Indicates if the adapter supports panorama download natively
@@ -186,6 +192,7 @@ export function adapterInterop(adapter: any): AdapterConstructor & typeof Abstra
     if (adapter) {
         for (const [, p] of [['_', adapter], ...Object.entries(adapter)]) {
             if (p.prototype instanceof AbstractAdapter) {
+                checkVersion(p.id, p.VERSION, PKG_VERSION);
                 return p;
             }
         }

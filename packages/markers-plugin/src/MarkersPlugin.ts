@@ -97,6 +97,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     MarkersPluginEvents
 > {
     static override readonly id = 'markers';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions: Array<keyof MarkersPluginConfig> = ['markers'];
 

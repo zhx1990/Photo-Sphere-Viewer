@@ -25,10 +25,8 @@ export function umdPlugin({ pkg, externals }) {
 }
 
 function wrapUmd(fileContent, pkg, externals) {
-    const deps = Object.keys(pkg.dependencies);
-    if (!deps.includes('three')) {
-        deps.unshift('three');
-    }
+    const deps = Object.keys(pkg.peerDependencies || {});
+    deps.unshift('three');
 
     const depsCommonJs = deps.map((dep) => `require('${dep}')`).join(', ');
     const depsAmd = deps.map((dep) => `'${dep}'`).join(', ');
@@ -52,6 +50,7 @@ ${fileContent
     .replace(`var ${globalParent};\n`, '')
     .replace(`var ${globalParent} = (() => {\n`, '')
     .replace(`(${globalParent} ||= {}).${globalName.split('.').pop()} = (() => {\n`, '')
+
     // hydrate exports
     .replace(/return __toCommonJS\((.*?)\);\n}\)\(\);/, '__copyProps(__defProp(exports, "__esModule", { value: true }), $1);')
     // unused function
@@ -75,6 +74,7 @@ ${fileContent
     .replace(/  var __commonJS = ([\s\S]*?)};\n/, '')
     .replace(/  var __create = (.*?);\n/, '')
     .replace(/  var __getProtoOf = (.*?);\n/, '')
+
     // remove plugin reference
     .replace(/external-global-plugin:/g, '')}
 }));`;

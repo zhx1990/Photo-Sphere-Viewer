@@ -72,6 +72,7 @@ export class AutorotatePlugin extends AbstractConfigurablePlugin<
     AutorotatePluginEvents
 > {
     static override readonly id = 'autorotate';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions: Array<keyof AutorotatePluginConfig> = ['keypoints'];
 

@@ -119,6 +119,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     VirtualTourEvents
 > {
     static override readonly id = 'virtual-tour';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions = Object.keys(getConfig.defaults);
 

@@ -15,6 +15,7 @@ const ID_OVERLAY_PLEASE_ROTATE = 'pleaseRotate';
  */
 export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
     static override readonly id = 'stereo';
+    static override readonly VERSION = PKG_VERSION;
 
     private readonly state = {
         enabled: false,

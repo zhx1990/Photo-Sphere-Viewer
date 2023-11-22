@@ -1,5 +1,5 @@
 import { TypedEvent, TypedEventTarget } from '../lib/TypedEventTarget';
-import { ConfigParser, logWarn } from '../utils';
+import { checkVersion, ConfigParser, logWarn } from '../utils';
 import type { Viewer } from '../Viewer';
 
 /**
@@ -13,6 +13,11 @@ export abstract class AbstractPlugin<
      * Unique identifier of the plugin
      */
     static readonly id: string;
+    /**
+     * Expected version of the core
+     * DO NOT USE on custom plugins
+     */
+    static readonly VERSION: string;
 
     constructor(protected viewer: Viewer) {
         super();
@@ -112,6 +117,7 @@ export function pluginInterop(plugin: any): PluginConstructor & typeof AbstractP
     if (plugin) {
         for (const [, p] of [['_', plugin], ...Object.entries(plugin)]) {
             if (p.prototype instanceof AbstractPlugin) {
+                checkVersion(p.id, p.VERSION, PKG_VERSION);
                 return p;
             }
         }

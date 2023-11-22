@@ -39,6 +39,7 @@ const ORIGIN = new Vector3();
  */
 export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], CubemapData> {
     static override readonly id = 'cubemap';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly supportsDownload = false;
     static override readonly supportsOverlay = true;
 

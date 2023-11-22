@@ -4,7 +4,7 @@
   "private": true,
   "main": "./index.ts",
   "types": "./index.ts",
-  "dependencies": {
+  "peerDependencies": {
     "@photo-sphere-viewer/core": "0.0.0"
   },
   "scripts": {

@@ -441,3 +441,12 @@ export function checkStylesheet(element: HTMLElement, name: string) {
         console.error(`PhotoSphereViewer: stylesheet "@photo-sphere-viewer/${name}/index.css" is not loaded`);
     }
 }
+
+/**
+ * Checks that a dependency version is the same as the core
+ */
+export function checkVersion(name: string, version: string, coreVersion: string) {
+    if (version && version !== coreVersion) {
+        console.error(`PhotoSphereViewer: @photo-sphere-viewer/${name} is in version ${version} but @photo-sphere-viewer/core is in version ${coreVersion}`);
+    }
+}

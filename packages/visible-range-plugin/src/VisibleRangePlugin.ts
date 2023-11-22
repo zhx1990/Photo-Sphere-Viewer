@@ -26,6 +26,7 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
     UpdatableVisibleRangePluginConfig
 > {
     static override readonly id = 'visible-range';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions: Array<keyof VisibleRangePluginConfig> = [
         'horizontalRange',

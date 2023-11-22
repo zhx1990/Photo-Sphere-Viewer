@@ -33,6 +33,7 @@ const getConfig = utils.getConfigParser<SettingsPluginConfig>({
  */
 export class SettingsPlugin extends AbstractPlugin<SettingsPluginEvents> {
     static override readonly id = 'settings';
+    static override readonly VERSION = PKG_VERSION;
 
     readonly config: SettingsPluginConfig;
 

@@ -94,6 +94,7 @@ export class MapPlugin extends AbstractConfigurablePlugin<
     MapPluginEvents
 > {
     static override readonly id = 'map';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions: Array<keyof MapPluginConfig> = [
         'imageUrl',

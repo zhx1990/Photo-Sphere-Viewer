@@ -64,6 +64,7 @@ const getConfig = getConfigParser<EquirectangularAdapterConfig>(
  */
 export class EquirectangularAdapter extends AbstractAdapter<string, Texture, PanoData> {
     static override readonly id: string = 'equirectangular';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly supportsDownload: boolean = true;
     static override readonly supportsOverlay: boolean = true;
 

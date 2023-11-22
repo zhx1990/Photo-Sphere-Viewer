@@ -40,6 +40,7 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
     OverlaysPluginEvents
 > {
     static override readonly id = 'overlays';
+    static override readonly VERSION = PKG_VERSION;
     static override configParser = getConfig;
     static override readonlyOptions: Array<keyof OverlaysPluginConfig> = ['overlays', 'cubemapAdapter'];
 

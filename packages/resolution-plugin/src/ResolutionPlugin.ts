@@ -15,6 +15,7 @@ const getConfig = utils.getConfigParser<ResolutionPluginConfig>({
  */
 export class ResolutionPlugin extends AbstractPlugin<ResolutionPluginEvents> {
     static override readonly id = 'resolution';
+    static override readonly VERSION = PKG_VERSION;
 
     readonly config: ResolutionPluginConfig;
 

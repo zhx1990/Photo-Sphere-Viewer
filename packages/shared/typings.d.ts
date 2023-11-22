@@ -17,3 +17,5 @@ declare module '*.glsl' {
     const content: string;
     export default content;
 }
+
+const PKG_VERSION: string;

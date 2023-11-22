@@ -25,6 +25,7 @@ export class GalleryPlugin extends AbstractConfigurablePlugin<
     GalleryPluginEvents
 > {
     static override readonly id = 'gallery';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions: Array<keyof GalleryPluginConfig> = ['visibleOnLoad', 'items'];
 

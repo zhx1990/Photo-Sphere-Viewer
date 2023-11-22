@@ -31,6 +31,7 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<
     PanoData
 > {
     static override readonly id = 'equirectangular-video';
+    static override readonly VERSION = PKG_VERSION;
 
     protected override readonly config: EquirectangularVideoAdapterConfig;
 

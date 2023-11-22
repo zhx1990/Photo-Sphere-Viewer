@@ -108,6 +108,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
     PanoData
 > {
     static override readonly id = 'equirectangular-tiles';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly supportsDownload = false;
     static override readonly supportsOverlay = false;
 

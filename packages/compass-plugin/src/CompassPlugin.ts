@@ -33,6 +33,7 @@ export class CompassPlugin extends AbstractConfigurablePlugin<
     UpdatableCompassPluginConfig
 > {
     static override readonly id = 'compass';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions: Array<keyof CompassPluginConfig> = ['navigation'];
 

@@ -36,6 +36,7 @@ export { PSVError } from './PSVError';
 export { Viewer } from './Viewer';
 export * from './model';
 export { CONSTANTS, events, utils };
+export const VERSION = PKG_VERSION;
 
 /** @internal  */
 import './styles/index.scss';

@@ -6,13 +6,8 @@
   "license": "MIT",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
-  "dependencies": {
+  "peerDependencies": {
     "@photo-sphere-viewer/core": "0.0.0"
-  },
-  "optionalDependencies": {
-    "@photo-sphere-viewer/compass-plugin": "0.0.0",
-    "@photo-sphere-viewer/gallery-plugin": "0.0.0",
-    "@photo-sphere-viewer/markers-plugin": "0.0.0"
   },
   "scripts": {
     "build": "tsup",

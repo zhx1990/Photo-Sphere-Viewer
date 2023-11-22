@@ -77,6 +77,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<
     CubemapData
 > {
     static override readonly id = 'cubemap-tiles';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly supportsDownload = false;
     static override readonly supportsOverlay = false;
 

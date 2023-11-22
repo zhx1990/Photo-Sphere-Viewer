@@ -35,6 +35,7 @@ export class GyroscopePlugin extends AbstractConfigurablePlugin<
     GyroscopePluginEvents
 > {
     static override readonly id = 'gyroscope';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
 
     private readonly state = {

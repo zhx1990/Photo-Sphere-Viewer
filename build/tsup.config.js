@@ -46,6 +46,9 @@ ${
             external: Object.keys(externals),
             noExternal: [/three\/examples\/.*/],
             target: 'es2021',
+            define: {
+                PKG_VERSION: `'${pkg.version}'`,
+            },
             esbuildPlugins: [
                 sassPlugin(),
                 externalGlobalPlugin(externals),

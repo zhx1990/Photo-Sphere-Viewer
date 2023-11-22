@@ -38,6 +38,7 @@ const getConfig = utils.getConfigParser<CubemapVideoAdapterConfig>(
  */
 export class CubemapVideoAdapter extends AbstractVideoAdapter<CubemapVideoPanorama, never> {
     static override readonly id = 'cubemap-video';
+    static override readonly VERSION = PKG_VERSION;
 
     protected override readonly config: CubemapVideoAdapterConfig;
 

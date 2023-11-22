@@ -25,6 +25,7 @@ export class VideoPlugin extends AbstractConfigurablePlugin<
     VideoPluginEvents
 > {
     static override readonly id = 'video';
+    static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions = Object.keys(getConfig.defaults);
 
