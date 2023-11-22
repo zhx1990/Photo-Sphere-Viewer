@@ -229,6 +229,27 @@
             });
 
             const virtualTour = viewer.getPlugin(VirtualTourPlugin);
+            const markers = viewer.getPlugin(MarkersPlugin);
+
+            virtualTour.addEventListener('enter-arrow', ({ link }) => {
+                console.log(`enter link ${link.nodeId}`);
+            });
+
+            virtualTour.addEventListener('leave-arrow', ({ link }) => {
+                console.log(`leave link ${link.nodeId}`);
+            });
+
+            markers.addEventListener('enter-marker', ({ marker }) => {
+                if (marker.data?.tourLink) {
+                    console.log(`enter link ${marker.data.tourLink.nodeId}`);
+                }
+            });
+
+            markers.addEventListener('leave-marker', ({ marker }) => {
+                if (marker.data?.tourLink) {
+                    console.log(`leave link ${marker.data.tourLink.nodeId}`);
+                }
+            });
 
             window.viewer = viewer;
         </script>

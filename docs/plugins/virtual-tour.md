@@ -605,9 +605,13 @@ Changes the nodes and display the first one (or the one designated by `startNode
 
 Changes the current node. `options` allows to override the default `transitionOptions`.
 
+#### `getCurrentNode()`
+
+Returns the current node.
+
 ## Events
 
-#### `node-changed(nodeId, data)`
+#### `node-changed(node, data)`
 
 Triggered when the current node is changed.
 
@@ -620,3 +624,9 @@ virtualTourPlugin.addEventListener('node-changed', ({ node, data }) => {
     }
 });
 ```
+
+#### `enter-arrow(link, node)` | `leave-arrow(link, node)` (3d mode only)
+
+Triggered when the user puts the cursor hover or away an arrow.
+
+_In markers mode, listen to `enter-markers`/`leave-marker` on the markers plugin (link markers have an additional `tourLink` data)._ 

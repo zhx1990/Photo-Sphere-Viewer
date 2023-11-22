@@ -18,4 +18,5 @@ declare module '*.glsl' {
     export default content;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const PKG_VERSION: string;

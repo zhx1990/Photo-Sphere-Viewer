@@ -21,4 +21,37 @@ export class NodeChangedEvent extends TypedEvent<VirtualTourPlugin> {
     }
 }
 
-export type VirtualTourEvents = NodeChangedEvent;
+/**
+ * @event Triggered when the user puts the cursor hover a marker
+ */
+export class EnterArrowEvent extends TypedEvent<VirtualTourPlugin> {
+    static override readonly type = 'enter-arrow';
+    override type: 'enter-arrow';
+
+    constructor(
+        public readonly link: VirtualTourLink,
+        public readonly node: VirtualTourNode
+    ) {
+        super(EnterArrowEvent.type);
+    }
+}
+
+/**
+ * @event Triggered when the user puts the cursor away from an arrow
+ */
+export class LeaveArrowEvent extends TypedEvent<VirtualTourPlugin> {
+    static override readonly type = 'leave-arrow';
+    override type: 'leave-arrow';
+
+    constructor(
+        public readonly link: VirtualTourLink,
+        public readonly node: VirtualTourNode
+    ) {
+        super(LeaveArrowEvent.type);
+    }
+}
+
+export type VirtualTourEvents = 
+    | NodeChangedEvent
+    | EnterArrowEvent
+    | LeaveArrowEvent;

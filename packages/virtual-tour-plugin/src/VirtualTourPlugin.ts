@@ -10,7 +10,7 @@ import { DEFAULT_ARROW, DEFAULT_MARKER, LINK_DATA, LINK_ID } from './constants';
 import { AbstractDatasource } from './datasources/AbstractDataSource';
 import { ClientSideDatasource } from './datasources/ClientSideDatasource';
 import { ServerSideDatasource } from './datasources/ServerSideDatasource';
-import { NodeChangedEvent, VirtualTourEvents } from './events';
+import { EnterArrowEvent, LeaveArrowEvent, NodeChangedEvent, VirtualTourEvents } from './events';
 import {
     GpsPosition,
     VirtualTourLink,
@@ -304,6 +304,13 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 this.setCurrentNode(id.substring(LINK_ID.length));
             }
         }
+    }
+
+    /**
+     * Returns the current node
+     */
+    getCurrentNode(): VirtualTourNode {
+        return this.state.currentNode;
     }
 
     /**
@@ -648,6 +655,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         this.viewer.needsUpdate();
         this.viewer.setCursor('pointer');
+
+        this.dispatchEvent(new EnterArrowEvent(link, this.state.currentNode))
     }
 
     private __onHoverObject(viewerPoint: Point) {
@@ -673,6 +682,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         this.viewer.needsUpdate();
         this.viewer.setCursor(null);
+
+        this.dispatchEvent(new LeaveArrowEvent(link, this.state.currentNode))
     }
 
     /**
