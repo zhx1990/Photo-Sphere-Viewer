@@ -12,7 +12,7 @@
   "scripts": {
     "build": "tsup",
     "watch": "tsup --watch",
-    "lint": "eslint . --fix && stylelint \"src/**/*.scss\" --fix",
+    "lint": "tsc --noEmit && eslint . --fix && stylelint \"src/**/*.scss\" --fix",
     "test": "mocha -r ts-node/register \"src/**/*.spec.ts\"",
     "publish-dist": "cd dist && npm publish --tag=$NPM_TAG --access=public",
     "npm-link": "cd dist && npm link"

@@ -9,7 +9,7 @@
   },
   "scripts": {
     "build:test": "tsup --define.dts=off",
-    "lint": "eslint . --fix && stylelint \"*.scss\" --fix",
+    "lint": "tsc --noEmit && eslint . --fix && stylelint \"*.scss\" --fix",
     "test": "mocha -r ts-node/register \"*.spec.ts\""
   },
   "psv": {

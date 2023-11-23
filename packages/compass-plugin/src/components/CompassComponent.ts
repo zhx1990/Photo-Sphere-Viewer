@@ -93,7 +93,7 @@ export class CompassComponent extends AbstractComponent {
         this.container.className = `psv-compass psv-compass--${this.config.position.join('-')}`;
 
         if (this.config.className) {
-            utils.addClasses(this.container, this.config.className);
+            this.container.classList.add(this.config.className);
         }
 
         this.background.innerHTML = this.config.backgroundSvg;
