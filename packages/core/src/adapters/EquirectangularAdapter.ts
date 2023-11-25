@@ -1,4 +1,4 @@
-import { BufferGeometry, MathUtils, Mesh, ShaderMaterial, SphereGeometry, Texture } from 'three';
+import { BufferGeometry, Material, MathUtils, Mesh, MeshBasicMaterial, SphereGeometry, Texture } from 'three';
 import { PSVError } from '../PSVError';
 import type { Viewer } from '../Viewer';
 import { SPHERE_RADIUS } from '../data/constants';
@@ -38,7 +38,7 @@ export type EquirectangularAdapterConfig = {
     blur?: boolean;
 };
 
-type EquirectangularMesh = Mesh<BufferGeometry, ShaderMaterial>;
+type EquirectangularMesh = Mesh<BufferGeometry, Material>;
 type EquirectangularTexture = TextureData<Texture, string, PanoData>;
 
 const getConfig = getConfigParser<EquirectangularAdapterConfig>(
@@ -66,7 +66,6 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
     static override readonly id: string = 'equirectangular';
     static override readonly VERSION = PKG_VERSION;
     static override readonly supportsDownload: boolean = true;
-    static override readonly supportsOverlay: boolean = true;
 
     private readonly config: EquirectangularAdapterConfig;
 
@@ -79,12 +78,6 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
         super(viewer);
 
         this.config = getConfig(config);
-        if (!isNil(this.viewer.config.useXmpData)) {
-            this.config.useXmpData = this.viewer.config.useXmpData;
-        }
-        if (!isNil(this.viewer.config.canvasBackground)) {
-            this.config.backgroundColor = this.viewer.config.canvasBackground;
-        }
 
         if (this.config.interpolateBackground) {
             if (!window.Worker) {
@@ -323,35 +316,20 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
             -Math.PI / 2
         ).scale(-1, 1, 1);
 
-        const material = AbstractAdapter.createOverlayMaterial();
-
-        return new Mesh(geometry, material);
+        return new Mesh(geometry, new MeshBasicMaterial());
     }
 
     setTexture(mesh: EquirectangularMesh, textureData: EquirectangularTexture) {
-        this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.panorama, textureData.texture);
-    }
-
-    override setOverlay(mesh: EquirectangularMesh, textureData: EquirectangularTexture, opacity: number) {
-        this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity, opacity);
-        if (!textureData) {
-            this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlay, null);
-        } else {
-            this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.overlay, textureData.texture);
-        }
+        (mesh.material as MeshBasicMaterial).map = textureData.texture;
     }
 
     setTextureOpacity(mesh: EquirectangularMesh, opacity: number) {
-        this.__setUniform(mesh, AbstractAdapter.OVERLAY_UNIFORMS.globalOpacity, opacity);
+        mesh.material.opacity = opacity;
         mesh.material.transparent = opacity < 1;
     }
 
     disposeTexture(textureData: EquirectangularTexture) {
         textureData.texture?.dispose();
-    }
-
-    private __setUniform(mesh: EquirectangularMesh, uniform: string, value: any) {
-        mesh.material.uniforms[uniform].value = value;
     }
 
     private __defaultPanoData(img: HTMLImageElement): PanoData {

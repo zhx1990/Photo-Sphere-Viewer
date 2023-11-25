@@ -95,13 +95,6 @@ export function getPosition(el: HTMLElement): Point {
 }
 
 /**
- * @deprecated use {@link getStyleProperty} (using dash-case instead of camelCase)
- */
-export function getStyle(elt: Element, prop: string): string {
-    return (window.getComputedStyle(elt, null) as any)[prop];
-}
-
-/**
  * Gets an element style value
  */
 export function getStyleProperty(elt: Element, varname: string): string {

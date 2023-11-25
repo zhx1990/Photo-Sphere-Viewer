@@ -7,7 +7,6 @@ Example usage of a transparent `videoLayer` marker using `chromaKey`.
 ```yaml
 autoload: true
 title: PSV Marker layers Demo
-version: 5.5.0-alpha.2
 packages:
     - name: markers-plugin
       imports: MarkersPlugin

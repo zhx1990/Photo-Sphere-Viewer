@@ -81,7 +81,7 @@ viewer.rotate({
 
 ### `setOption(option, value)`
 
-Update an option of the viewer. Some options cannot be changed : `panorama`, `panoData`, `container`, `overlay`, `overlayOpacity`, `adapter` and `plugins`.
+Update an option of the viewer. Some options cannot be changed : `panorama`, `panoData`, `container`, `adapter` and `plugins`.
 
 ```js
 viewer.setOption('fisheye', true);
@@ -118,10 +118,6 @@ viewer.setPanorama('image.jpg', {
   // more options in the API doc
 });
 ```
-
-### `setOverlay(overlay[, opacity]): Promise`
-
-Change the current [overlay](./config.md#overlay) without changing the panorama.
 
 ### `zoom(level)` | `zoomIn([step = 1])` | `zoomOut([step = 1])`
 

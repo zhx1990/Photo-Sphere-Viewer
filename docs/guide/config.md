@@ -229,10 +229,6 @@ Speed multiplicator for panorama moves. Used for click move, touch move and navb
 
 Speed multiplicator for panorama zooms. Used for mouse wheel, touch pinch and navbar buttons.
 
-#### ~~`useXmpData`~~
-
-Deprecated : must be configured [on the adapter](./adapters/equirectangular.md#usexmpdata).
-
 #### `panoData`
 
 -   type: `object | function<Image, PanoData, PanoData>`
@@ -292,10 +288,6 @@ requestHeaders: (url) => ({
     header: value,
 });
 ```
-
-#### ~~`canvasBackground`~~
-
-Deprecated : must be configured [on the adapter](./adapters/equirectangular.md#backgroundcolor).
 
 #### `moveInertia`
 

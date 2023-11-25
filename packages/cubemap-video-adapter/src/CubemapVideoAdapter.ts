@@ -17,21 +17,10 @@ type ShaderUniforms = {
     vidWH: { value: Vector2 },
 };
 
-const getConfig = utils.getConfigParser<CubemapVideoAdapterConfig>(
-    {
-        equiangular: null,
-        autoplay: false,
-        muted: false,
-    },
-    {
-        equiangular(equiangular) {
-            if (!utils.isNil(equiangular)) {
-                utils.logWarn('CubemapVideoAdapter "equiangular" option is deprecated, it must be defined on the panorama object');
-            }
-            return equiangular;
-        },
-    }
-);
+const getConfig = utils.getConfigParser<CubemapVideoAdapterConfig>({
+    autoplay: false,
+    muted: false,
+});
 
 /**
  * Adapter for cubemap videos
@@ -49,7 +38,7 @@ export class CubemapVideoAdapter extends AbstractVideoAdapter<CubemapVideoPanora
     }
 
     override loadTexture(panorama: CubemapVideoPanorama): Promise<CubemapTexture> {
-        panorama.equiangular = panorama.equiangular ?? this.config.equiangular ?? true;
+        panorama.equiangular = panorama.equiangular ?? true;
         return super.loadTexture(panorama);
     }
 

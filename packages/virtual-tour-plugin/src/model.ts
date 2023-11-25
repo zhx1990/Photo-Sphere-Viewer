@@ -218,7 +218,6 @@ export type VirtualTourPluginConfig = {
      * preload linked panoramas
      */
     preload?: boolean | ((node: VirtualTourNode, link: VirtualTourLink) => boolean);
-
     /**
      * Configuration of the transition between nodes. Can be a callback.
      * @default `{ showLoader: true, speed: '20rpm', fadeIn: true, rotation: true }`
@@ -230,14 +229,6 @@ export type VirtualTourPluginConfig = {
               fromNode?: VirtualTourNode,
               fromLink?: VirtualTourLink
           ) => VirtualTourTransitionOptions);
-    /**
-     * @deprecated Use {@link VirtualTourPluginConfig#transitionOptions}
-     */
-    rotateSpeed?: false | string | number;
-    /**
-     * @deprecated Use {@link VirtualTourPluginConfig#transitionOptions}
-     */
-    transition?: boolean | number;
     /**
      * if the Compass plugin is enabled, displays the links on the compass
      * @default true

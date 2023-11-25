@@ -110,7 +110,7 @@ export type PanoDataProvider = (image: HTMLImageElement, xmpData?: PanoData) => 
 /**
  * Object defining options for {@link Viewer.setPanorama}
  */
-export type PanoramaOptions = Partial<ExtendedPosition> & {
+export type PanoramaOptions = {
     /**
      * new panorama position
      */
@@ -131,7 +131,7 @@ export type PanoramaOptions = Partial<ExtendedPosition> & {
      * enable transition between old and new panorama
      * @default true
      */
-    transition?: boolean | number | 'fade-only';
+    transition?: boolean | 'fade-only';
     /**
      * speed or duration of the transition between old and new panorama
      * @default 1500
@@ -150,14 +150,6 @@ export type PanoramaOptions = Partial<ExtendedPosition> & {
      * new data used for this panorama
      */
     panoData?: PanoData | PanoDataProvider;
-    /**
-     * @deprecated Use the `overlay` plugin instead
-     */
-    overlay?: any;
-    /**
-     * @deprecated Use the `overlay` plugin instead
-     */
-    overlayOpacity?: number;
 };
 
 /**
@@ -293,10 +285,6 @@ export type NavbarCustomButton = {
 export type ViewerConfig = {
     container: HTMLElement | string;
     panorama?: any;
-    /** @deprecated Use the `overlay` plugin instead */
-    overlay?: any;
-    /** @deprecated Use the `overlay` plugin instead */
-    overlayOpacity?: number;
     /** @default equirectangular */
     adapter?: AdapterConstructor | [AdapterConstructor, any];
     plugins?: Array<PluginConstructor | [PluginConstructor, any]>;
@@ -342,12 +330,8 @@ export type ViewerConfig = {
     mousewheelCtrlKey?: boolean;
     /** @default false */
     touchmoveTwoFingers?: boolean;
-    /** @deprecated configure `useXmpData` on EquirectangularAdapter */
-    useXmpData?: boolean;
     panoData?: PanoData | PanoDataProvider;
     requestHeaders?: Record<string, string> | ((url: string) => Record<string, string>);
-    /** @deprecated configure `backgroundColor` on EquirectangularAdapter */
-    canvasBackground?: string;
     /** @default '{ alpha: true, antialias: true }' */
     rendererParameters?: WebGLRendererParameters;
     /** @default false */
@@ -405,8 +389,6 @@ export type ParsedViewerConfig = Omit<
 export type ReadonlyViewerConfig =
     | 'panorama'
     | 'panoData'
-    | 'overlay'
-    | 'overlayOpacity'
     | 'container'
     | 'adapter'
     | 'plugins';

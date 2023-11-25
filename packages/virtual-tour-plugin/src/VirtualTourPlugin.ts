@@ -36,8 +36,6 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
             fadeIn: true,
             rotation: true,
         },
-        rotateSpeed: null,
-        transition: null,
         linksOnCompass: true,
         markerStyle: DEFAULT_MARKER,
         arrowStyle: DEFAULT_ARROW,
@@ -86,25 +84,6 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
                 }
             }
             return map;
-        },
-        transitionOptions(transitionOptions, { rawConfig }) {
-            if (typeof transitionOptions === 'object') {
-                if (!utils.isNil(rawConfig.transition)) {
-                    utils.logWarn('VirtualTourPlugin: "transition" option is deprecated, use "transitionOptions" instead');
-                    if (typeof rawConfig.transition === 'number') {
-                        transitionOptions.speed = rawConfig.transition;
-                    } else if (rawConfig.transition === false) {
-                        transitionOptions.fadeIn = false;
-                    }
-                }
-                if (!utils.isNil(rawConfig.rotateSpeed)) {
-                    utils.logWarn('VirtualTourPlugin: "rotateSpeed" option is deprecated, use "transitionOptions" instead');
-                    if (rawConfig.rotateSpeed === false) {
-                        transitionOptions.rotation = false;
-                    }
-                }
-            }
-            return transitionOptions;
         },
     }
 );

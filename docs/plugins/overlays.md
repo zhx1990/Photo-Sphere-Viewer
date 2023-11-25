@@ -57,7 +57,6 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ```yaml
 title: PSV Overlay Demo
-version: 5.5.0-alpha.2
 packages:
     - name: overlays-plugin
       imports: OverlaysPlugin
