@@ -14,6 +14,7 @@ export class MarkerVisibilityEvent extends MarkersPluginEvent {
     static override readonly type = 'marker-visibility';
     override type: 'marker-visibility';
 
+    /** @internal */
     constructor(
         public readonly marker: Marker,
         public readonly visible: boolean
@@ -29,6 +30,7 @@ export class GotoMarkerDoneEvent extends MarkersPluginEvent {
     static override readonly type = 'goto-marker-done';
     override type: 'goto-marker-done';
 
+    /** @internal */
     constructor(public readonly marker: Marker) {
         super(GotoMarkerDoneEvent.type);
     }
@@ -41,6 +43,7 @@ export class LeaveMarkerEvent extends MarkersPluginEvent {
     static override readonly type = 'leave-marker';
     override type: 'leave-marker';
 
+    /** @internal */
     constructor(public readonly marker: Marker) {
         super(LeaveMarkerEvent.type);
     }
@@ -53,6 +56,7 @@ export class EnterMarkerEvent extends MarkersPluginEvent {
     static override readonly type = 'enter-marker';
     override type: 'enter-marker';
 
+    /** @internal */
     constructor(public readonly marker: Marker) {
         super(EnterMarkerEvent.type);
     }
@@ -65,6 +69,7 @@ export class SelectMarkerEvent extends MarkersPluginEvent {
     static override readonly type = 'select-marker';
     override type: 'select-marker';
 
+    /** @internal */
     constructor(
         public readonly marker: Marker,
         public readonly doubleClick: boolean,
@@ -81,6 +86,7 @@ export class SelectMarkerListEvent extends MarkersPluginEvent {
     static override readonly type = 'select-marker-list';
     override type: 'select-marker-list';
 
+    /** @internal */
     constructor(public readonly marker: Marker) {
         super(SelectMarkerListEvent.type);
     }
@@ -93,6 +99,7 @@ export class UnselectMarkerEvent extends MarkersPluginEvent {
     static override readonly type = 'unselect-marker';
     override type: 'unselect-marker';
 
+    /** @internal */
     constructor(public readonly marker: Marker) {
         super(UnselectMarkerEvent.type);
     }
@@ -105,6 +112,7 @@ export class HideMarkersEvent extends MarkersPluginEvent {
     static override readonly type = 'hide-markers';
     override type: 'hide-markers';
 
+    /** @internal */
     constructor() {
         super(HideMarkersEvent.type);
     }
@@ -117,6 +125,7 @@ export class SetMarkersEvent extends MarkersPluginEvent {
     static override readonly type = 'set-markers';
     override type: 'set-markers';
 
+    /** @internal */
     constructor(public readonly markers: Marker[]) {
         super(SetMarkersEvent.type);
     }
@@ -129,6 +138,7 @@ export class ShowMarkersEvent extends MarkersPluginEvent {
     static override readonly type = 'show-markers';
     override type: 'show-markers';
 
+    /** @internal */
     constructor() {
         super(ShowMarkersEvent.type);
     }
@@ -141,6 +151,7 @@ export class RenderMarkersListEvent extends MarkersPluginEvent {
     static override readonly type = 'render-markers-list';
     override type: 'render-markers-list';
 
+    /** @internal */
     constructor(
         /** the list of markers to display, can be modified */
         public markers: Marker[]

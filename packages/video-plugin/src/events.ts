@@ -8,6 +8,7 @@ export class PlayPauseEvent extends TypedEvent<VideoPlugin> {
     static override readonly type = 'play-pause';
     override type: 'play-pause';
 
+    /** @internal */
     constructor(public readonly playing: boolean) {
         super(PlayPauseEvent.type);
     }
@@ -20,6 +21,7 @@ export class VolumeChangeEvent extends TypedEvent<VideoPlugin> {
     static override readonly type = 'volume-change';
     override type: 'volume-change';
 
+    /** @internal */
     constructor(public readonly volume: number) {
         super(VolumeChangeEvent.type);
     }
@@ -32,6 +34,7 @@ export class ProgressEvent extends TypedEvent<VideoPlugin> {
     static override readonly type = 'progress';
     override type: 'progress';
 
+    /** @internal */
     constructor(
         public readonly time: number,
         public readonly duration: number,
@@ -43,15 +46,19 @@ export class ProgressEvent extends TypedEvent<VideoPlugin> {
 
 /**
  * @event Triggered when the video buffer changes
- * @internal
  */
 export class BufferEvent extends TypedEvent<VideoPlugin> {
     static override readonly type = 'buffer';
     override type: 'buffer';
 
+    /** @internal */
     constructor(public readonly maxBuffer: number) {
         super(BufferEvent.type);
     }
 }
 
-export type VideoPluginEvents = PlayPauseEvent | VolumeChangeEvent | ProgressEvent | BufferEvent;
+export type VideoPluginEvents = 
+    | PlayPauseEvent 
+    | VolumeChangeEvent 
+    | ProgressEvent 
+    | BufferEvent;

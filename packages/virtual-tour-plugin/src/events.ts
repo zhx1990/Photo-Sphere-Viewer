@@ -9,6 +9,7 @@ export class NodeChangedEvent extends TypedEvent<VirtualTourPlugin> {
     static override readonly type = 'node-changed';
     override type: 'node-changed';
 
+    /** @internal */
     constructor(
         public readonly node: VirtualTourNode,
         public readonly data: {
@@ -28,6 +29,7 @@ export class EnterArrowEvent extends TypedEvent<VirtualTourPlugin> {
     static override readonly type = 'enter-arrow';
     override type: 'enter-arrow';
 
+    /** @internal */
     constructor(
         public readonly link: VirtualTourLink,
         public readonly node: VirtualTourNode
@@ -43,6 +45,7 @@ export class LeaveArrowEvent extends TypedEvent<VirtualTourPlugin> {
     static override readonly type = 'leave-arrow';
     override type: 'leave-arrow';
 
+    /** @internal */
     constructor(
         public readonly link: VirtualTourLink,
         public readonly node: VirtualTourNode

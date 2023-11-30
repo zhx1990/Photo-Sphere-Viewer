@@ -8,6 +8,7 @@ export class ShowGalleryEvent extends TypedEvent<GalleryPlugin> {
     static override readonly type = 'show-gallery';
     override type: 'show-gallery';
 
+    /** @internal */
     constructor() {
         super(ShowGalleryEvent.type);
     }
@@ -20,6 +21,7 @@ export class HideGalleryEvent extends TypedEvent<GalleryPlugin> {
     static override readonly type = 'hide-gallery';
     override type: 'hide-gallery';
 
+    /** @internal */
     constructor() {
         super(ShowGalleryEvent.type);
     }
