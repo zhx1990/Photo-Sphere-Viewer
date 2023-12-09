@@ -39,7 +39,7 @@ The `content` can be an existing element in a the DOM or a [Web Component](https
 If your component has an `attachViewer()` method it will be called with the instance of the viewer as first parameter.
 :::
 
-#### `onClick(viewer)` (required)
+#### `onClick(viewer)`
 
 -   type : `function(Viewer)`
 

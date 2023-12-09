@@ -263,7 +263,7 @@ export type NavbarCustomButton = {
     /**
      * Function called when the button is clicked
      */
-    onClick: (viewer: Viewer) => void;
+    onClick?: (viewer: Viewer) => void;
     /**
      * initial state of the button
      * @default false
