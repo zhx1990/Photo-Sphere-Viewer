@@ -32,7 +32,6 @@ I forked the original Photo Sphere Viewer [by Jérémy Heleine](http://jeremyhel
 ## Sponsors
 
 [![getsentry](https://avatars.githubusercontent.com/u/1396951?s=200)](https://github.com/getsentry "Sentry")
-[![agyson](https://avatars.githubusercontent.com/u/30114396?s=200)](https://github.com/agyson "Agy Nurwicaksono")
 
 </div>
 
