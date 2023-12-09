@@ -37,6 +37,9 @@
 
         <script type="module">
             import { Viewer } from '@photo-sphere-viewer/core';
+            import { CustomNavbarButton } from './CustomNavbarButton.js';
+
+            customElements.define('custom-navbar-button', CustomNavbarButton);
 
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
@@ -112,6 +115,9 @@
                                 content: `Custom tooltip (${position})`,
                             });
                         },
+                    },
+                    {
+                        content: document.createElement('custom-navbar-button'),
                     },
                 ],
             });

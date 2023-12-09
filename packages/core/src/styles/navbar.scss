@@ -64,6 +64,11 @@
 .psv-custom-button {
     width: auto;
     min-width: $psv-buttons-height;
+
+    &--no-padding {
+        padding: 0;
+        height: 100%;
+    }
 }
 
 .psv-caption {

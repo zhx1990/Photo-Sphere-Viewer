@@ -233,6 +233,14 @@ export type ClickData = {
 };
 
 /**
+ * Custom Web Component interface for navbar buttons
+ */
+// eslint-disable-next-line @typescript-eslint/consistent-type-definitions
+export interface NavbarButtonElement extends HTMLElement {
+    attachViewer?(viewer: Viewer): void;
+}
+
+/**
  * Definition of a custom navbar button
  */
 export type NavbarCustomButton = {
@@ -247,7 +255,7 @@ export type NavbarCustomButton = {
     /**
      * Content of the button. Preferably a square image or SVG icon
      */
-    content: string;
+    content: string | NavbarButtonElement;
     /**
      * CSS class added to the button
      */
