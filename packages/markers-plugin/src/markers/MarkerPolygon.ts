@@ -11,7 +11,6 @@ import { AbstractDomMarker } from './AbstractDomMarker';
  * @internal
  */
 export class MarkerPolygon extends AbstractDomMarker {
-
     constructor(viewer: Viewer, plugin: MarkersPlugin, config: MarkerConfig) {
         super(viewer, plugin, config);
     }
@@ -29,24 +28,21 @@ export class MarkerPolygon extends AbstractDomMarker {
      * Checks if it is a polygon/polyline using pixel coordinates
      */
     private get isPixels(): boolean {
-        return this.type === MarkerType.polygonPixels
-            || this.type === MarkerType.polylinePixels;
+        return this.type === MarkerType.polygonPixels || this.type === MarkerType.polylinePixels;
     }
 
     /**
      * Checks if it is a polygon marker
      */
     private get isPolygon(): boolean {
-        return this.type === MarkerType.polygon
-            || this.type === MarkerType.polygonPixels;
+        return this.type === MarkerType.polygon || this.type === MarkerType.polygonPixels;
     }
 
     /**
      * Checks if it is a polyline marker
      */
     private get isPolyline(): boolean {
-        return this.type === MarkerType.polyline
-            || this.type === MarkerType.polylinePixels;
+        return this.type === MarkerType.polyline || this.type === MarkerType.polylinePixels;
     }
 
     override render(): Point {
@@ -176,5 +172,4 @@ export class MarkerPolygon extends AbstractDomMarker {
             .filter((pos) => pos.visible)
             .map((pos) => this.viewer.dataHelper.vector3ToViewerCoords(pos.vector));
     }
-
 }

@@ -111,7 +111,7 @@
 
             const overlays = viewer.getPlugin('overlays');
 
-            overlays.addEventListener('overlay-click', ({overlayId}) => {
+            overlays.addEventListener('overlay-click', ({ overlayId }) => {
                 console.log(`click ${overlayId}`);
                 if (overlayId === 'rick') {
                     const video = overlays.getVideo(overlayId);

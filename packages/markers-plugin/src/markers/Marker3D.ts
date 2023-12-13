@@ -1,5 +1,15 @@
 import { ExtendedPosition, PSVError, Point, Size, utils, type Viewer } from '@photo-sphere-viewer/core';
-import { BufferGeometry, Group, Mesh, Object3D, PlaneGeometry, ShaderMaterial, Texture, Vector3, VideoTexture } from 'three';
+import {
+    BufferGeometry,
+    Group,
+    Mesh,
+    Object3D,
+    PlaneGeometry,
+    ShaderMaterial,
+    Texture,
+    Vector3,
+    VideoTexture,
+} from 'three';
 import { ChromaKeyMaterial } from '../../../shared/ChromaKeyMaterial';
 import { createVideo } from '../../../shared/video-utils';
 import { MarkerType } from '../MarkerType';
@@ -13,7 +23,6 @@ import { Marker } from './Marker';
  * @internal
  */
 export class Marker3D extends Marker {
-
     override get threeElement(): Mesh<BufferGeometry, ShaderMaterial> {
         return this.element;
     }
@@ -166,7 +175,7 @@ export class Marker3D extends Marker {
                     const texture = new VideoTexture(video);
                     material.map = texture;
                     material.alpha = 0;
-                    
+
                     video.addEventListener('loadedmetadata', () => {
                         material.alpha = this.config.opacity;
 
@@ -190,20 +199,19 @@ export class Marker3D extends Marker {
                     material.map = texture;
                     material.alpha = 0;
 
-                    this.viewer.textureLoader.loadImage(this.config.imageLayer)
-                        .then((image) => {
-                            if (!utils.isExtendedPosition(this.config.position)) {
-                                mesh.material.userData[MARKER_DATA] = { width: image.width, height: image.height };
-                                this.__setTextureWrap(material);
-                            }
+                    this.viewer.textureLoader.loadImage(this.config.imageLayer).then((image) => {
+                        if (!utils.isExtendedPosition(this.config.position)) {
+                            mesh.material.userData[MARKER_DATA] = { width: image.width, height: image.height };
+                            this.__setTextureWrap(material);
+                        }
 
-                            texture.image = image;
-                            texture.anisotropy = 4;
-                            texture.needsUpdate = true;
-                            material.alpha = this.config.opacity;
+                        texture.image = image;
+                        texture.anisotropy = 4;
+                        texture.needsUpdate = true;
+                        material.alpha = this.config.opacity;
 
-                            this.viewer.needsUpdate();
-                        });
+                        this.viewer.needsUpdate();
+                    });
 
                     this.definition = this.config.imageLayer;
                 }
@@ -264,5 +272,4 @@ export class Marker3D extends Marker {
         material.repeat.set(1 - hMargin, 1 - vMargin);
         material.offset.set(hMargin / 2, vMargin / 2);
     }
-
 }

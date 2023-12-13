@@ -1,7 +1,5 @@
 <template>
-    <ExternalLink :href="href" style="float: right">
-        API Documentation
-    </ExternalLink>
+    <ExternalLink :href="href" style="float: right">API Documentation</ExternalLink>
 </template>
 
 <script>

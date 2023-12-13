@@ -629,4 +629,4 @@ virtualTourPlugin.addEventListener('node-changed', ({ node, data }) => {
 
 Triggered when the user puts the cursor hover or away an arrow.
 
-_In markers mode, listen to `enter-markers`/`leave-marker` on the markers plugin (link markers have an additional `tourLink` data)._ 
+_In markers mode, listen to `enter-markers`/`leave-marker` on the markers plugin (link markers have an additional `tourLink` data)._

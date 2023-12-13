@@ -17,7 +17,7 @@ export class CustomNavbarButton extends HTMLElement {
         title.innerText = 'Custom element';
         dom.appendChild(title);
 
-        this.input = document.createElement('input')
+        this.input = document.createElement('input');
         this.input.type = 'range';
         dom.appendChild(this.input);
 

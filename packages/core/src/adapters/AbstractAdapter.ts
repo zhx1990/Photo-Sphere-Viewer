@@ -107,7 +107,6 @@ export abstract class AbstractAdapter<TPanorama, TTexture, TData> {
      * Clear a loaded texture from memory
      */
     abstract disposeTexture(textureData: TextureData<TTexture, TPanorama, TData>): void;
-
 }
 
 // prettier-ignore

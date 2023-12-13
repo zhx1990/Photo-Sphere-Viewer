@@ -1,15 +1,7 @@
 import type { PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, CONSTANTS, PSVError, events, utils } from '@photo-sphere-viewer/core';
 import { CubemapAdapter, CubemapData, CubemapFaces } from '@photo-sphere-viewer/cubemap-adapter';
-import {
-    BoxGeometry,
-    BufferAttribute,
-    Mesh,
-    MeshBasicMaterial,
-    Texture,
-    Vector2,
-    Vector3,
-} from 'three';
+import { BoxGeometry, BufferAttribute, Mesh, MeshBasicMaterial, Texture, Vector2, Vector3 } from 'three';
 import { Queue, Task } from '../../shared/Queue';
 import { buildDebugTexture, buildErrorMaterial, createWireFrame } from '../../shared/tiles-utils';
 import { CubemapMultiTilesPanorama, CubemapTilesAdapterConfig, CubemapTilesPanorama } from './model';

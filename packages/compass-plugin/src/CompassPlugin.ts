@@ -15,7 +15,7 @@ const getConfig = utils.getConfigParser<CompassPluginConfig, ParsedCompassPlugin
         navigationColor: 'rgba(255, 0, 0, 0.2)',
         hotspots: [],
         hotspotColor: 'rgba(0, 0, 0, 0.5)',
-        className: null
+        className: null,
     },
     {
         position: (position, { defValue }) => {

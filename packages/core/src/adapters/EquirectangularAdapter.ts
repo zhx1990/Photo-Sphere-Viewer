@@ -143,7 +143,11 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
             return Promise.reject(new PSVError('Invalid panorama url, are you using the right adapter?'));
         }
 
-        const blob = await this.viewer.textureLoader.loadFile(panorama, loader ? (p) => this.viewer.loader.setProgress(p) : null, panorama);
+        const blob = await this.viewer.textureLoader.loadFile(
+            panorama,
+            loader ? (p) => this.viewer.loader.setProgress(p) : null,
+            panorama
+        );
         const xmpPanoData = useXmpPanoData ? await this.loadXMP(blob) : null;
         const img = await this.viewer.textureLoader.blobToImage(blob);
 

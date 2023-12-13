@@ -8,11 +8,11 @@ type EquirectangularMesh = Mesh<BufferGeometry, ShaderMaterial>;
 type EquirectangularTexture = TextureData<Texture, string>;
 
 type ShaderUniforms = {
-    panorama: { value: Texture },
-    resolution: { value: number },
-    transform: { value: Matrix4 },
-    zoom: { value: number },
-    opacity: { value: number },
+    panorama: { value: Texture };
+    resolution: { value: number };
+    transform: { value: Matrix4 };
+    zoom: { value: number };
+    opacity: { value: number };
 };
 
 const euler = new Euler();

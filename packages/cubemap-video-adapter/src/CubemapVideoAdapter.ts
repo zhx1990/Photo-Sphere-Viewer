@@ -10,11 +10,11 @@ type CubemapMesh = Mesh<BoxGeometry, ShaderMaterial>;
 type CubemapTexture = TextureData<VideoTexture, CubemapVideoPanorama>;
 
 type ShaderUniforms = {
-    mapped: { value: Texture },
-    equiangular: { value: boolean },
-    contCorrect: { value: number },
-    faceWH: { value: Vector2 },
-    vidWH: { value: Vector2 },
+    mapped: { value: Texture };
+    equiangular: { value: boolean };
+    contCorrect: { value: number };
+    faceWH: { value: Vector2 };
+    vidWH: { value: Vector2 };
 };
 
 const getConfig = utils.getConfigParser<CubemapVideoAdapterConfig>({

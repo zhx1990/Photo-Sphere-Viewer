@@ -101,11 +101,13 @@ const viewer = new Viewer({
 
 ::: tip Overlays vs. Markers
 Overlays seem very similar to image/video markers but serve different purposes:
-- Markers are for "small" elements, generally interactive
-- Markers are highly configurable (style, tooltip, user events, etc.)
-- Overlays can cover the whole panorama
-- Overlays cannot have a tooltip, change size, etc. You can however listen to click events
-- Overlays are rendered over the panorama itself where markers are rendered flat over the viewer HTML element
+
+-   Markers are for "small" elements, generally interactive
+-   Markers are highly configurable (style, tooltip, user events, etc.)
+-   Overlays can cover the whole panorama
+-   Overlays cannot have a tooltip, change size, etc. You can however listen to click events
+-   Overlays are rendered over the panorama itself where markers are rendered flat over the viewer HTML element
+
 :::
 
 ## Configuration

@@ -109,11 +109,10 @@ export class TextureLoader extends AbstractService {
         }
 
         if (!onProgress && !this.config.requestHeaders) {
-            return this.imageLoader.loadAsync(url)
-                .then((result) => {
-                    Cache.add(url, cacheKey, result);
-                    return result;
-                });
+            return this.imageLoader.loadAsync(url).then((result) => {
+                Cache.add(url, cacheKey, result);
+                return result;
+            });
         } else {
             return this.loadFile(url, onProgress, cacheKey).then((blob) => this.blobToImage(blob));
         }

@@ -394,7 +394,11 @@
 
                         <div
                             class="md-layout md-gutter"
-                            v-if="markerForm.type === 'image' || markerForm.type === 'imageLayer' || markerForm.type === 'imageLayer2'"
+                            v-if="
+                                markerForm.type === 'image'
+                                || markerForm.type === 'imageLayer'
+                                || markerForm.type === 'imageLayer2'
+                            "
                         >
                             <md-button
                                 v-if="markerForm.type === 'image'"
@@ -1067,8 +1071,9 @@ __s.remove();
             ) {
                 this.markers.removeMarker(TEMP_ID);
             }
-            if (!this.markerForm.saved && 
-                this.markerForm.type === 'imageLayer2' && 
+            if (
+                !this.markerForm.saved &&
+                this.markerForm.type === 'imageLayer2' &&
                 this.markerForm.positions.length > 0
             ) {
                 this.markers.removeMarker(TEMP_ID);
@@ -1106,8 +1111,9 @@ __s.remove();
                 this.markers.addMarker(this.getMarkerConfig());
             }
 
-            if (!this.markerForm.saved && 
-                this.markerForm.type === 'imageLayer2' && 
+            if (
+                !this.markerForm.saved &&
+                this.markerForm.type === 'imageLayer2' &&
                 this.markerForm.positions.length === 4
             ) {
                 this.markers.addMarker(this.getMarkerConfig());
@@ -1286,7 +1292,7 @@ __s.remove();
             if (Array.isArray(config.position)) {
                 config.type = 'imageLayer2';
                 config.imageLayer2 = config.imageLayer;
-                config.positions = config.position.map(({ yaw, pitch }) => ([yaw, pitch]));
+                config.positions = config.position.map(({ yaw, pitch }) => [yaw, pitch]);
                 config.position = { yaw: null, pitch: null };
             } else {
                 config.type = marker.type;
@@ -1362,7 +1368,7 @@ __s.remove();
                 JSON.stringify(
                     content,
                     (k, v) => {
-                        if (k === 'polyline' || k === 'polygon' || k === 'position' && Array.isArray(v)) {
+                        if (k === 'polyline' || k === 'polygon' || (k === 'position' && Array.isArray(v))) {
                             return JSON.stringify(v);
                         } else {
                             return v;

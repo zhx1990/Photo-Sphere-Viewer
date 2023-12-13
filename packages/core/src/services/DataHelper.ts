@@ -1,13 +1,6 @@
 import { Euler, MathUtils, Vector3 } from 'three';
 import { ANIMATION_MIN_DURATION, SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
-import {
-    ExtendedPosition,
-    PanoData,
-    PanoramaPosition,
-    Point,
-    Position,
-    SphereCorrection,
-} from '../model';
+import { ExtendedPosition, PanoData, PanoramaPosition, Point, Position, SphereCorrection } from '../model';
 import { PSVError } from '../PSVError';
 import {
     AnimationOptions,

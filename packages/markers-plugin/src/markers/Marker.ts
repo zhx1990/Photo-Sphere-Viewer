@@ -246,5 +246,4 @@ export abstract class Marker {
             this.tooltip = null;
         }
     }
-
 }

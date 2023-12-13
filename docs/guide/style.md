@@ -67,20 +67,20 @@ $psv-loader-width: 100px;
 
 ## Tooltip
 
-| variable                    | default                 | description                            |
-| --------------------------- | ----------------------- | -------------------------------------- |
-| $psv-tooltip-background     | rgba(61, 61, 61, .8)    | Background of tooltips                 |
-| $psv-tooltip-radius         | 4px                     | Border radius of the tooltips          |
-| $psv-tooltip-padding        | .5em 1em                | Content padding of the tooltips        |
-| $psv-tooltip-arrow-size     | 7px                     | Tooltips' arrow size                   |
-| $psv-tooltip-max-width      | 200px                   | Maximum width of the tooltips' content |
-| $psv-tooltip-text-color     | rgb(255, 255, 255)      | Text color of the tooltips             |
-| $psv-tooltip-font           | 14px sans-serif         | Font of the tooltips                   |
-| $psv-tooltip-text-shadow    | 0 1px #000              | Shadow applied to the tooltips' text   |
-| $psv-tooltip-shadow-color   | rgba(90, 90, 90, .7)    | Color of the tooltips' shadow          |
-| $psv-tooltip-shadow-offset  | 3px                     | Size of the tooltips' shadow           |
-| $psv-tooltip-animate-offset | 5px                     | Distance travelled on show animation   |
-| $psv-tooltip-animate-delay  | 100ms                   | Duration of the show animation         |
+| variable                    | default              | description                            |
+| --------------------------- | -------------------- | -------------------------------------- |
+| $psv-tooltip-background     | rgba(61, 61, 61, .8) | Background of tooltips                 |
+| $psv-tooltip-radius         | 4px                  | Border radius of the tooltips          |
+| $psv-tooltip-padding        | .5em 1em             | Content padding of the tooltips        |
+| $psv-tooltip-arrow-size     | 7px                  | Tooltips' arrow size                   |
+| $psv-tooltip-max-width      | 200px                | Maximum width of the tooltips' content |
+| $psv-tooltip-text-color     | rgb(255, 255, 255)   | Text color of the tooltips             |
+| $psv-tooltip-font           | 14px sans-serif      | Font of the tooltips                   |
+| $psv-tooltip-text-shadow    | 0 1px #000           | Shadow applied to the tooltips' text   |
+| $psv-tooltip-shadow-color   | rgba(90, 90, 90, .7) | Color of the tooltips' shadow          |
+| $psv-tooltip-shadow-offset  | 3px                  | Size of the tooltips' shadow           |
+| $psv-tooltip-animate-offset | 5px                  | Distance travelled on show animation   |
+| $psv-tooltip-animate-delay  | 100ms                | Duration of the show animation         |
 
 ## Panel
 

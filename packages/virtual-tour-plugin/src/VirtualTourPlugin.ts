@@ -245,9 +245,12 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
      * @internal
      */
     handleEvent(e: Event) {
-        if (e instanceof events.SizeUpdatedEvent || e instanceof events.PositionUpdatedEvent || e instanceof events.ReadyEvent) {
+        if (
+            e instanceof events.SizeUpdatedEvent
+            || e instanceof events.PositionUpdatedEvent
+            || e instanceof events.ReadyEvent
+        ) {
             this.arrowsRenderer.updateCamera();
-
         } else if (e instanceof events.ClickEvent) {
             const link = e.data.objects.find((o) => o.userData[LINK_DATA])?.userData[LINK_DATA];
             if (link) {
@@ -594,18 +597,17 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     }
 
     private __onEnterMarker(marker: Marker, link: VirtualTourLink) {
-        this.__getTooltipContent(link.nodeId)
-            .then((content) => {
-                if (content) {
-                    this.markers.updateMarker({
-                        id: marker.id,
-                        tooltip: {
-                            className: 'psv-virtual-tour-tooltip',
-                            content: content, 
-                        },
-                    });
-                }
-            });
+        this.__getTooltipContent(link.nodeId).then((content) => {
+            if (content) {
+                this.markers.updateMarker({
+                    id: marker.id,
+                    tooltip: {
+                        className: 'psv-virtual-tour-tooltip',
+                        content: content,
+                    },
+                });
+            }
+        });
     }
 
     private __onEnterObject(mesh: Mesh, viewerPoint: Point) {
@@ -613,29 +615,28 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         setMeshColor(mesh as any, link.arrowStyle?.hoverColor || this.config.arrowStyle.hoverColor);
 
-        this.__getTooltipContent(link.nodeId)
-            .then((content) => {
-                if (content) {
-                    this.state.currentTooltip = this.viewer.createTooltip({
-                        left: viewerPoint.x,
-                        top: viewerPoint.y,
-                        box: {
-                            // separate the tooltip from the cursor
-                            width: 20,
-                            height: 20,
-                        },
-                        className: 'psv-virtual-tour-tooltip',
-                        content: content,
-                    });
-                }
-            });
+        this.__getTooltipContent(link.nodeId).then((content) => {
+            if (content) {
+                this.state.currentTooltip = this.viewer.createTooltip({
+                    left: viewerPoint.x,
+                    top: viewerPoint.y,
+                    box: {
+                        // separate the tooltip from the cursor
+                        width: 20,
+                        height: 20,
+                    },
+                    className: 'psv-virtual-tour-tooltip',
+                    content: content,
+                });
+            }
+        });
 
         this.map?.setActiveHotspot(LINK_ID + link.nodeId);
 
         this.viewer.needsUpdate();
         this.viewer.setCursor('pointer');
 
-        this.dispatchEvent(new EnterArrowEvent(link, this.state.currentNode))
+        this.dispatchEvent(new EnterArrowEvent(link, this.state.currentNode));
     }
 
     private __onHoverObject(viewerPoint: Point) {
@@ -662,7 +663,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         this.viewer.needsUpdate();
         this.viewer.setCursor(null);
 
-        this.dispatchEvent(new LeaveArrowEvent(link, this.state.currentNode))
+        this.dispatchEvent(new LeaveArrowEvent(link, this.state.currentNode));
     }
 
     /**

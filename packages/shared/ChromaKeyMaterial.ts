@@ -1,18 +1,17 @@
-
 import { Color, ColorRepresentation, ShaderMaterial, Texture, Vector2 } from 'three';
 import chromaKeyFragment from './shaders/chromaKey.fragment.glsl';
 import chromaKeyVertex from './shaders/chromaKey.vertex.glsl';
 
 type ShaderUniforms = {
-    map: { value: Texture },
-    repeat: { value: Vector2 },
-    offset: { value: Vector2 },
-    alpha: { value: number },
-    keying: { value: boolean },
-    color: { value: Color },
-    similarity: { value: number },
-    smoothness: { value: number },
-    spill: { value: number },
+    map: { value: Texture };
+    repeat: { value: Vector2 };
+    offset: { value: Vector2 };
+    alpha: { value: number };
+    keying: { value: boolean };
+    color: { value: Color };
+    similarity: { value: number };
+    smoothness: { value: number };
+    spill: { value: number };
 };
 
 type ChromaKey = {
@@ -27,7 +26,6 @@ type ChromaKey = {
 };
 
 export class ChromaKeyMaterial extends ShaderMaterial {
-
     override uniforms: ShaderUniforms;
 
     get map(): Texture {
@@ -92,5 +90,4 @@ export class ChromaKeyMaterial extends ShaderMaterial {
 
         this.chromaKey = params?.chromaKey;
     }
-
 }

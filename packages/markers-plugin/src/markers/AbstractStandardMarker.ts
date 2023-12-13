@@ -12,7 +12,6 @@ import { Marker } from './Marker';
  * @internal
  */
 export abstract class AbstractStandardMarker extends AbstractDomMarker {
-
     constructor(viewer: Viewer, plugin: MarkersPlugin, config: MarkerConfig) {
         super(viewer, plugin, config);
     }
@@ -187,5 +186,4 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
 
         this.domElement.style.scale = `${scale}`;
     }
-
 }

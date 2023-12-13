@@ -158,7 +158,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
             cleanPanorama = panorama as any;
         }
 
-        let result: { textures: Texture[], flipTopBottom: boolean, cacheKey: string };
+        let result: { textures: Texture[]; flipTopBottom: boolean; cacheKey: string };
         switch (cleanPanorama.type) {
             case 'separate':
                 result = await this.loadTexturesSeparate(cleanPanorama, loader);
@@ -183,7 +183,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
             panoData: {
                 isCubemap: true,
                 flipTopBottom: result.flipTopBottom,
-                faceSize: (result.textures[0].image as HTMLImageElement | HTMLCanvasElement).width
+                faceSize: (result.textures[0].image as HTMLImageElement | HTMLCanvasElement).width,
             },
         };
     }
@@ -251,7 +251,11 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         }
 
         const cacheKey = panorama.path;
-        const img = await this.viewer.textureLoader.loadImage(panorama.path, loader ? (p) => this.viewer.loader.setProgress(p) : null, cacheKey);
+        const img = await this.viewer.textureLoader.loadImage(
+            panorama.path,
+            loader ? (p) => this.viewer.loader.setProgress(p) : null,
+            cacheKey
+        );
 
         if (img.width !== img.height * 6) {
             utils.logWarn('Invalid cubemap image, the width should be six times the height');
@@ -293,7 +297,11 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
 
     private async loadTexturesNet(panorama: CubemapNet, loader: boolean) {
         const cacheKey = panorama.path;
-        const img = await this.viewer.textureLoader.loadImage(panorama.path, loader ? (p) => this.viewer.loader.setProgress(p) : null, cacheKey);
+        const img = await this.viewer.textureLoader.loadImage(
+            panorama.path,
+            loader ? (p) => this.viewer.loader.setProgress(p) : null,
+            cacheKey
+        );
 
         if (img.width / 4 !== img.height / 3) {
             utils.logWarn('Invalid cubemap image, the width should be 4/3rd of the height');

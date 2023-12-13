@@ -9,7 +9,6 @@ import { Marker } from './Marker';
  * @internal
  */
 export abstract class AbstractDomMarker extends Marker {
-
     override get domElement(): HTMLElement | SVGElement {
         return this.element;
     }
@@ -53,5 +52,4 @@ export abstract class AbstractDomMarker extends Marker {
             Object.assign(element.style, this.config.style);
         }
     }
-
 }

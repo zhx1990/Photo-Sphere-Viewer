@@ -48,7 +48,9 @@ function getFullCss({ css, packages, cdnImport }) {
 ${packages
     .filter(({ style }) => style)
     .map(({ name, version }) => {
-        return `@import '${cdnImport ? buildPath({ name, version, type: 'css' }) : `../node_modules/${name}/index.css`}';`;
+        return `@import '${
+            cdnImport ? buildPath({ name, version, type: 'css' }) : `../node_modules/${name}/index.css`
+        }';`;
     })
     .join('\n')}
 

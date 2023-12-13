@@ -93,7 +93,7 @@ function intro(pitch, yaw) {
         duration: 2500,
         easing: 'inOutQuad',
         onTick: (properties) => {
-            viewer.setOptions({ 
+            viewer.setOptions({
                 fisheye: properties.fisheye,
                 maxFov: properties.maxFov,
             });
@@ -103,7 +103,7 @@ function intro(pitch, yaw) {
     }).then(() => {
         autorotate.start();
         viewer.navbar.show();
-        viewer.setOptions({ 
+        viewer.setOptions({
             mousemove: true,
             mousewheel: true,
         });
@@ -115,7 +115,7 @@ function reset() {
     isInit = true;
     autorotate.stop();
     viewer.navbar.hide();
-    viewer.setOptions({ 
+    viewer.setOptions({
         mousemove: false,
         mousewheel: false,
     });
@@ -126,12 +126,12 @@ function reset() {
             yaw: { start: viewer.getPosition().yaw, end: animatedValues.yaw.start },
             zoom: { start: viewer.getZoomLevel(), end: animatedValues.zoom.start },
             maxFov: { start: animatedValues.maxFov.end, end: animatedValues.maxFov.start },
-            fisheye: { start: animatedValues.fisheye.end, end: animatedValues.fisheye.start }
+            fisheye: { start: animatedValues.fisheye.end, end: animatedValues.fisheye.start },
         },
         duration: 1500,
         easing: 'inOutQuad',
         onTick: (properties) => {
-            viewer.setOptions({ 
+            viewer.setOptions({
                 fisheye: properties.fisheye,
                 maxFov: properties.maxFov,
             });

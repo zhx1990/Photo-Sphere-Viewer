@@ -9,7 +9,6 @@ import { AbstractStandardMarker } from './AbstractStandardMarker';
  * @internal
  */
 export class MarkerSvg extends AbstractStandardMarker {
-
     constructor(viewer: Viewer, plugin: MarkersPlugin, config: MarkerConfig) {
         super(viewer, plugin, config);
     }
@@ -124,5 +123,4 @@ export class MarkerSvg extends AbstractStandardMarker {
         // compute x/y/z position
         this.state.positions3D = [this.viewer.dataHelper.sphericalCoordsToVector3(this.state.position)];
     }
-
 }

@@ -1,14 +1,6 @@
 import type { PanoData, PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, CONSTANTS, EquirectangularAdapter, PSVError, events, utils } from '@photo-sphere-viewer/core';
-import {
-    BufferAttribute,
-    MathUtils,
-    Mesh,
-    MeshBasicMaterial,
-    SphereGeometry,
-    Texture,
-    Vector3,
-} from 'three';
+import { BufferAttribute, MathUtils, Mesh, MeshBasicMaterial, SphereGeometry, Texture, Vector3 } from 'three';
 import { Queue, Task } from '../../shared/Queue';
 import { buildDebugTexture, buildErrorMaterial, createWireFrame } from '../../shared/tiles-utils';
 import {
