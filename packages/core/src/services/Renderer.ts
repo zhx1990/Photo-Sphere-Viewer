@@ -316,7 +316,7 @@ export class Renderer extends AbstractService {
         this.renderer.setRenderTarget(null);
 
         const { duration, properties } = this.viewer.dataHelper.getAnimationProperties(
-            options.transition as any,
+            options.speed,
             options.transition === true ? e.position : null,
             e.zoomLevel
         );

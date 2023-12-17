@@ -66,7 +66,7 @@ export class DataHelper extends AbstractService {
         const zoomProvided = !isNil(targetZoom);
 
         const properties: AnimationOptions<{ yaw: any; pitch: any; zoom: any }>['properties'] = {};
-        let duration;
+        let duration = null;
 
         // clean/filter position and compute duration
         if (positionProvided) {
@@ -86,13 +86,22 @@ export class DataHelper extends AbstractService {
 
             properties.zoom = { start: currentZoom, end: targetZoom };
 
-            if (!duration) {
+            if (duration === null) {
                 // if animating zoom only and a speed is given, use an arbitrary PI/4 to compute the duration
                 duration = speedToDuration(speed, ((Math.PI / 4) * dZoom) / 100);
             }
         }
 
-        duration = Math.max(ANIMATION_MIN_DURATION, duration);
+        // if nothing to animate
+        if (duration === null) {
+            if (typeof speed === 'number') {
+                duration = speed;
+            } else {
+                duration = ANIMATION_MIN_DURATION;
+            }
+        } else {
+            duration = Math.max(ANIMATION_MIN_DURATION, duration);
+        }
 
         return { duration, properties };
     }
