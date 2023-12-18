@@ -12,6 +12,8 @@ import { ACTIONS, KEY_CODES } from './constants';
  */
 export const DEFAULTS: Required<ParsedViewerConfig> = {
     panorama: null,
+    overlay: null,
+    overlayOpacity: 1,
     container: null,
     adapter: [EquirectangularAdapter as any, null],
     plugins: [],
@@ -36,8 +38,10 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
     mousemove: true,
     mousewheelCtrlKey: false,
     touchmoveTwoFingers: false,
+    useXmpData: null,
     panoData: null,
     requestHeaders: null,
+    canvasBackground: null,
     rendererParameters: { alpha: true, antialias: true },
     withCredentials: false,
     // prettier-ignore
@@ -85,6 +89,8 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
 export const READONLY_OPTIONS: Record<ReadonlyViewerConfig, string> = {
     panorama: 'Use setPanorama method to change the panorama',
     panoData: 'Use setPanorama method to change the panorama',
+    overlay: 'Use setOverlay method to changer the overlay',
+    overlayOpacity: 'Use setOverlay method to changer the overlay',
     container: 'Cannot change viewer container',
     adapter: 'Cannot change adapter',
     plugins: 'Cannot change plugins',
@@ -116,6 +122,9 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
             throw new PSVError(`Adapter has no id.`);
         }
         return adapter;
+    },
+    overlayOpacity: (overlayOpacity) => {
+        return MathUtils.clamp(overlayOpacity, 0, 1);
     },
     defaultYaw: (defaultYaw) => {
         // defaultYaw is between 0 and PI
@@ -222,6 +231,24 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
             return navbar.split(/[ ,]/);
         }
         return navbar;
+    },
+    useXmpData: (useXmpData) => {
+        if (useXmpData !== null) {
+            logWarn(`Global useXmpData is deprecated, it is now configured on the adapter.`);
+        }
+        return useXmpData;
+    },
+    canvasBackground: (canvasBackground) => {
+        if (canvasBackground !== null) {
+            logWarn(`Global canvasBackground is deprecated, it is now configured on the adapter.`);
+        }
+        return canvasBackground;
+    },
+    overlay: (overlay) => {
+        if (overlay !== null) {
+            logWarn(`"overlay" option is deprecated, use "@photo-sphere-viewer/overlay-plugin" instead.`);
+        }
+        return overlay;
     },
 };
 

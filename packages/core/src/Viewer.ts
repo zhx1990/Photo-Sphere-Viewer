@@ -29,6 +29,7 @@ import {
     AnimateOptions,
     CssSize,
     ExtendedPosition,
+    PanoData,
     PanoramaOptions,
     ParsedViewerConfig,
     Position,
@@ -38,6 +39,7 @@ import {
 } from './model';
 import type { AbstractPlugin, PluginConstructor } from './plugins/AbstractPlugin';
 import { pluginInterop } from './plugins/AbstractPlugin';
+import { PSVError } from './PSVError';
 import { DataHelper } from './services/DataHelper';
 import { EventsHandler } from './services/EventsHandler';
 import { Renderer } from './services/Renderer';
@@ -323,12 +325,22 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
 
         // apply default parameters on first load
         if (!this.state.ready) {
-            ['sphereCorrection', 'panoData'].forEach((opt) => {
+            ['sphereCorrection', 'panoData', 'overlay', 'overlayOpacity'].forEach((opt) => {
                 if (!(opt in options)) {
                     // @ts-ignore
                     options[opt] = this.config[opt];
                 }
             });
+        }
+
+        if (isExtendedPosition(options)) {
+            logWarn(`PanoramaOptions.yaw and PanoramaOptions.pitch are deprecated, use PanoramaOptions.position instead`);
+            (options as PanoramaOptions).position = this.dataHelper.cleanPosition(options);
+        }
+        if (typeof options.transition === 'number') {
+            logWarn(`Use PanoramaOptions.speed to define the speed/duration of the transition`);
+            options.speed = options.transition;
+            options.transition = true;
         }
 
         if (options.transition === undefined) {
@@ -378,6 +390,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                 this.dispatchEvent(new PanoramaErrorEvent(path, err));
                 throw err;
             } else {
+                this.setOverlay(options.overlay, options.overlayOpacity);
                 this.navbar.setCaption(this.config.caption);
                 return true;
             }
@@ -447,6 +460,50 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
         }
 
         return this.state.loadingPromise;
+    }
+
+    /**
+     * @deprecated Use the `overlay` plugin instead
+     */
+    setOverlay(path: any, opacity = this.config.overlayOpacity): Promise<void> {
+        const supportsOverlay = (this.adapter.constructor as typeof AbstractAdapter).supportsOverlay;
+
+        if (!path) {
+            if (supportsOverlay) {
+                this.renderer.setOverlay(null, 0);
+            }
+
+            return Promise.resolve();
+        } else {
+            if (!supportsOverlay) {
+                return Promise.reject(new PSVError(`Current adapter does not supports overlay`));
+            }
+
+            return this.adapter
+                .loadTexture(
+                    path,
+                    (image) => {
+                        if ((this.state.textureData.panoData as PanoData).isEquirectangular) {
+                            const p = this.state.textureData.panoData as PanoData;
+                            const r = image.width / p.croppedWidth;
+                            return {
+                                isEquirectangular: true,
+                                fullWidth: r * p.fullWidth,
+                                fullHeight: r * p.fullHeight,
+                                croppedWidth: r * p.croppedWidth,
+                                croppedHeight: r * p.croppedHeight,
+                                croppedX: r * p.croppedX,
+                                croppedY: r * p.croppedY,
+                            };
+                        }
+                    },
+                    false,
+                    false
+                )
+                .then((textureData) => {
+                    this.renderer.setOverlay(textureData, opacity);
+                });
+        }
     }
 
     /**

@@ -17,10 +17,14 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         position: ['bottom', 'left'],
         visibleOnLoad: true,
         overlayImage: overlay,
+        compassImage: null,
         pinImage: pin,
         pinSize: 35,
         coneColor: '#1E78E6',
         coneSize: 40,
+        spotColor: null,
+        spotImage: null,
+        spotSize: null,
         spotStyle: {
             size: 15,
             image: null,
@@ -44,7 +48,28 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         },
     },
     {
-        spotStyle: (spotStyle, { defValue }) => ({ ...defValue, ...spotStyle }),
+        overlayImage: (overlayImage, { rawConfig }) => {
+            if (rawConfig.compassImage) {
+                utils.logWarn('map: "compassImage" is deprecated, use "overlayImage" instead');
+                return rawConfig.compassImage;
+            }
+            return overlayImage;
+        },
+        spotStyle: (spotStyle, { rawConfig, defValue }) => {
+            [
+                ['spotColor', 'color'],
+                ['spotImage', 'image'],
+                ['spotSize', 'size'],
+            ].forEach(([oldName, newName]) => {
+                // @ts-ignore
+                if (rawConfig[oldName]) {
+                    utils.logWarn(`map: "${oldName}" is deprecated, use "spotStyle.${newName}" instead`);
+                    // @ts-ignore
+                    spotStyle[newName] = rawConfig[oldName];
+                }
+            });
+            return { ...defValue, ...spotStyle };
+        },
         position: (position, { defValue }) => {
             return utils.cleanCssPosition(position, { allowCenter: false, cssOrder: true }) || defValue;
         },
@@ -53,7 +78,9 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         defaultZoom: (defaultZoom) => Math.log(defaultZoom / 100),
         maxZoom: (maxZoom) => Math.log(maxZoom / 100),
         minZoom: (minZoom) => Math.log(minZoom / 100),
-        buttons: (buttons, { defValue }) => ({ ...defValue, ...buttons }),
+        buttons: (buttons, { defValue }) => {
+            return { ...defValue, ...buttons };
+        },
     }
 );
 

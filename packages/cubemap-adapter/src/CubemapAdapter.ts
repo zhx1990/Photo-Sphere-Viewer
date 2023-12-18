@@ -1,6 +1,6 @@
 import type { PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractAdapter, CONSTANTS, PSVError, SYSTEM, utils } from '@photo-sphere-viewer/core';
-import { BoxGeometry, MathUtils, Mesh, MeshBasicMaterial, Texture, Vector2, Vector3 } from 'three';
+import { BoxGeometry, MathUtils, Mesh, ShaderMaterial, Texture, Vector3 } from 'three';
 import {
     Cubemap,
     CubemapAdapterConfig,
@@ -13,12 +13,23 @@ import {
 } from './model';
 import { cleanCubemap, cleanCubemapArray, isCubemap } from './utils';
 
-type CubemapMesh = Mesh<BoxGeometry, MeshBasicMaterial[]>;
+type CubemapMesh = Mesh<BoxGeometry, ShaderMaterial[]>;
 type CubemapTexture = TextureData<Texture[], CubemapPanorama, CubemapData>;
 
-const getConfig = utils.getConfigParser<CubemapAdapterConfig>({
-    blur: false,
-});
+const getConfig = utils.getConfigParser<CubemapAdapterConfig>(
+    {
+        flipTopBottom: null,
+        blur: false,
+    },
+    {
+        flipTopBottom(flipTopBottom) {
+            if (!utils.isNil(flipTopBottom)) {
+                utils.logWarn('CubemapPanorama "flipTopBottom" option is deprecated, it must be defined on the panorama object');
+            }
+            return flipTopBottom;
+        },
+    }
+);
 
 const EPS = 0.000001;
 const ORIGIN = new Vector3();
@@ -30,6 +41,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
     static override readonly id = 'cubemap';
     static override readonly VERSION = PKG_VERSION;
     static override readonly supportsDownload = false;
+    static override readonly supportsOverlay = true;
 
     private readonly config: CubemapAdapterConfig;
 
@@ -214,7 +226,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         return {
             textures: await Promise.all(promises),
             cacheKey,
-            flipTopBottom: panorama.flipTopBottom ?? false,
+            flipTopBottom: panorama.flipTopBottom ?? this.config.flipTopBottom ?? false,
         };
     }
 
@@ -291,7 +303,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         return {
             textures: cleanCubemap(textures),
             cacheKey,
-            flipTopBottom: panorama.flipTopBottom ?? false,
+            flipTopBottom: panorama.flipTopBottom ?? this.config.flipTopBottom ?? false,
         };
     }
 
@@ -356,7 +368,28 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
 
         const materials = [];
         for (let i = 0; i < 6; i++) {
-            materials.push(new MeshBasicMaterial());
+            materials.push(
+                AbstractAdapter.createOverlayMaterial({
+                    additionalUniforms: {
+                        rotation: { value: 0.0 },
+                    },
+                    overrideVertexShader: `
+uniform float rotation;
+varying vec2 vUv;
+const float mid = 0.5;
+void main() {
+  if (rotation == 0.0) {
+    vUv = uv;
+  } else {
+    vUv = vec2(
+      cos(rotation) * (uv.x - mid) + sin(rotation) * (uv.y - mid) + mid,
+      cos(rotation) * (uv.y - mid) - sin(rotation) * (uv.x - mid) + mid
+    );
+  }
+  gl_Position = projectionMatrix *  modelViewMatrix * vec4( position, 1.0 );
+}`,
+                })
+            );
         }
 
         return new Mesh(geometry, materials);
@@ -367,22 +400,36 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
 
         for (let i = 0; i < 6; i++) {
             if (panoData.flipTopBottom && (i === 2 || i === 3)) {
-                texture[i].center = new Vector2(0.5, 0.5);
-                texture[i].rotation = Math.PI;
+                this.__setUniform(mesh, i, 'rotation', Math.PI);
             }
 
-            mesh.material[i].map = texture[i];
+            this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.panorama, texture[i]);
+        }
+    }
+
+    override setOverlay(mesh: CubemapMesh, textureData: CubemapTexture, opacity: number) {
+        for (let i = 0; i < 6; i++) {
+            this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlayOpacity, opacity);
+            if (!textureData) {
+                this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlay, null);
+            } else {
+                this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.overlay, textureData.texture[i]);
+            }
         }
     }
 
     setTextureOpacity(mesh: CubemapMesh, opacity: number) {
         for (let i = 0; i < 6; i++) {
-            mesh.material[i].opacity = opacity;
+            this.__setUniform(mesh, i, AbstractAdapter.OVERLAY_UNIFORMS.globalOpacity, opacity);
             mesh.material[i].transparent = opacity < 1;
         }
     }
 
     disposeTexture(textureData: CubemapTexture) {
         textureData.texture?.forEach((texture) => texture.dispose());
+    }
+
+    private __setUniform(mesh: CubemapMesh, index: number, uniform: string, value: any) {
+        mesh.material[index].uniforms[uniform].value = value;
     }
 }

@@ -39,13 +39,24 @@ function prettyTileId(tile: CubemapTile) {
     return `${tileId(tile)}\n${CUBE_HASHMAP[tile.face]}`;
 }
 
-const getConfig = utils.getConfigParser<CubemapTilesAdapterConfig>({
-    showErrorTile: true,
-    baseBlur: true,
-    antialias: true,
-    blur: false,
-    debug: false,
-});
+const getConfig = utils.getConfigParser<CubemapTilesAdapterConfig>(
+    {
+        flipTopBottom: null,
+        showErrorTile: true,
+        baseBlur: true,
+        antialias: true,
+        blur: false,
+        debug: false,
+    },
+    {
+        flipTopBottom(flipTopBottom) {
+            if (!utils.isNil(flipTopBottom)) {
+                utils.logWarn('CubemapTilesAdapter "flipTopBottom" option is deprecated, it must be defined on the panorama object');
+            }
+            return flipTopBottom;
+        },
+    }
+);
 
 const vertexPosition = new Vector3();
 
@@ -60,6 +71,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<
     static override readonly id = 'cubemap-tiles';
     static override readonly VERSION = PKG_VERSION;
     static override readonly supportsDownload = false;
+    static override readonly supportsOverlay = false;
 
     private readonly config: CubemapTilesAdapterConfig;
 
@@ -148,7 +160,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<
         const firstTile = getTileConfig(panorama, 0, { CUBE_SEGMENTS });
         const panoData: CubemapData = {
             isCubemap: true,
-            flipTopBottom: panorama.flipTopBottom ?? false,
+            flipTopBottom: panorama.flipTopBottom ?? this.config.flipTopBottom ?? false,
             faceSize: firstTile.faceSize,
         };
 
@@ -445,6 +457,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<
 
             this.adapter = new CubemapAdapter(this.viewer, {
                 blur: this.config.baseBlur,
+                flipTopBottom: this.config.flipTopBottom,
             });
         }
         return this.adapter;
