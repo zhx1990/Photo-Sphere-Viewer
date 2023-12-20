@@ -45,7 +45,7 @@ export class MarkerNormal extends AbstractStandardMarker {
         switch (this.type) {
             case MarkerType.image:
                 this.definition = this.config.image;
-                element.style.backgroundImage = `url(${this.config.image})`;
+                element.style.backgroundImage = `url("${this.config.image}")`;
                 break;
             case MarkerType.html:
                 this.definition = this.config.html;

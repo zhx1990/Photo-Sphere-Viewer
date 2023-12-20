@@ -46,7 +46,7 @@ export class GalleryComponent extends AbstractComponent {
                 entries.forEach((entry) => {
                     if (entry.intersectionRatio > 0) {
                         const element = entry.target as HTMLElement;
-                        element.style.backgroundImage = `url(${element.dataset.src})`;
+                        element.style.backgroundImage = `url("${element.dataset.src}")`;
                         delete element.dataset.src;
                         this.observer.unobserve(entry.target);
                     }
