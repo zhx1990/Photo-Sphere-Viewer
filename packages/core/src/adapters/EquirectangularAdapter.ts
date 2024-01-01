@@ -142,8 +142,8 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
 
     async loadTexture(
         panorama: string,
-        newPanoData?: PanoData | PanoDataProvider,
         loader = true,
+        newPanoData?: PanoData | PanoDataProvider,
         useXmpPanoData = this.config.useXmpData
     ): Promise<EquirectangularTexture> {
         if (typeof panorama !== 'string') {

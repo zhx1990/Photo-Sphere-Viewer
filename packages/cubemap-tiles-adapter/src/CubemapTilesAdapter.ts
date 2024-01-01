@@ -150,7 +150,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<
         return this.getAdapter().sphericalCoordsToTextureCoords(position, data);
     }
 
-    override loadTexture(panorama: CubemapTilesPanorama | CubemapMultiTilesPanorama): Promise<CubemapTexture> {
+    override loadTexture(panorama: CubemapTilesPanorama | CubemapMultiTilesPanorama, loader = true): Promise<CubemapTexture> {
         try {
             checkPanoramaConfig(panorama, { CUBE_SEGMENTS });
         } catch (e) {
@@ -166,7 +166,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<
 
         if (panorama.baseUrl) {
             return this.getAdapter()
-                .loadTexture(panorama.baseUrl)
+                .loadTexture(panorama.baseUrl, loader)
                 .then((textureData) => ({
                     panorama,
                     panoData,

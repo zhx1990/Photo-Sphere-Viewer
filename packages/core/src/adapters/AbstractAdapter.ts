@@ -88,8 +88,8 @@ export abstract class AbstractAdapter<TPanorama, TTexture, TData> {
      */
     abstract loadTexture(
         panorama: TPanorama,
-        newPanoData?: PanoData | PanoDataProvider,
         loader?: boolean,
+        newPanoData?: PanoData | PanoDataProvider,
         useXmpPanoData?: boolean
     ): Promise<TextureData<TTexture, TPanorama, TData>>;
 

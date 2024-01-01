@@ -403,7 +403,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
 
         this.dispatchEvent(new PanoramaLoadEvent(path));
 
-        const loadingPromise = this.adapter.loadTexture(this.config.panorama, options.panoData).then((textureData) => {
+        const loadingPromise = this.adapter.loadTexture(this.config.panorama, true, options.panoData).then((textureData) => {
             // check if another panorama was requested
             if (textureData.panorama !== this.config.panorama) {
                 this.adapter.disposeTexture(textureData);

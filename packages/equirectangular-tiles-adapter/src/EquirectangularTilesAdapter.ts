@@ -195,7 +195,8 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
     }
 
     override loadTexture(
-        panorama: EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama
+        panorama: EquirectangularTilesPanorama | EquirectangularMultiTilesPanorama,
+        loader = true
     ): Promise<EquirectangularTexture> {
         try {
             checkPanoramaConfig(panorama, this);
@@ -219,7 +220,7 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
 
         if (panorama.baseUrl) {
             return this.getAdapter()
-                .loadTexture(panorama.baseUrl, panorama.basePanoData, true, false)
+                .loadTexture(panorama.baseUrl, loader, panorama.basePanoData, false)
                 .then((textureData) => ({
                     panorama,
                     panoData,

@@ -155,7 +155,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         return { textureFace, textureX, textureY };
     }
 
-    async loadTexture(panorama: CubemapPanorama, _unused?: null, loader = true): Promise<CubemapTexture> {
+    async loadTexture(panorama: CubemapPanorama, loader = true): Promise<CubemapTexture> {
         if (this.viewer.config.fisheye) {
             utils.logWarn('fisheye effect with cubemap texture can generate distorsion');
         }

@@ -283,6 +283,7 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
             texture = (
                 await adapter.loadTexture(
                     config.path,
+                    false,
                     (image) => {
                         const r = image.width / panoData.croppedWidth;
                         return {
@@ -295,7 +296,6 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
                             croppedY: r * panoData.croppedY,
                         };
                     },
-                    false,
                     false
                 )
             ).texture;
@@ -341,7 +341,7 @@ export class OverlaysPlugin extends AbstractConfigurablePlugin<
     private async __addCubeImageOverlay(config: CubeOverlayConfig & ParsedOverlayConfig) {
         const adapter = this.__getCubemapAdapter();
 
-        const texture = await adapter.loadTexture(config.path, null, false);
+        const texture = await adapter.loadTexture(config.path, false);
         const mesh = this.__createCubeMesh(config, texture);
 
         this.state.overlays[config.id] = { config, mesh };
