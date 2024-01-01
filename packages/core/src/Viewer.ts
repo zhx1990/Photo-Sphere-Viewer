@@ -482,6 +482,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
             return this.adapter
                 .loadTexture(
                     path,
+                    false,
                     (image) => {
                         if ((this.state.textureData.panoData as PanoData).isEquirectangular) {
                             const p = this.state.textureData.panoData as PanoData;
@@ -497,7 +498,6 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                             };
                         }
                     },
-                    false,
                     false
                 )
                 .then((textureData) => {

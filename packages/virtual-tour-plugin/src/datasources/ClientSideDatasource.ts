@@ -39,9 +39,7 @@ export class ClientSideDatasource extends AbstractDatasource {
                     throw new PSVError(`Target node ${link.nodeId} of node ${node.id} does not exists`);
                 }
 
-                // copy essential data
                 link.gps = link.gps || nodes[link.nodeId].gps;
-                link.name = link.name || nodes[link.nodeId].name;
 
                 this.checkLink(node, link);
 

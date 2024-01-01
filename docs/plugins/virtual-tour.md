@@ -305,13 +305,7 @@ Position of the link in **spherical coordinates** (radians/degrees) or **texture
 
 -   type: `number[]`
 
-Overrides the GPS coordinates of the target node.
-
-#### `name` (recommended in server mode)
-
--   type: `string`
-
-Overrides the tooltip content (defaults to the node's `name` property).
+Define the GPS coordinates of the target node. It must be provided in order to position the link without having to load the target node.
 
 #### `linkOffset`
 
@@ -530,6 +524,14 @@ Each node can still have a `map` property to override `color`, `image` and `size
 ::::
 
 :::::
+
+#### `getLinkTooltip(content, link, node)`
+
+-   type: `function(string, link, node) => string`
+-   default: `null`
+-   updatable: no
+
+Callback used to replace/modify the tooltip for a link. The first parameter is the default tooltip content which contains the node `name` + `thumbnail` + `caption`.
 
 #### `markerStyle` (markers mode only)
 

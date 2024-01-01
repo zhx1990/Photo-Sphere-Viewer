@@ -29,10 +29,8 @@ export class ServerSideDatasource extends AbstractDatasource {
                 }
 
                 node.links.forEach((link) => {
-                    // copy essential data
                     if (this.nodes[link.nodeId]) {
                         link.gps = link.gps || this.nodes[link.nodeId].gps;
-                        link.name = link.name || this.nodes[link.nodeId].name;
                     }
 
                     this.checkLink(node, link);

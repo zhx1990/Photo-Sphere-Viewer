@@ -191,6 +191,9 @@
                             // rotation: false,
                         },
 
+                        getLinkTooltip(content, link, node) {
+                            return `${content}<pre>Node #${node.id}</pre>`;
+                        },
                         markerStyle: {
                             // element: null,
                             // image: baseUrl + 'pictos/pin-red.png',
@@ -219,7 +222,6 @@
                         //         ...nodesById[nodeId],
                         //         links: nodesById[nodeId].links.map((link) => ({
                         //             ...link,
-                        //             name: nodesById[link.nodeId].name,
                         //             gps: nodesById[link.nodeId].gps,
                         //         })),
                         //     });

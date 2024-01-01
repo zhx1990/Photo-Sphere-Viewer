@@ -104,7 +104,7 @@ export type VirtualTourLink = Partial<ExtendedPosition> & {
      */
     nodeId: string;
     /**
-     * override the name of the node (tooltip)
+     * @deprecated unused
      */
     name?: string;
     /**
@@ -117,7 +117,7 @@ export type VirtualTourLink = Partial<ExtendedPosition> & {
      */
     linkOffset?: { yaw?: number; pitch?: number; depth?: number };
     /**
-     * override the GPS position of the node (GPS mode)
+     * define the GPS position of the node (GPS mode)
      */
     gps?: [number, number, number?];
     /**
@@ -243,6 +243,10 @@ export type VirtualTourPluginConfig = {
      * @default true
      */
     linksOnCompass?: boolean;
+    /**
+     * callback to modify the content of the tooltip
+     */
+    getLinkTooltip?: (content: string, link: VirtualTourLink, node: VirtualTourNode) => string;
     /**
      * global marker style
      */

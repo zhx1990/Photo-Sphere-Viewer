@@ -39,6 +39,7 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
         rotateSpeed: null,
         transition: null,
         linksOnCompass: true,
+        getLinkTooltip: null,
         markerStyle: DEFAULT_MARKER,
         arrowStyle: DEFAULT_ARROW,
         markerPitchOffset: -0.1,
@@ -554,10 +555,6 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 const config: MarkerConfig | VirtualTourMarkerStyle = {
                     ...this.config.markerStyle,
                     ...link.markerStyle,
-                    tooltip: {
-                        className: 'psv-virtual-tour-tooltip',
-                        content: link.name ? `<h3>${link.name}</h3>` : null,
-                    },
                     position: position,
                     id: LINK_ID + link.nodeId,
                     visible: true,
@@ -598,8 +595,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     /**
      * Returns the complete tootlip content for a node
      */
-    private async __getTooltipContent(nodeId: string): Promise<string> {
-        const node = await this.datasource.loadNode(nodeId);
+    private async __getTooltipContent(link: VirtualTourLink): Promise<string> {
+        const node = await this.datasource.loadNode(link.nodeId);
         const elements: string[] = [];
 
         if (node.name || node.thumbnail || node.caption) {
@@ -614,11 +611,15 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             }
         }
 
-        return elements.join('');
+        let content = elements.join('');
+        if (this.config.getLinkTooltip) {
+            content = this.config.getLinkTooltip(content, link, node);
+        }
+        return content;
     }
 
     private __onEnterMarker(marker: Marker, link: VirtualTourLink) {
-        this.__getTooltipContent(link.nodeId).then((content) => {
+        this.__getTooltipContent(link).then((content) => {
             if (content) {
                 this.markers.updateMarker({
                     id: marker.id,
@@ -636,7 +637,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         setMeshColor(mesh as any, link.arrowStyle?.hoverColor || this.config.arrowStyle.hoverColor);
 
-        this.__getTooltipContent(link.nodeId).then((content) => {
+        this.__getTooltipContent(link).then((content) => {
             if (content) {
                 this.state.currentTooltip = this.viewer.createTooltip({
                     left: viewerPoint.x,
