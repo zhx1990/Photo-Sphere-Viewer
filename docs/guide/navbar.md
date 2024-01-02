@@ -37,6 +37,8 @@ Content of the button. Preferably a square image or SVG icon.
 ::: tip Custom navbar elements
 The `content` can be an existing element in a the DOM or a [Web Component](https://developer.mozilla.org/docs/Web/API/Web_components/Using_custom_elements).
 If your component has an `attachViewer()` method it will be called with the instance of the viewer as first parameter.
+
+[Check the demo](../demos/advanced/navbar-element.md)
 :::
 
 #### `onClick(viewer)`

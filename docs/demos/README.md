@@ -71,6 +71,14 @@ Zoom to the cursor position on double-click.
 :::
 
 ::: item
+[![](../images/demos/navbar-element.jpg)](./advanced/navbar-element.md)
+
+### Navbar element
+
+Add complex elements to the navbar.
+:::
+
+::: item
 [![](../images/demos/screenshot.jpg)](./advanced/screenshot.md)
 
 ### Make a screenshot
@@ -90,6 +98,14 @@ Download a screenshot of the visible panorama.
 ### Chroma key markers
 
 Make video markers partially transparent.
+:::
+
+::: item
+[![](../images/demos/marker-element.jpg)](./markers/custom-element.md)
+
+### Custom element
+
+Use a custom element as marker.
 :::
 
 ::: item

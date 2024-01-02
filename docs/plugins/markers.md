@@ -302,6 +302,7 @@ If your component has an `updateMarker()` method it will be called by the plugin
 -   `zoomLevel`: current zoom level
 -   `viewerSize`: size of the viewport
 
+[Check the demo](../demos/markers/custom-element.md)
 :::
 
 ::: tip "Layers" positionning
