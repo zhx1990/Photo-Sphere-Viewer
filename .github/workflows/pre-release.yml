@@ -27,7 +27,7 @@ jobs:
           echo "NPM_TAG=$(echo ${{ github.event.inputs.version }} | cut -d '-' -f2 -s | cut -d '.' -f1 -s)" >> $GITHUB_OUTPUT
           echo "YARN_CACHE_DIR=$(yarn cache dir)" >> $GITHUB_OUTPUT
 
-      - name: yarn cache
+      - name: yarn cache ro
         uses: actions/cache/restore@v3
         with:
           key: yarn-${{ hashFiles('yarn.lock') }}
