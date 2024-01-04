@@ -87,15 +87,25 @@ jobs:
           key: yarn-${{ hashFiles('yarn.lock') }}
           path: ${{ steps.data.outputs.YARN_CACHE_DIR }}
 
-      - name: turbo cache ro
-        uses: actions/cache/restore@v3
+      - name: turbo cache
+        uses: actions/cache@v3
+        if: github.ref_name == 'main'
         with:
           path: .turbo
-          key: turbo-${{ github.sha }}
+          key: turbo_doc-${{ github.sha }}
           restore-keys: |
-            turbo-
+            turbo_doc-
+
+      - name: turbo cache ro
+        uses: actions/cache/restore@v3
+        if: github.ref_name != 'main'
+        with:
+          path: .turbo
+          key: turbo_doc-${{ github.sha }}
+          restore-keys: |
+            turbo_doc-
 
       - name: build
         run: |
           yarn install
-          yarn doc:build
+          yarn ci:build-doc
