@@ -15,7 +15,7 @@
     "serve": "turbo run watch --parallel",
     "serve:filter": "run() { turbo run watch --parallel --filter=$1... --filter=//; }; run",
     "npm-link": "turbo run npm-link --output-logs=new-only",
-    "doc:build": "turbo run build-doc",
+    "doc:build": "turbo run build-doc --force",
     "doc:serve": "turbo run serve-doc",
     "ci:build": "turbo run lint build test --cache-dir=.turbo",
     "ci:build-doc": "turbo run build-doc --cache-dir=.turbo",
