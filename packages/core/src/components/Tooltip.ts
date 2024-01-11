@@ -175,6 +175,11 @@ export class Tooltip extends AbstractComponent {
      * @throws {@link PSVError} if the configuration is invalid
      */
     update(content: string, config?: TooltipPosition) {
+        if (this.state.state === TooltipState.SHOWING) {
+            requestAnimationFrame(() => this.update(content, config));
+            return;
+        }
+
         this.content.innerHTML = content;
 
         const rect = this.container.getBoundingClientRect();
@@ -184,6 +189,7 @@ export class Tooltip extends AbstractComponent {
         this.state.border = parseInt(getStyleProperty(this.container, 'border-top-left-radius'), 10);
 
         this.move(config ?? this.state.config);
+        this.__waitImages();
     }
 
     /**
@@ -382,28 +388,32 @@ export class Tooltip extends AbstractComponent {
      * If the tooltip contains images, recompute its size once they are loaded
      */
     private __waitImages() {
-        const images = this.content.querySelectorAll('img');
+        const images = this.content.querySelectorAll('img') as NodeListOf<HTMLImageElement>;
 
         if (images.length > 0) {
             const promises: Array<Promise<any>> = [];
 
             images.forEach((image) => {
-                promises.push(
-                    new Promise((resolve) => {
-                        image.onload = resolve;
-                        image.onerror = resolve;
-                    })
-                );
-            });
-
-            Promise.all(promises).then(() => {
-                if (this.state.state === TooltipState.SHOWING || this.state.state === TooltipState.READY) {
-                    const rect = this.container.getBoundingClientRect();
-                    this.state.width = rect.right - rect.left;
-                    this.state.height = rect.bottom - rect.top;
-                    this.move(this.state.config);
+                if (!image.complete) {
+                    promises.push(
+                        new Promise((resolve) => {
+                            image.onload = resolve;
+                            image.onerror = resolve;
+                        })
+                    );
                 }
             });
+
+            if (promises.length) {
+                Promise.all(promises).then(() => {
+                    if (this.state.state === TooltipState.SHOWING || this.state.state === TooltipState.READY) {
+                        const rect = this.container.getBoundingClientRect();
+                        this.state.width = rect.right - rect.left;
+                        this.state.height = rect.bottom - rect.top;
+                        this.move(this.state.config);
+                    }
+                });
+            }
         }
     }
 }

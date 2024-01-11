@@ -218,12 +218,14 @@
                         // dataMode: 'server',
                         // getNode: (nodeId) => {
                         //     console.log('GET node ' + nodeId);
-                        //     return Promise.resolve({
-                        //         ...nodesById[nodeId],
-                        //         links: nodesById[nodeId].links.map((link) => ({
-                        //             ...link,
-                        //             gps: nodesById[link.nodeId].gps,
-                        //         })),
+                        //     return new Promise((resolve) => {
+                        //         setTimeout(() => resolve({
+                        //             ...nodesById[nodeId],
+                        //             links: nodesById[nodeId].links.map((link) => ({
+                        //                 ...link,
+                        //                 gps: nodesById[link.nodeId].gps,
+                        //             })),
+                        //         }), 200)
                         //     });
                         // },
                     }],

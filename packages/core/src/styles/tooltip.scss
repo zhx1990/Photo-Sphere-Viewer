@@ -5,7 +5,6 @@
     max-width: $psv-tooltip-max-width;
     background: $psv-tooltip-background;
     border-radius: $psv-tooltip-radius;
-    padding: $psv-tooltip-padding;
     opacity: 0;
     transition-property: opacity, transform;
     transition-timing-function: ease-in-out;
@@ -16,6 +15,7 @@
         color: $psv-tooltip-text-color;
         font: $psv-tooltip-font;
         text-shadow: $psv-tooltip-text-shadow;
+        padding: $psv-tooltip-padding;
     }
 
     &-arrow {

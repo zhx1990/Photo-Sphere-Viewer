@@ -1,3 +1,4 @@
+@use 'sass:list';
 @import '../../shared/vars';
 
 $psv-virtual-tour-link-button-color: rgba(255, 255, 255, 0.8) !default;
@@ -8,20 +9,20 @@ $psv-virtual-tour-link-button-ring: rgb(97, 170, 242) !default;
 }
 
 .psv-virtual-tour-tooltip {
-    padding: 0;
-
-    .psv-tooltip-content {
-        line-height: 0;
-    }
-
     h3 {
         margin: 0;
-        padding: $psv-tooltip-padding;
+        padding: 0;
         line-height: normal;
+
+        &:not(:last-child) {
+            margin-bottom: #{list.nth($psv-tooltip-padding, 1)};
+        }
     }
 
     img {
-        width: 100%;
+        display: block;
+        width: $psv-tooltip-max-width;
+        margin: 0 #{- list.nth($psv-tooltip-padding, 2)};
 
         &:first-child {
             border-radius: $psv-tooltip-radius $psv-tooltip-radius 0 0;
@@ -30,11 +31,15 @@ $psv-virtual-tour-link-button-ring: rgb(97, 170, 242) !default;
         &:last-child {
             border-radius: 0 0 $psv-tooltip-radius $psv-tooltip-radius;
         }
+
+        &:not(:last-child) {
+            margin-bottom: #{list.nth($psv-tooltip-padding, 1)};
+        }
     }
 
     p {
         margin: 0;
-        padding: $psv-tooltip-padding;
+        padding: 0;
         line-height: normal;
     }
 }
@@ -52,6 +57,51 @@ $psv-virtual-tour-link-button-ring: rgb(97, 170, 242) !default;
 
     &:hover {
         animation: psv-virtual-tour-link-button-in 1s ease-out forwards;
+    }
+}
+
+.psv-virtual-tour-loader {
+    display: block;
+    position: relative;
+    width: 40px;
+    height: 30px;
+    margin: 0 40px;
+
+    div {
+        display: inline-block;
+        position: absolute;
+        left: 10%;
+        width: 20%;
+        background: #fff;
+        animation: psv-virtual-tour-loader 1.2s cubic-bezier(0, 0.5, 0.5, 1) infinite;
+
+        &:nth-child(1) {
+            left: 10%;
+            animation-delay: -0.24s;
+        }
+
+        &:nth-child(2) {
+            left: 40%;
+            animation-delay: -0.12s;
+        }
+
+        &:nth-child(3) {
+            left: 70%;
+            animation-delay: 0;
+        }
+    }
+}
+
+@keyframes psv-virtual-tour-loader {
+    0% {
+        top: 10%;
+        height: 80%;
+    }
+
+    50%,
+    100% {
+        top: 30%;
+        height: 40%;
     }
 }
 

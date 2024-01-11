@@ -6,7 +6,7 @@ import type { MapPlugin, events as mapEvents } from '@photo-sphere-viewer/map-pl
 import type { Marker, MarkerConfig, MarkersPlugin, events as markersEvents } from '@photo-sphere-viewer/markers-plugin';
 import { MathUtils, Mesh } from 'three';
 import { ArrowsRenderer } from './ArrowsRenderer';
-import { DEFAULT_ARROW, DEFAULT_MARKER, LINK_DATA, LINK_ID } from './constants';
+import { DEFAULT_ARROW, DEFAULT_MARKER, LINK_DATA, LINK_ID, LOADING_TOOLTIP } from './constants';
 import { AbstractDatasource } from './datasources/AbstractDataSource';
 import { ClientSideDatasource } from './datasources/ClientSideDatasource';
 import { ServerSideDatasource } from './datasources/ServerSideDatasource';
@@ -207,8 +207,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
             this.viewer.renderer.setCustomRenderer((renderer) => this.arrowsRenderer.withRenderer(renderer));
         } else {
-            this.markers.addEventListener('enter-marker', this);
             this.markers.addEventListener('select-marker', this);
+            this.viewer.addEventListener(events.ShowTooltipEvent.type, this);
         }
 
         if (this.map) {
@@ -231,7 +231,6 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
      */
     override destroy() {
         if (this.markers) {
-            this.markers.removeEventListener('enter-marker', this);
             this.markers.removeEventListener('select-marker', this);
         }
 
@@ -247,6 +246,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         this.viewer.removeEventListener(events.ObjectEnterEvent.type, this);
         this.viewer.removeEventListener(events.ObjectHoverEvent.type, this);
         this.viewer.removeEventListener(events.ObjectLeaveEvent.type, this);
+        this.viewer.removeEventListener(events.ShowTooltipEvent.type, this);
         this.viewer.removeEventListener(events.ReadyEvent.type, this);
 
         this.viewer.unobserveObjects(LINK_DATA);
@@ -284,11 +284,10 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             if (link) {
                 this.setCurrentNode(link.nodeId, null, link);
             }
-        } else if (e.type === 'enter-marker') {
-            const marker = (e as markersEvents.EnterMarkerEvent).marker;
-            const link = marker.data?.[LINK_DATA];
-            if (link) {
-                this.__onEnterMarker(marker, link);
+        } else if (e instanceof events.ShowTooltipEvent) {
+            const marker = (e as events.ShowTooltipEvent).tooltipData as Marker;
+            if (marker?.id.startsWith(LINK_ID)) {
+                this.__onEnterMarker(marker, marker.data[LINK_DATA]);
             }
         } else if (e instanceof events.ObjectEnterEvent) {
             if (e.userDataKey === LINK_DATA) {
@@ -557,6 +556,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     ...link.markerStyle,
                     position: position,
                     id: LINK_ID + link.nodeId,
+                    tooltip: { ...LOADING_TOOLTIP },
                     visible: true,
                     hideList: true,
                     data: { [LINK_DATA]: link },
@@ -615,20 +615,21 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         if (this.config.getLinkTooltip) {
             content = this.config.getLinkTooltip(content, link, node);
         }
+        if (!content) {
+            content = node.id;
+        }
         return content;
     }
 
     private __onEnterMarker(marker: Marker, link: VirtualTourLink) {
         this.__getTooltipContent(link).then((content) => {
-            if (content) {
-                this.markers.updateMarker({
-                    id: marker.id,
-                    tooltip: {
-                        className: 'psv-virtual-tour-tooltip',
-                        content: content,
-                    },
-                });
-            }
+            this.markers.updateMarker({
+                id: marker.id,
+                tooltip: {
+                    className: 'psv-virtual-tour-tooltip',
+                    content: content,
+                },
+            });
         });
     }
 
@@ -637,20 +638,19 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         setMeshColor(mesh as any, link.arrowStyle?.hoverColor || this.config.arrowStyle.hoverColor);
 
+        this.state.currentTooltip = this.viewer.createTooltip({
+            ...LOADING_TOOLTIP,
+            left: viewerPoint.x,
+            top: viewerPoint.y,
+            box: {
+                // separate the tooltip from the cursor
+                width: 20,
+                height: 20,
+            },
+        }),
+
         this.__getTooltipContent(link).then((content) => {
-            if (content) {
-                this.state.currentTooltip = this.viewer.createTooltip({
-                    left: viewerPoint.x,
-                    top: viewerPoint.y,
-                    box: {
-                        // separate the tooltip from the cursor
-                        width: 20,
-                        height: 20,
-                    },
-                    className: 'psv-virtual-tour-tooltip',
-                    content: content,
-                });
-            }
+            this.state.currentTooltip.update(content);
         });
 
         this.map?.setActiveHotspot(LINK_ID + link.nodeId);

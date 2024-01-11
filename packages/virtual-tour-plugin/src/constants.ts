@@ -7,6 +7,11 @@ import arrowOutlineGeometryJson from './models/arrow_outline.json';
 export const LINK_DATA = 'tourLink';
 export const LINK_ID = '__tour-link__';
 
+export const LOADING_TOOLTIP = {
+    className: 'psv-virtual-tour-tooltip',
+    content: `<div class="psv-virtual-tour-loader"><div></div><div></div><div></div></div>`,
+};
+
 /**
  * Default style of the link marker
  */
