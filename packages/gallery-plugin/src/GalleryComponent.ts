@@ -80,9 +80,11 @@ export class GalleryComponent extends AbstractComponent {
      * @internal
      */
     handleEvent(e: Event) {
+        const isAboveBreakpoint = window.innerWidth > this.state.breakpoint;
+
         switch (e.type) {
             case 'wheel': {
-                if (window.innerWidth > this.state.breakpoint) {
+                if (isAboveBreakpoint) {
                     const evt = e as WheelEvent;
                     const scrollAmount = this.plugin.config.thumbnailSize.width + this.state.itemMargin ?? 0;
                     this.items.scrollLeft += (evt.deltaY / Math.abs(evt.deltaY)) * scrollAmount;
@@ -93,7 +95,7 @@ export class GalleryComponent extends AbstractComponent {
 
             case 'mousedown':
                 this.state.mousedown = true;
-                if (window.innerWidth > this.state.breakpoint) {
+                if (isAboveBreakpoint) {
                     this.state.initMouse = (e as MouseEvent).clientX;
                 } else {
                     this.state.initMouse = (e as MouseEvent).clientY;
@@ -103,7 +105,7 @@ export class GalleryComponent extends AbstractComponent {
 
             case 'mousemove':
                 if (this.state.mousedown) {
-                    if (window.innerWidth > this.state.breakpoint) {
+                    if (isAboveBreakpoint) {
                         const delta = this.state.mouse - (e as MouseEvent).clientX;
                         this.items.scrollLeft += delta;
                         this.state.mouse = (e as MouseEvent).clientX;
@@ -121,15 +123,17 @@ export class GalleryComponent extends AbstractComponent {
                 e.preventDefault();
                 break;
 
-            case 'click':
+            case 'click': {
                 // prevent click on drag
-                if (Math.abs(this.state.initMouse - (e as MouseEvent).clientX) < 10) {
+                const currentMouse = isAboveBreakpoint ? (e as MouseEvent).clientX : (e as MouseEvent).clientY;
+                if (Math.abs(this.state.initMouse - currentMouse) < 10) {
                     const item = utils.getClosest(e.target as HTMLElement, `[data-${GALLERY_ITEM_DATA_KEY}]`);
                     if (item) {
                         this.plugin.__click(item.dataset[GALLERY_ITEM_DATA]);
                     }
                 }
                 break;
+            }
         }
     }
 
