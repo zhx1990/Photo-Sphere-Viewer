@@ -2,7 +2,6 @@ import { Mesh, Vector3 } from 'three';
 import { SPHERE_RADIUS } from '../data/constants';
 import { Size, TextureData } from '../model';
 import type { Animation } from '../utils';
-import { logWarn } from '../utils';
 
 /**
  * Internal properties of the viewer
@@ -90,20 +89,6 @@ export class ViewerState {
      * Current panorama texture displayed
      */
     textureData: TextureData;
-
-    /**
-     * Current overlay texture displayed
-     */
-    overlayData: TextureData;
-
-    /**
-     * panorama metadata, if supported
-     * @deprecated use `textureData.panoData` instead
-     */
-    get panoData() {
-        logWarn('ViewerState.panoData is deprecated, use ViewerState.textureData.panoData instead');
-        return this.textureData?.panoData;
-    }
 
     /**
      * Current override of the global cursor

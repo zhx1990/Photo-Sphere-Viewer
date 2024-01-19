@@ -66,10 +66,6 @@ export type CubemapData = {
 
 export type CubemapAdapterConfig = {
     /**
-     * @deprecated Must be defined on the panorama object
-     */
-    flipTopBottom?: boolean;
-    /**
      * used for cubemap tiles adapter
      * @internal
      */

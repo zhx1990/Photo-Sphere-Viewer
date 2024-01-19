@@ -32,7 +32,6 @@ import { PanoData, PanoramaOptions, Point, SphereCorrection, TextureData } from 
 import { Animation, isNil } from '../utils';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
-import type { AbstractAdapter } from '../adapters/AbstractAdapter';
 
 const vector2 = new Vector2();
 const matrix4 = new Matrix4();
@@ -150,9 +149,6 @@ export class Renderer extends AbstractService {
                 if ((e as ConfigChangedEvent).containsOptions('fisheye')) {
                     this.__onPositionUpdated();
                 }
-                if ((e as ConfigChangedEvent).containsOptions('canvasBackground')) {
-                    this.container.style.background = this.config.canvasBackground;
-                }
                 break;
         }
     }
@@ -243,10 +239,6 @@ export class Renderer extends AbstractService {
      * @internal
      */
     setTexture(textureData: TextureData) {
-        if ((this.viewer.adapter.constructor as typeof AbstractAdapter).supportsOverlay) {
-            this.setOverlay(null, 0);
-        }
-
         if (this.state.textureData) {
             this.viewer.adapter.disposeTexture(this.state.textureData);
         }
@@ -254,21 +246,6 @@ export class Renderer extends AbstractService {
         this.state.textureData = textureData;
 
         this.viewer.adapter.setTexture(this.mesh, textureData);
-
-        this.viewer.needsUpdate();
-    }
-
-    /**
-     * @deprecated
-     */
-    setOverlay(textureData: TextureData, opacity: number) {
-        if (this.state.overlayData) {
-            this.viewer.adapter.disposeTexture(this.state.overlayData);
-        }
-
-        this.state.overlayData = textureData;
-
-        this.viewer.adapter.setOverlay(this.mesh, textureData, opacity);
 
         this.viewer.needsUpdate();
     }

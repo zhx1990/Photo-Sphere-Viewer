@@ -11,9 +11,4 @@ export type CubemapVideoPanorama = AbstractVideoPanorama & {
     equiangular?: boolean;
 };
 
-export type CubemapVideoAdapterConfig = AbstractVideoAdapterConfig & {
-    /**
-     * @deprecated Must be defined on the panorama object
-     */
-    equiangular?: boolean;
-};
+export type CubemapVideoAdapterConfig = AbstractVideoAdapterConfig;

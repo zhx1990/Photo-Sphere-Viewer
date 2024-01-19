@@ -24,7 +24,6 @@ export class LittlePlanetAdapter extends EquirectangularAdapter {
     static override readonly id = 'little-planet';
     static override readonly VERSION = PKG_VERSION;
     static override readonly supportsDownload = true;
-    static override readonly supportsOverlay = false;
 
     private uniforms: ShaderUniforms;
 

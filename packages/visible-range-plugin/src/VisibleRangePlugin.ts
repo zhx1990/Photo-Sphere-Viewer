@@ -177,15 +177,17 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
      * Changes the ranges according the current panorama cropping data
      */
     setRangesFromPanoData() {
-        this.setVerticalRange(this.__getPanoVerticalRange());
-        this.setHorizontalRange(this.__getPanoHorizontalRange());
+        if (this.viewer.state.textureData.panoData) {
+            this.setVerticalRange(this.__getPanoVerticalRange());
+            this.setHorizontalRange(this.__getPanoHorizontalRange());
+        }
     }
 
     /**
      * Gets the vertical range defined by the viewer's panoData
      */
     private __getPanoVerticalRange(): Range {
-        const p = this.viewer.state.panoData;
+        const p = this.viewer.state.textureData.panoData;
         if (p.croppedHeight === p.fullHeight) {
             return null;
         } else {
@@ -198,7 +200,7 @@ export class VisibleRangePlugin extends AbstractConfigurablePlugin<
      * Gets the horizontal range defined by the viewer's panoData
      */
     private __getPanoHorizontalRange(): Range {
-        const p = this.viewer.state.panoData;
+        const p = this.viewer.state.textureData.panoData;
         if (p.croppedWidth === p.fullWidth) {
             return null;
         } else {

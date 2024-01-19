@@ -1,4 +1,4 @@
-# OverlaysPlugin <Badge text="NEW"/>
+# OverlaysPlugin
 
 <Badges module="overlays-plugin"/>
 

@@ -95,11 +95,6 @@ export type MapPluginConfig = {
     overlayImage?: string;
 
     /**
-     * @deprecated Use `overlayImage` instead
-     */
-    compassImage?: string;
-
-    /**
      * SVG or image URL used for the central pin (must be square)
      */
     pinImage?: string;
@@ -121,21 +116,6 @@ export type MapPluginConfig = {
      * @default 40
      */
     coneSize?: number;
-
-    /**
-     * @deprecated use `spotStyle.color`
-     */
-    spotColor?: string;
-
-    /**
-     * @deprecated use `spotStyle.image`
-     */
-    spotImage?: string;
-
-    /**
-     * @deprecated use `spotStyle.size`
-     */
-    spotSize?: number;
 
     /**
      * Default style of hotspots
