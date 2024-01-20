@@ -175,11 +175,6 @@ export class Tooltip extends AbstractComponent {
      * @throws {@link PSVError} if the configuration is invalid
      */
     update(content: string, config?: TooltipPosition) {
-        if (this.state.state === TooltipState.SHOWING) {
-            requestAnimationFrame(() => this.update(content, config));
-            return;
-        }
-
         this.content.innerHTML = content;
 
         const rect = this.container.getBoundingClientRect();

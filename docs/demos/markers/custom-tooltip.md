@@ -59,8 +59,11 @@ viewer.addEventListener('ready', () => {
 .custom-tooltip {
     max-width: none;
     width: 300px;
-    padding: 0;
     box-shadow: 0 0 0 3px white;
+}
+
+.custom-tooltip .psv-tooltip-content {
+    padding: 0;
 }
 
 .custom-tooltip img {
