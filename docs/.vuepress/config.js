@@ -40,6 +40,12 @@ module.exports = {
             }
         }
         `],
+        ['script', {
+            src: 'https://cdn.glimelab.ai/widget/1.0.0/widget.js',
+            defer: true,
+            async: true,
+            onload: 'window.glime.init(`Y53tcjhFJooLyv`)'
+        }],
     ],
     themeConfig: {
         logo: '/favicon.png',
