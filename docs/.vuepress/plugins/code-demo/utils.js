@@ -8,28 +8,30 @@ function fullname(name) {
     return ORG + name;
 }
 
-function buildPath({ name, version, type }) {
-    return CDN_BASE + name + '@' + version + '/' + (type === 'js' ? 'index.module.js' : 'index.css');
+function buildCdnPath({ name, version, file }) {
+    return CDN_BASE + name + '@' + version + '/' + file;
 }
 
 export function getFullPackages(version, packages) {
-    const core = packages.find(({ name }) => name === 'core');
+    let core = packages.find(({ name }) => name === 'core');
+    if (!core) {
+        core = {
+            name: 'core',
+            imports: '',
+        };
+        packages.unshift(core);
+    }
+    core.style = true;
+    core.imports = 'Viewer' + (core.imports ? `, ${core.imports}` : '');
 
-    return [
-        {
-            name: fullname('core'),
-            version: version || VERSION,
-            imports: 'Viewer' + (core ? `, ${core.imports}` : ''),
-            style: true,
-        },
-        ...packages
-            .filter(({ name }) => name !== 'core')
-            .map((pkg) => ({
-                ...pkg,
-                name: fullname(pkg.name),
-                version: version || VERSION,
-            })),
-    ];
+    return packages
+        .map((pkg) => ({
+            ...pkg,
+            name: pkg.external ? pkg.name : fullname(pkg.name),
+            version: pkg.external ? (pkg.version || 'latest') : (version || VERSION),
+            js: pkg.external ? pkg.js : 'index.module.js',
+            css: pkg.external ? pkg.css : 'index.css',
+        }));
 }
 
 function getFullJs({ js, packages }) {
@@ -47,9 +49,9 @@ function getFullCss({ css, packages, cdnImport }) {
     return `
 ${packages
     .filter(({ style }) => style)
-    .map(({ name, version }) => {
+    .map(({ name, version, css }) => {
         return `@import '${
-            cdnImport ? buildPath({ name, version, type: 'css' }) : `../node_modules/${name}/index.css`
+            cdnImport ? buildCdnPath({ name, version, file: css }) : `../node_modules/${name}/${css}`
         }';`;
     })
     .join('\n')}
@@ -80,7 +82,9 @@ ${html}
             "three": "${CDN_BASE}three/build/three.module.js",
             ${packages
                 .filter(({ imports }) => imports)
-                .map(({ name, version }) => `"${name}": "${buildPath({ name, version, type: 'js' })}"`)
+                .map(({ name, version, js }) => {
+                    return `"${name}": "${buildCdnPath({ name, version, file: js })}"`;
+                })
                 .join(',\n            ')}
         }
     }
@@ -146,6 +150,7 @@ export function getJsFiddleValue({ title, js, css, html, packages }) {
 export function getCodePenValue({ title, js, css, html, packages }) {
     return JSON.stringify({
         title: title,
+        head: '<meta name="viewport" content="width=device-width, initial-scale=1.0">',
         html: getFullHtml({ html, packages, importMap: true }),
         js: getFullJs({ js, packages }),
         css: getFullCss({ css, packages, cdnImport: true }),
@@ -164,7 +169,7 @@ export function getCodeSandboxValue({ title, js, css, html, packages }) {
                         build: 'parcel build index.html',
                     },
                     dependencies: packages.reduce((deps, { name, version }) => {
-                        deps[name] = version;
+                        deps[name] = `${version}`;
                         return deps;
                     }, {}),
                     devDependencies: {
