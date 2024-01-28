@@ -29,7 +29,9 @@ function wrapUmd(fileContent, pkg, externals) {
         ...pkg.dependencies,
         ...pkg.peerDependencies,
     });
-    deps.unshift('three');
+    if (!deps.includes('three')) {
+        deps.unshift('three');
+    }
 
     const depsCommonJs = deps.map((dep) => `require('${dep}')`).join(', ');
     const depsAmd = deps.map((dep) => `'${dep}'`).join(', ');
