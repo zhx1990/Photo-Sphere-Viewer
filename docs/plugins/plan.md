@@ -31,7 +31,6 @@ const viewer = new PhotoSphereViewer.Viewer({
 
 ```yaml
 title: PSV Plan Demo
-autoload: true
 version: 5.7.0-alpha.1
 packages:
     - name: plan-plugin

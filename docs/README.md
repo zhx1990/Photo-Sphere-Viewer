@@ -36,7 +36,8 @@ I forked the original Photo Sphere Viewer [by Jérémy Heleine](http://jeremyhel
 </div>
 
 ::: slot footer
-[![Deploys by Netlify](https://www.netlify.com/v3/img/components/netlify-color-bg.svg)](https://www.netlify.com)
+[![Deploys by Netlify](https://www.netlify.com/v3/img/components/netlify-color-accent.svg)](https://www.netlify.com)
+[![js.org](./images/js.org.svg)](https://js.org)
 
 Licensed under MIT License, documentation under CC BY 3.0
 :::
