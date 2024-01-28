@@ -6,6 +6,11 @@
   "license": "MIT",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
+  "keywords": [
+    "map",
+    "leaflet",
+    "cartography"
+  ],
   "dependencies": {
     "leaflet": "^1.9.4"
   },

@@ -2,7 +2,7 @@ export const packageJson = (pkg) =>
     import('sort-package-json').then(({ default: sortPackageJson, sortOrder }) => {
         sortOrder.splice(sortOrder.indexOf('style') + 1, 0, 'sass');
 
-        let content = {
+        const content = {
             ...pkg,
             main: 'index.js',
             module: 'index.module.js',
@@ -17,7 +17,12 @@ export const packageJson = (pkg) =>
                 email: 'contact@git.strangeplanet.fr',
                 homepage: 'https://www.strangeplanet.fr',
             },
-            keywords: ['photosphere', 'panorama', 'threejs'],
+            keywords: [
+                'photosphere',
+                'panorama',
+                'threejs',
+                ...(pkg.keywords || []),
+            ],
         };
 
         if (pkg.psv.style) {
