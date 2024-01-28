@@ -25,7 +25,10 @@ export function umdPlugin({ pkg, externals }) {
 }
 
 function wrapUmd(fileContent, pkg, externals) {
-    const deps = Object.keys(pkg.peerDependencies || {});
+    const deps = Object.keys({
+        ...pkg.dependencies,
+        ...pkg.peerDependencies,
+    });
     deps.unshift('three');
 
     const depsCommonJs = deps.map((dep) => `require('${dep}')`).join(', ');

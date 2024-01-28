@@ -9,7 +9,9 @@
         <link rel="stylesheet" href="/dist/markers-plugin/index.css" />
         <link rel="stylesheet" href="/dist/gallery-plugin/index.css" />
         <link rel="stylesheet" href="/dist/map-plugin/index.css" />
+        <link rel="stylesheet" href="/dist/plan-plugin/index.css" />
         <link rel="stylesheet" href="/dist/virtual-tour-plugin/index.css" />
+        <link rel="stylesheet" href="/node_modules/leaflet/dist/leaflet.css" />
         <link rel="stylesheet" href="style.css" />
     </head>
     <body>
@@ -19,9 +21,11 @@
             {
                 "imports": {
                     "three": "/node_modules/three/build/three.module.js",
+                    "leaflet": "/node_modules/leaflet/dist/leaflet-src.esm.js",
                     "@photo-sphere-viewer/core": "/dist/core/index.module.js",
                     "@photo-sphere-viewer/gallery-plugin": "/dist/gallery-plugin/index.module.js",
                     "@photo-sphere-viewer/map-plugin": "/dist/map-plugin/index.module.js",
+                    "@photo-sphere-viewer/plan-plugin": "/dist/plan-plugin/index.module.js",
                     "@photo-sphere-viewer/markers-plugin": "/dist/markers-plugin/index.module.js",
                     "@photo-sphere-viewer/virtual-tour-plugin": "/dist/virtual-tour-plugin/index.module.js"
                 }
@@ -32,6 +36,7 @@
             import { Viewer } from '@photo-sphere-viewer/core';
             import { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
             import { MapPlugin } from '@photo-sphere-viewer/map-plugin';
+            import { PlanPlugin } from '@photo-sphere-viewer/plan-plugin';
             import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
             import { VirtualTourPlugin } from '@photo-sphere-viewer/virtual-tour-plugin';
 
@@ -47,6 +52,7 @@
                 gps: [-80.155975, 25.66668, 29 + 3],
                 data: {
                     map: { image: baseUrl + 'pictos/pin-red.png', size: 25 },
+                    plan: { image: baseUrl + 'pictos/pin-red.png', size: 25 },
                 },
             };
 
@@ -69,6 +75,7 @@
                     gps: [-80.15635, 25.66675, 3],
                     panoData: { poseHeading: 327 },
                     map: { x: 660, y: 570, color: '#fffd99' },
+                    plan: { color: '#fffd99' },
                 },
                 {
                     id: '2',
@@ -89,6 +96,7 @@
                     gps: [-80.15611, 25.6667, 5],
                     panoData: { poseHeading: 318 },
                     map: { x: 750, y: 590, color: '#ffb075' },
+                    plan: { color: '#ffb075' },
                 },
                 {
                     id: '3',
@@ -104,6 +112,7 @@
                     gps: [-80.15593, 25.66659, 5],
                     panoData: { poseHeading: 310 },
                     map: { x: 815, y: 640, color: '#b7c1ff' },
+                    plan: { color: '#b7c1ff' },
                 },
                 {
                     id: '4',
@@ -118,6 +127,7 @@
                     gps: [-80.15611, 25.666435, 3],
                     panoData: { poseHeading: 78 },
                     map: { x: 750, y: 705, color: '#64dbdb' },
+                    plan: { color: '#64dbdb' },
                 },
                 {
                     id: '5',
@@ -133,6 +143,7 @@
                     gps: [-80.15628, 25.666485, 3],
                     panoData: { poseHeading: 190 },
                     map: { x: 685, y: 685, color: '#9c9af9' },
+                    plan: { color: '#9c9af9' },
                 },
                 {
                     id: '6',
@@ -147,6 +158,7 @@
                     gps: [-80.156465, 25.666486, 2],
                     panoData: { poseHeading: 295 },
                     map: { x: 615, y: 685, color: '#de91f2' },
+                    plan: { color: '#de91f2' },
                 },
                 {
                     id: '7',
@@ -158,6 +170,7 @@
                     gps: [-80.15709, 25.66634, 3],
                     panoData: { poseHeading: 250, posePitch: 3 },
                     map: { x: 385, y: 745, color: '#8bed82' },
+                    plan: { color: '#8bed82' },
                 },
             ];
 
@@ -177,6 +190,10 @@
                     [MapPlugin, {
                         static: true,
                         maxZoom: 150,
+                    }],
+                    [PlanPlugin, {
+                        position: 'bottom right',
+                        defaultZoom: 18,
                     }],
                     [VirtualTourPlugin, {
                         positionMode: 'gps',

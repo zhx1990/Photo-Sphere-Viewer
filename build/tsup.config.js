@@ -12,6 +12,7 @@ import { readme } from './templates/readme';
 
 const externals = {
     'three': 'THREE',
+    'leaflet': 'L',
     '@photo-sphere-viewer/core': 'PhotoSphereViewer',
     '@photo-sphere-viewer/cubemap-adapter': 'PhotoSphereViewer.CubemapAdapter',
     '@photo-sphere-viewer/gyroscope-plugin': 'PhotoSphereViewer.GyroscopePlugin',

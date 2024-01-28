@@ -9,6 +9,7 @@ import type {
 } from '@photo-sphere-viewer/core';
 import type { MarkerConfig } from '@photo-sphere-viewer/markers-plugin';
 import type { MapHotspot } from '@photo-sphere-viewer/map-plugin';
+import type { PlanHotspot } from '@photo-sphere-viewer/plan-plugin';
 
 /**
  * Definition of GPS coordinates (longitude, latitude, optional altitude)
@@ -176,6 +177,10 @@ export type VirtualTourNode = {
      * configuration of the hotspot when using the MapPlugin
      */
     map?: Partial<Point> & Omit<MapHotspot, 'id' | 'yaw' | 'distance'>;
+    /**
+     * configuration of the hotspot when using the PlanPlugin
+     */
+    plan?: Omit<PlanHotspot, 'id' | 'coordinates'>;
     /**
      * Any custom data you want to attach to the node
      */

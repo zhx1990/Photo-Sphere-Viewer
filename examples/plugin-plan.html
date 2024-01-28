@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>PhotoSphereViewer - plan demo</title>
+
+        <link rel="stylesheet" href="/dist/core/index.css" />
+        <link rel="stylesheet" href="/dist/plan-plugin/index.css" />
+        <link rel="stylesheet" href="/dist/markers-plugin/index.css" />
+        <link rel="stylesheet" href="/node_modules/leaflet/dist/leaflet.css" />
+        <link rel="stylesheet" href="style.css" />
+    </head>
+    <body>
+        <div id="photosphere"></div>
+
+        <script type="importmap">
+            {
+                "imports": {
+                    "three": "/node_modules/three/build/three.module.js",
+                    "leaflet": "/node_modules/leaflet/dist/leaflet-src.esm.js",
+                    "@photo-sphere-viewer/core": "/dist/core/index.module.js",
+                    "@photo-sphere-viewer/plan-plugin": "/dist/plan-plugin/index.module.js",
+                    "@photo-sphere-viewer/markers-plugin": "/dist/markers-plugin/index.module.js"
+                }
+            }
+        </script>
+
+        <script type="module">
+            import { TileLayer } from 'leaflet';
+            import { Viewer } from '@photo-sphere-viewer/core';
+            import { PlanPlugin } from '@photo-sphere-viewer/plan-plugin';
+            import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+
+            const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+
+            const viewer = new Viewer({
+                container: 'photosphere',
+                panorama: baseUrl + 'sphere.jpg',
+                caption: 'Parc national du Mercantour <b>&copy; Damien Sorel</b>',
+                loadingImg: baseUrl + 'loader.gif',
+                defaultYaw: '-10deg',
+                plugins: [
+                    [PlanPlugin, {
+                        // position: 'top left',
+                        // visibleOnLoad: false,
+                        defaultZoom: 14,
+                        coordinates: [6.78677, 44.58241],
+
+                        layers: [
+                            {
+                                name: 'OpenStreetMap',
+                                urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                attribution: '&copy; OpenStreetMap',
+                            },
+                            {
+                                name: 'OpenTopoMap',
+                                layer: new TileLayer('https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png', {
+                                    subdomains: ['a', 'b', 'c'],
+                                    maxZoom: 17,
+                                }),
+                                attribution: '&copy; OpenTopoMap',
+                            },
+                            {
+                                name: 'Google Satellite',
+                                layer: new TileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}', {
+                                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+                                }),
+                                attribution: '&copy; Google',
+                            },
+                        ],
+                        // configureLeaflet(map) {
+                        //     new TileLayer('https://{s}.google.com/vt/lyrs=s,h&x={x}&y={y}&z={z}',{
+                        //         subdomains:['mt0','mt1','mt2','mt3'],
+                        //         attribution: '&copy; Google',
+                        //     }).addTo(map);
+                        // },
+
+                        // pinImage: baseUrl + 'pictos/pin-blue.png',
+                        // pinSize: 25,
+
+                        spotStyle: {
+                            // size: 25,
+                            // image: baseUrl + 'pictos/pin-blue.png',
+                            // hoverImage: baseUrl + 'pictos/pin-red.png',
+                        },
+
+                        hotspots: [
+                            {
+                                coordinates: [6.7783, 44.58506],
+                                id: 'green-lake',
+                                tooltip: 'Lac vert',
+                                color: 'green',
+                            },
+                        ],
+                    }],
+                    [MarkersPlugin, {
+                        markers: [
+                            {
+                                id: 'mountain',
+                                tooltip: 'A mountain',
+                                position: { yaw: 0.11, pitch: 0.32 },
+                                image: baseUrl + 'pictos/pin-blue.png',
+                                size: { width: 32, height: 32 },
+                                anchor: 'bottom center',
+                                data: {
+                                    plan: { 
+                                        coordinates: [6.79077, 44.58041],
+                                        size: 25,
+                                        image: baseUrl + 'pictos/pin-blue.png',
+                                        hoverImage: baseUrl + 'pictos/pin-red.png',
+                                    },
+                                },
+                            },
+                        ],
+                    }],
+                ],
+            });
+
+            const plan = viewer.getPlugin(PlanPlugin);
+
+            plan.addEventListener('select-hotspot', ({ hotspotId }) => {
+                console.log(`Click hotspot ${hotspotId}`);
+            });
+
+            window.viewer = viewer;
+        </script>
+    </body>
+</html>

@@ -9,6 +9,10 @@ Adds a interactive map on the viewer, with zoom/pan and optional hotspots.
 This plugin is available in the [@photo-sphere-viewer/map-plugin](https://www.npmjs.com/package/@photo-sphere-viewer/map-plugin) package.
 :::
 
+::: tip
+Looking for geographic map ? (OpenStreetMap, Google, etc) try the [Plan plugin](plan.md) instead.
+:::
+
 [[toc]]
 
 ## Usage

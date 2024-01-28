@@ -1,0 +1,156 @@
+@use 'sass:math';
+@import '../../shared/vars';
+
+$psv-plan-margin: 10px !default;
+$psv-plan-radius: 8px !default;
+$psv-plan-shadow: 0 0 5px rgba(0, 0, 0, 0.7) !default;
+$psv-plan-button-size: 34px !default;
+$psv-plan-button-background: rgba(0, 0, 0, 0.7) !default;
+$psv-plan-button-color: white !default;
+$psv-plan-button-radius: $psv-plan-radius !default;
+$psv-plan-transition: ease-in-out 0.3s !default;
+
+.psv-container {
+    --psv-plan-plugin-loaded: true;
+}
+
+.psv-plan {
+    position: absolute;
+    margin: $psv-plan-margin;
+    z-index: $psv-compass-zindex;
+    overflow: hidden;
+    border-radius: $psv-plan-radius;
+    transition: all $psv-plan-transition;
+    box-shadow: $psv-plan-shadow;
+
+    @at-root .psv--has-navbar & {
+        margin-bottom: calc(#{$psv-navbar-height} + #{$psv-plan-margin});
+    }
+
+    &__container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        transition: opacity $psv-plan-transition;
+    }
+
+    &__button {
+        position: absolute;
+        width: $psv-plan-button-size;
+        aspect-ratio: 1;
+        line-height: 0;
+        background: $psv-plan-button-background;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        transform-origin: center;
+        color: $psv-plan-button-color;
+        cursor: pointer;
+
+        svg {
+            width: 60%;
+        }
+
+        &--top-left {
+            left: 0;
+            top: 0;
+            border-bottom-right-radius: $psv-plan-button-radius;
+        }
+
+        &--top-right {
+            right: 0;
+            top: 0;
+            border-bottom-left-radius: $psv-plan-button-radius;
+        }
+
+        &--bottom-left {
+            left: 0;
+            bottom: 0;
+            border-top-right-radius: $psv-plan-button-radius;
+        }
+
+        &--bottom-right {
+            right: 0;
+            bottom: 0;
+            border-top-left-radius: $psv-plan-button-radius;
+        }
+    }
+
+    &--maximized {
+        width: calc(100% - #{$psv-plan-margin * 2}) !important;
+        height: calc(100% - #{$psv-plan-margin * 2}) !important;
+
+        @at-root .psv--has-navbar & {
+            height: calc(100% - #{$psv-navbar-height} - #{$psv-plan-margin * 2}) !important;
+        }
+    }
+
+    &--collapsed {
+        width: $psv-plan-button-size !important;
+        height: $psv-plan-button-size !important;
+
+        & > * {
+            opacity: 0;
+        }
+    }
+
+    &--collapsed &__button-close {
+        opacity: 1;
+        z-index: 1;
+    }
+
+    &--top-left {
+        top: 0;
+        left: 0;
+    }
+
+    &--top-right {
+        top: 0;
+        right: 0;
+    }
+
+    &--bottom-left {
+        bottom: 0;
+        left: 0;
+    }
+
+    &--bottom-right {
+        bottom: 0;
+        right: 0;
+    }
+
+    &__pin, &__spot {
+        filter: drop-shadow(2px 2px 2px rgba(0, 0, 0, 0.5));
+    }
+
+    &__spot {
+        border-radius: 50%;
+    }
+
+    &__layers-select {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        border: none;
+        opacity: 0;
+        cursor: pointer;
+
+        option[selected] {
+            font-weight: bold;
+        }
+    }
+
+    // Leaflet attribution
+    .leaflet-bottom.leaflet-right {
+        left: 0;
+        display: flex;
+        justify-content: center;
+    }
+}

@@ -89,7 +89,7 @@ getNode = async (nodeId) => {
 ::::
 
 ::: tip
-The [Gallery plugin](./gallery.md), [Map plugin](./map.md) and [Compass plugin](./compass.md) plugins can be easily integrated with the virtual tour.
+The [Gallery plugin](./gallery.md), [Map plugin](./map.md), [Plan plugin](./plan.md) and [Compass plugin](./compass.md) plugins can be easily integrated with the virtual tour.
 :::
 
 ## Example
@@ -279,7 +279,11 @@ The markers can be positioned with the classic `position` option (yaw + pitch) o
 
 #### `map` (client mode only)
 
-Configuration of the hotspot when using the MapPlugin. See global configuration for details.
+Configuration of the hotspot when using the [Map plugin](map.md). See [global configuration](#map-client-mode-only-2) for details.
+
+#### `plan` (client+GPS mode only)
+
+Configuration of the hotspot when using the [Plan plugin](plan.md). The node will be automatically placed on the map but you can customize [the style of the hotspot](plan.md#hotspots-2).
 
 #### `data`
 
@@ -454,11 +458,11 @@ If the [Compass plugin](./compass.md) is enabled, displays the links on the comp
 
 #### `map` (client mode only)
 
-Configuration when using the MapPlugin.
+Configuration when using the [Map plugin](./map.md).
 
 ::::: dialog "See details" "Virtual tour map"
 
-Using the [Map plugin](./map.md) allows to show the position of each node on a map. It requires some additional configuration, especially when working with GPS coordinates.
+Using the Map plugin allows to show the position of each node on a map. It requires some additional configuration, especially when working with GPS coordinates.
 
 ::: warning Map image
 The map image must be configured with `map.imageUrl` inside the VirtualTour plugin configuration. The `imageUrl` in the Map plugin is ignored.

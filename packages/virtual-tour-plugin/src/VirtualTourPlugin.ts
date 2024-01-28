@@ -3,6 +3,7 @@ import type { Point, Position, Tooltip, Viewer } from '@photo-sphere-viewer/core
 import { AbstractConfigurablePlugin, PSVError, events, utils } from '@photo-sphere-viewer/core';
 import type { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
 import type { MapPlugin, events as mapEvents } from '@photo-sphere-viewer/map-plugin';
+import type { PlanPlugin, events as planEvents } from '@photo-sphere-viewer/plan-plugin';
 import type { Marker, MarkerConfig, MarkersPlugin, events as markersEvents } from '@photo-sphere-viewer/markers-plugin';
 import { MathUtils, Mesh } from 'three';
 import { ArrowsRenderer } from './ArrowsRenderer';
@@ -114,6 +115,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     private arrowsRenderer: ArrowsRenderer;
 
     private map?: MapPlugin;
+    private plan?: PlanPlugin;
     private markers?: MarkersPlugin;
     private compass?: CompassPlugin;
     private gallery?: GalleryPlugin;
@@ -169,6 +171,10 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             }
         }
 
+        if (this.isGps) {
+            this.plan = this.viewer.getPlugin('plan');
+        }
+
         this.datasource = this.isServerSide
             ? new ServerSideDatasource(this, this.viewer)
             : new ClientSideDatasource(this, this.viewer);
@@ -195,6 +201,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             this.map.setImage(this.config.map.imageUrl);
         }
 
+        this.plan?.addEventListener('select-hotspot', this);
+
         if (this.isServerSide) {
             if (this.config.startNodeId) {
                 this.setCurrentNode(this.config.startNodeId);
@@ -209,15 +217,13 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
      * @internal
      */
     override destroy() {
-        if (this.markers) {
-            this.markers.removeEventListener('select-marker', this);
-        }
-
         if (this.is3D) {
             this.viewer.renderer.setCustomRenderer(null);
         }
 
+        this.markers?.removeEventListener('select-marker', this);
         this.map?.removeEventListener('select-hotspot', this);
+        this.plan?.removeEventListener('select-hotspot', this);
 
         this.viewer.removeEventListener(events.PositionUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.SizeUpdatedEvent.type, this);
@@ -281,7 +287,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 this.__onHoverObject(e.viewerPoint);
             }
         } else if (e.type === 'select-hotspot') {
-            const id = (e as mapEvents.SelectHotspot).hotspotId;
+            const id = (e as mapEvents.SelectHotspot | planEvents.SelectHotspot).hotspotId;
             if (id.startsWith(LINK_ID)) {
                 this.setCurrentNode(id.substring(LINK_ID.length));
             }
@@ -337,14 +343,23 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         if (this.map) {
             this.map.setHotspots([
-                ...nodes.map((node) => {
-                    return {
-                        ...(node.map || {}),
-                        ...this.__getNodeMapPosition(node),
-                        id: LINK_ID + node.id,
-                        tooltip: node.name,
-                    };
-                }),
+                ...nodes.map((node) => ({
+                    ...(node.map || {}),
+                    ...this.__getNodeMapPosition(node),
+                    id: LINK_ID + node.id,
+                    tooltip: node.name,
+                })),
+            ]);
+        }
+
+        if (this.plan) {
+            this.plan.setHotspots([
+                ...nodes.map((node) => ({
+                    ...(node.plan || {}),
+                    coordinates: node.gps,
+                    id: LINK_ID + node.id,
+                    tooltip: node.name,
+                })),
             ]);
         }
     }
@@ -426,6 +441,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 this.markers?.clearMarkers();
                 this.compass?.clearHotspots();
                 this.map?.minimize();
+                this.plan?.minimize();
 
                 return this.viewer
                     .setPanorama(node.panorama, {
@@ -456,6 +472,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     const center = this.__getNodeMapPosition(node);
                     this.map.setCenter(center);
                 }
+
+                this.plan?.setCoordinates(node.gps);
 
                 if (node.markers) {
                     this.__addNodeMarkers(node);
@@ -633,6 +651,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         });
 
         this.map?.setActiveHotspot(LINK_ID + link.nodeId);
+        this.plan?.setActiveHotspot(LINK_ID + link.nodeId);
 
         this.viewer.needsUpdate();
         this.viewer.setCursor('pointer');
@@ -660,6 +679,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         }
 
         this.map?.setActiveHotspot(null);
+        this.plan?.setActiveHotspot(null);
 
         this.viewer.needsUpdate();
         this.viewer.setCursor(null);
@@ -710,8 +730,11 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 node.markers.map((marker) => {
                     if (marker.gps && this.isGps) {
                         marker.position = gpsToSpherical(node.gps, marker.gps);
-                        if (marker.data?.['map'] && this.map) {
+                        if (marker.data?.['map']) {
                             Object.assign(marker.data['map'], this.__getGpsMapPosition(marker.gps));
+                        }
+                        if (marker.data?.['plan']) {
+                            marker.data['plan'].coordinates = marker.gps;
                         }
                     }
                     return marker;
