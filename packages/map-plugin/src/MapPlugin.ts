@@ -71,10 +71,8 @@ export class MapPlugin extends AbstractConfigurablePlugin<
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions: Array<keyof MapPluginConfig> = [
         'imageUrl',
-        'center',
         'visibleOnLoad',
         'defaultZoom',
-        'hotspots',
         'buttons',
     ];
 
@@ -150,6 +148,14 @@ export class MapPlugin extends AbstractConfigurablePlugin<
 
     override setOptions(options: Partial<UpdatableMapPluginConfig>) {
         super.setOptions(options);
+
+        if (options.center) {
+            this.component.recenter();
+        }
+        if (options.hotspots !== undefined) {
+            this.setHotspots(options.hotspots);
+        }
+
         this.component.applyConfig();
     }
 

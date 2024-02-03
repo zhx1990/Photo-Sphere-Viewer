@@ -183,6 +183,25 @@ export class PlanComponent extends AbstractComponent {
         this.state.needsUpdate = true;
     }
 
+    /**
+     * Force re-creation of the central pin
+     */
+    updatePin() {
+        if (this.state.pinMarker) {
+            this.state.pinMarker.remove();
+            this.state.pinMarker = null;
+        }
+        this.recenter();
+    }
+
+    /**
+     * Force re-creation of hotspots
+     */
+    updateSpots() {
+        this.setHotspots(Object.values(this.state.hotspots).filter(({ isMarker }) => !isMarker).map(({ hotspot }) => hotspot));
+        this.setMarkers(Object.values(this.state.hotspots).filter(({ isMarker }) => isMarker).map(({ hotspot }) => hotspot));
+    }
+
     override isVisible(): boolean {
         return this.state.visible && !this.state.collapsed;
     }

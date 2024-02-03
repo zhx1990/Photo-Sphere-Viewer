@@ -119,9 +119,9 @@ URL of the image to use as map.
 #### `center` (required)
 
 -   type: `{ x: number, y: number }`
--   updatable: no, use `setCenter()` method
+-   updatable: yes
 
-The position of the panorama on the map, in pixels.
+The position of the panorama on the map, in pixels. You can also use `setCenter()` method.
 
 #### `rotation`
 
@@ -199,9 +199,9 @@ Size of the cone of the compass.
 
 -   type: `MapHotspot[]`
 -   default: `null`
--   updatable: no, use `setHotspots()` method
+-   updatable: yes
 
-Small dots visible on the map. See bellow.
+Small dots visible on the map. See bellow. You can also use `setHotspots()` method.
 
 #### `spotStyle`
 

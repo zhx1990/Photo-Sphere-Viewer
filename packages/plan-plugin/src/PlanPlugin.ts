@@ -61,15 +61,10 @@ export class PlanPlugin extends AbstractConfigurablePlugin<
     static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
     static override readonly readonlyOptions: Array<keyof PlanPluginConfig> = [
-        'coordinates',
         'visibleOnLoad',
-        'pinImage',
-        'pinSize',
-        'spotStyle',
         'defaultZoom',
         'layers',
         'configureLeaflet',
-        'hotspots',
         'buttons',
     ];
 
@@ -128,6 +123,20 @@ export class PlanPlugin extends AbstractConfigurablePlugin<
 
     override setOptions(options: Partial<PlanPluginConfig>) {
         super.setOptions(options);
+
+        if (options.coordinates) {
+            this.component.recenter();
+        }
+        if (options.pinImage || options.pinSize) {
+            this.component.updatePin();
+        }
+        if (options.spotStyle) {
+            this.component.updateSpots();
+        }
+        if (options.hotspots !== undefined) {
+            this.setHotspots(options.hotspots);
+        }
+
         this.component.applyConfig();
     }
 

@@ -153,14 +153,9 @@ export type ParsedPlanPluginConfig = Omit<PlanPluginConfig, 'position'> & {
 
 export type UpdatablePlanPluginConfig = Omit<
     PlanPluginConfig,
-    | 'coordinates'
     | 'visibleOnLoad'
-    | 'pinImage'
-    | 'pinSize'
-    | 'spotStyle'
     | 'defaultZoom'
     | 'layers'
     | 'configureLeaflet'
-    | 'hotspots'
     | 'buttons'
 >;

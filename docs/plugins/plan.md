@@ -25,6 +25,10 @@ const viewer = new PhotoSphereViewer.Viewer({
 });
 ```
 
+::: warning
+Do not forget to import Leaflet JS and CSS files.
+:::
+
 ## Example
 
 ::: code-demo
@@ -118,9 +122,9 @@ const viewer = new Viewer({
 #### `coordinates` (required)
 
 -   type: `[number, number]`
--   updatable: no, use `setCoordinates()` method
+-   updatable: yes
 
-GPS position of the panorama (longitude, latitude).
+GPS position of the panorama (longitude, latitude). You can also use `setCoordinates()` method.
 
 #### `layers`
 
@@ -185,7 +189,7 @@ Position of the widget, accepted positions are combinations of `top`, `bottom` a
 
 -   type: `string`
 -   default: default SVG
--   updatable: no
+-   updatable: yes
 
 SVG or image URL used for the central pin.
 
@@ -193,7 +197,7 @@ SVG or image URL used for the central pin.
 
 -   type: `number`
 -   default: `35`
--   updatable: no
+-   updatable: yes
 
 Size of the central pin.
 
@@ -201,14 +205,14 @@ Size of the central pin.
 
 -   type: `PlanHotspot[]`
 -   default: `null`
--   updatable: no, use `setHotspots()` method
+-   updatable: yes
 
-Markers visible on the map. See bellow.
+Markers visible on the map. See bellow. You can also use `setHotspots()` method.
 
 #### `spotStyle`
 
 -   type: `object`
--   updatable: no
+-   updatable: yes
 
 Style of hotspots.
 

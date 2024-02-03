@@ -22,9 +22,12 @@ $psv-plan-transition: ease-in-out 0.3s !default;
     border-radius: $psv-plan-radius;
     transition: all $psv-plan-transition;
     box-shadow: $psv-plan-shadow;
+    max-width: calc(100% - #{$psv-plan-margin * 2});
+    max-height: calc(100% - #{$psv-plan-margin * 2});
 
     @at-root .psv--has-navbar & {
         margin-bottom: calc(#{$psv-navbar-height} + #{$psv-plan-margin});
+        max-height: calc(100% - #{$psv-plan-margin * 2} - #{$psv-navbar-height});
     }
 
     &__container {
@@ -85,6 +88,21 @@ $psv-plan-transition: ease-in-out 0.3s !default;
 
         @at-root .psv--has-navbar & {
             height: calc(100% - #{$psv-navbar-height} - #{$psv-plan-margin * 2}) !important;
+        }
+
+        @media screen and (width < 500px) {
+            margin: 0;
+            width: 100% !important;
+            height: 100% !important;
+            max-width: none;
+            max-height: none;
+            border-radius: 0;
+
+            @at-root .psv--has-navbar & {
+                margin-bottom: $psv-navbar-height;
+                height: calc(100% - #{$psv-navbar-height}) !important;
+                max-height: calc(100% - #{$psv-navbar-height});
+            }
         }
     }
 
