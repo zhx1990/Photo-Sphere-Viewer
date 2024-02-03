@@ -352,8 +352,8 @@ export class CubemapTilesAdapter extends AbstractAdapter<
                     this.viewer.needsUpdate();
                 }
             })
-            .catch(() => {
-                if (!task.isCancelled() && this.config.showErrorTile) {
+            .catch((err) => {
+                if (!utils.isAbortError(err) && !task.isCancelled() && this.config.showErrorTile) {
                     if (!this.state.errorMaterial) {
                         this.state.errorMaterial = buildErrorMaterial();
                     }

@@ -365,13 +365,14 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
         this.config.description = options.description;
 
         const done = (err?: Error) => {
-            this.loader.hide();
-
-            this.state.loadingPromise = null;
-
             if (isAbortError(err)) {
                 return false;
-            } else if (err) {
+            }
+
+            this.loader.hide();
+            this.state.loadingPromise = null;
+
+            if (err) {
                 this.navbar.setCaption('');
                 this.showError(this.config.lang.loadError);
                 console.error(err);

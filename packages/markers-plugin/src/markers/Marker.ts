@@ -55,8 +55,8 @@ export abstract class Marker {
     };
 
     constructor(
-        protected readonly viewer: Viewer,
-        protected readonly plugin: MarkersPlugin,
+        protected viewer: Viewer,
+        protected plugin: MarkersPlugin,
         config: MarkerConfig
     ) {
         if (!config.id) {
@@ -86,6 +86,9 @@ export abstract class Marker {
      * @internal
      */
     destroy() {
+        delete this.viewer;
+        delete this.plugin;
+
         this.hideTooltip();
     }
 

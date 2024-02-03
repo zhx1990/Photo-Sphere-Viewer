@@ -1,15 +1,18 @@
-import { FileLoader, ImageLoader } from 'three';
 import { PSVError } from '../PSVError';
 import type { Viewer } from '../Viewer';
 import { Cache } from '../data/cache';
 import { AbstractService } from './AbstractService';
+import { BlobLoader } from '../lib/BlobLoader';
+import { ImageLoader } from '../lib/ImageLoader';
 
 /**
  * Image and texture loading system
  */
 export class TextureLoader extends AbstractService {
-    private readonly fileLoader: FileLoader;
+    private readonly fileLoader: BlobLoader;
     private readonly imageLoader: ImageLoader;
+
+    private abortCtrl: Record<string, AbortController> = {};
 
     /**
      * @internal
@@ -17,9 +20,7 @@ export class TextureLoader extends AbstractService {
     constructor(viewer: Viewer) {
         super(viewer);
 
-        this.fileLoader = new FileLoader();
-        this.fileLoader.setResponseType('blob');
-
+        this.fileLoader = new BlobLoader();
         this.imageLoader = new ImageLoader();
 
         if (this.config.withCredentials) {
@@ -41,7 +42,8 @@ export class TextureLoader extends AbstractService {
      * @internal
      */
     abortLoading() {
-        // noop implementation waiting for https://github.com/mrdoob/three.js/pull/23070
+        Object.values(this.abortCtrl).forEach((ctrl) => ctrl.abort());
+        this.abortCtrl = {};
     }
 
     /**
@@ -73,8 +75,8 @@ export class TextureLoader extends AbstractService {
                 (result) => {
                     progress = 100;
                     onProgress?.(progress);
-                    Cache.add(url, cacheKey, result as any);
-                    resolve(result as any);
+                    Cache.add(url, cacheKey, result);
+                    resolve(result);
                 },
                 (e) => {
                     if (e.lengthComputable) {
@@ -87,7 +89,8 @@ export class TextureLoader extends AbstractService {
                 },
                 (err) => {
                     reject(err);
-                }
+                },
+                this.__getAbortSignal(cacheKey)
             );
         });
     }
@@ -109,9 +112,18 @@ export class TextureLoader extends AbstractService {
         }
 
         if (!onProgress && !this.config.requestHeaders) {
-            return this.imageLoader.loadAsync(url).then((result) => {
-                Cache.add(url, cacheKey, result);
-                return result;
+            return new Promise((resolve, reject) => {
+                this.imageLoader.load(
+                    url,
+                    (result) => {
+                        Cache.add(url, cacheKey, result);
+                        resolve(result);
+                    },
+                    (err) => {
+                        reject(err);
+                    },
+                    this.__getAbortSignal(cacheKey)
+                );
             });
         } else {
             return this.loadFile(url, onProgress, cacheKey).then((blob) => this.blobToImage(blob));
@@ -138,9 +150,27 @@ export class TextureLoader extends AbstractService {
      */
     preloadPanorama(panorama: any): Promise<unknown> {
         if (this.viewer.adapter.supportsPreload(panorama)) {
-            return this.viewer.adapter.loadTexture(panorama);
+            return this.viewer.adapter.loadTexture(panorama, false);
         } else {
             return Promise.reject(new PSVError('Current adapter does not support preload'));
         }
     }
+
+    /**
+     * Get an abort signal
+     * the signal is shared accross all requests with the same cache key (for tiles adapters)
+     */
+    private __getAbortSignal(cacheKey: string): AbortSignal {
+        if (cacheKey) {
+            if (this.abortCtrl[cacheKey]?.signal.aborted) {
+                delete this.abortCtrl[cacheKey];
+            }
+            if (!this.abortCtrl[cacheKey]) {
+                this.abortCtrl[cacheKey] = new AbortController();
+            }
+            return this.abortCtrl[cacheKey].signal;
+        }
+        return null;
+    }
+
 }

@@ -177,6 +177,10 @@ export class Marker3D extends Marker {
                     material.alpha = 0;
 
                     video.addEventListener('loadedmetadata', () => {
+                        if (!this.viewer) {
+                            return; // the marker has been removed
+                        }
+
                         material.alpha = this.config.opacity;
 
                         if (!utils.isExtendedPosition(this.config.position)) {
@@ -200,6 +204,10 @@ export class Marker3D extends Marker {
                     material.alpha = 0;
 
                     this.viewer.textureLoader.loadImage(this.config.imageLayer).then((image) => {
+                        if (!this.viewer) {
+                            return; // the marker has been removed
+                        }
+
                         if (!utils.isExtendedPosition(this.config.position)) {
                             mesh.material.userData[MARKER_DATA] = { width: image.width, height: image.height };
                             this.__setTextureWrap(material);
