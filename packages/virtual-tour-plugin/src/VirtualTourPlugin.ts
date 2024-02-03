@@ -310,6 +310,10 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             throw new PSVError('Cannot set nodes in server side mode');
         }
 
+        this.state.currentTooltip?.hide();
+        this.state.currentTooltip = null;
+        this.state.currentNode = null;
+
         (this.datasource as ClientSideDatasource).setNodes(nodes);
 
         if (!startNodeId) {
@@ -318,7 +322,6 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             startNodeId = nodes[0].id;
             utils.logWarn(`startNodeId not found is provided nodes, resetted to ${startNodeId}`);
         }
-
         this.setCurrentNode(startNodeId);
 
         if (this.gallery) {
