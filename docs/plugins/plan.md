@@ -35,7 +35,6 @@ Do not forget to import Leaflet JS and CSS files.
 
 ```yaml
 title: PSV Plan Demo
-version: 5.7.0-alpha.1
 packages:
     - name: plan-plugin
       imports: PlanPlugin
@@ -62,7 +61,6 @@ const viewer = new Viewer({
     loadingImg: baseUrl + 'loader.gif',
     touchmoveTwoFingers: true,
     mousewheelCtrlKey: true,
-    defaultYaw: '-10deg',
 
     plugins: [
         [PlanPlugin, {

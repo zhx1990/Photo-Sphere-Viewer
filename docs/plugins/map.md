@@ -56,7 +56,6 @@ const viewer = new Viewer({
     loadingImg: baseUrl + 'loader.gif',
     touchmoveTwoFingers: true,
     mousewheelCtrlKey: true,
-    defaultYaw: '-10deg',
 
     plugins: [
         [MapPlugin, {
