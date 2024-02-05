@@ -1,16 +1,17 @@
-import type { Viewer } from '@photo-sphere-viewer/core';
+import type { Position, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractComponent, CONSTANTS, utils } from '@photo-sphere-viewer/core';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
-import { Control, DivIcon, Icon, Layer, Map, Marker, TileLayer } from 'leaflet';
+import { Control, Layer, Map, Marker, TileLayer } from 'leaflet';
+import { MathUtils } from 'three';
 import type { PlanPlugin } from '../PlanPlugin';
 import { HOTSPOT_MARKER_ID, OSM_ATTRIBUTION, OSM_LABEL, OSM_URL } from '../constants';
 import { SelectHotspot } from '../events';
 import { PlanHotspot } from '../model';
 import { createLeafletIcon, getStyle, gpsToLeaflet } from '../utils';
 import { PlanCloseButton } from './PlanCloseButton';
+import { PlanLayersButton } from './PlanLayersButton';
 import { PlanMaximizeButton } from './PlanMaximizeButton';
 import { PlanResetButton } from './PlanResetButton';
-import { PlanLayersButton } from './PlanLayersButton';
 
 export class PlanComponent extends AbstractComponent {
     protected override readonly state = {
@@ -217,6 +218,16 @@ export class PlanComponent extends AbstractComponent {
     }
 
     /**
+     * Rotates the central pin
+     */
+    updateBearing(position: Position = this.viewer.getPosition()) {
+        if (this.state.pinMarker) {
+            const elt = this.state.pinMarker.getElement().firstElementChild as HTMLElement;
+            elt.style.rotate = MathUtils.radToDeg(position.yaw + this.config.bearing) + 'deg';
+        }
+    }
+
+    /**
      * Changes the base layer
      */
     setLayer(name: string) {
@@ -237,18 +248,20 @@ export class PlanComponent extends AbstractComponent {
     }
 
     /**
-     * Moves the position min and resets the map position
+     * Moves the position pin and resets the map position
      */
     recenter() {
         const pos = gpsToLeaflet(this.config.coordinates);
 
         if (!this.state.pinMarker) {
-            const icon = createLeafletIcon(this.config.pinImage, this.config.pinSize);
+            const icon = createLeafletIcon(this.config.pinImage, this.config.pinSize, 'psv-plan__pin');
 
             this.state.pinMarker = new Marker(pos, {
                 icon,
                 alt: '',
             }).addTo(this.map);
+
+            this.updateBearing();
         } else {
             this.state.pinMarker.setLatLng(pos);
         }
@@ -342,12 +355,7 @@ export class PlanComponent extends AbstractComponent {
         hotspots.forEach((hotspot) => {
             const style = getStyle(this.config.spotStyle, hotspot, false);
 
-            let icon: Icon<any>;
-            if (style.image) {
-                icon = createLeafletIcon(style.image, style.size);
-            } else {
-                icon = new DivIcon({ html: '', className: 'psv-plan__spot' });
-            }
+            const icon = createLeafletIcon(style.image || '', style.size, 'psv-plan__spot');
 
             const marker = new Marker(gpsToLeaflet(hotspot.coordinates), {
                 icon,
@@ -370,7 +378,11 @@ export class PlanComponent extends AbstractComponent {
             marker.on('mouseover', () => this.setActiveHotspot(hotspot.id));
             marker.on('mouseout', () => this.setActiveHotspot(null));
 
-            this.state.hotspots[hotspot.id] = { hotspot, marker, isMarker: isMarkers };
+            this.state.hotspots[hotspot.id] = {
+                hotspot,
+                marker,
+                isMarker: isMarkers,
+            };
 
             this.__applyStyle(hotspot.id, false);
         });
@@ -394,13 +406,13 @@ export class PlanComponent extends AbstractComponent {
         element.style.marginTop = (-style.size / 2) + 'px';
         element.style.marginLeft = (-style.size / 2) + 'px';
 
-        if (element.tagName === 'DIV') {
+        if (!style.image) {
             element.style.backgroundColor = style.color;
             element.style.outlineStyle = 'solid';
             element.style.outlineColor = style.borderColor;
             element.style.outlineWidth = style.borderSize + 'px';
         } else {
-            (element as HTMLImageElement).src = style.image;
+            (element.firstElementChild as HTMLImageElement).src = style.image;
         }
     }
 

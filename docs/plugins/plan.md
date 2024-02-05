@@ -124,6 +124,14 @@ const viewer = new Viewer({
 
 GPS position of the panorama (longitude, latitude). You can also use `setCoordinates()` method.
 
+#### `bearing`
+
+-   type: `number | string`
+-   default: `0`
+-   updatable: yes
+
+Rotation offset to apply to the central pin to make it match with the panorama orientation.
+
 #### `layers`
 
 -   type: `array`

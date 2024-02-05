@@ -10,6 +10,7 @@ import { GpsPosition, ParsedPlanPluginConfig, PlanHotspot, PlanPluginConfig, Upd
 const getConfig = utils.getConfigParser<PlanPluginConfig>(
     {
         coordinates: null,
+        bearing: 0,
         size: { width: '300px', height: '200px' },
         position: ['bottom', 'left'],
         visibleOnLoad: true,
@@ -44,6 +45,7 @@ const getConfig = utils.getConfigParser<PlanPluginConfig>(
         position: (position, { defValue }) => {
             return utils.cleanCssPosition(position, { allowCenter: false, cssOrder: true }) || defValue;
         },
+        bearing: (bearing) => utils.parseAngle(bearing),
         buttons: (buttons, { defValue }) => ({ ...defValue, ...buttons }),
     }
 );
@@ -87,6 +89,7 @@ export class PlanPlugin extends AbstractConfigurablePlugin<
 
         this.markers = this.viewer.getPlugin('markers');
 
+        this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
         this.viewer.addEventListener(events.ReadyEvent.type, this, { once: true });
         this.markers?.addEventListener('set-markers', this);
 
@@ -97,6 +100,7 @@ export class PlanPlugin extends AbstractConfigurablePlugin<
      * @internal
      */
     override destroy() {
+        this.viewer.removeEventListener(events.PositionUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.ReadyEvent.type, this);
         this.markers?.removeEventListener('set-markers', this);
 
@@ -113,6 +117,9 @@ export class PlanPlugin extends AbstractConfigurablePlugin<
             case events.ReadyEvent.type:
                 this.component.show();
                 break;
+            case events.PositionUpdatedEvent.type:
+                this.component.updateBearing((e as events.PositionUpdatedEvent).position);
+                break;
             case 'set-markers':
                 this.component.setMarkers(this.__markersToHotspots((e as markersEvents.SetMarkersEvent).markers));
                 break;
@@ -126,6 +133,9 @@ export class PlanPlugin extends AbstractConfigurablePlugin<
 
         if (options.coordinates) {
             this.component.recenter();
+        }
+        if (!utils.isNil(options.bearing)) {
+            this.component.updateBearing();
         }
         if (options.pinImage || options.pinSize) {
             this.component.updatePin();

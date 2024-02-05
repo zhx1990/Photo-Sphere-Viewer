@@ -1,26 +1,17 @@
-import { DivIcon, Icon, LatLngLiteral } from 'leaflet';
+import { DivIcon, LatLngLiteral } from 'leaflet';
 import { GpsPosition, PlanHotspotStyle } from './model';
 
 export function gpsToLeaflet(gps: GpsPosition): LatLngLiteral {
     return { lng: gps[0], lat: gps[1], alt: gps[2] };
 }
 
-export function createLeafletIcon(src: string, size: number): Icon<any> {
-    if (src.includes('<svg')) {
-        return new DivIcon({
-            html: src,
-            iconSize: [size, size],
-            iconAnchor: [size / 2, size / 2],
-            className: 'psv-plan__pin',
-        });
-    } else {
-        return new Icon({
-            iconUrl: src,
-            iconSize: [size, size],
-            iconAnchor: [size / 2, size / 2],
-            className: 'psv-plan__pin',
-        });
-    }
+export function createLeafletIcon(src: string, size: number, className: string): DivIcon {
+    return new DivIcon({
+        html: src && !src.includes('<svg')  ? `<img src="${src}" style="width: 100%; height: 100%">` : src,
+        iconSize: [size, size],
+        iconAnchor: [size / 2, size / 2],
+        className,
+    });
 }
 
 export function getStyle(defaultStyle: PlanHotspotStyle, style: PlanHotspotStyle, isHover: boolean) {

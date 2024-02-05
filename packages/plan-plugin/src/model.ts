@@ -79,6 +79,12 @@ export type PlanPluginConfig = {
     coordinates?: GpsPosition;
 
     /**
+     * Rotation offset to apply to the central pin
+     * @default 0
+     */
+    bearing?: string | number;
+
+    /**
      * Size of the map
      * @default '300px * 200px'
      */
@@ -147,8 +153,9 @@ export type PlanPluginConfig = {
     };
 };
 
-export type ParsedPlanPluginConfig = Omit<PlanPluginConfig, 'position'> & {
+export type ParsedPlanPluginConfig = Omit<PlanPluginConfig, 'position' | 'bearing'> & {
     position: [string, string];
+    bearing: number;
 };
 
 export type UpdatablePlanPluginConfig = Omit<
