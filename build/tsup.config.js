@@ -35,11 +35,11 @@ ${
         return {
             entryPoints: [pkg.main],
             outDir: 'dist',
-            format: dev ? ['esm'] : ['iife', 'esm'],
+            format: dev ? ['esm'] : ['iife', 'esm', 'cjs'],
             globalName: pkg.psv.globalName,
             outExtension({ format }) {
                 return {
-                    js: format === 'iife' ? '.js' : '.module.js',
+                    js: { iife: '.js', cjs: '.cjs', esm: '.module.js' }[format],
                 };
             },
             dts: dts,

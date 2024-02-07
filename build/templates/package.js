@@ -4,7 +4,7 @@ export const packageJson = (pkg) =>
 
         const content = {
             ...pkg,
-            main: 'index.js',
+            main: 'index.cjs',
             module: 'index.module.js',
             types: 'index.d.ts',
             license: 'MIT',
