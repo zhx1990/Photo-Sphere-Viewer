@@ -50,6 +50,8 @@ function wrapUmd(fileContent, pkg, externals) {
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(${globalExport}, ${depsGlobal}));
 })(this, (function (exports, ${depsParams}) {
 
+console.warn('PhotoSphereViewer "index.js" scripts are deprecated and will be removed in a future version. Please use ES Modules: https://photo-sphere-viewer.js.org/guide/#your-first-viewer');
+
 ${fileContent
     // remove iife assignation
     .replace(`var ${globalParent};\n`, '')
@@ -88,7 +90,7 @@ ${fileContent
 function shiftMap(fileContent, pkg, mapContent) {
     // prettier-ignore
     const offset =
-        6 /* header */
+        8 /* header */
         - 1 - (pkg.psv.globalName.includes('.') ? 1 : 0) /* iife */
         - 10  - (fileContent.match(/__publicField\(/) ? 5 : 0) /* unused functions */ 
         - 4 * fileContent.match(/__commonJS\({/g).length; /* imports */
