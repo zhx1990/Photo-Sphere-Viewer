@@ -18,6 +18,8 @@ describe('UMD', () => {
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory((global.PhotoSphereViewer = global.PhotoSphereViewer || {}, global.PhotoSphereViewer.Shared = {}), global.THREE, global.PhotoSphereViewer));
 })(this, (function (exports, THREE, PhotoSphereViewer) {
 
+console.warn('PhotoSphereViewer "index.js" scripts are deprecated and will be removed in a future version. Please use ES Modules: https://photo-sphere-viewer.js.org/guide/#your-first-viewer');
+
 /*!
  * PhotoSphereViewer.Shared ${pkg.version}
  * @copyright ${new Date().getFullYear()} Damien "Mistic" Sorel
