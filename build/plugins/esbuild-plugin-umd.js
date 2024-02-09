@@ -5,6 +5,10 @@ export function umdPlugin({ pkg, externals }) {
     return {
         name: 'umd',
         setup(build) {
+            if (build.initialOptions.format !== 'iife') {
+                return;
+            }
+
             build.onEnd((result) => {
                 const iifeFile = result.outputFiles.find((f) => f.path.endsWith('index.js'));
                 const mapFile = result.outputFiles.find((f) => f.path.endsWith('index.js.map'));

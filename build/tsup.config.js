@@ -4,7 +4,7 @@ import { defineConfig } from 'tsup';
 import { assetsPlugin } from './plugins/esbuild-plugin-assets';
 import { scssBundlePlugin } from './plugins/esbuild-plugin-scss-bundle';
 import { umdPlugin } from './plugins/esbuild-plugin-umd';
-import { cssMapPlugin } from './plugins/esbuild-plugin-css-map';
+import { mapFixPlugin } from './plugins/esbuild-plugin-map-fix';
 import { license } from './templates/license';
 import { npmrc } from './templates/npmrc';
 import { packageJson } from './templates/package';
@@ -54,7 +54,7 @@ ${
                 sassPlugin(),
                 externalGlobalPlugin(externals),
                 umdPlugin({ pkg, externals }),
-                cssMapPlugin(),
+                mapFixPlugin(),
                 ...(dev
                     ? []
                     : [
