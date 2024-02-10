@@ -95,10 +95,10 @@ export class Loader extends AbstractComponent {
             inner = document.createElement('img');
             inner.className = 'psv-loader-image';
             inner.src = this.viewer.config.loadingImg;
-        } else if (this.viewer.config.loadingTxt) {
+        } else if (this.viewer.config.loadingTxt !== null) {
             inner = document.createElement('div');
             inner.className = 'psv-loader-text';
-            inner.innerHTML = this.viewer.config.loadingTxt;
+            inner.innerHTML = this.viewer.config.loadingTxt || this.viewer.config.lang.loading;
         }
         if (inner) {
             const size = Math.round(Math.sqrt(2 * Math.pow(this.size / 2 - this.thickness / 2 - this.border, 2)));

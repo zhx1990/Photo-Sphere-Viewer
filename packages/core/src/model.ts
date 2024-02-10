@@ -346,23 +346,7 @@ export type ViewerConfig = {
     withCredentials?: boolean;
     /** @default 'zoom move download description caption fullscreen' */
     navbar?: boolean | string | Array<string | NavbarCustomButton>;
-    lang?: {
-        zoom: string;
-        zoomOut: string;
-        zoomIn: string;
-        moveUp: string;
-        moveDown: string;
-        moveLeft: string;
-        moveRight: string;
-        download: string;
-        fullscreen: string;
-        menu: string;
-        close: string;
-        twoFingers: string;
-        ctrlZoom: string;
-        loadError: string;
-        [K: string]: string;
-    };
+    lang?: Record<string, string>;
     keyboard?: boolean | 'always' | 'fullscreen' | Record<string, ACTIONS | ((viewer: Viewer) => void)>;
     keyboardActions?: Record<string, ACTIONS | ((viewer: Viewer) => void)>;
 };

@@ -134,8 +134,10 @@ lang: {
   moveDown: 'Move down',
   moveLeft: 'Move left',
   moveRight: 'Move right',
+  description: 'Description',
   download: 'Download',
   fullscreen: 'Fullscreen',
+  loading: 'Loading...',
   menu: 'Menu',
   close: 'Close',
   twoFingers: 'Use two fingers to navigate',
@@ -155,7 +157,7 @@ Path to an image displayed in the center of the loader.
 #### `loadingTxt`
 
 -   type: `string`
--   default: `'Loading...'`
+-   default: `lang.loading`
 
 Text displayed in the center of the loader, only used if `loadingImg` is not provided.
 

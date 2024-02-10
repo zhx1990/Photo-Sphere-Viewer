@@ -20,7 +20,7 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
     downloadUrl: null,
     downloadName: null,
     loadingImg: null,
-    loadingTxt: 'Loading...',
+    loadingTxt: '', // empty string => `lang.loading`
     size: null,
     fisheye: 0,
     minFov: 30,
@@ -57,8 +57,10 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
         moveDown: 'Move down',
         moveLeft: 'Move left',
         moveRight: 'Move right',
+        description: 'Description',
         download: 'Download',
         fullscreen: 'Fullscreen',
+        loading: 'Loading...',
         menu: 'Menu',
         close: 'Close',
         twoFingers: 'Use two fingers to navigate',
@@ -146,10 +148,6 @@ export const CONFIG_PARSERS: ConfigParsers<ViewerConfig, ParsedViewerConfig> = {
         return MathUtils.clamp(maxFov, 1, 179);
     },
     lang: (lang) => {
-        if (Array.isArray(lang.twoFingers)) {
-            logWarn('lang.twoFingers must not be an array');
-            lang.twoFingers = lang.twoFingers[0];
-        }
         return {
             ...DEFAULTS.lang,
             ...lang,

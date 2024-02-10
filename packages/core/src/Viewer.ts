@@ -384,7 +384,7 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
             }
         };
 
-        this.navbar.setCaption(`<em>${this.config.loadingTxt || ''}</em>`);
+        this.navbar.setCaption(`<em>${this.config.lang.loading}</em>`);
         if (options.showLoader || !this.state.ready) {
             this.loader.show();
         }
