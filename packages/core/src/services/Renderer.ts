@@ -1,5 +1,6 @@
 import {
     Box3,
+    ColorManagement,
     Euler,
     Frustum,
     Group,
@@ -32,6 +33,9 @@ import { PanoData, PanoramaOptions, Point, SphereCorrection, TextureData } from 
 import { Animation, isNil } from '../utils';
 import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
+
+// https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791
+ColorManagement.enabled = false;
 
 const vector2 = new Vector2();
 const matrix4 = new Matrix4();

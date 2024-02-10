@@ -1,6 +1,8 @@
 import { Cache as ThreeCache } from 'three';
 import { logWarn } from '../utils';
 
+ThreeCache.enabled = false;
+
 export const Cache = {
     enabled: true,
 
