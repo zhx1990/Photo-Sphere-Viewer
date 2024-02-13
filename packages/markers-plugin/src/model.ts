@@ -95,6 +95,10 @@ export type MarkerConfig = {
      */
     size?: Size;
     /**
+     * Rotation applied to the marker (ignored for `polygon` and `polyline`)
+     */
+    rotation?: string | number;
+    /**
      * Applies a perspective on the image to make it look like placed on the floor or on a wall (only for `imageLayer`)
      */
     orientation?: 'front' | 'horizontal' | 'vertical-left' | 'vertical-right';
@@ -185,7 +189,8 @@ export type MarkerConfig = {
     data?: any;
 };
 
-export type ParsedMarkerConfig = Omit<MarkerConfig, 'scale' | 'tooltip' | 'hoverScale'> & {
+export type ParsedMarkerConfig = Omit<MarkerConfig, 'rotation' | 'scale' | 'tooltip' | 'hoverScale'> & {
+    rotation?: number;
     scale?:
         | { zoom?: [number, number]; yaw?: [number, number] }
         | ((zoomLevel: number, position: Position) => number);

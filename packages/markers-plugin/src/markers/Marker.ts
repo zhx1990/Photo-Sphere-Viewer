@@ -159,6 +159,9 @@ export abstract class Marker {
         if (utils.isNil(this.config.opacity)) {
             this.config.opacity = 1;
         }
+        if (!utils.isNil(this.config.rotation)) {
+            this.config.rotation = utils.parseAngle(this.config.rotation);
+        }
 
         this.state.anchor = utils.parsePoint(this.config.anchor);
     }

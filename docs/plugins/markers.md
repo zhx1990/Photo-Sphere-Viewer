@@ -340,6 +340,14 @@ Size of the marker in pixels.
 
 _(This option is ignored for polygons and polylines)._
 
+#### `rotation`
+
+-   type: `string | number`
+
+Rotation applied to the marker, in degrees or radians.
+
+_(This option is ignored for polygons and polylines)._
+
 #### `orientation` (only for `imageLayer`, `videoLayer`)
 
 -   type: `'front' | 'horizontal' | 'vertical-left' | 'vertical-right'`

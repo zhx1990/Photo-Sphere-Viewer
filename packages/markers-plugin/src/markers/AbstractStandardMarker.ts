@@ -101,6 +101,10 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
                 ...this.config.hoverScale,
             };
         }
+
+        if (!utils.isNil(this.config.rotation)) {
+            element.style.rotate = MathUtils.radToDeg(this.config.rotation) + 'deg';
+        }
     }
 
     /**
