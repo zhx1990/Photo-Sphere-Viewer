@@ -106,7 +106,7 @@ export class Marker3D extends Marker {
             this.state.size = this.config.size;
 
             mesh.position.set(0.5 - this.state.anchor.x, this.state.anchor.y - 0.5, 0);
-            mesh.rotation.set(0, 0, -this.config.rotation ?? 0);
+            mesh.rotation.set(0, 0, -(this.config.rotation ?? 0));
             this.viewer.dataHelper.sphericalCoordsToVector3(this.state.position, group.position);
 
             group.lookAt(0, group.position.y, 0);
@@ -193,6 +193,8 @@ export class Marker3D extends Marker {
                     video.play();
 
                     this.definition = this.config.videoLayer;
+                } else {
+                    material.alpha = this.config.opacity;
                 }
                 break;
 
@@ -223,6 +225,8 @@ export class Marker3D extends Marker {
                     });
 
                     this.definition = this.config.imageLayer;
+                } else {
+                    material.alpha = this.config.opacity;
                 }
                 break;
 
