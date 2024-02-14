@@ -66,6 +66,7 @@ const viewer = new Viewer({
         [PlanPlugin, {
             defaultZoom: 14,
             coordinates: [6.78677, 44.58241],
+            bearing: '120deg',
             layers: [
                 {
                     name: 'OpenStreetMap',
