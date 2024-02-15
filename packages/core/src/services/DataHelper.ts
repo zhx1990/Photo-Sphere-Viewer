@@ -262,7 +262,10 @@ export class DataHelper extends AbstractService {
      * Converts pixel position to angles if present and ensure boundaries
      */
     cleanPosition(position: ExtendedPosition): Position {
-        if ('yaw' in position && 'pitch' in position) {
+        if ('yaw' in position || 'pitch' in position) {
+            if (!('yaw' in position) || !('pitch' in position)) {
+                throw new PSVError(`Position is missing 'yaw' or 'pitch'`);
+            }
             return {
                 yaw: parseAngle(position.yaw),
                 pitch: parseAngle(position.pitch, !this.state.littlePlanet),
