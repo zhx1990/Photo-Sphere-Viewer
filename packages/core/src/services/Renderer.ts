@@ -232,9 +232,9 @@ export class Renderer extends AbstractService {
         this.viewer.dynamics.update(elapsed);
 
         if (this.state.needsUpdate || this.state.continuousUpdateCount > 0) {
+            this.state.needsUpdate = false;
             (this.customRenderer || this.renderer).render(this.scene, this.camera);
             this.viewer.dispatchEvent(new RenderEvent());
-            this.state.needsUpdate = false;
         }
     }
 

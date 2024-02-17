@@ -128,7 +128,7 @@ export type PanoramaOptions = {
      */
     zoom?: number;
     /**
-     * enable transition between old and new panorama
+     * enable transition (rotation + fading) between old and new panorama
      * @default true
      */
     transition?: boolean | 'fade-only';
