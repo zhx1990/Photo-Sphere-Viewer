@@ -3,6 +3,7 @@ import { AdapterConstructor } from './adapters/AbstractAdapter';
 import { ACTIONS } from './data/constants';
 import { PluginConstructor } from './plugins/AbstractPlugin';
 import { Viewer } from './Viewer';
+import { AnimationOptions } from './utils';
 
 /**
  * A wrapper around a Promise with an initial value before resolution
@@ -84,6 +85,11 @@ export type AnimateOptions = Partial<ExtendedPosition> & {
      * New zoom level between 0 and 100
      */
     zoom?: number;
+    /**
+     * Easing function used for the animation
+     * @default 'inOutSine'
+     */
+    easing?: AnimationOptions<any>['easing'];
 };
 
 /**
