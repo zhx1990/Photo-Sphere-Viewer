@@ -28,7 +28,7 @@ export function distance(p1: Point, p2: Point): number {
 }
 
 /**
- * Computes the angle wet ween two points
+ * Computes the angle between two points
  */
 export function angle(p1: Point, p2: Point): number {
     return Math.atan2(p2.y - p1.y, p2.x - p1.x);

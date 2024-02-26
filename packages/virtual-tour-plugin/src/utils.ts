@@ -1,20 +1,6 @@
 import { Position, utils } from '@photo-sphere-viewer/core';
-import { BufferGeometry, MathUtils, Mesh, MeshBasicMaterial, MeshLambertMaterial } from 'three';
+import { MathUtils } from 'three';
 import { GpsPosition } from './model';
-
-/**
- * Changes the color of a mesh
- */
-export function setMeshColor(mesh: Mesh<BufferGeometry, MeshBasicMaterial | MeshLambertMaterial>, color: string) {
-    mesh.material.color.set(color);
-}
-
-/**
- * Returns the distance between two GPS points
- */
-export function gpsDistance(gps1: GpsPosition, gps2: GpsPosition): number {
-    return distance(gpsDegToRad(gps1), gpsDegToRad(gps2));
-}
 
 /**
  * Returns the difference between two WS84 GPS points as yaw+pitch on the viewer
@@ -57,4 +43,19 @@ function bearing(p1: [number, number], p2: [number, number]): number {
     const y = Math.sin(long2 - long1) * Math.cos(lat2);
     const x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(long2 - long1);
     return Math.atan2(y, x);
+}
+
+/**
+ * @deprecated
+ */
+export function checkArrowStyle(style: any): any {
+    if (style && ['color', 'hoverColor', 'outlineColor'].some(key => key in style)) {
+        utils.logWarn(`VirtualTourPlugin: "arrowStyle" does not support color, hoverColor, outlineColor anymore`);
+        return undefined;
+    }
+    if (style && typeof style.size === 'number') {
+        utils.logWarn(`VirtualTourPlugin: "arrowStyle.size" must be an object (width + height, in pixels)`);
+        delete style.size;
+    }
+    return style;
 }

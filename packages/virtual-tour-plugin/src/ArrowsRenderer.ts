@@ -1,137 +1,248 @@
-import { CONSTANTS, CustomRenderer, Position, Viewer } from '@photo-sphere-viewer/core';
-import {
-    AmbientLight,
-    BackSide,
-    Camera,
-    Group,
-    Intersection,
-    MathUtils,
-    Mesh,
-    MeshBasicMaterial,
-    MeshLambertMaterial,
-    PerspectiveCamera,
-    PointLight,
-    REVISION,
-    Raycaster,
-    Scene,
-    Vector2,
-    WebGLRenderer,
-} from 'three';
-import type { VirtualTourPlugin } from './VirtualTourPlugin';
-import { ARROW_GEOM, ARROW_OUTLINE_GEOM, LINK_DATA } from './constants';
-import { VirtualTourLink } from './model';
-import { setMeshColor } from './utils';
+import { AbstractComponent, events, Position, utils, type Viewer } from '@photo-sphere-viewer/core';
+import { MathUtils, PerspectiveCamera, Scene } from 'three';
+import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
+import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
+import { LINK_DATA } from './constants';
+import { VirtualTourArrowStyle, VirtualTourLink } from './model';
+import { checkArrowStyle } from './utils';
+import { type VirtualTourPlugin } from './VirtualTourPlugin';
 
-// https://discourse.threejs.org/t/updates-to-lighting-in-three-js-r155/53733
-const LIGHT_INTENSITY = parseInt(REVISION) >= 155 ? Math.PI : 1;
+const ARROW_DATA = 'arrow';
+
+type ArrowData = {
+    yaw: number;
+    conflict: boolean;
+}
 
 /**
- * Custom renderer to draw the arrows atop the panorama, without being impacted by the zoom level
+ * @internal
  */
-export class ArrowsRenderer implements CustomRenderer {
-    private renderer: WebGLRenderer;
+export class ArrowsRenderer extends AbstractComponent {
 
-    private readonly camera: PerspectiveCamera;
-    private readonly scene: Scene;
-    private readonly group: Group;
+    private renderer: CSS3DRenderer | CSS2DRenderer;
+    private scene: Scene;
+    private camera: PerspectiveCamera;
 
-    constructor(
-        private viewer: Viewer,
-        private plugin: VirtualTourPlugin
-    ) {
-        this.camera = new PerspectiveCamera(50, 16 / 9, 0.1, 2 * CONSTANTS.SPHERE_RADIUS);
+    get is3D() {
+        return this.plugin.is3D;
+    }
+
+    get arrowsPosition() {
+        return this.plugin.config.arrowsPosition;
+    }
+
+    get arrowStyle() {
+        return this.plugin.config.arrowStyle;
+    }
+
+    constructor(parent: Viewer, private plugin: VirtualTourPlugin) {
+        super(parent, {
+            className: 'psv-virtual-tour-arrows',
+        });
+
+        this.renderer = this.is3D ? new CSS3DRenderer({
+            element: this.container,
+        }) : new CSS2DRenderer({
+            element: this.container,
+        });
+
+        this.camera = this.is3D ? new PerspectiveCamera(30, 1) : null;
         this.scene = new Scene();
 
-        const ambientLight = new AmbientLight(0xffffff, LIGHT_INTENSITY);
-        this.scene.add(ambientLight);
+        this.viewer.addEventListener(events.ReadyEvent.type, this, { once: true });
+        this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
+        this.viewer.addEventListener(events.SizeUpdatedEvent.type, this);
+        this.viewer.addEventListener(events.RenderEvent.type, this);
 
-        const localLight = new PointLight(0xffffff, LIGHT_INTENSITY, 0, 0);
-        localLight.position.set(0, 0, 0);
-        this.scene.add(localLight);
-
-        this.group = new Group();
-        this.scene.add(this.group);
-
-        // position the arrows slighly above/bellow the bottom/top of the viewer
-        let positionY = CONSTANTS.SPHERE_RADIUS * Math.atan(MathUtils.degToRad(this.camera.fov / 2)) - 1.5;
-        if (this.plugin.config.arrowPosition === 'bottom') {
-            positionY *= -1;
-        }
-        this.group.position.set(0, positionY, 0);
+        this.container.addEventListener('click', this);
+        this.container.addEventListener('mouseenter', this, true);
+        this.container.addEventListener('mouseleave', this, true);
+        this.container.addEventListener('mousemove', this, true);
     }
 
-    destroy() {
-        delete this.viewer;
-        delete this.plugin;
-        delete this.renderer;
+    override destroy(): void {
+        this.viewer.removeEventListener(events.ReadyEvent.type, this);
+        this.viewer.removeEventListener(events.PositionUpdatedEvent.type, this);
+        this.viewer.removeEventListener(events.SizeUpdatedEvent.type, this);
+        this.viewer.removeEventListener(events.RenderEvent.type, this);
+
+        super.destroy();
     }
 
-    withRenderer(renderer: WebGLRenderer) {
-        this.renderer = renderer;
-        return this;
-    }
-
-    updateCamera() {
-        this.camera.aspect = this.viewer.state.aspect;
-
-        // the camera rotate around the center of the sphere
-        this.camera.position.copy(this.viewer.state.direction).negate();
-        this.camera.lookAt(0, 0, 0);
-
-        this.camera.updateProjectionMatrix();
-    }
-
-    render(scene: Scene, camera: Camera) {
-        this.renderer.render(scene, camera);
-        this.renderer.autoClear = false;
-        this.renderer.clearDepth();
-        this.renderer.render(this.scene, this.camera);
-        this.renderer.autoClear = true;
-    }
-
-    getIntersections(raycaster: Raycaster, vector: Vector2): Array<Intersection<Mesh>> {
-        raycaster.setFromCamera(vector, this.camera);
-
-        return raycaster.intersectObjects(this.group.children);
-    }
-
-    clearArrows() {
-        this.group.clear();
-    }
-
-    addArrow(link: VirtualTourLink, position: Position, depth: number) {
-        const size = link.arrowStyle?.size || this.plugin.config.arrowStyle.size;
-
-        const mesh = new Mesh(ARROW_GEOM, new MeshLambertMaterial());
-        mesh.userData = { [LINK_DATA]: link };
-        mesh.renderOrder = 1000 + this.group.children.length;
-        mesh.scale.multiplyScalar(size);
-        mesh.rotation.order = 'YXZ';
-        mesh.rotateY(-position.yaw);
-        // 2 = base distance to center
-        this.viewer.dataHelper.sphericalCoordsToVector3(
-            { yaw: position.yaw, pitch: 0 },
-            mesh.position,
-            2 * depth * size
-        );
-
-        const outlineMesh = new Mesh(ARROW_OUTLINE_GEOM, new MeshBasicMaterial({ side: BackSide }));
-        outlineMesh.scale.copy(mesh.scale);
-        outlineMesh.position.copy(mesh.position);
-        outlineMesh.rotation.copy(mesh.rotation);
-
-        setMeshColor(mesh, link.arrowStyle?.color || this.plugin.config.arrowStyle.color);
-        setMeshColor(outlineMesh, link.arrowStyle?.outlineColor || this.plugin.config.arrowStyle.outlineColor);
-
-        this.group.add(mesh);
-        this.group.add(outlineMesh);
-
-        // arrows are renderer last and on top of their outline
-        // the depth buffer must be cleared only once
-        mesh.onBeforeRender = function (renderer) {
-            if (this.renderOrder === 1000) {
-                renderer.clearDepth();
+    handleEvent(e: Event) {
+        switch (e.type) {
+            case events.ReadyEvent.type:
+            case events.SizeUpdatedEvent.type:
+            case events.PositionUpdatedEvent.type:
+                this.__updateCamera();
+                break;
+            case events.RenderEvent.type:
+                this.render()
+                break;
+            case 'click': {
+                const link = this.getTargetLink(e.target as HTMLElement, true);
+                if (link) {
+                    this.plugin.setCurrentNode(link.nodeId, null, link);
+                }
+                break;
             }
-        };
+            case 'mouseenter': {
+                const link = this.getTargetLink(e.target as HTMLElement);
+                if (link) {
+                    this.plugin.__onEnterArrow(link, e as MouseEvent);
+                }
+                break;
+            }
+                break;
+            case 'mouseleave': {
+                const link = this.getTargetLink(e.target as HTMLElement);
+                if (link) {
+                    this.plugin.__onLeaveArrow(link);
+                }
+                break;
+            }
+                break;
+            case 'mousemove': {
+                const link = this.getTargetLink(e.target as HTMLElement, true);
+                if (link) {
+                    this.plugin.__onHoverArrow(e as MouseEvent);
+                }
+                break;
+            }
+                break;
+        }
     }
+
+    private __updateCamera() {
+        const size = this.viewer.getSize();
+        this.renderer.setSize(size.width, size.height);
+
+        if (this.is3D) {
+            const position = this.viewer.getPosition();
+            position.pitch = MathUtils.clamp(position.pitch, - this.arrowsPosition.maxPitch, -this.arrowsPosition.minPitch);
+
+            this.viewer.dataHelper.sphericalCoordsToVector3(
+                position,
+                this.camera.position,
+                size.height * 2
+            ).negate();
+
+            this.camera.lookAt(0, 0, 0);
+            this.camera.translateY(size.height / 3);
+            this.camera.updateProjectionMatrix();
+        }
+    }
+
+    render() {
+        if (this.is3D) {
+            const position = this.viewer.getPosition();
+
+            const objectsAndDist: Array<[CSS3DObject, number]> = [];
+            let minDist = Number.MAX_SAFE_INTEGER;
+            this.scene.children
+                .forEach((object) => {
+                    const data = object.userData[ARROW_DATA] as ArrowData;
+                    if (data.conflict) {
+                        const distance = Math.abs(utils.getShortestArc(position.yaw, data.yaw));
+                        minDist = Math.min(minDist, distance);
+                        objectsAndDist.push([object as CSS3DObject, distance]);
+                    }
+                });
+
+            objectsAndDist.forEach(([object, distance]) => {
+                const fade = distance !== minDist;
+                object.element.style.opacity = fade ? '0.5' : null;
+                object.element.style.zIndex = fade ? '-1' : null;
+            });
+
+            this.renderer.render(this.scene, this.camera);
+        } else {
+            this.renderer.render(this.scene, this.viewer.renderer.camera);
+        }
+    }
+
+    clear() {
+        this.scene.clear();
+    }
+
+    private __buildArrowElement(link: VirtualTourLink, style?: VirtualTourArrowStyle): HTMLElement {
+        if (style?.image) {
+            const image = document.createElement('img');
+            image.src = style.image;
+            return image;
+        } else if (style?.element) {
+            if (typeof style.element === 'function') {
+                return style.element(link);
+            } else {
+                return style.element;
+            }
+        }
+    }
+
+    addLinkArrow(link: VirtualTourLink, position: Position, depth = 1) {
+        let element = this.__buildArrowElement(link, link.arrowStyle);
+        if (!element) {
+            element = this.__buildArrowElement(link, this.arrowStyle);
+        }
+        (element as any)[LINK_DATA] = link;
+
+        const conf = {
+            ...this.arrowStyle,
+            ...checkArrowStyle(link.arrowStyle),
+        };
+
+        element.classList.add('psv-virtual-tour-link');
+        if (conf.className) {
+            utils.addClasses(element, conf.className);
+        }
+        if (conf.style) {
+            Object.assign(element.style, conf.style);
+        }
+
+        if (this.is3D) {
+            // 1.5 ratio is arbitrary
+            element.style.width = conf.size.width * 1.5 + 'px';
+            element.style.height = conf.size.height * 1.5 + 'px';
+
+            let conflict = false;
+            this.scene.children.forEach((object) => {
+                const data = object.userData[ARROW_DATA] as ArrowData;
+                if (Math.abs(utils.getShortestArc(data.yaw, position.yaw)) < this.arrowsPosition.linkOverlapAngle) {
+                    data.conflict = true;
+                    conflict = true;
+                }
+            });
+
+            const object = new CSS3DObject(element);
+            object.userData[ARROW_DATA] = { yaw: position.yaw, conflict } as ArrowData;
+
+            object.rotation.set(-Math.PI / 2, 0, Math.PI - position.yaw);
+
+            this.viewer.dataHelper.sphericalCoordsToVector3(
+                { yaw: position.yaw, pitch: 0 },
+                object.position,
+                depth * 100
+            );
+
+            this.scene.add(object);
+        } else {
+            element.style.width = conf.size.width + 'px';
+            element.style.height = conf.size.height + 'px';
+
+            const object = new CSS2DObject(element);
+
+            this.viewer.dataHelper.sphericalCoordsToVector3(
+                position,
+                object.position
+            );
+
+            this.scene.add(object);
+        }
+    }
+
+    private getTargetLink(target: HTMLElement, closest = false): VirtualTourLink {
+        const target2 = closest ? utils.getClosest(target, '.psv-virtual-tour-link') : target;
+        return target2 ? (target2 as any)[LINK_DATA] : undefined;
+    }
+
 }

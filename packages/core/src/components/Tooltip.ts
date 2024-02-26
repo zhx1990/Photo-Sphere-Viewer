@@ -84,6 +84,7 @@ export class Tooltip extends AbstractComponent {
         pos: '',
         config: null as TooltipPosition,
         data: null as any,
+        hideTimeout: null as ReturnType<typeof setTimeout>,
     };
 
     private readonly content: HTMLElement;
@@ -130,6 +131,7 @@ export class Tooltip extends AbstractComponent {
      * @internal
      */
     override destroy() {
+        clearTimeout(this.state.hideTimeout);
         delete this.state.data;
         super.destroy();
     }
@@ -264,6 +266,12 @@ export class Tooltip extends AbstractComponent {
         this.state.state = TooltipState.HIDING;
 
         this.viewer.dispatchEvent(new HideTooltipEvent(this.state.data));
+
+        // watchdog in case the "transitionend" event is not received
+        const duration = parseFloat(getStyleProperty(this.container, 'transition-duration'));
+        this.state.hideTimeout = setTimeout(() => {
+            this.destroy();
+        }, duration * 2);
     }
 
     /**

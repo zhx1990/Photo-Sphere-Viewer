@@ -29,14 +29,14 @@ export function toggleClass(element: Element, className: string, active?: boolea
  * Adds one or several CSS classes to an element
  */
 export function addClasses(element: Element, className: string) {
-    element.classList.add(...className.split(' '));
+    element.classList.add(...className.split(' ').filter(c => !!c));
 }
 
 /**
  * Removes one or several CSS classes to an element
  */
 export function removeClasses(element: Element, className: string) {
-    element.classList.remove(...className.split(' '));
+    element.classList.remove(...className.split(' ').filter(c => !!c));
 }
 
 /**

@@ -107,7 +107,7 @@
                     links: [
                         { nodeId: '2', position: { pitch: 0, yaw: '310deg' } },
                         { nodeId: '4', position: { pitch: 0, yaw: '220deg' } },
-                        { nodeId: '5', position: { pitch: 0, yaw: '270deg' } },
+                        { nodeId: '5', position: { pitch: 0, yaw: '270deg' }, linkOffset: { depth: 2 } },
                     ],
                     gps: [-80.15593, 25.66659, 5],
                     panoData: { poseHeading: 310 },
@@ -200,7 +200,6 @@
                         renderMode: '3d',
                         startNodeId: nodes[1].id,
                         preload: true,
-                        arrowPosition: 'bottom',
                         transitionOptions: {
                             // showLoader: false,
                             // speed: '10rpm',
@@ -211,14 +210,10 @@
                         getLinkTooltip(content, link, node) {
                             return `${content}<pre>Node #${node.id}</pre>`;
                         },
-                        markerStyle: {
-                            // element: null,
-                            // image: baseUrl + 'pictos/pin-red.png',
-                            // style: { cursor: 'help' },
-                        },
                         arrowStyle: {
-                            // outlineColor: '#1e78e6',
-                            // size: 0.5,
+                            // image: 'https://www.svgrepo.com/show/181247/upload-arrows.svg',
+                            // size: { width: 80, height: 80 },
+                            // style: { cursor: 'help' },
                         },
 
                         // client mode

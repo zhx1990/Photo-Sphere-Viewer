@@ -7,8 +7,8 @@ import type {
     Size,
     SphereCorrection,
 } from '@photo-sphere-viewer/core';
-import type { MarkerConfig } from '@photo-sphere-viewer/markers-plugin';
 import type { MapHotspot } from '@photo-sphere-viewer/map-plugin';
+import type { MarkerConfig } from '@photo-sphere-viewer/markers-plugin';
 import type { PlanHotspot } from '@photo-sphere-viewer/plan-plugin';
 
 /**
@@ -21,44 +21,38 @@ export type GpsPosition = [number, number, number?];
  */
 export type VirtualTourArrowStyle = {
     /**
-     * @default '#aaaaaa'
+     * URL of an image used for the arrow
      */
+    image?: string;
+    /**
+     * Use a custom element for the arrow
+     */
+    element?: HTMLElement | ((link: VirtualTourLink) => HTMLElement);
+    /**
+     * CSS classes added to the element
+     */
+    className?: string;
+    /**
+     * Size of the arrow
+     */
+    size?: Size;
+    /**
+     * CSS properties to set on the arrow
+     */
+    style?: Record<string, string>;
+
+    /** @deprecated */
     color?: string;
-    /**
-     * @default '#aa5500'
-     */
+    /** @deprecated */
     hoverColor?: string;
-    /**
-     * @default '#000000'
-     */
+    /** @deprecated */
     outlineColor?: string;
-    /**
-     * @default 1
-     */
-    size?: number;
 };
 
 /**
- * Style of the marker in markers mode
+ * @deprecated
  */
-export type VirtualTourMarkerStyle = Omit<
-    MarkerConfig,
-    | 'id'
-    | 'element'
-    | 'position'
-    | 'polygon'
-    | 'polygonPixels'
-    | 'polyline'
-    | 'polylinePixels'
-    | 'tooltip'
-    | 'content'
-    | 'listContent'
-    | 'hideList'
-    | 'visible'
-    | 'data'
-> & {
-    element?: HTMLElement | ((link: VirtualTourLink) => HTMLElement);
-};
+export type VirtualTourMarkerStyle = any;
 
 /**
  * Behaviour of the transition between nodes
@@ -118,7 +112,7 @@ export type VirtualTourLink = Partial<ExtendedPosition> & {
      */
     gps?: [number, number, number?];
     /**
-     * override global marker style
+     * @deprecated
      */
     markerStyle?: VirtualTourMarkerStyle;
     /**
@@ -202,7 +196,7 @@ export type VirtualTourPluginConfig = {
      * configure rendering mode of links
      * @default '3d'
      */
-    renderMode?: '3d' | 'markers';
+    renderMode?: '3d' | '2d' | 'markers';
     /**
      * initial nodes (client mode)
      */
@@ -240,7 +234,7 @@ export type VirtualTourPluginConfig = {
      */
     getLinkTooltip?: (content: string, link: VirtualTourLink, node: VirtualTourNode) => string;
     /**
-     * global marker style
+     * @deprecated
      */
     markerStyle?: VirtualTourMarkerStyle;
     /**
@@ -248,15 +242,38 @@ export type VirtualTourPluginConfig = {
      */
     arrowStyle?: VirtualTourArrowStyle;
     /**
-     * (GPS & Markers mode) vertical offset applied to link markers, to compensate for viewer height
-     * @default -0.1
+     * @deprecated
      */
     markerPitchOffset?: number;
     /**
-     * (3D mode) arrows vertical position
-     * @default 'bottom'
+     * @deprecated
      */
     arrowPosition?: 'top' | 'bottom';
+    /**
+     * configuration of the arrows container
+     */
+    arrowsPosition?: {
+        /**
+         * (3D mode) Minimal vertical view angle
+         * @default 0.3
+         */
+        minPitch?: number;
+        /**
+         * (3D mode) Maximal vertical view angle
+         * @default PI/2
+         */
+        maxPitch?: number;
+        /**
+         * (3D mode) Make transparent links that are close to each other
+         * @default PI/4
+         */
+        linkOverlapAngle?: number;
+        /**
+         * (2D+GPS mode) vertical offset applied to link markers, to compensate for viewer height
+         * @default -0.1
+         */
+        linkPitchOffset?: number;
+    };
     /**
      * special configuration when using the MapPlugin
      */

@@ -3,11 +3,11 @@ import type { Point, Position, Tooltip, Viewer } from '@photo-sphere-viewer/core
 import { AbstractConfigurablePlugin, PSVError, events, utils } from '@photo-sphere-viewer/core';
 import type { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
 import type { MapPlugin, events as mapEvents } from '@photo-sphere-viewer/map-plugin';
+import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import type { PlanPlugin, events as planEvents } from '@photo-sphere-viewer/plan-plugin';
-import type { Marker, MarkerConfig, MarkersPlugin, events as markersEvents } from '@photo-sphere-viewer/markers-plugin';
-import { MathUtils, Mesh } from 'three';
+import { MathUtils } from 'three';
 import { ArrowsRenderer } from './ArrowsRenderer';
-import { DEFAULT_ARROW, DEFAULT_MARKER, LINK_DATA, LINK_ID, LOADING_TOOLTIP } from './constants';
+import { DEFAULT_ARROW, LINK_DATA, LINK_ID, LOADING_TOOLTIP } from './constants';
 import { AbstractDatasource } from './datasources/AbstractDataSource';
 import { ClientSideDatasource } from './datasources/ClientSideDatasource';
 import { ServerSideDatasource } from './datasources/ServerSideDatasource';
@@ -15,12 +15,11 @@ import { EnterArrowEvent, LeaveArrowEvent, NodeChangedEvent, VirtualTourEvents }
 import {
     GpsPosition,
     VirtualTourLink,
-    VirtualTourMarkerStyle,
     VirtualTourNode,
     VirtualTourPluginConfig,
-    VirtualTourTransitionOptions,
+    VirtualTourTransitionOptions
 } from './model';
-import { gpsDistance, gpsToSpherical, setMeshColor } from './utils';
+import { checkArrowStyle, gpsToSpherical } from './utils';
 
 const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
     {
@@ -39,10 +38,16 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
         },
         linksOnCompass: true,
         getLinkTooltip: null,
-        markerStyle: DEFAULT_MARKER,
+        markerStyle: null,
         arrowStyle: DEFAULT_ARROW,
-        markerPitchOffset: -0.1,
-        arrowPosition: 'bottom',
+        markerPitchOffset: null,
+        arrowPosition: null,
+        arrowsPosition: {
+            minPitch: 0.3,
+            maxPitch: Math.PI / 2,
+            linkOverlapAngle: Math.PI / 4,
+            linkPitchOffset: -0.1,
+        },
         map: null,
     },
     {
@@ -59,20 +64,36 @@ const getConfig = utils.getConfigParser<VirtualTourPluginConfig>(
             return positionMode;
         },
         renderMode(renderMode) {
-            if (renderMode !== '3d' && renderMode !== 'markers') {
+            if (renderMode === 'markers') {
+                utils.logWarn(`VirtualTourPlugin: "renderMode" markers has been replaced by 2d`);
+                return '2d';
+            }
+            if (renderMode !== '3d' && renderMode !== '2d') {
                 throw new PSVError('VirtualTourPlugin: invalid renderMode');
             }
             return renderMode;
         },
-        markerStyle(markerStyle, { defValue }) {
-            // historically the user set "html=null" to override the marker type
-            if (markerStyle.html === null) {
-                markerStyle.element = null;
+        markerStyle(markerStyle) {
+            if (markerStyle) {
+                utils.logWarn(`VirtualTourPlugin: "markerStyle" is deprecated`);
             }
-            return { ...defValue, ...markerStyle };
+            return null;
+        },
+        arrowPosition(arrowPosition) {
+            if (arrowPosition) {
+                utils.logWarn(`VirtualTourPlugin: "arrowPosition" is deprecated`);
+            }
+            return null;
+        },
+        arrowsPosition(arrowsPosition, { defValue, rawConfig }) {
+            if (!utils.isNil(rawConfig.markerPitchOffset)) {
+                utils.logWarn(`VirtualTourPlugin: "markerPitchOffset" is deprecated, use "arrowsPosition.linkPitchOffset" instead`);
+                arrowsPosition.linkPitchOffset = rawConfig.markerPitchOffset;
+            }
+            return { ...defValue, ...arrowsPosition };
         },
         arrowStyle(arrowStyle, { defValue }) {
-            return { ...defValue, ...arrowStyle };
+            return { ...defValue, ...checkArrowStyle(arrowStyle) };
         },
         map(map, { rawConfig }) {
             if (map) {
@@ -135,9 +156,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     constructor(viewer: Viewer, config: VirtualTourPluginConfig) {
         super(viewer, config);
 
-        if (this.is3D) {
-            this.arrowsRenderer = new ArrowsRenderer(this.viewer, this);
-        }
+        this.arrowsRenderer = new ArrowsRenderer(this.viewer, this);
     }
 
     /**
@@ -151,10 +170,6 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         this.markers = this.viewer.getPlugin('markers');
         this.compass = this.viewer.getPlugin('compass');
         this.gallery = this.viewer.getPlugin('gallery');
-
-        if (!this.is3D && !this.markers) {
-            throw new PSVError('VirtualTour plugin requires the Markers plugin in markers mode.');
-        }
 
         if (this.markers?.config.markers) {
             utils.logWarn(
@@ -179,23 +194,6 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
             ? new ServerSideDatasource(this, this.viewer)
             : new ClientSideDatasource(this, this.viewer);
 
-        if (this.is3D) {
-            this.viewer.observeObjects(LINK_DATA);
-
-            this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
-            this.viewer.addEventListener(events.SizeUpdatedEvent.type, this);
-            this.viewer.addEventListener(events.ClickEvent.type, this);
-            this.viewer.addEventListener(events.ObjectEnterEvent.type, this);
-            this.viewer.addEventListener(events.ObjectHoverEvent.type, this);
-            this.viewer.addEventListener(events.ObjectLeaveEvent.type, this);
-            this.viewer.addEventListener(events.ReadyEvent.type, this, { once: true });
-
-            this.viewer.renderer.setCustomRenderer((renderer) => this.arrowsRenderer.withRenderer(renderer));
-        } else {
-            this.markers.addEventListener('select-marker', this);
-            this.viewer.addEventListener(events.ShowTooltipEvent.type, this);
-        }
-
         if (this.map) {
             this.map.addEventListener('select-hotspot', this);
             this.map.setImage(this.config.map.imageUrl);
@@ -217,27 +215,11 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
      * @internal
      */
     override destroy() {
-        if (this.is3D) {
-            this.viewer.renderer.setCustomRenderer(null);
-        }
-
-        this.markers?.removeEventListener('select-marker', this);
         this.map?.removeEventListener('select-hotspot', this);
         this.plan?.removeEventListener('select-hotspot', this);
 
-        this.viewer.removeEventListener(events.PositionUpdatedEvent.type, this);
-        this.viewer.removeEventListener(events.SizeUpdatedEvent.type, this);
-        this.viewer.removeEventListener(events.ClickEvent.type, this);
-        this.viewer.removeEventListener(events.ObjectEnterEvent.type, this);
-        this.viewer.removeEventListener(events.ObjectHoverEvent.type, this);
-        this.viewer.removeEventListener(events.ObjectLeaveEvent.type, this);
-        this.viewer.removeEventListener(events.ShowTooltipEvent.type, this);
-        this.viewer.removeEventListener(events.ReadyEvent.type, this);
-
-        this.viewer.unobserveObjects(LINK_DATA);
-
         this.datasource.destroy();
-        this.arrowsRenderer?.destroy();
+        this.arrowsRenderer.destroy();
 
         delete this.datasource;
         delete this.markers;
@@ -252,39 +234,10 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
      * @internal
      */
     handleEvent(e: Event) {
-        if (
-            e instanceof events.SizeUpdatedEvent
-            || e instanceof events.PositionUpdatedEvent
-            || e instanceof events.ReadyEvent
-        ) {
-            this.arrowsRenderer.updateCamera();
-        } else if (e instanceof events.ClickEvent) {
+        if (e instanceof events.ClickEvent) {
             const link = e.data.objects.find((o) => o.userData[LINK_DATA])?.userData[LINK_DATA];
             if (link) {
                 this.setCurrentNode(link.nodeId, null, link);
-            }
-        } else if (e.type === 'select-marker') {
-            const marker = (e as markersEvents.SelectMarkerEvent).marker;
-            const link = marker.data?.[LINK_DATA];
-            if (link) {
-                this.setCurrentNode(link.nodeId, null, link);
-            }
-        } else if (e instanceof events.ShowTooltipEvent) {
-            const marker = (e as events.ShowTooltipEvent).tooltipData as Marker;
-            if (marker?.id.startsWith(LINK_ID)) {
-                this.__onEnterMarker(marker, marker.data[LINK_DATA]);
-            }
-        } else if (e instanceof events.ObjectEnterEvent) {
-            if (e.userDataKey === LINK_DATA) {
-                this.__onEnterObject(e.object, e.viewerPoint);
-            }
-        } else if (e instanceof events.ObjectLeaveEvent) {
-            if (e.userDataKey === LINK_DATA) {
-                this.__onLeaveObject(e.object);
-            }
-        } else if (e instanceof events.ObjectHoverEvent) {
-            if (e.userDataKey === LINK_DATA) {
-                this.__onHoverObject(e.viewerPoint);
             }
         } else if (e.type === 'select-hotspot') {
             const id = (e as mapEvents.SelectHotspot | planEvents.SelectHotspot).hotspotId;
@@ -437,7 +390,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     this.state.currentTooltip = null;
                 }
 
-                this.arrowsRenderer?.clearArrows();
+                this.arrowsRenderer.clear();
                 if (this.gallery?.config.hideOnClick) {
                     this.gallery.hide();
                 }
@@ -519,65 +472,24 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     private __renderLinks(node: VirtualTourNode) {
         const positions: Position[] = [];
 
-        let minDist = Number.POSITIVE_INFINITY;
-        let maxDist = Number.NEGATIVE_INFINITY;
-        const linksDist: Record<string, number> = {};
-
-        if (this.isGps) {
-            node.links.forEach((link) => {
-                const dist = gpsDistance(node.gps, link.gps);
-                linksDist[link.nodeId] = dist;
-                minDist = Math.min(dist, minDist);
-                maxDist = Math.max(dist, maxDist);
-            });
-        }
-
         node.links.forEach((link) => {
             const position = this.__getLinkPosition(node, link);
             position.yaw += link.linkOffset?.yaw ?? 0;
             position.pitch += link.linkOffset?.pitch ?? 0;
+
+            if (this.isGps && !this.is3D) {
+                position.pitch += this.config.arrowsPosition.linkPitchOffset;
+            }
+
             positions.push(position);
 
-            if (this.is3D) {
-                let depth = 1;
-                if (!utils.isNil(link.linkOffset?.depth)) {
-                    depth = link.linkOffset.depth;
-                } else if (this.isGps && minDist !== maxDist) {
-                    depth = MathUtils.mapLinear(linksDist[link.nodeId], minDist, maxDist, 0.5, 1.5);
-                }
-                this.arrowsRenderer.addArrow(link, position, depth);
-            } else {
-                if (this.isGps) {
-                    position.pitch += this.config.markerPitchOffset;
-                }
-
-                const config: MarkerConfig | VirtualTourMarkerStyle = {
-                    ...this.config.markerStyle,
-                    ...link.markerStyle,
-                    position: position,
-                    id: LINK_ID + link.nodeId,
-                    tooltip: { ...LOADING_TOOLTIP },
-                    visible: true,
-                    hideList: true,
-                    data: { [LINK_DATA]: link },
-                };
-
-                if (typeof config.element === 'function') {
-                    config.element = config.element(link);
-                }
-
-                this.markers.addMarker(config as any, false);
-            }
+            this.arrowsRenderer.addLinkArrow(link, position, link.linkOffset?.depth);
         });
 
-        if (this.is3D) {
-            this.viewer.needsUpdate();
-        } else {
-            this.markers.renderMarkers();
-        }
+        this.arrowsRenderer.render();
 
-        if (this.config.linksOnCompass && this.compass) {
-            this.compass.setHotspots(positions);
+        if (this.config.linksOnCompass) {
+            this.compass?.setHotspots(positions);
         }
     }
 
@@ -621,22 +533,14 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         return content;
     }
 
-    private __onEnterMarker(marker: Marker, link: VirtualTourLink) {
-        this.__getTooltipContent(link).then((content) => {
-            this.markers.updateMarker({
-                id: marker.id,
-                tooltip: {
-                    className: 'psv-virtual-tour-tooltip',
-                    content: content,
-                },
-            });
-        });
-    }
+    /** @internal */
+    __onEnterArrow(link: VirtualTourLink, evt: MouseEvent) {
+        const viewerPos = utils.getPosition(this.viewer.container);
 
-    private __onEnterObject(mesh: Mesh, viewerPoint: Point) {
-        const link: VirtualTourLink = mesh.userData[LINK_DATA];
-
-        setMeshColor(mesh as any, link.arrowStyle?.hoverColor || this.config.arrowStyle.hoverColor);
+        const viewerPoint: Point = {
+            x: evt.clientX - viewerPos.x,
+            y: evt.clientY - viewerPos.y,
+        };
 
         this.state.currentTooltip = this.viewer.createTooltip({
             ...LOADING_TOOLTIP,
@@ -656,13 +560,18 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         this.map?.setActiveHotspot(LINK_ID + link.nodeId);
         this.plan?.setActiveHotspot(LINK_ID + link.nodeId);
 
-        this.viewer.needsUpdate();
-        this.viewer.setCursor('pointer');
-
         this.dispatchEvent(new EnterArrowEvent(link, this.state.currentNode));
     }
 
-    private __onHoverObject(viewerPoint: Point) {
+    /** @internal */
+    __onHoverArrow(evt: MouseEvent) {
+        const viewerPos = utils.getPosition(this.viewer.container);
+
+        const viewerPoint: Point = {
+            x: evt.clientX - viewerPos.x,
+            y: evt.clientY - viewerPos.y,
+        };
+
         if (this.state.currentTooltip) {
             this.state.currentTooltip.move({
                 left: viewerPoint.x,
@@ -671,11 +580,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
         }
     }
 
-    private __onLeaveObject(mesh: Mesh) {
-        const link = mesh.userData[LINK_DATA];
-
-        setMeshColor(mesh as any, link.arrowStyle?.color || this.config.arrowStyle.color);
-
+    /** @internal */
+    __onLeaveArrow(link: VirtualTourLink) {
         if (this.state.currentTooltip) {
             this.state.currentTooltip.hide();
             this.state.currentTooltip = null;
@@ -683,9 +589,6 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
 
         this.map?.setActiveHotspot(null);
         this.plan?.setActiveHotspot(null);
-
-        this.viewer.needsUpdate();
-        this.viewer.setCursor(null);
 
         this.dispatchEvent(new LeaveArrowEvent(link, this.state.currentNode));
     }

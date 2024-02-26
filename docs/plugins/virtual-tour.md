@@ -13,7 +13,7 @@ This plugin is available in the [@photo-sphere-viewer/virtual-tour-plugin](https
 
 ## Usage
 
-The plugin allows to define `nodes` which contains a `panorama` and one or more `links` to other nodes. The links are represented with a 3D arrow (default) or using the [Markers plugin](./markers.md).
+The plugin allows to define `nodes` which contains a `panorama` and one or more `links` to other nodes.
 
 There are two different ways to define the position of the links : the manual mode and the GPS mode.
 
@@ -317,11 +317,11 @@ Define the GPS coordinates of the target node. It must be provided in order to p
 
 Offset added to the final link position, to move the marker/arrow without affecting where the viewer is rotated before going to the next node.
 
-`depth` is only used in 3D render mode to manage overlapping arrows. Note that it is automatically computed in GPS mode depending on the distance to the node, but can be overriden if necessary.
+`depth` is only used in 3D render mode to manage overlapping arrows. Note that overlapping arrows are automatically made transparent (depending on `arrowsPosition.linkOverlapAngle`).
 
-#### `arrowStyle` / `markerStyle`
+#### `arrowStyle`
 
-Overrides the global style of the arrow/marker used to display the link. See global configuration for details.
+Overrides the global style of the arrow used to display the link. See global configuration for details.
 
 #### `data`
 
@@ -349,11 +349,11 @@ Configure how the links between nodes are positionned.
 
 #### `renderMode`
 
--   type: `'markers' | '3d'`
+-   type: `'2d' | '3d'`
 -   default: `'3d'`
 -   updatable: no
 
-How the links are displayed, `markers` requires the [Markers plugin](./markers.md).
+How the links are displayed.
 
 #### `nodes` (client mode only)
 
@@ -537,32 +537,6 @@ Each node can still have a `map` property to override `color`, `image` and `size
 
 Callback used to replace/modify the tooltip for a link. The first parameter is the default tooltip content which contains the node `name` + `thumbnail` + `caption`.
 
-#### `markerStyle` (markers mode only)
-
--   type: `object`
--   updatable: no
-
-Style of the marker used to display links.
-
-Default value is:
-
-```js
-{
-  element: // a circular button with a ripple effect
-  size   : { width: 80, height: 80 },
-}
-```
-
-::: tip
-If you want to use another marker type like `image` you must define `element: null` to remove the default value.
-
-```js{2}
-markerStyle: {
-  element : null,
-  image: 'path/to/image.png',
-}
-```
-
 :::
 
 #### `arrowStyle` (3d mode only)
@@ -576,30 +550,32 @@ Default value is:
 
 ```js
 {
-  color       : 0xaaaaaa,
-  hoverColor  : 0xaa5500,
-  outlineColor: 0x000000,
-  size        : 1,
+  element: // a circular button with a ripple effect
+  size   : { width: 80, height: 80 },
 }
 ```
 
-(The 3D model cannot be modified).
+You can also use `image` (path to an image file) and add custom CSS with `style` and `className`.
 
-#### `markerPitchOffset` (markers+GPS mode only)
+#### `arrowsPosition` (3d mode only)
 
--   type: `number`
--   default: `-0.1`
+-   type: `object`
 -   updatable: no
 
-Vertical offset in radians applied to the markers to compensate for the viewer position above ground.
+Default value is:
 
-#### `arrowPosition` (3d mode only)
-
--   type: `'top' | 'bottom'`
--   default: `'bottom'`
--   updatable: no
-
-Vertical position of the arrows.
+```js
+{
+    /* (3D mode) Minimal vertical view angle */
+    minPitch: 0.3,
+    /* (3D mode) Maximal vertical view angle */
+    maxPitch: Math.PI / 2,
+    /* (3D mode) Make transparent links that are close to each other */
+    linkOverlapAngle: Math.PI / 4,
+    /* (2D+GPS mode) vertical offset applied to link markers, to compensate for viewer height */
+    linkPitchOffset: -0.1,
+}
+```
 
 ## Methods
 
@@ -634,5 +610,3 @@ virtualTourPlugin.addEventListener('node-changed', ({ node, data }) => {
 #### `enter-arrow(link, node)` | `leave-arrow(link, node)` (3d mode only)
 
 Triggered when the user puts the cursor hover or away an arrow.
-
-_In markers mode, listen to `enter-markers`/`leave-marker` on the markers plugin (link markers have an additional `tourLink` data)._
