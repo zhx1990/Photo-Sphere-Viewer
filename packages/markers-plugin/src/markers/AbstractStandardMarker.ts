@@ -102,9 +102,7 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
             };
         }
 
-        if (!utils.isNil(this.config.rotation)) {
-            element.style.rotate = MathUtils.radToDeg(this.config.rotation) + 'deg';
-        }
+        element.style.rotate = this.config.rotation !== 0 ? MathUtils.radToDeg(this.config.rotation) + 'deg' : null;
     }
 
     /**

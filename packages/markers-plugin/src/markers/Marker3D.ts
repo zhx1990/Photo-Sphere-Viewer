@@ -106,8 +106,10 @@ export class Marker3D extends Marker {
             this.state.position = this.viewer.dataHelper.cleanPosition(this.config.position);
             this.state.size = this.config.size;
 
-            mesh.position.set(0.5 - this.state.anchor.x, this.state.anchor.y - 0.5, 0);
-            mesh.rotation.set(0, 0, -(this.config.rotation ?? 0));
+            // 100 is magic number that gives a coherent size at default zoom level
+            mesh.scale.set(this.config.size.width / 100, this.config.size.height / 100, 1);
+            mesh.position.set(mesh.scale.x * (0.5 - this.state.anchor.x), mesh.scale.y * (this.state.anchor.y - 0.5), 0);
+            mesh.rotation.set(0, 0, -this.config.rotation);
             this.viewer.dataHelper.sphericalCoordsToVector3(this.state.position, group.position);
 
             group.lookAt(0, group.position.y, 0);
@@ -123,9 +125,6 @@ export class Marker3D extends Marker {
                     break;
                 // no default
             }
-
-            // 100 is magic number that gives a coherent size at default zoom level
-            group.scale.set(this.config.size.width / 100, this.config.size.height / 100, 1);
 
             const p = mesh.geometry.getAttribute('position');
             this.state.positions3D = [0, 1, 3, 2].map((i) => {
