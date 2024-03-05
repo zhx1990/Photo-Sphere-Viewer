@@ -332,7 +332,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         if (marker.isPoly()) {
             this.svgContainer.appendChild(marker.domElement);
         } else if (marker.is3d()) {
-            this.viewer.renderer.addObject(marker.threeElement.parent);
+            this.viewer.renderer.addObject(marker.threeElement);
         } else {
             this.container.appendChild(marker.domElement);
         }

@@ -1,5 +1,5 @@
 import { PSVError, Point, Position, Size, Tooltip, TooltipConfig, utils, type Viewer } from '@photo-sphere-viewer/core';
-import { BufferGeometry, Mesh, ShaderMaterial, Vector3 } from 'three';
+import { Group, Vector3 } from 'three';
 import { MarkerType, getMarkerType } from '../MarkerType';
 import { type MarkersPlugin } from '../MarkersPlugin';
 import { MarkerConfig, ParsedMarkerConfig } from '../model';
@@ -34,7 +34,7 @@ export abstract class Marker {
         return null;
     }
 
-    get threeElement(): Mesh<BufferGeometry, ShaderMaterial> {
+    get threeElement(): Group {
         return null;
     }
 

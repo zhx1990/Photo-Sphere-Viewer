@@ -384,6 +384,7 @@ export class Renderer extends AbstractService {
 
         const intersections = this.raycaster
             .intersectObjects(this.scene.children, true)
+            .filter((i) => i.object.visible)
             .filter((i) => (i.object as Mesh).isMesh && !!i.object.userData) as Array<Intersection<Mesh>>;
 
         if (this.customRenderer?.getIntersections) {

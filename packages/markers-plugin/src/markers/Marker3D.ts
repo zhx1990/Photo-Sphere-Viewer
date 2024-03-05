@@ -1,11 +1,9 @@
 import { ExtendedPosition, PSVError, Point, Size, utils, type Viewer } from '@photo-sphere-viewer/core';
 import {
-    BufferGeometry,
     Group,
     Mesh,
     Object3D,
     PlaneGeometry,
-    ShaderMaterial,
     Texture,
     Vector3,
     VideoTexture,
@@ -23,13 +21,17 @@ import { Marker } from './Marker';
  * @internal
  */
 export class Marker3D extends Marker {
-    override get threeElement(): Mesh<BufferGeometry, ShaderMaterial> {
+    override get threeElement(): Group {
         return this.element;
+    }
+
+    get threeMesh(): Mesh<PlaneGeometry, ChromaKeyMaterial> {
+        return this.threeElement.children[0] as any;
     }
 
     override get video(): HTMLVideoElement {
         if (this.type === MarkerType.videoLayer) {
-            return (this.threeElement.material as ChromaKeyMaterial).map.image;
+            return this.threeMesh.material.map.image;
         } else {
             return null;
         }
@@ -48,21 +50,20 @@ export class Marker3D extends Marker {
         const geometry = new PlaneGeometry(1, 1);
         const mesh = new Mesh(geometry, material);
         mesh.userData = { [MARKER_DATA]: this };
-        const group = new Group().add(mesh);
 
         // overwrite the visible property to be tied to the Marker instance
         // and do it without context bleed
-        Object.defineProperty(group, 'visible', {
+        Object.defineProperty(mesh, 'visible', {
             enumerable: true,
             get: function (this: Object3D) {
-                return (this.children[0].userData[MARKER_DATA] as Marker).state.visible;
+                return (this.userData[MARKER_DATA] as Marker).state.visible;
             },
             set: function (this: Object3D, visible: boolean) {
-                (this.children[0].userData[MARKER_DATA] as Marker).state.visible = visible;
+                (this.userData[MARKER_DATA] as Marker).state.visible = visible;
             },
         });
 
-        this.element = mesh;
+        this.element = new Group().add(mesh);
 
         if (this.type === MarkerType.videoLayer) {
             this.viewer.needsContinuousUpdate(true);
@@ -70,7 +71,7 @@ export class Marker3D extends Marker {
     }
 
     override destroy(): void {
-        delete this.threeElement.userData[MARKER_DATA];
+        delete this.threeMesh.userData[MARKER_DATA];
 
         if (this.type === MarkerType.videoLayer) {
             this.video.pause();
@@ -81,7 +82,7 @@ export class Marker3D extends Marker {
     }
 
     override render(): Point {
-        if (this.viewer.renderer.isObjectVisible(this.threeElement)) {
+        if (this.viewer.renderer.isObjectVisible(this.threeMesh)) {
             return this.viewer.dataHelper.sphericalCoordsToViewerCoords(this.state.position);
         } else {
             return null;
@@ -91,9 +92,9 @@ export class Marker3D extends Marker {
     override update(config: MarkerConfig): void {
         super.update(config);
 
-        const mesh = this.threeElement;
+        const mesh = this.threeMesh;
         const group = mesh.parent;
-        const material = mesh.material as ChromaKeyMaterial;
+        const material = mesh.material;
 
         this.state.dynamicSize = false;
 
