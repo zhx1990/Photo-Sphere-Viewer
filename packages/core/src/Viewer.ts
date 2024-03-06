@@ -1,3 +1,4 @@
+import { PSVError } from './PSVError';
 import type { AbstractAdapter } from './adapters/AbstractAdapter';
 import type { AbstractComponent } from './components/AbstractComponent';
 import { Loader } from './components/Loader';
@@ -105,6 +106,11 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
         this.config = getViewerConfig(config);
 
         this.parent = getElement(config.container);
+
+        if (!this.parent) {
+            throw new PSVError(`"container" element not found.`);
+        }
+
         // @ts-ignore
         this.parent[VIEWER_DATA] = this;
 
