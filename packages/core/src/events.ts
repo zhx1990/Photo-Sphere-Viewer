@@ -257,6 +257,19 @@ export class PositionUpdatedEvent extends ViewerEvent {
 }
 
 /**
+ * @event Triggered when camera roll change
+ */
+export class RollUpdatedEvent extends ViewerEvent {
+    static override readonly type = 'roll-updated';
+    override type: 'roll-updated';
+
+    /** @internal */
+    constructor(public readonly roll: number) {
+        super(RollUpdatedEvent.type);
+    }
+}
+
+/**
  * @event Triggered when the panorama image has been loaded and the viewer is ready to perform the first render
  */
 export class ReadyEvent extends ViewerEvent {
@@ -459,6 +472,7 @@ export type ViewerEvents =
     | PanoramaLoadedEvent
     | PanoramaErrorEvent
     | PositionUpdatedEvent
+    | RollUpdatedEvent
     | ReadyEvent
     | RenderEvent
     | ShowNotificationEvent

@@ -648,14 +648,17 @@ export class EventsHandler extends AbstractService {
      * Raw method for movement, called from mouse event and move inertia
      */
     private __applyMove(clientX: number, clientY: number) {
+        const x = (clientX - this.data.mouseX) * Math.cos(this.state.roll) - (clientY - this.data.mouseY) * Math.sin(this.state.roll);
+        const y = (clientY - this.data.mouseY) * Math.cos(this.state.roll) + (clientX - this.data.mouseX) * Math.sin(this.state.roll);
+
         const rotation: Position = {
             yaw:
                 this.config.moveSpeed
-                * ((clientX - this.data.mouseX) / this.state.size.width)
+                * (x / this.state.size.width)
                 * MathUtils.degToRad(this.state.littlePlanet ? 90 : this.state.hFov),
             pitch:
                 this.config.moveSpeed
-                * ((clientY - this.data.mouseY) / this.state.size.height)
+                * (y / this.state.size.height)
                 * MathUtils.degToRad(this.state.littlePlanet ? 90 : this.state.vFov),
         };
 

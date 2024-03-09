@@ -26,6 +26,7 @@ import {
     ConfigChangedEvent,
     PositionUpdatedEvent,
     RenderEvent,
+    RollUpdatedEvent,
     SizeUpdatedEvent,
     ZoomUpdatedEvent,
 } from '../events';
@@ -106,6 +107,7 @@ export class Renderer extends AbstractService {
         this.viewer.addEventListener(SizeUpdatedEvent.type, this);
         this.viewer.addEventListener(ZoomUpdatedEvent.type, this);
         this.viewer.addEventListener(PositionUpdatedEvent.type, this);
+        this.viewer.addEventListener(RollUpdatedEvent.type, this);
         this.viewer.addEventListener(ConfigChangedEvent.type, this);
 
         this.hide();
@@ -135,6 +137,7 @@ export class Renderer extends AbstractService {
         this.viewer.removeEventListener(SizeUpdatedEvent.type, this);
         this.viewer.removeEventListener(ZoomUpdatedEvent.type, this);
         this.viewer.removeEventListener(PositionUpdatedEvent.type, this);
+        this.viewer.removeEventListener(RollUpdatedEvent.type, this);
         this.viewer.removeEventListener(ConfigChangedEvent.type, this);
 
         super.destroy();
@@ -149,6 +152,7 @@ export class Renderer extends AbstractService {
             case SizeUpdatedEvent.type: this.__onSizeUpdated(); break;
             case ZoomUpdatedEvent.type: this.__onZoomUpdated(); break;
             case PositionUpdatedEvent.type: this.__onPositionUpdated(); break;
+            case RollUpdatedEvent.type: this.__onPositionUpdated(); break;
             case ConfigChangedEvent.type:
                 if ((e as ConfigChangedEvent).containsOptions('fisheye')) {
                     this.__onPositionUpdated();
@@ -216,6 +220,7 @@ export class Renderer extends AbstractService {
                 .multiplyScalar(this.config.fisheye / 2)
                 .negate();
         }
+        this.camera.rotateZ(-this.state.roll);
         this.camera.updateMatrixWorld();
         this.viewer.needsUpdate();
         this.frustumNeedsUpdate = true;

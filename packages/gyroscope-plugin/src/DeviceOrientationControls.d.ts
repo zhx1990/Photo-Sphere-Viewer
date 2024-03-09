@@ -12,5 +12,5 @@ export class DeviceOrientationControls {
 
     disconnect();
 
-    update();
+    update(): boolean;
 }

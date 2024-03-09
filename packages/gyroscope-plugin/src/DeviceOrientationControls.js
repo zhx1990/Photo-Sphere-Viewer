@@ -88,11 +88,15 @@ export class DeviceOrientationControls {
         };
 
         this.update = function () {
-            if (scope.enabled === false) return;
+            if (scope.enabled === false) return false;
 
             const device = scope.deviceOrientation;
 
             if (device) {
+                if (!device.alpha && !device.beta && !device.gamma) {
+                    return false;
+                }
+
                 const alpha = device.alpha ? MathUtils.degToRad(device.alpha) + scope.alphaOffset : 0; // Z
 
                 const beta = device.beta ? MathUtils.degToRad(device.beta) : 0; // X'
@@ -106,7 +110,11 @@ export class DeviceOrientationControls {
                 if (8 * (1 - lastQuaternion.dot(scope.object.quaternion)) > EPS) {
                     lastQuaternion.copy(scope.object.quaternion);
                 }
+
+                return true;
             }
+
+            return false;
         };
 
         this.dispose = function () {

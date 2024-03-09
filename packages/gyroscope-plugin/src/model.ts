@@ -5,6 +5,11 @@ export type GyroscopePluginConfig = {
      */
     touchmove?: boolean;
     /**
+     * applies camera roll (rotation on Z axis)
+     * @default true
+     */
+    roll?: boolean;
+    /**
      * when true the view will ignore the current direction when enabling gyroscope control
      * @default false
      */

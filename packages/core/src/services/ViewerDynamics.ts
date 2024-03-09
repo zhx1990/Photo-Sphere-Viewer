@@ -1,7 +1,7 @@
 import { MathUtils } from 'three';
 import { Dynamic, MultiDynamic } from '../utils';
 import type { Viewer } from '../Viewer';
-import { PositionUpdatedEvent, ZoomUpdatedEvent } from '../events';
+import { PositionUpdatedEvent, RollUpdatedEvent, ZoomUpdatedEvent } from '../events';
 import { AbstractService } from './AbstractService';
 
 export class ViewerDynamics extends AbstractService {
@@ -40,6 +40,19 @@ export class ViewerDynamics extends AbstractService {
         }
     );
 
+    readonly roll = new Dynamic(
+        (roll) => {
+            this.viewer.state.roll = roll;
+            this.viewer.dispatchEvent(new RollUpdatedEvent(roll));
+        },
+        {
+            defaultValue: 0,
+            min: - Math.PI,
+            max: Math.PI,
+            wrap: false,
+        }
+    );
+
     /**
      * @internal
      */
@@ -54,6 +67,7 @@ export class ViewerDynamics extends AbstractService {
     updateSpeeds() {
         this.zoom.setSpeed(this.config.zoomSpeed * 50);
         this.position.setSpeed(MathUtils.degToRad(this.config.moveSpeed * 50));
+        this.roll.setSpeed(MathUtils.degToRad(this.config.moveSpeed * 50));
     }
 
     /**
@@ -62,5 +76,6 @@ export class ViewerDynamics extends AbstractService {
     update(elapsed: number) {
         this.zoom.update(elapsed);
         this.position.update(elapsed);
+        this.roll.update(elapsed);
     }
 }

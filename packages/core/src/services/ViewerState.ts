@@ -33,6 +33,11 @@ export class ViewerState {
     direction = new Vector3(0, 0, SPHERE_RADIUS);
 
     /**
+     * current camera roll
+     */
+    roll = 0;
+
+    /**
      * vertical FOV
      */
     vFov = 60;

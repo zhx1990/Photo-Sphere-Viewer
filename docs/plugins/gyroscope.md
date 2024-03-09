@@ -41,6 +41,14 @@ There are known inconsistencies of orientation data accross devices. If the pano
 
 Allows to pan horizontally the camera when the gyroscope is enabled (requires global `mousemove=true`).
 
+#### `roll`
+
+-   type: `boolean`
+-   default: `true`
+-   updatable: yes
+
+Applies camera roll (rotation on Z axis).
+
 #### `absolutePosition`
 
 -   type: `boolean`

@@ -8,6 +8,7 @@ import { GyroscopePluginConfig } from './model.js';
 const getConfig = utils.getConfigParser<GyroscopePluginConfig>(
     {
         touchmove: true,
+        roll: true,
         absolutePosition: false,
         moveMode: 'smooth',
     },
@@ -164,6 +165,10 @@ export class GyroscopePlugin extends AbstractConfigurablePlugin<
             this.state.enabled = false;
             this.viewer.config.moveInertia = this.state.config_moveInertia;
 
+            if (this.config.roll) {
+                this.viewer.dynamics.roll.goto(0, 30);
+            }
+
             this.dispatchEvent(new GyroscopeUpdatedEvent(false));
 
             this.viewer.resetIdleTimer();
@@ -197,26 +202,32 @@ export class GyroscopePlugin extends AbstractConfigurablePlugin<
 
         // on first run compute the offset depending on the current viewer position and device orientation
         if (this.state.alphaOffset === null) {
-            this.controls.update();
-            this.controls.object.getWorldDirection(direction);
+            if (this.controls.update()) {
+                this.controls.object.getWorldDirection(direction);
 
-            const sphericalCoords = this.viewer.dataHelper.vector3ToSphericalCoords(direction);
-            this.state.alphaOffset = sphericalCoords.yaw - position.yaw;
+                const sphericalCoords = this.viewer.dataHelper.vector3ToSphericalCoords(direction);
+                this.state.alphaOffset = sphericalCoords.yaw - position.yaw;
+            }
         } else {
             this.controls.alphaOffset = this.state.alphaOffset;
-            this.controls.update();
-            this.controls.object.getWorldDirection(direction);
+            if (this.controls.update()) {
+                this.controls.object.getWorldDirection(direction);
 
-            const sphericalCoords = this.viewer.dataHelper.vector3ToSphericalCoords(direction);
+                const sphericalCoords = this.viewer.dataHelper.vector3ToSphericalCoords(direction);
 
-            const target: Position = {
-                yaw: sphericalCoords.yaw,
-                pitch: -sphericalCoords.pitch,
-            };
+                const target: Position = {
+                    yaw: sphericalCoords.yaw,
+                    pitch: -sphericalCoords.pitch,
+                };
 
-            // having a slow speed on smalls movements allows to absorb the device/hand vibrations
-            const step = this.state.moveMode === 'smooth' ? 3 : 10;
-            this.viewer.dynamics.position.goto(target, utils.getAngle(position, target) < 0.01 ? 1 : step);
+                // having a slow speed on smalls movements allows to absorb the device/hand vibrations
+                const step = this.state.moveMode === 'smooth' ? 3 : 10;
+                this.viewer.dynamics.position.goto(target, utils.getAngle(position, target) < 0.01 ? 1 : step);
+
+                if (this.config.roll) {
+                    this.viewer.dynamics.roll.goto(-this.controls.object.rotation.z, this.state.moveMode === 'smooth' ? 10 : 30);
+                }
+            }
         }
     }
 
