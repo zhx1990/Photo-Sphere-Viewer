@@ -54,7 +54,7 @@ export function logWarn(message: string) {
  * Checks if an object is a ExtendedPosition, ie has textureX/textureY or yaw/pitch
  */
 export function isExtendedPosition(object: any): object is ExtendedPosition {
-    if (!object) {
+    if (!object || Array.isArray(object)) {
         return false;
     }
     return [

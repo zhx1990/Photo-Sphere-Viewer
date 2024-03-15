@@ -1,6 +1,6 @@
-import { CONSTANTS, Point, Position, utils, type Viewer } from '@photo-sphere-viewer/core';
+import { CONSTANTS, Point, Position, PSVError, utils, type Viewer } from '@photo-sphere-viewer/core';
 import { MathUtils } from 'three';
-import { DEFAULT_HOVER_SCALE, MARKER_DATA } from '../constants';
+import { DEFAULT_HOVER_SCALE } from '../constants';
 import { type MarkersPlugin } from '../MarkersPlugin';
 import { MarkerType } from '../MarkerType';
 import { MarkerConfig } from '../model';
@@ -8,16 +8,19 @@ import { AbstractDomMarker } from './AbstractDomMarker';
 import { Marker } from './Marker';
 
 /**
- * Base class for standard markers (all but 3d and poly)
+ * Base class for standard markers
  * @internal
  */
 export abstract class AbstractStandardMarker extends AbstractDomMarker {
+
+    protected needsUpdateSize: boolean;
+
     constructor(viewer: Viewer, plugin: MarkersPlugin, config: MarkerConfig) {
         super(viewer, plugin, config);
     }
 
-    override createElement(): void {
-        this.element[MARKER_DATA] = this;
+    protected override afterCreateElement(): void {
+        super.afterCreateElement();
 
         this.domElement.addEventListener('transitionend', () => {
             // the transition "scale" is only applied manually on mouseover
@@ -59,16 +62,6 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
                 mouseover: this === hoveringMarker,
             });
 
-            if (this.type === MarkerType.element) {
-                this.config.element.updateMarker?.({
-                    marker: this,
-                    position,
-                    viewerPosition,
-                    zoomLevel,
-                    viewerSize: this.viewer.state.size,
-                });
-            }
-
             return position;
         } else {
             return null;
@@ -77,6 +70,20 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
 
     override update(config: MarkerConfig): void {
         super.update(config);
+
+        if (!utils.isExtendedPosition(this.config.position)) {
+            throw new PSVError(`missing marker ${this.id} position`);
+        }
+
+        // convert texture coordinates to spherical coordinates
+        try {
+            this.state.position = this.viewer.dataHelper.cleanPosition(this.config.position);
+        } catch (e) {
+            throw new PSVError(`invalid marker ${this.id} position`, e);
+        }
+
+        // compute x/y/z position
+        this.state.positions3D = [this.viewer.dataHelper.sphericalCoordsToVector3(this.state.position)];
 
         const element = this.domElement;
 
@@ -96,13 +103,16 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
         }
         if (this.config.hoverScale) {
             this.config.hoverScale = {
-                ...DEFAULT_HOVER_SCALE,
                 ...this.plugin.config.defaultHoverScale,
                 ...this.config.hoverScale,
             };
         }
 
-        element.style.rotate = this.config.rotation !== 0 ? MathUtils.radToDeg(this.config.rotation) + 'deg' : null;
+        // set rotation
+        element.style.rotate = this.config.rotation.roll !== 0 ? MathUtils.radToDeg(this.config.rotation.roll) + 'deg' : null;
+
+        // set anchor
+        element.style.transformOrigin = `${this.state.anchor.x * 100}% ${this.state.anchor.y * 100}%`;
     }
 
     /**
@@ -111,7 +121,7 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
      * before querying its bounding rect
      */
     private __updateSize() {
-        if (!this.state.dynamicSize) {
+        if (!this.needsUpdateSize) {
             return;
         }
 
@@ -128,7 +138,7 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
                 width: rect.width,
                 height: rect.height,
             };
-        } else if (this.isNormal()) {
+        } else {
             this.state.size = {
                 width: (element as HTMLElement).offsetWidth,
                 height: (element as HTMLElement).offsetHeight,
@@ -147,7 +157,7 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
 
         // custom element HTML marker remain dynamic
         if (this.type !== MarkerType.element) {
-            this.state.dynamicSize = false;
+            this.needsUpdateSize = false;
         }
     }
 

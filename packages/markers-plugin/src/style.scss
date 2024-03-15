@@ -19,6 +19,11 @@
         height: 100%;
         z-index: $psv-polygon-marker-zindex;
     }
+
+    &-css3d-container {
+        position: absolute;
+        z-index: $psv-polygon-marker-zindex + 1;
+    }
 }
 
 .psv-marker {
@@ -32,6 +37,10 @@
         overflow: visible;
         background-size: contain;
         background-repeat: no-repeat;
+    }
+
+    &--css3d {
+        display: block;
     }
 
     &--transparent {

@@ -41,6 +41,10 @@ export type MarkerConfig = {
      */
     element?: MarkerElement;
     /**
+     * Exiting DOM element
+     */
+    elementLayer?: MarkerElement;
+    /**
      * Size of the square
      */
     square?: number;
@@ -102,10 +106,12 @@ export type MarkerConfig = {
     size?: Size;
     /**
      * Rotation applied to the marker (ignored for `polygon` and `polyline`)
+     * If defined as a scalar, it applies to the `roll` (Z axis)
+     * Only 3D markers (`imageLayer`, `videoLayer`, `elementLayer`) support `yaw` and `pitch`
      */
-    rotation?: string | number;
+    rotation?: string | number | { yaw?: number | string; pitch?: number | string; roll?: number | string; };
     /**
-     * Applies a perspective on the image to make it look like placed on the floor or on a wall (only for `imageLayer`)
+     * @deprecated Use `rotation` as an object
      */
     orientation?: 'front' | 'horizontal' | 'vertical-left' | 'vertical-right';
     /**
@@ -201,7 +207,7 @@ export type MarkerConfig = {
 };
 
 export type ParsedMarkerConfig = Omit<MarkerConfig, 'rotation' | 'scale' | 'tooltip' | 'hoverScale'> & {
-    rotation?: number;
+    rotation?: { yaw?: number; pitch?: number; roll?: number; };
     scale?:
         | { zoom?: [number, number]; yaw?: [number, number] }
         | ((zoomLevel: number, position: Position) => number);

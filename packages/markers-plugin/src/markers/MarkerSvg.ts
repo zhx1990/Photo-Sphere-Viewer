@@ -1,4 +1,4 @@
-import { PSVError, utils, type Viewer } from '@photo-sphere-viewer/core';
+import { utils, type Viewer } from '@photo-sphere-viewer/core';
 import { SVG_NS } from '../constants';
 import { type MarkersPlugin } from '../MarkersPlugin';
 import { MarkerType } from '../MarkerType';
@@ -9,6 +9,11 @@ import { AbstractStandardMarker } from './AbstractStandardMarker';
  * @internal
  */
 export class MarkerSvg extends AbstractStandardMarker {
+
+    get svgElement(): SVGElement {
+        return this.domElement.firstElementChild as any;
+    }
+
     constructor(viewer: Viewer, plugin: MarkersPlugin, config: MarkerConfig) {
         super(viewer, plugin, config);
     }
@@ -22,20 +27,15 @@ export class MarkerSvg extends AbstractStandardMarker {
         const elt = document.createElementNS(SVG_NS, svgType);
         this.element = document.createElementNS(SVG_NS, 'svg');
         this.element.appendChild(elt);
-
-        super.createElement();
+        this.afterCreateElement();
     }
 
     override update(config: MarkerConfig): void {
         super.update(config);
 
-        const svgElement = this.domElement.firstElementChild as SVGElement;
+        const svgElement = this.svgElement;
 
-        if (!utils.isExtendedPosition(this.config.position)) {
-            throw new PSVError('missing marker position');
-        }
-
-        this.state.dynamicSize = true;
+        this.needsUpdateSize = true;
 
         // set content
         switch (this.type) {
@@ -113,14 +113,5 @@ export class MarkerSvg extends AbstractStandardMarker {
         } else {
             svgElement.setAttributeNS(null, 'fill', 'rgba(0,0,0,0.5)');
         }
-
-        // set anchor
-        this.domElement.style.transformOrigin = `${this.state.anchor.x * 100}% ${this.state.anchor.y * 100}%`;
-
-        // convert texture coordinates to spherical coordinates
-        this.state.position = this.viewer.dataHelper.cleanPosition(this.config.position);
-
-        // compute x/y/z position
-        this.state.positions3D = [this.viewer.dataHelper.sphericalCoordsToVector3(this.state.position)];
     }
 }

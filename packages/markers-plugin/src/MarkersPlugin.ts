@@ -1,6 +1,8 @@
 import type { Point, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractConfigurablePlugin, PSVError, events, utils } from '@photo-sphere-viewer/core';
 import { Object3D } from 'three';
+import { CSS3DContainer } from './CSS3DContainer';
+import { getMarkerType } from './MarkerType';
 import { MarkersButton } from './MarkersButton';
 import { MarkersListButton } from './MarkersListButton';
 import {
@@ -27,12 +29,12 @@ import {
 } from './events';
 import { AbstractStandardMarker } from './markers/AbstractStandardMarker';
 import { Marker } from './markers/Marker';
-import { getMarkerType } from './MarkerType';
-import { MarkerConfig, MarkersPluginConfig, ParsedMarkersPluginConfig, UpdatableMarkersPluginConfig } from './model';
-import { MarkerNormal } from './markers/MarkerNormal';
 import { Marker3D } from './markers/Marker3D';
+import { MarkerCSS3D } from './markers/MarkerCSS3D';
+import { MarkerNormal } from './markers/MarkerNormal';
 import { MarkerPolygon } from './markers/MarkerPolygon';
 import { MarkerSvg } from './markers/MarkerSvg';
+import { MarkerConfig, MarkersPluginConfig, ParsedMarkersPluginConfig, UpdatableMarkersPluginConfig } from './model';
 
 const getConfig = utils.getConfigParser<MarkersPluginConfig, ParsedMarkersPluginConfig>(
     {
@@ -71,6 +73,8 @@ function getMarkerCtor(config: MarkerConfig): typeof Marker {
         case 'imageLayer':
         case 'videoLayer':
             return Marker3D;
+        case 'elementLayer':
+            return MarkerCSS3D;
         case 'polygon':
         case 'polyline':
         case 'polygonPixels':
@@ -104,7 +108,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
     private readonly markers: Record<string, Marker> = {};
 
     private readonly state = {
-        visible: true,
+        allVisible: true,
         showAllTooltips: false,
         currentMarker: null as Marker,
         hoveringMarker: null as Marker,
@@ -114,6 +118,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
     private readonly container: HTMLElement;
     private readonly svgContainer: SVGElement;
+    private readonly css3DContainer: CSS3DContainer;
 
     constructor(viewer: Viewer, config: MarkersPluginConfig) {
         super(viewer, config);
@@ -125,6 +130,9 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         this.svgContainer = document.createElementNS(SVG_NS, 'svg');
         this.svgContainer.setAttribute('class', 'psv-markers-svg-container');
         this.container.appendChild(this.svgContainer);
+
+        this.css3DContainer = new CSS3DContainer(viewer);
+        this.container.appendChild(this.css3DContainer.element);
 
         // Markers events via delegation
         this.container.addEventListener('mouseenter', this, true);
@@ -168,6 +176,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         this.viewer.removeEventListener(events.ObjectLeaveEvent.type, this);
         this.viewer.removeEventListener(events.ReadyEvent.type, this);
 
+        this.css3DContainer.destroy();
         this.viewer.container.removeChild(this.container);
 
         super.destroy();
@@ -245,7 +254,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      * Toggles all markers
      */
     toggleAllMarkers() {
-        if (this.state.visible) {
+        if (this.state.allVisible) {
             this.hideAllMarkers();
         } else {
             this.showAllMarkers();
@@ -256,7 +265,10 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      * Shows all markers
      */
     showAllMarkers() {
-        this.state.visible = true;
+        this.state.allVisible = true;
+        Object.values(this.markers).forEach((marker) => {
+            marker.config.visible = true;
+        });
         this.renderMarkers();
         this.dispatchEvent(new ShowMarkersEvent());
     }
@@ -265,7 +277,10 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      * Hides all markers
      */
     hideAllMarkers() {
-        this.state.visible = false;
+        this.state.allVisible = false;
+        Object.values(this.markers).forEach((marker) => {
+            marker.config.visible = false;
+        });
         this.renderMarkers();
         this.dispatchEvent(new HideMarkersEvent());
     }
@@ -327,10 +342,12 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         }
 
         // @ts-ignore
-        const marker = new (getMarkerCtor(config))(this.viewer, this, config);
+        const marker: Marker = new (getMarkerCtor(config))(this.viewer, this, config);
 
         if (marker.isPoly()) {
             this.svgContainer.appendChild(marker.domElement);
+        } else if (marker.isCss3d()) {
+            this.css3DContainer.addObject(marker as MarkerCSS3D);
         } else if (marker.is3d()) {
             this.viewer.renderer.addObject(marker.threeElement);
         } else {
@@ -398,6 +415,8 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
 
         if (marker.isPoly()) {
             this.svgContainer.removeChild(marker.domElement);
+        } else if (marker.isCss3d()) {
+            this.css3DContainer.removeObject(marker as MarkerCSS3D);
         } else if (marker.is3d()) {
             this.viewer.renderer.removeObject(marker.threeElement);
         } else {
@@ -565,13 +584,11 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      */
     showMarkersList() {
         let markers: Marker[] = [];
-        if (this.state.visible) {
-            Object.values(this.markers).forEach((marker) => {
-                if (marker.config.visible && !marker.config.hideList) {
-                    markers.push(marker);
-                }
-            });
-        }
+        Object.values(this.markers).forEach((marker) => {
+            if (marker.config.visible && !marker.config.hideList) {
+                markers.push(marker);
+            }
+        });
 
         const e = new RenderMarkersListEvent(markers);
         this.dispatchEvent(e);
@@ -618,7 +635,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
         const hoveringMarker = this.state.hoveringMarker;
 
         Object.values(this.markers).forEach((marker) => {
-            let isVisible = this.state.visible && marker.config.visible;
+            let isVisible = marker.config.visible;
             let visibilityChanged = false;
             let position: Point = null;
 
@@ -631,7 +648,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
             marker.state.visible = isVisible;
             marker.state.position2D = position;
 
-            if (!marker.is3d()) {
+            if (marker.domElement) {
                 utils.toggleClass(marker.domElement, 'psv-marker--visible', isVisible);
             }
 
@@ -646,7 +663,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
             if (visibilityChanged) {
                 this.dispatchEvent(new MarkerVisibilityEvent(marker, isVisible));
 
-                if (marker.is3d()) {
+                if (marker.is3d() || marker.isCss3d()) {
                     this.state.needsReRender = true;
                 }
             }
@@ -728,7 +745,7 @@ export class MarkersPlugin extends AbstractConfigurablePlugin<
      * Handles mouse move events, refresh the tooltip for polygon markers
      */
     private __onHoverMarker(e: MouseEvent, marker?: Marker) {
-        if (marker && (marker.isPoly() || marker.is3d())) {
+        if (marker && (marker.isPoly() || marker.is3d() || marker.isCss3d())) {
             if (marker.config.tooltip?.trigger === 'hover') {
                 marker.showTooltip(e.clientX, e.clientY);
             }

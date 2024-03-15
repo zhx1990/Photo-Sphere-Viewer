@@ -1,5 +1,5 @@
 import { PSVError, Point, Position, Size, Tooltip, TooltipConfig, utils, type Viewer } from '@photo-sphere-viewer/core';
-import { Group, Vector3 } from 'three';
+import { Object3D, Vector3 } from 'three';
 import { MarkerType, getMarkerType } from '../MarkerType';
 import { type MarkersPlugin } from '../MarkersPlugin';
 import { MarkerConfig, ParsedMarkerConfig } from '../model';
@@ -34,7 +34,7 @@ export abstract class Marker {
         return null;
     }
 
-    get threeElement(): Group {
+    get threeElement(): Object3D {
         return null;
     }
 
@@ -44,7 +44,6 @@ export abstract class Marker {
 
     /** @internal */
     readonly state = {
-        dynamicSize: false,
         anchor: null as Point,
         visible: false,
         staticTooltip: false,
@@ -75,6 +74,7 @@ export abstract class Marker {
 
     /**
      * @internal
+     * Returns the 2D position if the marker is visible
      */
     abstract render(params: {
         viewerPosition: Position;
@@ -88,6 +88,7 @@ export abstract class Marker {
     destroy() {
         delete this.viewer;
         delete this.plugin;
+        delete this.element;
 
         this.hideTooltip();
     }
@@ -121,6 +122,13 @@ export abstract class Marker {
     }
 
     /**
+     * Checks if it is an CSS3D marker
+     */
+    isCss3d(): boolean {
+        return false;
+    }
+
+    /**
      * Updates the marker with new properties
      * @throws {@link PSVError} if the configuration is invalid
      * @internal
@@ -129,7 +137,7 @@ export abstract class Marker {
         const newType = getMarkerType(config, true);
 
         if (newType !== undefined && newType !== this.type) {
-            throw new PSVError('cannot change marker type');
+            throw new PSVError(`cannot change marker ${config.id} type`);
         }
 
         if (utils.isExtendedPosition(config)) {
@@ -160,11 +168,23 @@ export abstract class Marker {
             this.config.opacity = 1;
         }
 
-        try {
-            this.config.rotation = utils.parseAngle(this.config.rotation ?? 0);
-        } catch (e) {
-            utils.logWarn((e as PSVError).message);
-            this.config.rotation = 0;
+        if (this.config.rotation) {
+            const rot = this.config.rotation;
+            if (typeof rot === 'object') {
+                this.config.rotation = {
+                    yaw: rot.yaw ? utils.parseAngle(rot.yaw, true, false) : 0,
+                    pitch: rot.pitch ? utils.parseAngle(rot.pitch, true, false) : 0,
+                    roll: rot.roll ? utils.parseAngle(rot.roll, true, false) : 0,
+                };
+            } else {
+                this.config.rotation = {
+                    yaw: 0,
+                    pitch: 0,
+                    roll: utils.parseAngle(rot, true, false),
+                };
+            }
+        } else {
+            this.config.rotation = { yaw: 0, pitch: 0, roll: 0 };
         }
 
         this.state.anchor = utils.parsePoint(this.config.anchor);
@@ -207,7 +227,7 @@ export abstract class Marker {
                 left: 0,
             };
 
-            if (this.isPoly() || this.is3d()) {
+            if (this.isPoly() || this.is3d() || this.isCss3d()) {
                 if (clientX || clientY) {
                     const viewerPos = utils.getPosition(this.viewer.container);
                     config.top = clientY - viewerPos.y;

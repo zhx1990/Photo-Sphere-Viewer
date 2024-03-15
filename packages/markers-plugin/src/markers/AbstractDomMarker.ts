@@ -5,16 +5,21 @@ import { MarkerConfig } from '../model';
 import { Marker } from './Marker';
 
 /**
- * Base class for markers added in the DOM (all by 3d)
+ * Base class for markers added in the DOM
  * @internal
  */
 export abstract class AbstractDomMarker extends Marker {
+
     override get domElement(): HTMLElement | SVGElement {
         return this.element;
     }
 
     constructor(viewer: Viewer, plugin: MarkersPlugin, config: MarkerConfig) {
         super(viewer, plugin, config);
+    }
+
+    protected afterCreateElement(): void {
+        this.element[MARKER_DATA] = this;
     }
 
     override destroy(): void {

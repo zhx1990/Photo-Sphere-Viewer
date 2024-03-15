@@ -7,6 +7,7 @@ export enum MarkerType {
     element = 'element',
     imageLayer = 'imageLayer',
     videoLayer = 'videoLayer',
+    elementLayer = 'elementLayer',
     polygon = 'polygon',
     polygonPixels = 'polygonPixels',
     polyline = 'polyline',

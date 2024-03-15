@@ -1,4 +1,4 @@
-import { Point, Viewer, utils } from '@photo-sphere-viewer/core';
+import { PSVError, Point, Viewer, utils } from '@photo-sphere-viewer/core';
 import { Vector3 } from 'three';
 import { MarkerType } from '../MarkerType';
 import { MarkersPlugin } from '../MarkersPlugin';
@@ -60,9 +60,7 @@ export class MarkerPolygon extends AbstractDomMarker {
             const position = this.viewer.dataHelper.sphericalCoordsToViewerCoords(this.state.position);
 
             const points = positions
-                .filter((innerPos, i) => {
-                    return innerPos.length > 0 && (this.isPolygon || i === 0);
-                })
+                .filter((innerPos) => innerPos.length > 0)
                 .map((innerPos) => {
                     let innerPoints = 'M';
                     innerPoints += innerPos
@@ -91,8 +89,6 @@ export class MarkerPolygon extends AbstractDomMarker {
 
         element.classList.add('psv-marker--poly');
 
-        this.state.dynamicSize = true;
-
         // set style
         if (this.config.svgStyle) {
             Object.entries(this.config.svgStyle).forEach(([prop, value]) => {
@@ -109,38 +105,47 @@ export class MarkerPolygon extends AbstractDomMarker {
             element.setAttributeNS(null, 'stroke', 'rgb(0,0,0)');
         }
 
-        // fold arrays: [1,2,3,4] => [[1,2],[3,4]]
-        let actualPoly: any = this.config[this.type];
-        if (!Array.isArray(actualPoly[0])) {
-            for (let i = 0; i < actualPoly.length; i++) {
-                // @ts-ignore
-                actualPoly.splice(i, 2, [actualPoly[i], actualPoly[i + 1]]);
+        try {
+            // fold arrays: [1,2,3,4] => [[1,2],[3,4]]
+            let actualPoly: any = this.config[this.type];
+            if (!Array.isArray(actualPoly[0])) {
+                for (let i = 0; i < actualPoly.length; i++) {
+                    // @ts-ignore
+                    actualPoly.splice(i, 2, [actualPoly[i], actualPoly[i + 1]]);
+                }
             }
-        }
+    
+            // make nested array for holes
+            if (!Array.isArray(actualPoly[0][0])) {
+                actualPoly = [actualPoly];
+            }
 
-        if (!Array.isArray(actualPoly[0][0])) {
-            actualPoly = [actualPoly];
-        }
+            if (this.isPolyline && actualPoly.length > 1) {
+                throw new PSVError(`polylines cannot have holes`);
+            }
 
-        // convert texture coordinates to spherical coordinates
-        if (this.isPixels) {
-            this.definition = (actualPoly as Array<Array<[number, number]>>).map((coords) => {
-                return coords.map((coord) => {
-                    const sphericalCoords = this.viewer.dataHelper.textureCoordsToSphericalCoords({
-                        textureX: coord[0],
-                        textureY: coord[1],
+            // convert texture coordinates to spherical coordinates
+            if (this.isPixels) {
+                this.definition = (actualPoly as Array<Array<[number, number]>>).map((coords) => {
+                    return coords.map((coord) => {
+                        const sphericalCoords = this.viewer.dataHelper.textureCoordsToSphericalCoords({
+                            textureX: coord[0],
+                            textureY: coord[1],
+                        });
+                        return [sphericalCoords.yaw, sphericalCoords.pitch];
                     });
-                    return [sphericalCoords.yaw, sphericalCoords.pitch];
                 });
-            });
-        }
-        // clean angles
-        else {
-            this.definition = (actualPoly as Array<Array<[number, number]>> | Array<Array<[string, string]>>).map((coords) => {
-                return coords.map((coord) => {
-                    return [utils.parseAngle(coord[0]), utils.parseAngle(coord[1], true)];
+            }
+            // clean angles
+            else {
+                this.definition = (actualPoly as Array<Array<[number, number]>> | Array<Array<[string, string]>>).map((coords) => {
+                    return coords.map((coord) => {
+                        return [utils.parseAngle(coord[0]), utils.parseAngle(coord[1], true)];
+                    });
                 });
-            });
+            }
+        } catch (e) {
+            throw new PSVError(`invalid marker ${this.id} position`, e);
         }
 
         const centroid = this.isPolygon ? getPolygonCenter(this.coords[0]) : getPolylineCenter(this.coords[0]);

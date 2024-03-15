@@ -39,6 +39,33 @@
                     [MarkersPlugin, {
                         markers: (() => {
                             const a = [];
+
+                            const iframe = document.createElement('iframe');
+                            iframe.src = 'https://www.youtube-nocookie.com/embed/sFVEaeZGwEU?si=h2PQuWtQtGzNxMm?autoplay=0';
+                            iframe.width = '560px';
+                            iframe.height = '315px';
+                            iframe.style.border = '10px inset #7d4200';
+
+                            const div = document.createElement('div');
+                            div.style.width = '160px';
+                            div.style.height = '160px';
+                            div.style.background = 'red';
+
+                            a.push({
+                                id: 'div',
+                                elementLayer: div,
+                                position: { yaw: -0.13, pitch: 0.41},
+                                rotation: { yaw: 0.8 },
+                                tooltip: 'A red square',
+                                opacity: 0.5,
+                            });
+
+                            a.push({
+                                id: 'iframe',
+                                elementLayer: iframe,
+                                position: { yaw: -0.7, pitch: 0.3},
+                                rotation: { yaw: -0.2 },
+                            });
                             
                             a.push({
                                 id: 'video',
