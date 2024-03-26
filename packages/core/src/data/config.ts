@@ -65,7 +65,8 @@ export const DEFAULTS: Required<ParsedViewerConfig> = {
         close: 'Close',
         twoFingers: 'Use two fingers to navigate',
         ctrlZoom: 'Use ctrl + scroll to zoom the image',
-        loadError: "The panorama can't be loaded",
+        loadError: 'The panorama cannot be loaded',
+        webglError: 'Your browser does not seem to support WebGL',
     },
     keyboard: 'fullscreen',
     keyboardActions: {

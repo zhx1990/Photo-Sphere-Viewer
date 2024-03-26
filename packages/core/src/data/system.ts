@@ -83,7 +83,7 @@ export const SYSTEM = {
  */
 function getWebGLCtx(): WebGLRenderingContext | null {
     const canvas = document.createElement('canvas');
-    const names = ['webgl2', 'webgl', 'experimental-webgl', 'moz-webgl', 'webkit-3d'];
+    const names = ['webgl2', 'webgl', 'experimental-webgl'];
     let context = null;
 
     if (!canvas.getContext) {
