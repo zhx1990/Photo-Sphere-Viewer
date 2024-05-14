@@ -153,28 +153,41 @@ function isTouchEnabled(): ResolvableBoolean {
  * We only test powers of 2 and height = width / 2 because that's what we need to generate WebGL textures
  */
 function getMaxCanvasWidth(maxWidth: number): number {
-    const canvas = document.createElement('canvas');
-    const ctx = canvas.getContext('2d');
-    canvas.width = maxWidth;
-    canvas.height = maxWidth / 2;
+    let width = maxWidth;
+    let pass = false;
 
-    while (canvas.width > 1024) {
+    while (width > 1024 && !pass) {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = width;
+        canvas.height = width / 2;
+
         ctx.fillStyle = 'white';
         ctx.fillRect(0, 0, 1, 1);
 
         try {
             if (ctx.getImageData(0, 0, 1, 1).data[0] > 0) {
-                return canvas.width;
+                pass = true;
             }
         } catch (e) {
             // continue
         }
 
-        canvas.width /= 2;
-        canvas.height /= 2;
+        // Release canvas elements (Safari memory usage fix)
+        // https://stackoverflow.com/questions/52532614/total-canvas-memory-use-exceeds-the-maximum-limit-safari-12
+        canvas.width = 0;
+        canvas.height = 0;
+
+        if (!pass) {
+            width /= 2;
+        }
     }
 
-    throw new PSVError('Unable to detect system capabilities');
+    if (pass) {
+        return width;
+    } else {
+        throw new PSVError('Unable to detect system capabilities');
+    }
 }
 
 /**
