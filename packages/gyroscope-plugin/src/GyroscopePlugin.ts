@@ -145,7 +145,6 @@ export class GyroscopePlugin extends AbstractConfigurablePlugin<
 
                 // force reset
                 this.controls.deviceOrientation = null;
-                this.controls.screenOrientation = 0;
                 this.controls.alphaOffset = 0;
 
                 this.state.alphaOffset = this.config.absolutePosition ? 0 : null;
