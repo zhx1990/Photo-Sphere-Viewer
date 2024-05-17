@@ -135,7 +135,7 @@ export function isFullscreenEnabled(elt: HTMLElement): boolean {
     if (SYSTEM.isIphone) {
         return elt === fullscreenElement;
     } else {
-        return (document.fullscreenElement || (document as any).webkitFullscreenElement) === elt;
+        return document.fullscreenElement === elt;
     }
 }
 
@@ -146,9 +146,9 @@ export function requestFullscreen(elt: HTMLElement) {
     if (SYSTEM.isIphone) {
         fullscreenElement = elt;
         elt.classList.add('psv-fullscreen-emulation');
-        document.dispatchEvent(new Event(SYSTEM.fullscreenEvent));
+        document.dispatchEvent(new Event('fullscreenchange'));
     } else {
-        (elt.requestFullscreen || (elt as any).webkitRequestFullscreen).call(elt);
+        elt.requestFullscreen();
     }
 }
 
@@ -159,8 +159,8 @@ export function exitFullscreen() {
     if (SYSTEM.isIphone) {
         fullscreenElement.classList.remove('psv-fullscreen-emulation');
         fullscreenElement = null;
-        document.dispatchEvent(new Event(SYSTEM.fullscreenEvent));
+        document.dispatchEvent(new Event('fullscreenchange'));
     } else {
-        (document.exitFullscreen || (document as any).webkitExitFullscreen).call(document);
+        document.exitFullscreen();
     }
 }

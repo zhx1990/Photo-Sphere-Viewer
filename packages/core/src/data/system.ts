@@ -34,11 +34,6 @@ export const SYSTEM = {
     isTouchEnabled: null as ResolvableBoolean,
 
     /**
-     * Name of the fullscreen event
-     */
-    fullscreenEvent: null as string,
-
-    /**
      * @internal
      */
     __maxCanvasWidth: null as number | null,
@@ -70,7 +65,6 @@ export const SYSTEM = {
             this.isWebGLSupported = ctx !== null;
             this.maxTextureWidth = ctx ? ctx.getParameter(ctx.MAX_TEXTURE_SIZE) : 0;
             this.isTouchEnabled = isTouchEnabled();
-            this.fullscreenEvent = getFullscreenEvent();
             this.isIphone = /iPhone/i.test(navigator.userAgent);
             this.loaded = true;
         }
@@ -194,17 +188,4 @@ function getMaxCanvasWidth(maxWidth: number): number {
     } else {
         throw new PSVError('Unable to detect system capabilities');
     }
-}
-
-/**
- * Gets the event name for fullscreen
- */
-function getFullscreenEvent(): string {
-    if ('exitFullscreen' in document) {
-        return 'fullscreenchange';
-    }
-    if ('webkitExitFullscreen' in document) {
-        return 'webkitfullscreenchange';
-    }
-    return null;
 }

@@ -116,7 +116,7 @@ export class EventsHandler extends AbstractService {
         window.addEventListener('touchmove', this, { passive: false });
         window.addEventListener('touchend', this, { passive: false });
         this.viewer.container.addEventListener('wheel', this, { passive: false });
-        document.addEventListener(SYSTEM.fullscreenEvent, this);
+        document.addEventListener('fullscreenchange', this);
         this.resizeObserver.observe(this.viewer.container);
     }
 
@@ -130,7 +130,7 @@ export class EventsHandler extends AbstractService {
         window.removeEventListener('touchmove', this);
         window.removeEventListener('touchend', this);
         this.viewer.container.removeEventListener('wheel', this);
-        document.removeEventListener(SYSTEM.fullscreenEvent, this);
+        document.removeEventListener('fullscreenchange', this);
         this.resizeObserver.disconnect();
 
         clearTimeout(this.data.dblclickTimeout);
@@ -153,7 +153,7 @@ export class EventsHandler extends AbstractService {
             case 'mouseup': this.__onMouseUp(evt as MouseEvent); break;
             case 'touchmove': this.__onTouchMove(evt as TouchEvent); break;
             case 'touchend': this.__onTouchEnd(evt as TouchEvent); break;
-            case SYSTEM.fullscreenEvent: this.__onFullscreenChange(); break;
+            case 'fullscreenchange': this.__onFullscreenChange(); break;
         }
 
         if (!getClosest(evt.target as HTMLElement, '.' + CAPTURE_EVENTS_CLASS)) {
