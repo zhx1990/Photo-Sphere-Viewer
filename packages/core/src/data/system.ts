@@ -44,6 +44,11 @@ export const SYSTEM = {
     __maxCanvasWidth: null as number | null,
 
     /**
+     * If the current device is an iPhone
+     */
+    isIphone: false,
+
+    /**
      * Maximum canvas width
      */
     get maxCanvasWidth(): number {
@@ -66,6 +71,7 @@ export const SYSTEM = {
             this.maxTextureWidth = ctx ? ctx.getParameter(ctx.MAX_TEXTURE_SIZE) : 0;
             this.isTouchEnabled = isTouchEnabled();
             this.fullscreenEvent = getFullscreenEvent();
+            this.isIphone = /iPhone/i.test(navigator.userAgent);
             this.loaded = true;
         }
 

@@ -1,3 +1,4 @@
+import { SYSTEM } from '../data/system';
 import { Point } from '../model';
 import { angle, distance } from './math';
 
@@ -125,23 +126,41 @@ export function getTouchData(e: TouchEvent): TouchData {
     };
 }
 
+let fullscreenElement: HTMLElement;
+
 /**
  * Detects if fullscreen is enabled
  */
 export function isFullscreenEnabled(elt: HTMLElement): boolean {
-    return (document.fullscreenElement || (document as any).webkitFullscreenElement) === elt;
+    if (SYSTEM.isIphone) {
+        return elt === fullscreenElement;
+    } else {
+        return (document.fullscreenElement || (document as any).webkitFullscreenElement) === elt;
+    }
 }
 
 /**
  * Enters fullscreen mode
  */
 export function requestFullscreen(elt: HTMLElement) {
-    (elt.requestFullscreen || (elt as any).webkitRequestFullscreen).call(elt);
+    if (SYSTEM.isIphone) {
+        fullscreenElement = elt;
+        elt.classList.add('psv-fullscreen-emulation');
+        document.dispatchEvent(new Event(SYSTEM.fullscreenEvent));
+    } else {
+        (elt.requestFullscreen || (elt as any).webkitRequestFullscreen).call(elt);
+    }
 }
 
 /**
  * Exits fullscreen mode
  */
 export function exitFullscreen() {
-    (document.exitFullscreen || (document as any).webkitExitFullscreen).call(document);
+    if (SYSTEM.isIphone) {
+        fullscreenElement.classList.remove('psv-fullscreen-emulation');
+        fullscreenElement = null;
+        document.dispatchEvent(new Event(SYSTEM.fullscreenEvent));
+    } else {
+        (document.exitFullscreen || (document as any).webkitExitFullscreen).call(document);
+    }
 }
