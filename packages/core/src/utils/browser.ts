@@ -1,4 +1,3 @@
-import { SYSTEM } from '../data/system';
 import { Point } from '../model';
 import { angle, distance } from './math';
 
@@ -131,8 +130,8 @@ let fullscreenElement: HTMLElement;
 /**
  * Detects if fullscreen is enabled
  */
-export function isFullscreenEnabled(elt: HTMLElement): boolean {
-    if (SYSTEM.isIphone) {
+export function isFullscreenEnabled(elt: HTMLElement, isIphone = false): boolean {
+    if (isIphone) {
         return elt === fullscreenElement;
     } else {
         return document.fullscreenElement === elt;
@@ -142,8 +141,8 @@ export function isFullscreenEnabled(elt: HTMLElement): boolean {
 /**
  * Enters fullscreen mode
  */
-export function requestFullscreen(elt: HTMLElement) {
-    if (SYSTEM.isIphone) {
+export function requestFullscreen(elt: HTMLElement, isIphone = false) {
+    if (isIphone) {
         fullscreenElement = elt;
         elt.classList.add('psv-fullscreen-emulation');
         document.dispatchEvent(new Event('fullscreenchange'));
@@ -155,8 +154,8 @@ export function requestFullscreen(elt: HTMLElement) {
 /**
  * Exits fullscreen mode
  */
-export function exitFullscreen() {
-    if (SYSTEM.isIphone) {
+export function exitFullscreen(isIphone = false) {
+    if (isIphone) {
         fullscreenElement.classList.remove('psv-fullscreen-emulation');
         fullscreenElement = null;
         document.dispatchEvent(new Event('fullscreenchange'));
