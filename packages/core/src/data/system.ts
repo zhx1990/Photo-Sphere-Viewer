@@ -62,7 +62,7 @@ export const SYSTEM = {
             const ctx = getWebGLCtx();
 
             this.pixelRatio = window.devicePixelRatio || 1;
-            this.isWebGLSupported = ctx !== null;
+            this.isWebGLSupported = !!ctx;
             this.maxTextureWidth = ctx ? ctx.getParameter(ctx.MAX_TEXTURE_SIZE) : 0;
             this.isTouchEnabled = isTouchEnabled();
             this.isIphone = /iPhone/i.test(navigator.userAgent);
@@ -70,7 +70,7 @@ export const SYSTEM = {
         }
 
         if (!SYSTEM.isWebGLSupported) {
-            throw new PSVError('WebGL is not supported.');
+            throw new PSVError('WebGL 2 is not supported.');
         }
         if (SYSTEM.maxTextureWidth === 0) {
             throw new PSVError('Unable to detect system capabilities');
@@ -82,26 +82,10 @@ export const SYSTEM = {
  * Tries to return a canvas webgl context
  */
 function getWebGLCtx(): WebGLRenderingContext | null {
-    const canvas = document.createElement('canvas');
-    const names = ['webgl2', 'webgl', 'experimental-webgl'];
-    let context = null;
-
-    if (!canvas.getContext) {
-        return null;
-    }
-
-    if (
-        names.some((name) => {
-            try {
-                context = canvas.getContext(name);
-                return context !== null;
-            } catch (e) {
-                return false;
-            }
-        })
-    ) {
-        return context;
-    } else {
+    try {
+        const canvas = document.createElement('canvas');
+        return canvas.getContext('webgl2');
+    } catch (e) {
         return null;
     }
 }
