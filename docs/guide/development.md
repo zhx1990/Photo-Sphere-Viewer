@@ -11,6 +11,7 @@ You will need [Node.js 18](https://nodejs.org/).
 ## Commands
 
 -   launch the dev server with `npm run serve`
+    -   watch only some packages wuth `npm run serve:filter`
 -   launch the documentation with `npm run doc:serve`
 -   register all package for npm link with `npm run npm-link`
 -   execute the linters with `npm run lint`
