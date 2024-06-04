@@ -140,4 +140,12 @@ Enable global scaling and customize for each marker.
 Use custom SVG patterns as polygon `fill`.
 :::
 
+::: item
+[![](../images/demos/marker-youtube.jpg)](./markers/youtube-element.md)
+
+### Youtube element
+
+`elementLayer` marker.
+:::
+
 ::::

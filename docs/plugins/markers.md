@@ -348,6 +348,19 @@ Existing DOM element.
 }
 ```
 
+::: tip Custom element markers
+The `element`/`elementLayer` marker accepts [Web Components](https://developer.mozilla.org/docs/Web/API/Web_components/Using_custom_elements).
+If your component has an `updateMarker()` method it will be called by the plugin on each render with a bunch of properties:
+
+-   `marker`: reference to the marker object itself
+-   `position`: computed 2D position in the viewport
+-   `viewerPosition`: current camera orientation in yaw+pitch
+-   `zoomLevel`: current zoom level
+-   `viewerSize`: size of the viewport
+
+[Check the demo](../demos/markers/custom-element.md)
+:::
+
 #### `elementLayer`
 
 -   type: `HTMLElement`
@@ -363,18 +376,7 @@ Existing DOM element.
 }
 ```
 
-::: tip Custom element markers
-The `element`/`elementLayer` marker accepts [Web Components](https://developer.mozilla.org/docs/Web/API/Web_components/Using_custom_elements).
-If your component has an `updateMarker()` method it will be called by the plugin on each render with a bunch of properties:
-
--   `marker`: reference to the marker object itself
--   `position`: computed 2D position in the viewport
--   `viewerPosition`: current camera orientation in yaw+pitch
--   `zoomLevel`: current zoom level
--   `viewerSize`: size of the viewport
-
-[Check the demo](../demos/markers/custom-element.md)
-:::
+[Check the demo](../demos//markers//youtube-element.md)
 
 #### `polygon`
 

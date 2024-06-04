@@ -41,9 +41,9 @@
                             const a = [];
 
                             const iframe = document.createElement('iframe');
-                            iframe.src = 'https://www.youtube-nocookie.com/embed/sFVEaeZGwEU?si=h2PQuWtQtGzNxMm?autoplay=0';
-                            iframe.width = '560px';
-                            iframe.height = '315px';
+                            iframe.src = 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?si=h2PQuWtQtGzNxMm?autoplay=0';
+                            iframe.width = '640px';
+                            iframe.style.aspectRatio = `${16/9}`;
                             iframe.style.border = '10px inset #7d4200';
 
                             const div = document.createElement('div');
@@ -63,7 +63,7 @@
                             a.push({
                                 id: 'iframe',
                                 elementLayer: iframe,
-                                position: { yaw: -0.7, pitch: 0.3},
+                                position: { yaw: -0.7, pitch: 0.32},
                                 rotation: { yaw: -0.2 },
                             });
                             
