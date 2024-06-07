@@ -38,8 +38,8 @@ export type EquirectangularAdapterConfig = {
     blur?: boolean;
 };
 
-type EquirectangularMesh = Mesh<BufferGeometry, Material>;
-type EquirectangularTexture = TextureData<Texture, string, PanoData>;
+export type EquirectangularMesh = Mesh<BufferGeometry, Material>;
+export type EquirectangularTexture = TextureData<Texture, string, PanoData>;
 
 const getConfig = getConfigParser<EquirectangularAdapterConfig>(
     {

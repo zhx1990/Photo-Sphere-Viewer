@@ -3,6 +3,7 @@ import * as utils from './utils';
 import * as events from './events';
 
 export type { AdapterConstructor } from './adapters/AbstractAdapter';
+export type { DualFisheyeAdapterConfig } from './adapters/DualFisheyeAdapter';
 export type { EquirectangularAdapterConfig } from './adapters/EquirectangularAdapter';
 export type { ButtonConfig, ButtonConstructor } from './buttons/AbstractButton';
 export type { Tooltip, TooltipConfig, TooltipPosition } from './components/Tooltip';
@@ -19,6 +20,7 @@ export type { TextureLoader } from './services/TextureLoader';
 export type { ViewerState } from './services/ViewerState';
 
 export { AbstractAdapter } from './adapters/AbstractAdapter';
+export { DualFisheyeAdapter } from './adapters/DualFisheyeAdapter';
 export { EquirectangularAdapter } from './adapters/EquirectangularAdapter';
 export { AbstractButton } from './buttons/AbstractButton';
 export { AbstractComponent } from './components/AbstractComponent';
