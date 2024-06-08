@@ -22,6 +22,7 @@ iframe.src = 'https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?si=h2PQuWtQtGzN
 iframe.width = '640px';
 iframe.style.aspectRatio = `${16/9}`;
 iframe.style.border = 'none';
+iframe.allow = 'fullscreen';
 
 const viewer = new Viewer({
     container: 'viewer',
