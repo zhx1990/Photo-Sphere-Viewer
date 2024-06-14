@@ -171,6 +171,9 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
             poseHeading: firstNonNull(newPanoData?.poseHeading, xmpPanoData?.poseHeading, 0),
             posePitch: firstNonNull(newPanoData?.posePitch, xmpPanoData?.posePitch, 0),
             poseRoll: firstNonNull(newPanoData?.poseRoll, xmpPanoData?.poseRoll, 0),
+            initialHeading: xmpPanoData?.initialHeading,
+            initialPitch: xmpPanoData?.initialPitch,
+            initialFov: xmpPanoData?.initialFov,
         };
 
         if (panoData.croppedWidth !== img.width || panoData.croppedHeight !== img.height) {
@@ -219,9 +222,12 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
                 croppedHeight: getXMPValue(data, 'CroppedAreaImageHeightPixels'),
                 croppedX: getXMPValue(data, 'CroppedAreaLeftPixels'),
                 croppedY: getXMPValue(data, 'CroppedAreaTopPixels'),
-                poseHeading: getXMPValue(data, 'PoseHeadingDegrees'),
-                posePitch: getXMPValue(data, 'PosePitchDegrees'),
-                poseRoll: getXMPValue(data, 'PoseRollDegrees'),
+                poseHeading: getXMPValue(data, 'PoseHeadingDegrees', false),
+                posePitch: getXMPValue(data, 'PosePitchDegrees', false),
+                poseRoll: getXMPValue(data, 'PoseRollDegrees', false),
+                initialHeading: getXMPValue(data, 'InitialViewHeadingDegrees', false),
+                initialPitch: getXMPValue(data, 'InitialViewPitchDegrees', false),
+                initialFov: getXMPValue(data, 'InitialHorizontalFOVDegrees', false),
             };
         }
 

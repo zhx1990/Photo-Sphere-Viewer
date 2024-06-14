@@ -106,6 +106,12 @@ export type PanoData = {
     poseHeading?: number;
     posePitch?: number;
     poseRoll?: number;
+    /* @internal */
+    initialHeading?: number;
+    /* @internal */
+    initialPitch?: number;
+    /* @internal */
+    initialFov?: number;
 };
 
 /**

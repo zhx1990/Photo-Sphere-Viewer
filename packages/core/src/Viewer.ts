@@ -365,13 +365,6 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
             options.panoData = this.config.panoData;
         }
 
-        const positionProvided = !isNil(options.position);
-        const zoomProvided = !isNil(options.zoom);
-
-        if (positionProvided || zoomProvided) {
-            this.stopAll();
-        }
-
         this.hideError();
         this.resetIdleTimer();
 
@@ -412,12 +405,22 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                 this.adapter.disposeTexture(textureData);
                 throw getAbortError();
             }
-            return textureData;
+
+            const cleanOptions = this.dataHelper.cleanPanoramaOptions(options, textureData.panoData);
+
+            if (!isNil(cleanOptions.zoom) || !isNil(cleanOptions.position)) {
+                this.stopAll();
+            }
+
+            return {
+                textureData,
+                cleanOptions,
+            };
         });
 
         if (!options.transition || !this.state.ready || !this.adapter.supportsTransition(this.config.panorama)) {
             this.state.loadingPromise = loadingPromise
-                .then((textureData) => {
+                .then(({ textureData, cleanOptions }) => {
                     this.renderer.show();
                     this.renderer.setTexture(textureData);
                     this.renderer.setPanoramaPose(textureData.panoData);
@@ -429,11 +432,11 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
 
                     this.dispatchEvent(new PanoramaLoadedEvent(textureData));
 
-                    if (zoomProvided) {
-                        this.zoom(options.zoom);
+                    if (!isNil(cleanOptions.zoom)) {
+                        this.zoom(cleanOptions.zoom);
                     }
-                    if (positionProvided) {
-                        this.rotate(options.position);
+                    if (!isNil(cleanOptions.position)) {
+                        this.rotate(cleanOptions.position);
                     }
                 })
                 .then(
@@ -442,12 +445,12 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
                 );
         } else {
             this.state.loadingPromise = loadingPromise
-                .then((textureData) => {
+                .then(({ textureData, cleanOptions }) => {
                     this.loader.hide();
 
                     this.dispatchEvent(new PanoramaLoadedEvent(textureData));
 
-                    this.state.transitionAnimation = this.renderer.transition(textureData, options);
+                    this.state.transitionAnimation = this.renderer.transition(textureData, cleanOptions);
                     return this.state.transitionAnimation;
                 })
                 .then((completed) => {

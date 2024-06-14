@@ -68,18 +68,18 @@ export function isExtendedPosition(object: any): object is ExtendedPosition {
 /**
  * Returns the value of a given attribute in the panorama metadata
  */
-export function getXMPValue(data: string, attr: string): number | null {
+export function getXMPValue(data: string, attr: string, intVal = true): number | null {
     // XMP data are stored in children
     let result = data.match('<GPano:' + attr + '>(.*)</GPano:' + attr + '>');
     if (result !== null) {
-        const val = parseInt(result[1], 10);
+        const val = intVal ? parseInt(result[1], 10) : parseFloat(result[1]);
         return isNaN(val) ? null : val;
     }
 
     // XMP data are stored in attributes
     result = data.match('GPano:' + attr + '="(.*?)"');
     if (result !== null) {
-        const val = parseInt(result[1], 10);
+        const val = intVal ? parseInt(result[1], 10) : parseFloat(result[1]);
         return isNaN(val) ? null : val;
     }
 

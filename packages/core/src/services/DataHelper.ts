@@ -1,7 +1,8 @@
 import { Euler, MathUtils, Vector3 } from 'three';
-import { ANIMATION_MIN_DURATION, SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
-import { ExtendedPosition, PanoData, PanoramaPosition, Point, Position, SphereCorrection } from '../model';
 import { PSVError } from '../PSVError';
+import type { Viewer } from '../Viewer';
+import { ANIMATION_MIN_DURATION, SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
+import { ExtendedPosition, PanoData, PanoramaOptions, PanoramaPosition, Point, Position, SphereCorrection } from '../model';
 import {
     AnimationOptions,
     applyEulerInverse,
@@ -12,7 +13,6 @@ import {
     parseAngle,
     speedToDuration,
 } from '../utils';
-import type { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
 
 const vector3 = new Vector3();
@@ -34,7 +34,7 @@ export class DataHelper extends AbstractService {
      */
     fovToZoomLevel(fov: number): number {
         const temp = Math.round(((fov - this.config.minFov) / (this.config.maxFov - this.config.minFov)) * 100);
-        return temp - 2 * (temp - 50);
+        return MathUtils.clamp(temp - 2 * (temp - 50), 0, 100);
     }
 
     /**
@@ -49,6 +49,13 @@ export class DataHelper extends AbstractService {
      */
     vFovToHFov(vFov: number): number {
         return MathUtils.radToDeg(2 * Math.atan(Math.tan(MathUtils.degToRad(vFov) / 2) * this.state.aspect));
+    }
+
+    /**
+     * Converts horizontal FOV to vertical FOV
+     */
+    hFovToVFov(hFov: number): number {
+        return MathUtils.radToDeg(2 * Math.atan(Math.tan(MathUtils.degToRad(hFov) / 2) / this.state.aspect));
     }
 
     /**
@@ -118,7 +125,7 @@ export class DataHelper extends AbstractService {
         const result = this.viewer.adapter.textureCoordsToSphericalCoords(point, this.state.textureData.panoData);
 
         if (
-            !EULER_ZERO.equals(this.viewer.renderer.panoramaPose) 
+            !EULER_ZERO.equals(this.viewer.renderer.panoramaPose)
             || !EULER_ZERO.equals(this.viewer.renderer.sphereCorrection)
         ) {
             this.sphericalCoordsToVector3(result, vector3);
@@ -140,7 +147,7 @@ export class DataHelper extends AbstractService {
         }
 
         if (
-            !EULER_ZERO.equals(this.viewer.renderer.panoramaPose) 
+            !EULER_ZERO.equals(this.viewer.renderer.panoramaPose)
             || !EULER_ZERO.equals(this.viewer.renderer.sphereCorrection)
         ) {
             this.sphericalCoordsToVector3(position, vector3);
@@ -295,5 +302,31 @@ export class DataHelper extends AbstractService {
             tilt: MathUtils.degToRad(panoData?.posePitch || 0),
             roll: MathUtils.degToRad(panoData?.poseRoll || 0),
         };
+    }
+
+    /**
+     * Update the panorama options if the panorama files contains "InitialView" metadata
+     */
+    cleanPanoramaOptions(options: PanoramaOptions, panoData: PanoData): PanoramaOptions {
+        if (!panoData?.isEquirectangular) {
+            return options;
+        }
+
+        if (isNil(options.zoom) && !isNil(panoData.initialFov)) {
+            options = {
+                ...options,
+                zoom: this.fovToZoomLevel(this.hFovToVFov(panoData.initialFov)),
+            };
+        }
+        if (isNil(options.position) && !isNil(panoData.initialHeading) && !isNil(panoData.initialPitch)) {
+            options = {
+                ...options,
+                position: {
+                    yaw: parseAngle(panoData.initialHeading),
+                    pitch: parseAngle(panoData.initialPitch, true),
+                },
+            };
+        }
+        return options;
     }
 }
