@@ -53,8 +53,8 @@ export class ArrowsRenderer extends AbstractComponent {
         this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
         this.viewer.addEventListener(events.SizeUpdatedEvent.type, this);
         this.viewer.addEventListener(events.RenderEvent.type, this);
+        this.viewer.addEventListener(events.ClickEvent.type, this);
 
-        this.container.addEventListener('click', this);
         this.container.addEventListener('mouseenter', this, true);
         this.container.addEventListener('mouseleave', this, true);
         this.container.addEventListener('mousemove', this, true);
@@ -65,6 +65,7 @@ export class ArrowsRenderer extends AbstractComponent {
         this.viewer.removeEventListener(events.PositionUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.SizeUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.RenderEvent.type, this);
+        this.viewer.removeEventListener(events.ClickEvent.type, this);
 
         super.destroy();
     }
@@ -79,8 +80,8 @@ export class ArrowsRenderer extends AbstractComponent {
             case events.RenderEvent.type:
                 this.render()
                 break;
-            case 'click': {
-                const link = this.getTargetLink(e.target as HTMLElement, true);
+            case events.ClickEvent.type: {
+                const link = this.getTargetLink((e as events.ClickEvent).data.target, true);
                 if (link) {
                     this.plugin.setCurrentNode(link.nodeId, null, link);
                 }
