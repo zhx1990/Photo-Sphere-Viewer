@@ -126,9 +126,9 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
         }
 
         const element = this.domElement;
-        const init = !this.state.size;
+        const makeTransparent = !this.state.visible || !this.state.size;
 
-        if (init) {
+        if (makeTransparent) {
             element.classList.add('psv-marker--transparent');
         }
 
@@ -145,7 +145,7 @@ export abstract class AbstractStandardMarker extends AbstractDomMarker {
             };
         }
 
-        if (init) {
+        if (makeTransparent) {
             element.classList.remove('psv-marker--transparent');
         }
 
