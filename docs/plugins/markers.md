@@ -271,7 +271,7 @@ Path to an image file.
 ::: tip "Layers" positionning
 There is two ways to position `imageLayer` and `videoLayer` markers:
 
--   `position` (one value) + `size` + `anchor` (optional) + `orientation` (optional)
+-   `position` (one value) + `size` + `anchor` (optional) + `rotation` (optional)
 -   `position` with four values defining the corners of the image/video
 
 (`elementLayer` can only be positionned with `position` + `rotation`)
@@ -565,7 +565,7 @@ _(This option is ignored for polygons and polylines)._
 The same effect can be achieved by using the `rotation` option.
 
 - front → no rotation
-- horizontal → `rotation.pitch: (+/-) Math.PI` (the sign depends on the marker `position.pitch`)
+- horizontal → `rotation.pitch: (+/-) Math.PI / 2` (the sign depends on the marker `position.pitch`)
 - vertical-left → `rotation.yaw: 1.25`
 - vertical-right → `rotation.yaw: -1.25`
 :::
