@@ -113,6 +113,7 @@ export class Marker3D extends Marker {
             // 100 is magic number that gives a coherent size at default zoom level
             mesh.scale.set(this.config.size.width / 100, this.config.size.height / 100, 1);
             mesh.position.set(mesh.scale.x * (0.5 - this.state.anchor.x), mesh.scale.y * (this.state.anchor.y - 0.5), 0);
+            mesh.rotation.set(0, 0, 0);
             this.viewer.dataHelper.sphericalCoordsToVector3(this.state.position, group.position);
 
             group.lookAt(0, group.position.y, 0);
