@@ -605,6 +605,6 @@ virtualTourPlugin.addEventListener('node-changed', ({ node, data }) => {
 });
 ```
 
-#### `enter-arrow(link, node)` | `leave-arrow(link, node)` (3d mode only)
+#### `enter-arrow(link, node)` | `leave-arrow(link, node)`
 
 Triggered when the user puts the cursor hover or away an arrow.
