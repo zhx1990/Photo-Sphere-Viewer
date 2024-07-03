@@ -229,6 +229,7 @@ export class ArrowsRenderer extends AbstractComponent {
         } else {
             element.style.width = conf.size.width + 'px';
             element.style.height = conf.size.height + 'px';
+            element.style.pointerEvents = 'auto'; // CSS2DObject does not do it...
 
             const object = new CSS2DObject(element);
 

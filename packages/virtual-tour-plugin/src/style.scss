@@ -60,7 +60,6 @@ $psv-virtual-tour-link-shadow: drop-shadow(0 10px 2px rgba(0, 0, 0, 0.7)) !defau
     pointer-events: none;
 
     .psv-virtual-tour-link {
-        pointer-events: auto;
         transition: opacity linear .2s;
 
         &:hover {

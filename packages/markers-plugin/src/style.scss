@@ -23,6 +23,7 @@
     &-css3d-container {
         position: absolute;
         z-index: $psv-polygon-marker-zindex + 1;
+        pointer-events: none;
     }
 }
 
