@@ -10,7 +10,8 @@ import { stdin } from 'process';
 const FROM_TAG = process.argv[2];
 const TO_TAG = process.argv[3];
 
-const FILENAME = `dist/changelog_${TO_TAG}.md`;
+const DIST_DIR = 'dist';
+const FILENAME = `${DIST_DIR}/changelog_${TO_TAG}.md`;
 
 if (!FROM_TAG || !TO_TAG || FROM_TAG === TO_TAG) {
     console.warn('No tags provided or same tags');
@@ -46,6 +47,7 @@ ${log
 });
 
 function writeFileAndExit(content) {
+    fs.mkdirSync(DIST_DIR, { recursive: true });
     fs.writeFileSync(FILENAME, content);
     process.exit(0);
 }

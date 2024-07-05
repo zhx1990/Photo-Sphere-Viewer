@@ -1,7 +1,7 @@
 import { execSync } from 'child_process';
 import { readFileSync } from 'fs';
 import assert from 'assert';
-import pkg from './package.json';
+import pkg from '../package.json';
 
 /**
  * This test ensures that the custom UMD plugin is behaving correctly
