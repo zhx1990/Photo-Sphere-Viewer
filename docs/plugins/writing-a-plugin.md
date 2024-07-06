@@ -98,14 +98,9 @@ export default {
     input: 'src/index.js',
     output: [
         {
-            file: 'dist/index.js',
-            format: 'umd',
-            name: 'PhotoSphereViewerCustomPlugin',
+            file: 'dist/index.cjs',
+            format: 'cjs',
             sourcemap: true,
-            globals: {
-                'three': 'THREE',
-                '@photo-sphere-viewer/core': 'PhotoSphereViewer',
-            },
         },
         {
             file: 'dist/index.module.js',
@@ -268,7 +263,6 @@ export default class CustomPlugin extends AbstractPlugin {
 If you intend to publish your plugin on npmjs.org please respect the following naming:
 
 -   class name : `[[Name]]Plugin`
--   export name (in rollup config file) : `PhotoSphereViewer[[Name]]Plugin`
 -   NPM package name : `photo-sphere-viewer-[[name]]-plugin`
 
 Your `package.json` must be properly configured to allow application bundlers to get the right file, and `@photo-sphere-viewer/core` must be declared as dependency.
@@ -277,7 +271,7 @@ Your `package.json` must be properly configured to allow application bundlers to
 {
     "name": "photo-sphere-viewer-custom-plugin",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "index.cjs",
     "module": "index.module.js",
     "style": "index.css",
     "dependencies": {

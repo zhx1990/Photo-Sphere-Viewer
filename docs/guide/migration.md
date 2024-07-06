@@ -12,7 +12,7 @@ The previous `photo-sphere-viewer` package has been splitted in to multiple pack
 
 Each package contains the following files :
 
--   **index.js** : UMD bundle
+-   **index.cjs** : CJS bundle
 -   **index.module.js** : ESM bundle
 -   **index.d.ts** : TypeScript declaration
 -   **index.css** (optional) : stylesheet

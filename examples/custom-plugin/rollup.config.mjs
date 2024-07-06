@@ -7,14 +7,9 @@ export default {
     input: 'src/index.ts',
     output: [
         {
-            file: 'dist/index.js',
-            format: 'umd',
-            name: 'PhotoSphereViewerCustomPlugin',
+            file: 'dist/index.cjs',
+            format: 'cjs',
             sourcemap: true,
-            globals: {
-                'three': 'THREE',
-                '@photo-sphere-viewer/core': 'PhotoSphereViewer',
-            },
         },
         {
             file: 'dist/index.module.js',
@@ -40,7 +35,7 @@ export default {
             baseContents: (pkg) => {
                 pkg = {
                     ...pkg,
-                    main: 'index.js',
+                    main: 'index.cjs',
                     module: 'index.module.js',
                     types: 'index.d.ts',
                     style: 'index.css',

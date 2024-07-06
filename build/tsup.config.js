@@ -3,7 +3,6 @@ import { sassPlugin } from 'esbuild-sass-plugin';
 import { defineConfig } from 'tsup';
 import { assetsPlugin } from './plugins/esbuild-plugin-assets';
 import { scssBundlePlugin } from './plugins/esbuild-plugin-scss-bundle';
-import { umdPlugin } from './plugins/esbuild-plugin-umd';
 import { mapFixPlugin } from './plugins/esbuild-plugin-map-fix';
 import { license } from './templates/license';
 import { npmrc } from './templates/npmrc';
@@ -35,11 +34,11 @@ ${
         return {
             entryPoints: [pkg.main],
             outDir: 'dist',
-            format: dev ? ['esm'] : ['iife', 'esm', 'cjs'],
+            format: dev ? ['esm'] : ['esm', 'cjs'],
             globalName: pkg.psv.globalName,
             outExtension({ format }) {
                 return {
-                    js: { iife: '.js', cjs: '.cjs', esm: '.module.js' }[format],
+                    js: { cjs: '.cjs', esm: '.module.js' }[format],
                 };
             },
             dts: dts,
@@ -53,7 +52,6 @@ ${
             esbuildPlugins: [
                 sassPlugin(),
                 externalGlobalPlugin(externals),
-                umdPlugin({ pkg, externals }),
                 mapFixPlugin(),
                 ...(dev
                     ? []

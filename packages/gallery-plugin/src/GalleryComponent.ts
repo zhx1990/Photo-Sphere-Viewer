@@ -86,7 +86,7 @@ export class GalleryComponent extends AbstractComponent {
             case 'wheel': {
                 if (isAboveBreakpoint) {
                     const evt = e as WheelEvent;
-                    const scrollAmount = this.plugin.config.thumbnailSize.width + this.state.itemMargin ?? 0;
+                    const scrollAmount = this.plugin.config.thumbnailSize.width + (this.state.itemMargin ?? 0);
                     this.items.scrollLeft += (evt.deltaY / Math.abs(evt.deltaY)) * scrollAmount;
                     e.preventDefault();
                 }

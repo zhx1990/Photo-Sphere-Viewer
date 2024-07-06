@@ -2,17 +2,8 @@
   "name": "@photo-sphere-viewer/shared",
   "version": "0.0.0",
   "private": true,
-  "main": "./index.ts",
-  "types": "./index.ts",
-  "peerDependencies": {
-    "@photo-sphere-viewer/core": "0.0.0"
-  },
   "scripts": {
-    "build:test": "tsup --define.dts=off",
     "lint": "tsc --noEmit && eslint . --fix && stylelint \"*.scss\" --fix",
     "test": "mocha -r ts-node/register \"**/*.spec.ts\""
-  },
-  "psv": {
-    "globalName": "PhotoSphereViewer.Shared"
   }
 }
