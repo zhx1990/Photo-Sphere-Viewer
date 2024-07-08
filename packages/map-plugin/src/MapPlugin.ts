@@ -49,7 +49,7 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
             return utils.cleanCssPosition(position, { allowCenter: false, cssOrder: true }) || defValue;
         },
         rotation: (rotation) => utils.parseAngle(rotation),
-        coneColor: (coneColor) => (coneColor ? new Color(coneColor).getStyle() : null),
+        coneColor: (coneColor) => (coneColor ? new Color(coneColor).getStyle() : null), // must be in rgb format
         defaultZoom: (defaultZoom) => Math.log(defaultZoom / 100),
         maxZoom: (maxZoom) => Math.log(maxZoom / 100),
         minZoom: (minZoom) => Math.log(minZoom / 100),

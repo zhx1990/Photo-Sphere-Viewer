@@ -22,7 +22,6 @@ prompt([
             { value: 'core', checked: true },
             ...packages,
         ],
-        pageSize: 100,
     }
 ])
     .then((answers) => {

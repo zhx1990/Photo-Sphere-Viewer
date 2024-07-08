@@ -398,10 +398,6 @@ export function getConfigParser<T extends Record<string, any>, U extends T = T>(
     parsers?: ConfigParsers<T, U>
 ): ConfigParser<T, U> {
     const parser = function (userConfig: T): U {
-        if (!userConfig) {
-            return clone(defaults);
-        }
-
         const rawConfig: U = clone({
             ...defaults,
             ...userConfig,
