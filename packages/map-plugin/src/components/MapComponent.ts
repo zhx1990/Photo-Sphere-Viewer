@@ -3,7 +3,7 @@ import { AbstractComponent, CONSTANTS, events, SYSTEM, utils } from '@photo-sphe
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import { MathUtils } from 'three';
 import { HOTSPOT_MARKER_ID, MAP_SHADOW_BLUR, PIN_SHADOW_BLUR, PIN_SHADOW_OFFSET } from '../constants';
-import { SelectHotspot } from '../events';
+import { SelectHotspot, ViewChanged } from '../events';
 import type { MapPlugin } from '../MapPlugin';
 import { MapHotspot } from '../model';
 import {
@@ -351,7 +351,7 @@ export class MapComponent extends AbstractComponent {
      */
     toggleCollapse() {
         if (this.state.maximized) {
-            this.toggleMaximized();
+            this.toggleMaximized(false);
         }
 
         this.state.collapsed = !this.state.collapsed;
@@ -360,6 +360,9 @@ export class MapComponent extends AbstractComponent {
 
         if (!this.state.collapsed) {
             this.reset();
+            this.plugin.dispatchEvent(new ViewChanged('normal'));
+        } else {
+            this.plugin.dispatchEvent(new ViewChanged('closed'));
         }
 
         this.closeButton?.update();
@@ -368,7 +371,7 @@ export class MapComponent extends AbstractComponent {
     /**
      * Switch maximized mode
      */
-    toggleMaximized() {
+    toggleMaximized(dispatchMinimizeEvent = true) {
         if (this.state.collapsed) {
             return;
         }
@@ -379,6 +382,9 @@ export class MapComponent extends AbstractComponent {
 
         if (this.state.maximized) {
             this.overlay.style.display = 'none';
+            this.plugin.dispatchEvent(new ViewChanged('maximized'));
+        } else if (dispatchMinimizeEvent) {
+            this.plugin.dispatchEvent(new ViewChanged('normal'));
         }
 
         this.maximizeButton?.update();
@@ -388,7 +394,14 @@ export class MapComponent extends AbstractComponent {
      * Changes the zoom level
      */
     zoom(d: number) {
-        this.state.zoom = MathUtils.clamp(this.state.zoom + d, this.config.minZoom, this.config.maxZoom);
+        this.setZoom(this.state.zoom + d);
+    }
+
+    /**
+     * Changes the zoom level
+     */
+    setZoom(value: number) {
+        this.state.zoom = MathUtils.clamp(value, this.config.minZoom, this.config.maxZoom);
         this.update();
     }
 

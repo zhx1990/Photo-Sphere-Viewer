@@ -174,6 +174,13 @@ export class MapPlugin extends AbstractConfigurablePlugin<
     }
 
     /**
+     * Changes the current zoom level
+     */
+    setZoom(level: number) {
+        this.component.setZoom(Math.log(level / 100));
+    }
+
+    /**
      * Closes the map
      */
     close() {
