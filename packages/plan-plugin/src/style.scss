@@ -17,7 +17,7 @@ $psv-plan-transition: ease-in-out 0.3s !default;
 .psv-plan {
     position: absolute;
     margin: $psv-plan-margin;
-    z-index: $psv-compass-zindex;
+    z-index: $psv-ui-zindex - 1; // under gallery
     overflow: hidden;
     border-radius: $psv-plan-radius;
     transition: all $psv-plan-transition;
@@ -26,7 +26,6 @@ $psv-plan-transition: ease-in-out 0.3s !default;
     max-height: calc(100% - #{$psv-plan-margin * 2});
 
     @at-root .psv--has-navbar & {
-        margin-bottom: calc(#{$psv-navbar-height} + #{$psv-plan-margin});
         max-height: calc(100% - #{$psv-plan-margin * 2} - #{$psv-navbar-height});
     }
 
@@ -99,7 +98,6 @@ $psv-plan-transition: ease-in-out 0.3s !default;
             border-radius: 0;
 
             @at-root .psv--has-navbar & {
-                margin-bottom: $psv-navbar-height;
                 height: calc(100% - #{$psv-navbar-height}) !important;
                 max-height: calc(100% - #{$psv-navbar-height});
             }
@@ -133,11 +131,19 @@ $psv-plan-transition: ease-in-out 0.3s !default;
     &--bottom-left {
         bottom: 0;
         left: 0;
+
+        @at-root .psv--has-navbar & {
+            bottom: #{$psv-navbar-height};
+        }
     }
 
     &--bottom-right {
         bottom: 0;
         right: 0;
+
+        @at-root .psv--has-navbar & {
+            bottom: #{$psv-navbar-height};
+        }
     }
 
     &__pin, &__spot {

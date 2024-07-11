@@ -1,5 +1,7 @@
 import type { Viewer } from '@photo-sphere-viewer/core';
 import { AbstractConfigurablePlugin, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import type { MapPlugin } from '@photo-sphere-viewer/map-plugin';
+import type { PlanPlugin } from '@photo-sphere-viewer/plan-plugin';
 import { GalleryPluginEvents, HideGalleryEvent, ShowGalleryEvent } from './events';
 import { GalleryButton } from './GalleryButton';
 import { GalleryComponent } from './GalleryComponent';
@@ -35,6 +37,9 @@ export class GalleryPlugin extends AbstractConfigurablePlugin<
     private handler?: (id: GalleryItem['id']) => void;
     private currentId?: GalleryItem['id'];
 
+    private map?: MapPlugin;
+    private plan?: PlanPlugin;
+
     constructor(viewer: Viewer, config: GalleryPluginConfig) {
         super(viewer, config);
 
@@ -48,6 +53,9 @@ export class GalleryPlugin extends AbstractConfigurablePlugin<
         super.init();
 
         utils.checkStylesheet(this.viewer.container, 'gallery-plugin');
+
+        this.map = this.viewer.getPlugin('map');
+        this.plan = this.viewer.getPlugin('plan');
 
         this.viewer.addEventListener(events.PanoramaLoadedEvent.type, this);
         this.viewer.addEventListener(events.ShowPanelEvent.type, this);
@@ -102,7 +110,10 @@ export class GalleryPlugin extends AbstractConfigurablePlugin<
      * Shows the gallery
      */
     show() {
-        this.dispatchEvent(new ShowGalleryEvent());
+        this.map?.minimize();
+        this.plan?.minimize();
+        
+        this.dispatchEvent(new ShowGalleryEvent(!this.gallery.isAboveBreakpoint));
         return this.gallery.show();
     }
 
@@ -123,6 +134,10 @@ export class GalleryPlugin extends AbstractConfigurablePlugin<
         } else {
             this.show();
         }
+    }
+
+    isVisible() {
+        return this.gallery.isVisible();
     }
 
     /**

@@ -18,6 +18,10 @@ export class GalleryComponent extends AbstractComponent {
     private readonly observer: IntersectionObserver;
     private readonly items: HTMLElement;
 
+    get isAboveBreakpoint() {
+        return window.innerWidth > this.state.breakpoint;
+    }
+
     constructor(
         private readonly plugin: GalleryPlugin,
         viewer: Viewer
@@ -80,11 +84,9 @@ export class GalleryComponent extends AbstractComponent {
      * @internal
      */
     handleEvent(e: Event) {
-        const isAboveBreakpoint = window.innerWidth > this.state.breakpoint;
-
         switch (e.type) {
             case 'wheel': {
-                if (isAboveBreakpoint) {
+                if (this.isAboveBreakpoint) {
                     const evt = e as WheelEvent;
                     const scrollAmount = this.plugin.config.thumbnailSize.width + (this.state.itemMargin ?? 0);
                     this.items.scrollLeft += (evt.deltaY / Math.abs(evt.deltaY)) * scrollAmount;
@@ -95,7 +97,7 @@ export class GalleryComponent extends AbstractComponent {
 
             case 'mousedown':
                 this.state.mousedown = true;
-                if (isAboveBreakpoint) {
+                if (this.isAboveBreakpoint) {
                     this.state.initMouse = (e as MouseEvent).clientX;
                 } else {
                     this.state.initMouse = (e as MouseEvent).clientY;
@@ -105,7 +107,7 @@ export class GalleryComponent extends AbstractComponent {
 
             case 'mousemove':
                 if (this.state.mousedown) {
-                    if (isAboveBreakpoint) {
+                    if (this.isAboveBreakpoint) {
                         const delta = this.state.mouse - (e as MouseEvent).clientX;
                         this.items.scrollLeft += delta;
                         this.state.mouse = (e as MouseEvent).clientX;
@@ -125,7 +127,7 @@ export class GalleryComponent extends AbstractComponent {
 
             case 'click': {
                 // prevent click on drag
-                const currentMouse = isAboveBreakpoint ? (e as MouseEvent).clientX : (e as MouseEvent).clientY;
+                const currentMouse = this.isAboveBreakpoint ? (e as MouseEvent).clientX : (e as MouseEvent).clientY;
                 if (Math.abs(this.state.initMouse - currentMouse) < 10) {
                     const item = utils.getClosest(e.target as HTMLElement, `[data-${GALLERY_ITEM_DATA_KEY}]`);
                     if (item) {

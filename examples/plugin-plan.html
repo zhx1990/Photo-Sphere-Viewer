@@ -135,6 +135,16 @@
                 console.log(`Click hotspot ${hotspotId}`);
             });
 
+            plan.addEventListener('view-changed', ({ view }) => {
+                console.log(`View size: ${view}`);
+
+                if (view === 'maximized') {
+                    plan.setZoom(16);
+                } else if (view === 'normal') {
+                    plan.setZoom(14);
+                }
+            });
+
             window.viewer = viewer;
         </script>
     </body>

@@ -9,7 +9,7 @@ $psv-compass-margin: 10px !default;
 .psv-compass {
     position: absolute;
     margin: $psv-compass-margin;
-    z-index: $psv-compass-zindex;
+    z-index: $psv-ui-zindex;
     cursor: default;
 
     @at-root .psv--has-navbar & {

@@ -9,7 +9,7 @@ export class ShowGalleryEvent extends TypedEvent<GalleryPlugin> {
     override type: 'show-gallery';
 
     /** @internal */
-    constructor() {
+    constructor(public readonly fullscreen: boolean) {
         super(ShowGalleryEvent.type);
     }
 }
@@ -23,7 +23,7 @@ export class HideGalleryEvent extends TypedEvent<GalleryPlugin> {
 
     /** @internal */
     constructor() {
-        super(ShowGalleryEvent.type);
+        super(HideGalleryEvent.type);
     }
 }
 

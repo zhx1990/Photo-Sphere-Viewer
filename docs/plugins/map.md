@@ -409,6 +409,10 @@ Switches between closed and opened mode.
 
 Switches between maximized and minimized views. (Has no effect if the map is closed).
 
+#### `setZoom(level)`
+
+Changes the current zoom level (between `minZoom` and `maxZoom`).
+
 ## Events
 
 #### `select-hotspot(hotspotId)`
@@ -420,3 +424,7 @@ mapPlugin.addEventListener('select-hotspot', ({ hotspotId }) => {
     console.log(`Clicked on hotspot ${hotspotId}`);
 });
 ```
+
+#### `view-changed(view)`
+
+Triggered when the map is maximized (`view=maximized`), minimized or opened (`view=normal`) or closed (`view=closed`).

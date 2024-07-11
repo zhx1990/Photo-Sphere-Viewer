@@ -1,11 +1,12 @@
 import type { Position, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractComponent, CONSTANTS, utils } from '@photo-sphere-viewer/core';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import type { GalleryPlugin, events as GalleryEvents } from '@photo-sphere-viewer/gallery-plugin';
 import { Control, Layer, Map, Marker, TileLayer } from 'leaflet';
 import { MathUtils } from 'three';
 import type { PlanPlugin } from '../PlanPlugin';
 import { HOTSPOT_MARKER_ID, OSM_ATTRIBUTION, OSM_LABEL, OSM_URL } from '../constants';
-import { SelectHotspot } from '../events';
+import { SelectHotspot, ViewChanged } from '../events';
 import { PlanHotspot } from '../model';
 import { createLeafletIcon, getStyle, gpsToLeaflet } from '../utils';
 import { PlanCloseButton } from './PlanCloseButton';
@@ -18,6 +19,7 @@ export class PlanComponent extends AbstractComponent {
         visible: false,
         maximized: false,
         collapsed: false,
+        galleryWasVisible: false,
 
         layers: {} as Record<string, Layer>,
         pinMarker: null as Marker,
@@ -32,6 +34,8 @@ export class PlanComponent extends AbstractComponent {
         needsUpdate: false,
         renderLoop: null as ReturnType<typeof requestAnimationFrame>,
     };
+
+    private gallery?: GalleryPlugin;
 
     public readonly map: Map;
     private readonly resetButton: PlanResetButton;
@@ -144,8 +148,18 @@ export class PlanComponent extends AbstractComponent {
         }
     }
 
+    init() {
+        this.gallery = this.viewer.getPlugin('gallery');
+
+        this.gallery?.addEventListener('show-gallery', this);
+        this.gallery?.addEventListener('hide-gallery', this);
+    }
+
     override destroy(): void {
         cancelAnimationFrame(this.state.renderLoop);
+
+        this.gallery?.removeEventListener('show-gallery', this);
+        this.gallery?.removeEventListener('hide-gallery', this);
 
         super.destroy();
     }
@@ -160,6 +174,14 @@ export class PlanComponent extends AbstractComponent {
                 break;
             case 'transitionend':
                 this.state.forceRender = false;
+                break;
+            case 'hide-gallery':
+                this.__onToggleGallery(false);
+                break;
+            case 'show-gallery':
+                if (!(e as GalleryEvents.ShowGalleryEvent).fullscreen) {
+                    this.__onToggleGallery(true);
+                }
                 break;
         }
     }
@@ -244,7 +266,7 @@ export class PlanComponent extends AbstractComponent {
      * Resets the map position and zoom level
      */
     reset() {
-        this.map.setView(gpsToLeaflet(this.config.coordinates), this.config.defaultZoom);
+        this.map?.setView(gpsToLeaflet(this.config.coordinates), this.config.defaultZoom);
     }
 
     /**
@@ -278,15 +300,18 @@ export class PlanComponent extends AbstractComponent {
      */
     toggleCollapse() {
         if (this.state.maximized) {
-            this.toggleMaximized();
+            this.toggleMaximized(false);
         }
 
         this.state.collapsed = !this.state.collapsed;
 
         utils.toggleClass(this.container, 'psv-plan--collapsed', this.state.collapsed);
 
-        if (!this.state.collapsed && this.map) {
+        if (!this.state.collapsed) {
             this.reset();
+            this.plugin.dispatchEvent(new ViewChanged('normal'));
+        } else {
+            this.plugin.dispatchEvent(new ViewChanged('closed'));
         }
 
         this.closeButton?.update();
@@ -295,7 +320,7 @@ export class PlanComponent extends AbstractComponent {
     /**
      * Switch maximized mode
      */
-    toggleMaximized() {
+    toggleMaximized(dispatchMinimizeEvent = true) {
         if (this.state.collapsed) {
             return;
         }
@@ -305,7 +330,18 @@ export class PlanComponent extends AbstractComponent {
         utils.toggleClass(this.container, 'psv-plan--maximized', this.state.maximized);
 
         if (this.state.maximized) {
+            this.state.galleryWasVisible = this.gallery?.isVisible();
+            this.gallery?.hide();
+
             this.map.getContainer().focus();
+            this.plugin.dispatchEvent(new ViewChanged('maximized'));
+        } else {
+            if (this.state.galleryWasVisible) {
+                this.gallery.show();
+            }
+            if (dispatchMinimizeEvent) {
+                this.plugin.dispatchEvent(new ViewChanged('normal'));
+            }
         }
 
         this.maximizeButton?.update();
@@ -433,6 +469,14 @@ export class PlanComponent extends AbstractComponent {
 
         if (this.maximized) {
             this.toggleMaximized();
+        }
+    }
+
+    private __onToggleGallery(visible: boolean) {
+        if (!visible) {
+            this.container.style.marginBottom = '';
+        } else {
+            this.container.style.marginBottom = (this.viewer.container.querySelector<HTMLElement>('.psv-gallery').offsetHeight + 10) + 'px';
         }
     }
 

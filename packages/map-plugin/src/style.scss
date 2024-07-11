@@ -22,12 +22,8 @@ $psv-map-transition: ease-in-out 0.3s !default;
 .psv-map {
     position: absolute;
     margin: $psv-map-margin;
-    z-index: $psv-compass-zindex;
+    z-index: $psv-ui-zindex - 1; // under gallery
     transition: all $psv-map-transition;
-
-    @at-root .psv--has-navbar & {
-        margin-bottom: calc(#{$psv-navbar-height} + #{$psv-map-margin});
-    }
 
     &__container {
         position: absolute;
@@ -135,13 +131,12 @@ $psv-map-transition: ease-in-out 0.3s !default;
     }
 
     &--maximized {
-        margin: 0;
+        margin: 0 !important;
         width: 100% !important;
         height: 100% !important;
 
         @at-root .psv--has-navbar & {
             height: calc(100% - #{$psv-navbar-height}) !important;
-            margin-bottom: $psv-navbar-height;
         }
     }
 
@@ -201,10 +196,18 @@ $psv-map-transition: ease-in-out 0.3s !default;
     &--bottom-left {
         bottom: 0;
         left: 0;
+
+        @at-root .psv--has-navbar & {
+            bottom: #{$psv-navbar-height};
+        }
     }
 
     &--bottom-right {
         bottom: 0;
         right: 0;
+
+        @at-root .psv--has-navbar & {
+            bottom: #{$psv-navbar-height};
+        }
     }
 }

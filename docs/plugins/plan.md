@@ -395,6 +395,10 @@ Switches between maximized and minimized views. (Has no effect if the map is clo
 
 Returns the Leaflet instance.
 
+#### `setZoom(level)`
+
+Changes the current zoom level.
+
 ## Events
 
 #### `select-hotspot(hotspotId)`
@@ -406,3 +410,7 @@ planPlugin.addEventListener('select-hotspot', ({ hotspotId }) => {
     console.log(`Clicked on hotspot ${hotspotId}`);
 });
 ```
+
+#### `view-changed(view)`
+
+Triggered when the map is maximized (`view=maximized`), minimized or opened (`view=normal`) or closed (`view=closed`).

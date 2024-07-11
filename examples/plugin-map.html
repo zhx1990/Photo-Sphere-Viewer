@@ -119,6 +119,16 @@
                 console.log(`Click hotspot ${hotspotId}`);
             });
 
+            map.addEventListener('view-changed', ({ view }) => {
+                console.log(`View size: ${view}`);
+
+                if (view === 'maximized') {
+                    map.setZoom(100);
+                } else if (view === 'normal') {
+                    map.setZoom(40);
+                }
+            });
+
             function changeMap() {
                 viewer.textureLoader.loadImage(baseUrl + 'map.jpg').then((image) => {
                     const canvas = document.createElement('canvas');

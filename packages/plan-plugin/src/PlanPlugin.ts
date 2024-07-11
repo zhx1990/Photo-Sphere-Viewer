@@ -87,6 +87,8 @@ export class PlanPlugin extends AbstractConfigurablePlugin<
 
         utils.checkStylesheet(this.viewer.container, 'plan-plugin');
 
+        this.component.init();
+
         this.markers = this.viewer.getPlugin('markers');
 
         this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
@@ -162,6 +164,13 @@ export class PlanPlugin extends AbstractConfigurablePlugin<
      */
     show() {
         this.component.show();
+    }
+
+    /**
+     * Changes the current zoom level
+     */
+    setZoom(level: number) {
+        this.component.zoom(level);
     }
 
     /**

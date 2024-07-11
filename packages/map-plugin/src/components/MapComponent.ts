@@ -1,6 +1,7 @@
 import type { Point, Tooltip, Viewer } from '@photo-sphere-viewer/core';
 import { AbstractComponent, CONSTANTS, events, SYSTEM, utils } from '@photo-sphere-viewer/core';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import type { GalleryPlugin, events as GalleryEvents } from '@photo-sphere-viewer/gallery-plugin';
 import { MathUtils } from 'three';
 import { HOTSPOT_MARKER_ID, MAP_SHADOW_BLUR, PIN_SHADOW_BLUR, PIN_SHADOW_OFFSET } from '../constants';
 import { SelectHotspot, ViewChanged } from '../events';
@@ -29,6 +30,7 @@ export class MapComponent extends AbstractComponent {
         visible: false,
         maximized: false,
         collapsed: false,
+        galleryWasVisible: false,
 
         imgScale: 1,
         zoom: this.config.defaultZoom,
@@ -51,6 +53,8 @@ export class MapComponent extends AbstractComponent {
 
         images: {} as Record<string, { loading: boolean; value: ImageSource }>,
     };
+
+    private gallery?: GalleryPlugin;
 
     private readonly canvas: HTMLCanvasElement;
     private readonly overlay: HTMLElement;
@@ -141,6 +145,13 @@ export class MapComponent extends AbstractComponent {
         }
     }
 
+    init() {
+        this.gallery = this.viewer.getPlugin('gallery');
+
+        this.gallery?.addEventListener('show-gallery', this);
+        this.gallery?.addEventListener('hide-gallery', this);
+    }
+
     override destroy(): void {
         this.canvas.width = 0;
         this.canvas.height = 0;
@@ -150,6 +161,9 @@ export class MapComponent extends AbstractComponent {
         window.removeEventListener('touchend', this);
         window.removeEventListener('mouseup', this);
         this.viewer.removeEventListener(events.KeypressEvent.type, this);
+
+        this.gallery?.removeEventListener('show-gallery', this);
+        this.gallery?.removeEventListener('hide-gallery', this);
 
         cancelAnimationFrame(this.state.renderLoop);
 
@@ -257,6 +271,14 @@ export class MapComponent extends AbstractComponent {
                 }
                 this.state.forceRender = false;
                 this.update();
+                break;
+            case 'hide-gallery':
+                this.__onToggleGallery(false);
+                break;
+            case 'show-gallery':
+                if (!(e as GalleryEvents.ShowGalleryEvent).fullscreen) {
+                    this.__onToggleGallery(true);
+                }
                 break;
         }
     }
@@ -381,10 +403,18 @@ export class MapComponent extends AbstractComponent {
         utils.toggleClass(this.container, 'psv-map--maximized', this.state.maximized);
 
         if (this.state.maximized) {
+            this.state.galleryWasVisible = this.gallery?.isVisible();
+            this.gallery?.hide();
+
             this.overlay.style.display = 'none';
             this.plugin.dispatchEvent(new ViewChanged('maximized'));
-        } else if (dispatchMinimizeEvent) {
-            this.plugin.dispatchEvent(new ViewChanged('normal'));
+        } else {
+            if (this.state.galleryWasVisible) {
+                this.gallery.show();
+            }
+            if (dispatchMinimizeEvent) {
+                this.plugin.dispatchEvent(new ViewChanged('normal'));
+            }
         }
 
         this.maximizeButton?.update();
@@ -786,5 +816,13 @@ export class MapComponent extends AbstractComponent {
 
     private __setCursor(cursor: string) {
         this.canvas.style.cursor = cursor;
+    }
+
+    private __onToggleGallery(visible: boolean) {
+        if (!visible) {
+            this.container.style.marginBottom = '';
+        } else {
+            this.container.style.marginBottom = (this.viewer.container.querySelector<HTMLElement>('.psv-gallery').offsetHeight + 10) + 'px';
+        }
     }
 }

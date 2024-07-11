@@ -93,6 +93,8 @@ export class MapPlugin extends AbstractConfigurablePlugin<
 
         utils.checkStylesheet(this.viewer.container, 'map-plugin');
 
+        this.component.init();
+
         this.markers = this.viewer.getPlugin('markers');
 
         this.viewer.addEventListener(events.PositionUpdatedEvent.type, this);
