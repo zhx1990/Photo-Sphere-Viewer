@@ -1,4 +1,5 @@
 import { AbstractComponent, events, Position, utils, type Viewer } from '@photo-sphere-viewer/core';
+import type { GalleryPlugin, events as GalleryEvents } from '@photo-sphere-viewer/gallery-plugin';
 import { MathUtils, PerspectiveCamera, Scene } from 'three';
 import { CSS2DObject, CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer.js';
 import { CSS3DObject, CSS3DRenderer } from 'three/examples/jsm/renderers/CSS3DRenderer.js';
@@ -22,6 +23,8 @@ export class ArrowsRenderer extends AbstractComponent {
     private renderer: CSS3DRenderer | CSS2DRenderer;
     private scene: Scene;
     private camera: PerspectiveCamera;
+
+    private gallery?: GalleryPlugin;
 
     get is3D() {
         return this.plugin.is3D;
@@ -60,12 +63,22 @@ export class ArrowsRenderer extends AbstractComponent {
         this.container.addEventListener('mousemove', this, true);
     }
 
+    init() {
+        this.gallery = this.viewer.getPlugin('gallery');
+
+        this.gallery?.addEventListener('show-gallery', this);
+        this.gallery?.addEventListener('hide-gallery', this);
+    }
+
     override destroy(): void {
         this.viewer.removeEventListener(events.ReadyEvent.type, this);
         this.viewer.removeEventListener(events.PositionUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.SizeUpdatedEvent.type, this);
         this.viewer.removeEventListener(events.RenderEvent.type, this);
         this.viewer.removeEventListener(events.ClickEvent.type, this);
+
+        this.gallery?.removeEventListener('show-gallery', this);
+        this.gallery?.removeEventListener('hide-gallery', this);
 
         super.destroy();
     }
@@ -94,7 +107,6 @@ export class ArrowsRenderer extends AbstractComponent {
                 }
                 break;
             }
-                break;
             case 'mouseleave': {
                 const link = this.getTargetLink(e.target as HTMLElement);
                 if (link) {
@@ -102,7 +114,6 @@ export class ArrowsRenderer extends AbstractComponent {
                 }
                 break;
             }
-                break;
             case 'mousemove': {
                 const link = this.getTargetLink(e.target as HTMLElement, true);
                 if (link) {
@@ -110,6 +121,13 @@ export class ArrowsRenderer extends AbstractComponent {
                 }
                 break;
             }
+            case 'hide-gallery':
+                this.__onToggleGallery(false);
+                break;
+            case 'show-gallery':
+                if (!(e as GalleryEvents.ShowGalleryEvent).fullscreen) {
+                    this.__onToggleGallery(true);
+                }
                 break;
         }
     }
@@ -245,6 +263,14 @@ export class ArrowsRenderer extends AbstractComponent {
     private getTargetLink(target: HTMLElement, closest = false): VirtualTourLink {
         const target2 = closest ? utils.getClosest(target, '.psv-virtual-tour-link') : target;
         return target2 ? (target2 as any)[LINK_DATA] : undefined;
+    }
+
+    private __onToggleGallery(visible: boolean) {
+        if (!visible) {
+            this.container.style.marginBottom = '';
+        } else {
+            this.container.style.marginBottom = (this.viewer.container.querySelector<HTMLElement>('.psv-gallery').offsetHeight) + 'px';
+        }
     }
 
 }

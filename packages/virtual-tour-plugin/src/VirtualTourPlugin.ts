@@ -165,6 +165,8 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
     override init() {
         super.init();
 
+        this.arrowsRenderer.init();
+
         utils.checkStylesheet(this.viewer.container, 'virtual-tour-plugin');
 
         this.markers = this.viewer.getPlugin('markers');
