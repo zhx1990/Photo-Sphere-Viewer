@@ -590,7 +590,7 @@ export class MapComponent extends AbstractComponent {
                 const fov = MathUtils.degToRad(this.viewer.state.hFov);
                 const a1 = -Math.PI / 2 - fov / 2;
                 const a2 = a1 + fov;
-                const c = this.config.coneSize;
+                const c = this.config.coneSize * SYSTEM.pixelRatio;
 
                 const grad = context.createRadialGradient(0, 0, c / 4, 0, 0, c);
                 grad.addColorStop(0, this.config.coneColor);
