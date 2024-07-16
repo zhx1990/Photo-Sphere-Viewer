@@ -18,7 +18,8 @@ export function mapFixPlugin() {
                     content.sources = content.sources.map((src) => {
                         return src
                             .replace('../src', 'src')
-                            .replace('../../shared', '../shared');
+                            .replace('../../shared', '../shared')
+                            .replace('../../../node_modules', '../node_modules');
                     });
                     mapFile.contents = Buffer.from(JSON.stringify(content));
                 });

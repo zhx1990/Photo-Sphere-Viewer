@@ -1,29 +1,19 @@
-import { externalGlobalPlugin } from 'esbuild-plugin-external-global';
 import { sassPlugin } from 'esbuild-sass-plugin';
 import { defineConfig } from 'tsup';
 import { assetsPlugin } from './plugins/esbuild-plugin-assets';
-import { scssBundlePlugin } from './plugins/esbuild-plugin-scss-bundle';
 import { mapFixPlugin } from './plugins/esbuild-plugin-map-fix';
+import { scssBundlePlugin } from './plugins/esbuild-plugin-scss-bundle';
 import { license } from './templates/license';
 import { npmrc } from './templates/npmrc';
 import { packageJson } from './templates/package';
 import { readme } from './templates/readme';
-
-const externals = {
-    'three': 'THREE',
-    'leaflet': 'L',
-    '@photo-sphere-viewer/core': 'PhotoSphereViewer',
-    '@photo-sphere-viewer/cubemap-adapter': 'PhotoSphereViewer.CubemapAdapter',
-    '@photo-sphere-viewer/gyroscope-plugin': 'PhotoSphereViewer.GyroscopePlugin',
-    '@photo-sphere-viewer/settings-plugin': 'PhotoSphereViewer.SettingsPlugin',
-};
 
 export default function createConfig(pkg) {
     const banner = `/*!
  * ${pkg.psv.globalName} ${pkg.version}
 ${
     pkg.name === '@photo-sphere-viewer/core' ? ' * @copyright 2014-2015 Jérémy Heleine\n' : ''
-} * @copyright ${new Date().getFullYear()} Damien "Mistic" Sorel
+} * @copyright 2015-${new Date().getFullYear()} Damien "Mistic" Sorel
  * @licence MIT (https://opensource.org/licenses/MIT)
  */`;
 
@@ -43,7 +33,7 @@ ${
             },
             dts: dts,
             sourcemap: true,
-            external: Object.keys(externals),
+            external: ['three'],
             noExternal: [/three\/examples\/.*/],
             target: 'es2021',
             define: {
@@ -51,7 +41,6 @@ ${
             },
             esbuildPlugins: [
                 sassPlugin(),
-                externalGlobalPlugin(externals),
                 mapFixPlugin(),
                 ...(dev
                     ? []
