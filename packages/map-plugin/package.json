@@ -21,7 +21,8 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.MapPlugin",
-    "style": true
+    "title": "Photo Sphere Viewer / Map Plugin",
+    "style": true,
+    "budget": "50kb"
   }
 }

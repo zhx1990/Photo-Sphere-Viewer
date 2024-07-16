@@ -3,7 +3,7 @@ import path from 'path';
 import prettyBytes from 'pretty-bytes';
 
 /**
- *
+ * Generates static files in output directory
  */
 export function assetsPlugin(files) {
     return {
@@ -13,7 +13,7 @@ export function assetsPlugin(files) {
                 return;
             }
 
-            build.onEnd((result) => {
+            build.onEnd(() => {
                 const outdir = build.initialOptions.outdir;
 
                 return mkdir(path.resolve(outdir), { recursive: true })

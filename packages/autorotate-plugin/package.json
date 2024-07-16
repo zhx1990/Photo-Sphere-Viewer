@@ -21,6 +21,7 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.AutorotatePlugin"
+    "title": "Photo Sphere Viewer / Autorotate Plugin",
+    "budget": "20kb"
   }
 }

@@ -17,7 +17,8 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.GalleryPlugin",
-    "style": true
+    "title": "Photo Sphere Viewer / Gallery Plugin",
+    "style": true,
+    "budget": "20kb"
   }
 }

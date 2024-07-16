@@ -17,7 +17,8 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.VirtualTourPlugin",
-    "style": true
+    "title": "Photo Sphere Viewer / Virtual Tour Plugin",
+    "style": true,
+    "budget": "50kb"
   }
 }

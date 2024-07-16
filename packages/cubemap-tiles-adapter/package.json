@@ -18,6 +18,7 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.CubemapTilesAdapter"
+    "title": "Photo Sphere Viewer / Cubemap Tiles Adapter",
+    "budget": "30kb"
   }
 }

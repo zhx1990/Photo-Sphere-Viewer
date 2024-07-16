@@ -17,7 +17,8 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.SettingsPlugin",
-    "style": true
+    "title": "Photo Sphere Viewer / Settings Plugin",
+    "style": true,
+    "budget": "20kb"
   }
 }

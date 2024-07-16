@@ -17,6 +17,7 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.VisibleRangePlugin"
+    "title": "Photo Sphere Viewer / Visible Range Plugin",
+    "budget": "20kb"
   }
 }

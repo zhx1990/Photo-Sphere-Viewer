@@ -18,6 +18,7 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.StereoPlugin"
+    "title": "Photo Sphere Viewer / Stereo Plugin",
+    "budget": "20kb"
   }
 }

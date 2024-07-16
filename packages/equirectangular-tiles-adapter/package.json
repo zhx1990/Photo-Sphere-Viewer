@@ -17,6 +17,7 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.EquirectangularTilesAdapter"
+    "title": "Photo Sphere Viewer / Equirectangular Tiles Adapter",
+    "budget": "30kb"
   }
 }

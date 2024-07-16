@@ -17,6 +17,7 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.GyroscopePlugin"
+    "title": "Photo Sphere Viewer / Gyroscope Plugin",
+    "budget": "20kb"
   }
 }

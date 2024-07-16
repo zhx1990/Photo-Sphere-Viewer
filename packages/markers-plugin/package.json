@@ -23,7 +23,8 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.MarkersPlugin",
-    "style": true
+    "title": "Photo Sphere Viewer / Markers Plugin",
+    "style": true,
+    "budget": "90kb"
   }
 }

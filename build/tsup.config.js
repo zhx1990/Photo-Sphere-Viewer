@@ -3,6 +3,7 @@ import { defineConfig } from 'tsup';
 import { assetsPlugin } from './plugins/esbuild-plugin-assets';
 import { mapFixPlugin } from './plugins/esbuild-plugin-map-fix';
 import { scssBundlePlugin } from './plugins/esbuild-plugin-scss-bundle';
+import { budgetPlugin } from './plugins/esbuild-plugin-budget';
 import { license } from './templates/license';
 import { npmrc } from './templates/npmrc';
 import { packageJson } from './templates/package';
@@ -10,10 +11,9 @@ import { readme } from './templates/readme';
 
 export default function createConfig(pkg) {
     const banner = `/*!
- * ${pkg.psv.globalName} ${pkg.version}
-${
-    pkg.name === '@photo-sphere-viewer/core' ? ' * @copyright 2014-2015 Jérémy Heleine\n' : ''
-} * @copyright 2015-${new Date().getFullYear()} Damien "Mistic" Sorel
+ * ${pkg.psv.title} ${pkg.version}
+${pkg.name === '@photo-sphere-viewer/core' ? ' * @copyright 2014-2015 Jérémy Heleine\n' : ''
+        } * @copyright 2015-${new Date().getFullYear()} Damien "Mistic" Sorel
  * @licence MIT (https://opensource.org/licenses/MIT)
  */`;
 
@@ -25,7 +25,6 @@ ${
             entryPoints: [pkg.main],
             outDir: 'dist',
             format: dev ? ['esm'] : ['esm', 'cjs'],
-            globalName: pkg.psv.globalName,
             outExtension({ format }) {
                 return {
                     js: { cjs: '.cjs', esm: '.module.js' }[format],
@@ -42,17 +41,18 @@ ${
             esbuildPlugins: [
                 sassPlugin(),
                 mapFixPlugin(),
+                budgetPlugin(pkg.psv.budget),
                 ...(dev
                     ? []
                     : [
-                          scssBundlePlugin(),
-                          assetsPlugin({
-                              'LICENSE': license(),
-                              '.npmrc': npmrc(),
-                              'README.md': readme(pkg),
-                              'package.json': packageJson(pkg),
-                          }),
-                      ]),
+                        scssBundlePlugin(),
+                        assetsPlugin({
+                            'LICENSE': license(),
+                            '.npmrc': npmrc(),
+                            'README.md': readme(pkg),
+                            'package.json': packageJson(pkg),
+                        }),
+                    ]),
             ],
             esbuildOptions(options, context) {
                 options.banner = {

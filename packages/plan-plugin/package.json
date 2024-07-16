@@ -28,7 +28,8 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.PlanPlugin",
-    "style": true
+    "title": "Photo Sphere Viewer / Plan Plugin",
+    "style": true,
+    "budget": "30kb"
   }
 }

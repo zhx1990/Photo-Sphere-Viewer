@@ -21,6 +21,7 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.OverlaysPlugin"
+    "title": "Photo Sphere Viewer / Overlays Plugin",
+    "budget": "20kb"
   }
 }

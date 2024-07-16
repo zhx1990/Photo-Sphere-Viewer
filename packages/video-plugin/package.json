@@ -17,7 +17,8 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.VideoPlugin",
-    "style": true
+    "title": "Photo Sphere Viewer / Video Plugin",
+    "style": true,
+    "budget": "30kb"
   }
 }

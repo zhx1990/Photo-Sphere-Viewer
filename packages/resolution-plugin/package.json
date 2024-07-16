@@ -18,6 +18,7 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.ResolutionPlugin"
+    "title": "Photo Sphere Viewer / Resolution Plugin",
+    "budget": "10kb"
   }
 }

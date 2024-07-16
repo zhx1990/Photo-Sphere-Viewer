@@ -17,7 +17,8 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.CompassPlugin",
-    "style": true
+    "title": "Photo Sphere Viewer / Compass Plugin",
+    "style": true,
+    "budget": "20kb"
   }
 }

@@ -17,6 +17,7 @@
     "npm-link": "cd dist && npm link"
   },
   "psv": {
-    "globalName": "PhotoSphereViewer.EquirectangularVideoAdapter"
+    "title": "Photo Sphere Viewer / Equirectangular Video Adapter",
+    "budget": "10kb"
   }
 }
