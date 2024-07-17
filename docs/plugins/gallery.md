@@ -125,7 +125,7 @@ Displays the gallery when loading the first panorama. The user will be able to t
 -   default: `true`
 -   updatable: yes
 
-Hides the gallery when the user clicks on an item.
+Hides the gallery when the user clicks on an item (forced to `true` on screens < 500px).
 
 #### `thumbnailSize`
 

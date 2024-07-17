@@ -198,7 +198,7 @@ export class GalleryPlugin extends AbstractConfigurablePlugin<
         this.currentId = id;
         this.gallery.setActive(id);
 
-        if (this.config.hideOnClick) {
+        if (this.config.hideOnClick || !this.gallery.isAboveBreakpoint) {
             this.hide();
         }
     }
