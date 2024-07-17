@@ -194,3 +194,18 @@ This plugin adds buttons to the default navbar:
 -   `gallery` allows to toggle the gallery panel
 
 If you use a [custom navbar](../guide/navbar.md) you will need to manually add the buttons to the list.
+
+## SCSS variables
+
+| variable | default | description |
+| -------- | ------- | ----------- |
+| $psv-gallery-breakpoint | 500px | Screen size bellow which the gallery is displayed full-height |
+| $psv-gallery-padding | 15px | Padding of the container |
+| $psv-gallery-border | 1px solid $psv-caption-text-color | Border between the gallery and the navbar |
+| $psv-gallery-background | $psv-navbar-background | Background of the gallery |
+| $psv-gallery-item-radius | 5px | Corner radius of gallery items |
+| $psv-gallery-item-active-border | 3px solid white | Border of active gallery item |
+| $psv-gallery-title-font | $psv-caption-font | Font of the gallery item title |
+| $psv-gallery-title-color | $psv-caption-text-color | Color of the gallery item title |
+| $psv-gallery-title-background | rgba(0, 0, 0, .6) | Background of the gallery item title |
+| $psv-gallery-thumb-hover-scale | 1.2 | Scale factor of thumbnails on mouse hover |

@@ -13,7 +13,7 @@ This plugin is available in the [@photo-sphere-viewer/settings-plugin](https://w
 
 ## Usage
 
-Once enabled the plugin will add a new "Settings" button which other plugins can use to display various settings in the side panel.
+Once enabled the plugin will add a new "Settings" button which can be populated by other plugins.
 
 ```js
 const viewer = new PhotoSphereViewer.Viewer({
@@ -187,3 +187,17 @@ This plugin adds buttons to the default navbar:
 -   `settings` allows to open the settings panel
 
 If you use a [custom navbar](../guide/navbar.md) you will need to manually add the buttons to the list.
+
+## SCSS variables
+
+| variable | default | description |
+| -------- | ------- | ----------- |
+| $psv-settings-font | $psv-caption-font | Font of settings |
+| $psv-settings-text-color | $psv-panel-text-color | Text color of settings |
+| $psv-settings-background | $psv-panel-background | Background color of settings |
+| $psv-settings-item-height | $psv-panel-menu-item-height | Height of each settings item |
+| $psv-settings-item-padding | $psv-panel-menu-item-padding | Padding of each settings item |
+| $psv-settings-hover-background | $psv-panel-menu-hover-background | Background color of items on mouse hover |
+| $psv-settings-badge-font | 10px / .9 monospace | Font of the badge displayed on the button |
+| $psv-settings-badge-text-color | white | Text color if the badge |
+| $psv-settings-badge-background | #111 | Background color of the badge |

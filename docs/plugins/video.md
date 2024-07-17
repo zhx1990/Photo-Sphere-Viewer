@@ -230,3 +230,22 @@ This plugin adds buttons to the default navbar:
 -   `videoTime` shows the video time and duration (not a real button)
 
 If you use a [custom navbar](../guide/navbar.md) you will need to manually add the buttons to the list.
+
+## SCSS variables
+
+| variable | default | description |
+| -------- | ------- | ----------- |
+| $psv-progressbar-height | 3px | Height of the progress bar |
+| $psv-progressbar-height-active | 5px | Height of the progress bar on mouse hover |
+| $psv-progressbar-progress-color | $psv-buttons-color | Color of the playing progress bar |
+| $psv-progressbar-buffer-color | $psv-buttons-active-background | Color of the buffer progress bar |
+| $psv-progressbar-handle-size | 9px | Size of the seek handle |
+| $psv-progressbar-handle-color | white | Color of the seek handle |
+| $psv-volume-height | 80px | Height of the volume control |
+| $psv-volume-width | $psv-progressbar-height-active | Width of the volume control |
+| $psv-volume-bar-color | $psv-progressbar-progress-color | Color of the volume controle |
+| $psv-volume-track-color | $psv-progressbar-buffer-color | Background color of the volume control |
+| $psv-volume-handle-size | $psv-progressbar-handle-size | Size of the volume handle |
+| $psv-volume-handle-color | $psv-progressbar-handle-color | Color of the volume handle |
+| $psv-video-bigbutton-color | $psv-buttons-color | Color of the central play button |
+| $psv-video-bigbutton-size | (portrait: 20vw,<br>landscape: 10vw) | Size if the central play button, depending on screen orientation |

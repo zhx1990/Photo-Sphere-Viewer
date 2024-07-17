@@ -428,3 +428,15 @@ mapPlugin.addEventListener('select-hotspot', ({ hotspotId }) => {
 #### `view-changed(view)`
 
 Triggered when the map is maximized (`view=maximized`), minimized or opened (`view=normal`) or closed (`view=closed`).
+
+## SCSS variables
+
+| variable | default | description |
+| -------- | ------- | ----------- |
+| $psv-map-background | rgba(61, 61, 61, .7) | Background color of the map |
+| $psv-map-button-size | 34px | Size of map buttons |
+| $psv-map-button-color | $psv-buttons-color | Color of map buttons |
+| $psv-map-toolbar-font | 12px sans-serif | Font for the zoom indicator |
+| $psv-map-toolbar-text-color | white | Color of the zoom indicator |
+| $psv-map-toolbar-background | #222 | Background color of the zoom indicator |
+| $psv-map-transition | ease-in-out .3s | Transition |

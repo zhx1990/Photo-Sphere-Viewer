@@ -414,3 +414,14 @@ planPlugin.addEventListener('select-hotspot', ({ hotspotId }) => {
 #### `view-changed(view)`
 
 Triggered when the map is maximized (`view=maximized`), minimized or opened (`view=normal`) or closed (`view=closed`).
+
+## SCSS variables
+
+| variable | default | description |
+| -------- | ------- | ----------- |
+| $psv-plan-radius | 8px | Corner radius of the plan |
+| $psv-plan-shadow | 0 0 5px rgba(0, 0, 0, .7) | Shadow applied to the plan |
+| $psv-plan-button-size | 34px | Size if plan buttons |
+| $psv-plan-button-background | rgba(0, 0, 0, .7) | Background color of buttons |
+| $psv-plan-button-color | white | Icon color if buttons |
+| $psv-map-transition | ease-in-out .3s | Transition |
