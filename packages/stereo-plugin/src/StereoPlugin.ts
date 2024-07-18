@@ -1,8 +1,11 @@
 import type { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
 import type { Viewer } from '@photo-sphere-viewer/core';
 import { AbstractPlugin, events, PSVError, utils } from '@photo-sphere-viewer/core';
+import type { GalleryPlugin } from '@photo-sphere-viewer/gallery-plugin';
 import type { GyroscopePlugin } from '@photo-sphere-viewer/gyroscope-plugin';
+import type { MapPlugin } from '@photo-sphere-viewer/map-plugin';
 import type { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
+import type { PlanPlugin } from '@photo-sphere-viewer/plan-plugin';
 import { StereoEffect } from 'three/examples/jsm/effects/StereoEffect.js';
 import { StereoPluginEvents, StereoUpdatedEvent } from './events';
 import mobileRotateIcon from './icons/mobile-rotate.svg';
@@ -23,9 +26,12 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
         waitLandscape: null as any,
     };
 
+    private compass?: CompassPlugin;
+    private gallery?: GalleryPlugin;
     private gyroscope: GyroscopePlugin;
-    private markers: MarkersPlugin;
-    private compass: CompassPlugin;
+    private map?: MapPlugin;
+    private markers?: MarkersPlugin;
+    private plan?: PlanPlugin;
 
     /**
      * @internal
@@ -44,9 +50,12 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
     override init() {
         super.init();
 
-        this.markers = this.viewer.getPlugin('markers');
         this.compass = this.viewer.getPlugin('compass');
+        this.gallery = this.viewer.getPlugin('gallery');
         this.gyroscope = this.viewer.getPlugin('gyroscope');
+        this.map = this.viewer.getPlugin('map');
+        this.markers = this.viewer.getPlugin('markers');
+        this.plan = this.viewer.getPlugin('plan');
 
         if (!this.gyroscope) {
             throw new PSVError('Stereo plugin requires the Gyroscope plugin');
@@ -65,9 +74,12 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
 
         this.stop();
 
-        delete this.markers;
         delete this.compass;
+        delete this.gallery;
         delete this.gyroscope;
+        delete this.map;
+        delete this.markers;
+        delete this.plan;
 
         super.destroy();
     }
@@ -108,10 +120,13 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
                 this.viewer.renderer.setCustomRenderer((renderer) => new StereoEffect(renderer));
                 this.state.enabled = true;
 
-                this.markers?.hideAllMarkers();
-                this.compass?.hide();
                 this.viewer.navbar.hide();
                 this.viewer.panel.hide();
+                this.compass?.hide();
+                this.gallery?.hide();
+                this.map?.hide();
+                this.plan?.hide();
+                this.markers?.hideAllMarkers();
 
                 this.dispatchEvent(new StereoUpdatedEvent(true));
 
@@ -137,14 +152,16 @@ export class StereoPlugin extends AbstractPlugin<StereoPluginEvents> {
             this.viewer.renderer.setCustomRenderer(null);
             this.state.enabled = false;
 
-            this.markers?.showAllMarkers();
-            this.compass?.show();
-            this.viewer.navbar.show();
-
             this.__unlockOrientation();
             this.__stopWakelock();
             this.viewer.exitFullscreen();
             this.gyroscope.stop();
+
+            this.viewer.navbar.show();
+            this.compass?.show();
+            this.map?.show();
+            this.plan?.show();
+            this.markers?.showAllMarkers();
 
             this.dispatchEvent(new StereoUpdatedEvent(false));
         }
