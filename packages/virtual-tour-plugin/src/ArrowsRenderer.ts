@@ -64,10 +64,12 @@ export class ArrowsRenderer extends AbstractComponent {
     }
 
     init() {
-        this.gallery = this.viewer.getPlugin('gallery');
+        if (this.is3D) {
+            this.gallery = this.viewer.getPlugin('gallery');
 
-        this.gallery?.addEventListener('show-gallery', this);
-        this.gallery?.addEventListener('hide-gallery', this);
+            this.gallery?.addEventListener('show-gallery', this);
+            this.gallery?.addEventListener('hide-gallery', this);
+        }
     }
 
     override destroy(): void {
