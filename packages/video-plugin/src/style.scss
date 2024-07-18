@@ -203,7 +203,7 @@ $psv-video-bigbutton-color: $psv-buttons-color !default;
             opacity: 1;
             transition-timing-function: linear, step-start;
 
-            @media (orientation: landscape) {
+            @container psv-container (orientation: landscape) {
                 width: map.get($psv-video-bigbutton-size, landscape);
             }
         }

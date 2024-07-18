@@ -122,7 +122,7 @@
         }
     }
 
-    @media screen and (max-width: #{$psv-panel-width}) {
+    @container psv-container (max-width: #{$psv-panel-width}) {
         width: 100% !important;
         max-width: none;
 

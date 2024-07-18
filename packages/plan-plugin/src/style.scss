@@ -88,7 +88,7 @@ $psv-plan-transition: ease-in-out 0.3s !default;
             height: calc(100% - #{$psv-navbar-height} - #{$psv-plan-margin * 2}) !important;
         }
 
-        @media screen and (width < 500px) {
+        @container psv-container (max-width: 500px) {
             margin: 0;
             width: 100% !important;
             height: 100% !important;

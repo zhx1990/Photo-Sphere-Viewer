@@ -1,5 +1,7 @@
 .psv-container {
     --psv-core-loaded: true;
+    container-name: psv-container;
+    container-type: size;
 
     width: 100%;
     height: 100%;

@@ -17,7 +17,7 @@
         svg {
             width: map.get($psv-overlay-image-size, portrait);
 
-            @media (orientation: landscape) {
+            @container psv-container (orientation: landscape) {
                 width: map.get($psv-overlay-image-size, landscape);
             }
         }

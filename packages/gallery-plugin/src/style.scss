@@ -121,7 +121,7 @@ $psv-gallery-breakpoint: 500px !default;
         }
     }
 
-    @media screen and (width <= #{$psv-gallery-breakpoint}) {
+    @container psv-container (max-width: #{$psv-gallery-breakpoint}) {
         top: 0;
 
         &-container {
