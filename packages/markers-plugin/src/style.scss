@@ -5,7 +5,7 @@
 }
 
 .psv-markers {
-    user-select: none;
+    pointer-events: none;
     position: absolute;
     z-index: $psv-hud-zindex;
     width: 100%;
@@ -23,12 +23,12 @@
     &-css3d-container {
         position: absolute;
         z-index: $psv-polygon-marker-zindex + 1;
-        pointer-events: none;
     }
 }
 
 .psv-marker {
     display: none;
+    pointer-events: auto;
 
     &--normal {
         position: absolute;

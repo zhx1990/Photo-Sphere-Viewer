@@ -259,7 +259,7 @@ export abstract class Marker {
             }
 
             if (this.tooltip) {
-                this.tooltip.update(this.config.tooltip.content, config);
+                this.tooltip.move(config);
             } else {
                 this.tooltip = this.viewer.createTooltip(config);
             }
