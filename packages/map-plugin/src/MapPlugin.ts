@@ -16,7 +16,7 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         size: '200px',
         position: ['bottom', 'left'],
         visibleOnLoad: true,
-        overlayImage: null,
+        overlayImage: undefined,
         pinImage: pin,
         pinSize: 35,
         coneColor: '#1E78E6',

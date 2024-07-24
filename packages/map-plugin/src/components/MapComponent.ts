@@ -300,7 +300,8 @@ export class MapComponent extends AbstractComponent {
         this.container.style.width = this.config.size;
         this.container.style.height = this.config.size;
 
-        this.overlay.innerHTML = getImageHtml(this.config.overlayImage ?? (this.config.shape === 'square' ? overlaySquare : overlayRound));
+        this.overlay.innerHTML = this.config.overlayImage === null ? ''
+            : getImageHtml(this.config.overlayImage ?? (this.config.shape === 'square' ? overlaySquare : overlayRound));
 
         this.resetButton?.applyConfig();
         this.closeButton?.applyConfig();
