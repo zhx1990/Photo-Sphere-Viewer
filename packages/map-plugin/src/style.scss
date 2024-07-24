@@ -2,6 +2,8 @@
 @import '../../shared/vars';
 
 $psv-map-margin: 10px !default;
+$psv-map-radius: 8px !default;
+$psv-map-shadow: 0 0 5px rgba(0, 0, 0, 0.7) !default;
 $psv-map-background: rgba(61, 61, 61, 0.7) !default;
 $psv-map-toolbar-font: 12px sans-serif !default;
 $psv-map-toolbar-background: #222 !default;
@@ -9,6 +11,7 @@ $psv-map-toolbar-text-color: white !default;
 $psv-map-button-size: 34px !default;
 $psv-map-button-spacing: 3px !default;
 $psv-map-button-color: $psv-buttons-color !default;
+$psv-map-button-background: rgba(0, 0, 0, 0.5) !default;
 $psv-map-transition: ease-in-out 0.3s !default;
 
 @function round-to($value, $precision) {
@@ -34,7 +37,6 @@ $psv-map-transition: ease-in-out 0.3s !default;
         z-index: -1;
         background: $psv-map-background;
         overflow: hidden;
-        border-radius: 50%;
         transition: all $psv-map-transition;
 
         svg,
@@ -43,6 +45,17 @@ $psv-map-transition: ease-in-out 0.3s !default;
             width: 100%;
             height: 100%;
         }
+    }
+
+    &--round &__container {
+        border-radius: 50%;
+        box-shadow: $psv-map-shadow;
+    }
+
+    &--square {
+        border-radius: $psv-map-radius;
+        box-shadow: $psv-map-shadow;
+        overflow: hidden;
     }
 
     &__overlay {
@@ -85,8 +98,7 @@ $psv-map-transition: ease-in-out 0.3s !default;
         width: $psv-map-button-size;
         aspect-ratio: 1;
         line-height: 0;
-        background: $psv-map-background;
-        border-radius: 50%;
+        background: $psv-map-button-background;
         display: flex;
         justify-content: center;
         align-items: center;
@@ -99,35 +111,41 @@ $psv-map-transition: ease-in-out 0.3s !default;
             width: 60%;
         }
 
-        // "sigh"
-        $button-position: #{round-to((1 - math.cos(45deg)) * 50%, 1000)};
-        /* stylelint-disable max-line-length */
-        $button-offset: #{$psv-map-button-size - round-to((1 - math.cos(45deg)) * $psv-map-button-size * 0.5, 1000) + $psv-map-button-spacing};
-        /* stylelint-enable */
-
         &--top-left {
-            left: $button-position;
-            top: $button-position;
-            transform: translate(-$button-offset, -$button-offset);
+            left: 0;
+            top: 0;
+            border-bottom-right-radius: $psv-map-radius;
+            transform: translate(-$psv-map-button-spacing, -$psv-map-button-spacing);
         }
 
         &--top-right {
-            right: $button-position;
-            top: $button-position;
-            transform: translate($button-offset, -$button-offset);
+            right: 0;
+            top: 0;
+            border-bottom-left-radius: $psv-map-radius;
+            transform: translate($psv-map-button-spacing, -$psv-map-button-spacing);
         }
 
         &--bottom-left {
-            left: $button-position;
-            bottom: $button-position;
-            transform: translate(-$button-offset, $button-offset);
+            left: 0;
+            bottom: 0;
+            border-top-right-radius: $psv-map-radius;
+            transform: translate(-$psv-map-button-spacing, $psv-map-button-spacing);
         }
 
         &--bottom-right {
-            right: $button-position;
-            bottom: $button-position;
-            transform: translate($button-offset, $button-offset);
+            right: 0;
+            bottom: 0;
+            border-top-left-radius: $psv-map-radius;
+            transform: translate($psv-map-button-spacing, $psv-map-button-spacing);
         }
+    }
+
+    &--round &__button {
+        border-radius: 50%;
+    }
+
+    &--square &__button {
+        transform: unset;
     }
 
     &--maximized {
@@ -140,31 +158,31 @@ $psv-map-transition: ease-in-out 0.3s !default;
         }
     }
 
-    &--maximized &__container {
+    &--maximized, &--maximized &__container {
         border-radius: 0;
     }
 
-    &--maximized &__button {
-        border: 2px solid currentcolor;
+    &--round#{&}--maximized &__button {
+        outline: 2px solid currentcolor;
 
         &--top-left {
-            left: $psv-map-button-size + $psv-map-margin;
-            top: $psv-map-button-size + $psv-map-margin;
+            left: $psv-map-margin;
+            top: $psv-map-margin;
         }
 
         &--top-right {
-            right: $psv-map-button-size + $psv-map-margin;
-            top: $psv-map-button-size + $psv-map-margin;
+            right: $psv-map-margin;
+            top: $psv-map-margin;
         }
 
         &--bottom-left {
-            left: $psv-map-button-size + $psv-map-margin;
-            bottom: $psv-map-button-size + $psv-map-margin;
+            left: $psv-map-margin;
+            bottom: $psv-map-margin;
         }
 
         &--bottom-right {
-            right: $psv-map-button-size + $psv-map-margin;
-            bottom: $psv-map-button-size + $psv-map-margin;
+            right: $psv-map-margin;
+            bottom: $psv-map-margin;
         }
     }
 

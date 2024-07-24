@@ -4,7 +4,6 @@ import { Color } from 'three';
 import { MapComponent } from './components/MapComponent';
 import { HOTSPOT_GENERATED_ID, HOTSPOT_MARKER_ID, MARKER_DATA_KEY } from './constants';
 import { MapPluginEvents } from './events';
-import overlay from './overlay.svg';
 import pin from './icons/pin.svg';
 import { MapHotspot, MapPluginConfig, ParsedMapPluginConfig, UpdatableMapPluginConfig } from './model';
 
@@ -13,10 +12,11 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         imageUrl: null,
         center: null,
         rotation: 0,
+        shape: 'round',
         size: '200px',
         position: ['bottom', 'left'],
         visibleOnLoad: true,
-        overlayImage: overlay,
+        overlayImage: null,
         pinImage: pin,
         pinSize: 35,
         coneColor: '#1E78E6',

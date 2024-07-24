@@ -72,6 +72,11 @@ export type MapPluginConfig = {
     rotation?: string | number;
 
     /**
+     * @default 'round'
+     */
+    shape?: 'round' | 'square';
+
+    /**
      * Size of the map
      * @default '200px'
      */

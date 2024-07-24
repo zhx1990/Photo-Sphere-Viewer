@@ -128,7 +128,15 @@ The position of the panorama on the map, in pixels. You can also use `setCenter(
 -   default: `0`
 -   updatable: yes
 
-Rotation to apply to the map to make it match with the panorama.
+Rotation to apply to the map to make it match with the panorama, it can be declared in radians or in degrees (ex: `'45deg'`).
+
+#### `shape`
+
+-   type: `'round' | 'square'`
+-   default: `'round'`
+-   updatable: yes
+
+The shape of the widget.
 
 #### `size`
 
@@ -433,9 +441,12 @@ Triggered when the map is maximized (`view=maximized`), minimized or opened (`vi
 
 | variable | default | description |
 | -------- | ------- | ----------- |
+| $psv-map-radius | 8px | Corner radius of the widget (only if shape=square) |
+| $psv-map-shadow | 0 0 5px rgba(0, 0, 0, .7) | Shadow applied to the widget |
 | $psv-map-background | rgba(61, 61, 61, .7) | Background color of the map |
-| $psv-map-button-size | 34px | Size of map buttons |
-| $psv-map-button-color | $psv-buttons-color | Color of map buttons |
+| $psv-map-button-size | 34px | Size of buttons |
+| $psv-map-button-background | rgba(0, 0, 0, .5) | Background color of buttons |
+| $psv-map-button-color | $psv-buttons-color | Color of buttons |
 | $psv-map-toolbar-font | 12px sans-serif | Font for the zoom indicator |
 | $psv-map-toolbar-text-color | white | Color of the zoom indicator |
 | $psv-map-toolbar-background | #222 | Background color of the zoom indicator |

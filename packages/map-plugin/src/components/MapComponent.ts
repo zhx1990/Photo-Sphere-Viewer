@@ -24,6 +24,8 @@ import { MapCompassButton } from './MapCompassButton';
 import { MapMaximizeButton } from './MapMaximizeButton';
 import { MapResetButton } from './MapResetButton';
 import { MapZoomToolbar } from './MapZoomToolbar';
+import overlayRound from '../overlay-round.svg';
+import overlaySquare from '../overlay-square.svg';
 
 export class MapComponent extends AbstractComponent {
     protected override readonly state = {
@@ -288,14 +290,17 @@ export class MapComponent extends AbstractComponent {
             'psv-map--top-right',
             'psv-map--top-left',
             'psv-map--bottom-right',
-            'psv-map--bottom-left'
+            'psv-map--bottom-left',
+            'psv-map--round',
+            'psv-map--square',
         );
         this.container.classList.add(`psv-map--${this.config.position.join('-')}`);
+        this.container.classList.add(`psv-map--${this.config.shape}`);
 
         this.container.style.width = this.config.size;
         this.container.style.height = this.config.size;
 
-        this.overlay.innerHTML = getImageHtml(this.config.overlayImage);
+        this.overlay.innerHTML = getImageHtml(this.config.overlayImage ?? (this.config.shape === 'square' ? overlaySquare : overlayRound));
 
         this.resetButton?.applyConfig();
         this.closeButton?.applyConfig();
@@ -477,7 +482,9 @@ export class MapComponent extends AbstractComponent {
 
         // update UI
         if (!this.config.static) {
-            this.overlay.style.transform = `rotate(${-yawAndRotation}rad)`;
+            if (this.config.shape === 'round') {
+                this.overlay.style.transform = `rotate(${-yawAndRotation}rad)`;
+            }
             this.compassButton?.rotate(yawAndRotation);
         }
         this.zoomToolbar.setText(this.state.zoom);
