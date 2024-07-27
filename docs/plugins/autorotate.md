@@ -222,7 +222,7 @@ Speed of the automatic rotation. Can be a negative value to reverse the rotation
 -   default: `defaultPitch`
 -   updatable: yes
 
-Vertical angle at which the automatic rotation is performed.
+Vertical angle at which the automatic rotation is performed. If `null` the current pitch is kept.
 
 #### `autorotateZoomLvl`
 

@@ -330,12 +330,14 @@ export class AutorotatePlugin extends AbstractConfigurablePlugin<
                     Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
                 );
 
-                this.viewer.dynamics.position.goto(
-                    {
-                        pitch: this.config.autorotatePitch ?? this.viewer.config.defaultPitch,
-                    },
-                    Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
-                );
+                if (!utils.isNil(this.config.autorotatePitch)) {
+                    this.viewer.dynamics.position.goto(
+                        {
+                            pitch: this.config.autorotatePitch,
+                        },
+                        Math.abs(this.config.autorotateSpeed / this.viewer.config.moveSpeed)
+                    );
+                }
             }
         });
     }
