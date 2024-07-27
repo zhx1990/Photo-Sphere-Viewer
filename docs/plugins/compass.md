@@ -135,7 +135,7 @@ Position of the widget, accepted positions are combinations of `top`, `center`, 
 
 -   type: `boolean`
 -   default: `true`
--   updatable: no
+-   updatable: yes
 
 Allows to click on the compass to rotate the viewer.
 

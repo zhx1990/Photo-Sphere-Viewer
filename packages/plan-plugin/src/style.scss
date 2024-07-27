@@ -16,7 +16,7 @@ $psv-plan-transition: ease-in-out 0.3s !default;
 .psv-plan {
     position: absolute;
     margin: $psv-plan-margin;
-    z-index: $psv-ui-zindex - 1; // under gallery
+    z-index: $psv-ui-zindex;
     overflow: hidden;
     border-radius: $psv-plan-radius;
     transition: all $psv-plan-transition;

@@ -32,22 +32,24 @@ export class CompassComponent extends AbstractComponent {
         this.container.appendChild(this.background);
         this.container.appendChild(this.canvas);
 
-        if (this.config.navigation) {
-            this.container.addEventListener('mouseenter', this);
-            this.container.addEventListener('mouseleave', this);
-            this.container.addEventListener('mousemove', this);
-            this.container.addEventListener('mousedown', this);
-            this.container.addEventListener('mouseup', this);
-            this.container.addEventListener('touchstart', this);
-            this.container.addEventListener('touchmove', this);
-            this.container.addEventListener('touchend', this);
-        }
+        this.container.addEventListener('mouseenter', this);
+        this.container.addEventListener('mouseleave', this);
+        this.container.addEventListener('mousemove', this);
+        this.container.addEventListener('mousedown', this);
+        this.container.addEventListener('mouseup', this);
+        this.container.addEventListener('touchstart', this);
+        this.container.addEventListener('touchmove', this);
+        this.container.addEventListener('touchend', this);
 
         this.applyConfig();
         this.hide();
     }
 
     handleEvent(e: Event) {
+        if (!this.config.navigation) {
+            return;
+        }
+
         switch (e.type) {
             case 'mouseenter':
             case 'mousemove':
@@ -106,7 +108,6 @@ export class CompassComponent extends AbstractComponent {
         this.background.innerHTML = this.config.backgroundSvg;
 
         this.container.style.width = this.config.size;
-        this.container.style.height = this.config.size;
 
         this.container.style.marginTop = this.config.position[0] === 'center' ? `calc(-${this.config.size} / 2)` : '';
         this.container.style.marginLeft = this.config.position[1] === 'center' ? `calc(-${this.config.size} / 2)` : '';

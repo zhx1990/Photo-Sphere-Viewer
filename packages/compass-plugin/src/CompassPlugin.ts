@@ -3,7 +3,7 @@ import { AbstractConfigurablePlugin, events, utils } from '@photo-sphere-viewer/
 import type { events as markersEvents, MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
 import compass from './compass.svg';
 import { CompassComponent } from './components/CompassComponent';
-import { CompassHotspot, CompassPluginConfig, ParsedCompassPluginConfig, UpdatableCompassPluginConfig } from './model';
+import { CompassHotspot, CompassPluginConfig, ParsedCompassPluginConfig } from './model';
 
 const getConfig = utils.getConfigParser<CompassPluginConfig, ParsedCompassPluginConfig>(
     {
@@ -29,13 +29,11 @@ const getConfig = utils.getConfigParser<CompassPluginConfig, ParsedCompassPlugin
  */
 export class CompassPlugin extends AbstractConfigurablePlugin<
     CompassPluginConfig,
-    ParsedCompassPluginConfig,
-    UpdatableCompassPluginConfig
+    ParsedCompassPluginConfig
 > {
     static override readonly id = 'compass';
     static override readonly VERSION = PKG_VERSION;
     static override readonly configParser = getConfig;
-    static override readonly readonlyOptions: Array<keyof CompassPluginConfig> = ['navigation'];
 
     private markers?: MarkersPlugin;
     private readonly component: CompassComponent;
@@ -82,7 +80,7 @@ export class CompassPlugin extends AbstractConfigurablePlugin<
         super.destroy();
     }
 
-    override setOptions(options: Partial<UpdatableCompassPluginConfig>) {
+    override setOptions(options: Partial<CompassPluginConfig>) {
         super.setOptions(options);
 
         this.component.applyConfig();
