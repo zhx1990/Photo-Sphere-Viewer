@@ -17,6 +17,7 @@
             {
                 "imports": {
                     "three": "/node_modules/three/build/three.module.js",
+                    "lil-gui": "/node_modules/three/examples/jsm/libs/lil-gui.module.min.js",
                     "@photo-sphere-viewer/core": "/dist/core/index.module.js",
                     "@photo-sphere-viewer/compass-plugin": "/dist/compass-plugin/index.module.js",
                     "@photo-sphere-viewer/markers-plugin": "/dist/markers-plugin/index.module.js"
@@ -25,6 +26,9 @@
         </script>
 
         <script type="module">
+            import { GUI } from 'lil-gui';
+            import { addColorPicker } from './scripts/LilGuiColorPicker.js';
+            import { addTextarea } from './scripts/LilGuiTextarea.js';
             import { Viewer } from '@photo-sphere-viewer/core';
             import { CompassPlugin } from '@photo-sphere-viewer/compass-plugin';
             import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
@@ -114,6 +118,34 @@
             const compass = viewer.getPlugin(CompassPlugin);
 
             window.viewer = viewer;
+
+            const config = {
+                size: compass.config.size,
+                backgroundSvg: compass.config.backgroundSvg,
+                position: compass.config.position.join(' '),
+                navigation: compass.config.navigation,
+                coneColor: compass.config.coneColor,
+                navigationColor: compass.config.navigationColor,
+                hotspotColor: compass.config.hotspotColor,
+            };
+
+            const gui = new GUI({ title: 'Compass Plugin Options' });
+
+            gui.add(config, 'size');
+            addTextarea(gui, config, 'backgroundSvg', 10);
+            gui.add(config, 'position', ['top left', 'top right', 'bottom left', 'bottom right']);
+            gui.add(config, 'navigation');
+            addColorPicker(gui, config, 'coneColor');
+            addColorPicker(gui, config, 'navigationColor');
+            addColorPicker(gui, config, 'hotspotColor');
+
+            gui.onChange(() => {
+                compass.setOptions({
+                    ...config,
+                });
+
+                document.querySelector('.lil-gui').style.right = (config.position === 'top right') ? 'auto' : '';
+            });
         </script>
     </body>
 </html>

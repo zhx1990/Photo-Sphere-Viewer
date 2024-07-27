@@ -16,6 +16,7 @@
             {
                 "imports": {
                     "three": "/node_modules/three/build/three.module.js",
+                    "lil-gui": "/node_modules/three/examples/jsm/libs/lil-gui.module.min.js",
                     "@photo-sphere-viewer/core": "/dist/core/index.module.js",
                     "@photo-sphere-viewer/autorotate-plugin": "/dist/autorotate-plugin/index.module.js",
                     "@photo-sphere-viewer/markers-plugin": "/dist/markers-plugin/index.module.js"
@@ -24,6 +25,7 @@
         </script>
 
         <script type="module">
+            import { GUI } from 'lil-gui';
             import { Viewer } from '@photo-sphere-viewer/core';
             import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
             import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
@@ -98,6 +100,45 @@
             }
 
             window.viewer = viewer;
+
+            const config = {
+                autostartDelay: autorotate.config.autostartDelay,
+                autostartOnIdle: autorotate.config.autostartOnIdle,
+                autorotateSpeed: '3rpm',
+                autorotatePitch: autorotate.config.autorotatePitch ?? '0deg',
+                autorotateZoomLvl: autorotate.config.autorotateZoomLvl ?? 50,
+            };
+
+            const config2 = {
+                overridePitch: autorotate.config.autorotatePitch !== null,
+                overrideZoomLvl: autorotate.config.autorotateZoomLvl !== null,
+            };
+
+            const gui = new GUI({ title: 'Autorotate Plugin Options' });
+
+            gui.add(config, 'autostartDelay', 0, 10000, 500);
+            gui.add(config, 'autostartOnIdle');
+            const overridePitch = gui.add(config2, 'overridePitch');
+            const autorotatePitch = gui.add(config, 'autorotatePitch');
+            const overrideZoomLvl = gui.add(config2, 'overrideZoomLvl');
+            const autorotateZoomLvl = gui.add(config, 'autorotateZoomLvl', 0, 100, 1);
+
+            overridePitch.name('[override pitch]');
+            overridePitch.onChange((ok) => (ok ?  autorotatePitch.show() : autorotatePitch.hide()));
+            config2.overridePitch ?  autorotatePitch.show() : autorotatePitch.hide();
+
+            overrideZoomLvl.name('[override zoom lvl]');
+            overrideZoomLvl.onChange((ok) => (ok ?  autorotateZoomLvl.show() : autorotateZoomLvl.hide()));
+            config2.overrideZoomLvl ?  autorotateZoomLvl.show() : autorotateZoomLvl.hide();
+
+            gui.onChange(() => {
+                autorotate.setOptions({
+                    ...config,
+                    autostartDelay: config.autostartDelay,
+                    autorotatePitch: config2.overridePitch ? config.autorotatePitch : null,
+                    autorotateZoomLvl: config2.overrideZoomLvl ? config.autorotateZoomLvl : null,
+                });
+            });
         </script>
     </body>
 </html>
