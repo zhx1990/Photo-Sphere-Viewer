@@ -37,10 +37,10 @@ export type CssSize = {
 /**
  * Object defining angular corrections to a sphere
  */
-export type SphereCorrection = {
-    pan?: number;
-    tilt?: number;
-    roll?: number;
+export type SphereCorrection<T = number | string> = {
+    pan?: T;
+    tilt?: T;
+    roll?: T;
 };
 
 /**

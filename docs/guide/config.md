@@ -205,28 +205,14 @@ Requires two fingers to rotate the panorama. This allows standard touch-scroll n
 
 #### `sphereCorrection`
 
--   type: `{ pan: double, tilt: double, roll: double }`
+-   type: `{ pan: double | string, tilt: double | string, roll: double | string }`
 -   default: `{ pan:0, tilt:0, roll: 0 }`
 
-Allows to rotate the panorama sphere. Angles are in radians.
+Allows to fix the panorama orientation.
 
-**Note:** if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
+**Note:** if the XMP data contains pose heading/pitch/roll data, they will be applied before `sphereCorrection`.
 
 ![pan-tilt-toll](../images/pan-tilt-roll.png)
-
-#### `moveSpeed`
-
--   type: `double`
--   default `1`
-
-Speed multiplicator for panorama moves. Used for click move, touch move and navbar buttons.
-
-#### `zoomSpeed`
-
--   type: `double`
--   default `1`
-
-Speed multiplicator for panorama zooms. Used for mouse wheel, touch pinch and navbar buttons.
 
 #### `panoData`
 
@@ -243,9 +229,6 @@ panoData: {
   croppedHeight: 2000,
   croppedX: 1000,
   croppedY: 500,
-  poseHeading: 270, // 0 to 360
-  posePitch: 0, // -90 to 90
-  poseRoll: 0, // -180 to 180
 }
 ```
 
@@ -262,11 +245,23 @@ panoData: (image, xmpData) => ({
 });
 ```
 
-**Note:** if the XMP data and/or `panoData` contains heading/pitch/roll data, they will be applied before `sphereCorrection`.
-
 ::: warning
-Only the default [equirectangular](./adapters/equirectangular.md) adapter and low-resolution panorama of [equirectangular-tiles](./adapters/equirectangular-tiles.md) supports `panoData`, for other adapters you can only use [`sphereCorrection`](#spherecorrection) if the tilt/roll/pan needs to be corrected.
+Only the default [equirectangular](./adapters/equirectangular.md) adapter supports `panoData`.
 :::
+
+#### `moveSpeed`
+
+-   type: `double`
+-   default `1`
+
+Speed multiplicator for panorama moves. Used for click move, touch move and navbar buttons.
+
+#### `zoomSpeed`
+
+-   type: `double`
+-   default `1`
+
+Speed multiplicator for panorama zooms. Used for mouse wheel, touch pinch and navbar buttons.
 
 #### `requestHeaders`
 

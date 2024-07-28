@@ -155,7 +155,7 @@ virtualTour.setNodes([
         links: [{ nodeId: '2' }],
         markers: [markerLighthouse],
         gps: [-80.156479, 25.666725, 3],
-        panoData: { poseHeading: 327 },
+        sphereCorrection: { pan: '33deg' },
     },
     {
         id: '2',
@@ -166,7 +166,7 @@ virtualTour.setNodes([
         links: [{ nodeId: '3' }, { nodeId: '1' }],
         markers: [markerLighthouse],
         gps: [-80.156168, 25.666623, 3],
-        panoData: { poseHeading: 318 },
+        sphereCorrection: { pan: '42deg' },
     },
     {
         id: '3',
@@ -176,7 +176,7 @@ virtualTour.setNodes([
         caption: `[3] ${caption}`,
         links: [{ nodeId: '4' }, { nodeId: '2' }, { nodeId: '5' }],
         gps: [-80.155932, 25.666498, 5],
-        panoData: { poseHeading: 310 },
+        sphereCorrection: { pan: '50deg' },
     },
     {
         id: '4',
@@ -186,7 +186,7 @@ virtualTour.setNodes([
         caption: `[4] ${caption}`,
         links: [{ nodeId: '3' }, { nodeId: '5' }],
         gps: [-80.156089, 25.666357, 3],
-        panoData: { poseHeading: 78 },
+        sphereCorrection: { pan: '-78deg' },
     },
     {
         id: '5',
@@ -196,7 +196,7 @@ virtualTour.setNodes([
         caption: `[5] ${caption}`,
         links: [{ nodeId: '6' }, { nodeId: '3' }, { nodeId: '4' }],
         gps: [-80.156292, 25.666446, 2],
-        panoData: { poseHeading: 190 },
+        sphereCorrection: { pan: '170deg' },
     },
     {
         id: '6',
@@ -206,7 +206,7 @@ virtualTour.setNodes([
         caption: `[6] ${caption}`,
         links: [{ nodeId: '5' }, { nodeId: '7' }],
         gps: [-80.156465, 25.666496, 2],
-        panoData: { poseHeading: 295 },
+        sphereCorrection: { pan: '65deg' },
     },
     {
         id: '7',
@@ -216,7 +216,7 @@ virtualTour.setNodes([
         caption: `[7] ${caption}`,
         links: [{ nodeId: '6' }],
         gps: [-80.15707, 25.6665, 3],
-        panoData: { poseHeading: 250, posePitch: 3 },
+        sphereCorrection: { pan: '110deg', pitch: -3 },
     },
 ], '2');
 ```

@@ -82,6 +82,9 @@ The data can also contains angular values:
 -   Pose Heading
 -   Pose Pitch
 -   Pose Roll
+-   Initial View Heading
+-   Initial View Pitch
+-   Initial Horizontal FOV
 
 ![XMP_pano_pixels](../../images/XMP_pano_pixels.png)
 
@@ -101,15 +104,21 @@ The XMP payload is as follow:
   <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
     <rdf:Description rdf:about="" xmlns:GPano="http://ns.google.com/photos/1.0/panorama/">
       <GPano:ProjectionType>equirectangular</GPano:ProjectionType>
+      <!-- cropping information -->
       <GPano:FullPanoWidthPixels>6000</GPano:FullPanoWidthPixels>
       <GPano:FullPanoHeightPixels>3000</GPano:FullPanoHeightPixels>
       <GPano:CroppedAreaImageWidthPixels>4000</GPano:CroppedAreaImageWidthPixels>
       <GPano:CroppedAreaImageHeightPixels>2000</GPano:CroppedAreaImageHeightPixels>
       <GPano:CroppedAreaLeftPixels>1000</GPano:CroppedAreaLeftPixels>
       <GPano:CroppedAreaTopPixels>500</GPano:CroppedAreaTopPixels>
+      <!-- pose information -->
       <GPano:PoseHeadingDegrees>0</GPano:PoseHeadingDegrees>
       <GPano:PosePitchDegrees>0</GPano:PosePitchDegrees>
       <GPano:PoseRollDegrees>0</GPano:PoseRollDegrees>
+      <!-- initial view information -->
+      <GPano:InitialViewHeadingDegrees>0</GPano:InitialViewHeadingDegrees>
+      <GPano:InitialViewPitchDegrees>0</GPano:InitialViewPitchDegrees>
+      <GPano:InitialHorizontalFOVDegrees>0</GPano:InitialHorizontalFOVDegrees>
     </rdf:Description>
   </rdf:RDF>
 </x:xmpmeta>
@@ -130,6 +139,8 @@ You can also directly pass the values to Photo Sphere Viewer with the `panoData`
 const viewer = new PhotoSphereViewer.Viewer({
     container: 'viewer',
     panorama: 'path/to/panorama.jpg',
+
+    // cropping information
     panoData: {
         fullWidth: 6000,
         fullHeight: 3000,
@@ -137,10 +148,19 @@ const viewer = new PhotoSphereViewer.Viewer({
         croppedHeight: 2000,
         croppedX: 1000,
         croppedY: 500,
-        poseHeading: 0, // 0 to 360
-        posePitch: 0, // -90 to 90
-        poseRoll: 0, // -180 to 180
     },
+
+    // pose information
+    // sphereCorrection: {
+    //   pan: '0deg',
+    //   tilt: '0deg',
+    //   roll: '0deg',
+    // },
+
+    // initial view information
+    // defaultYaw: '0deg',
+    // defaultPitch: '0deg',
+    // defaultZoomLvl: 50,
 });
 ```
 

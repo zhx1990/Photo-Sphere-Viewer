@@ -285,7 +285,7 @@ export class DataHelper extends AbstractService {
     /**
      * Ensure a SphereCorrection object is valid
      */
-    cleanSphereCorrection(sphereCorrection: SphereCorrection): SphereCorrection {
+    cleanSphereCorrection(sphereCorrection: SphereCorrection): SphereCorrection<number> {
         return {
             pan: parseAngle(sphereCorrection?.pan || 0),
             tilt: parseAngle(sphereCorrection?.tilt || 0, true),

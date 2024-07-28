@@ -65,7 +65,7 @@
             <div class="md-layout-item">
                 <label class="md-caption">Pose Heading</label>
                 <vue-slider
-                    v-model="panoData.poseHeading"
+                    v-model="sphereCorrection.pan"
                     :min="0"
                     :max="360"
                     :marks="[0, 90, 180, 270, 360]"
@@ -76,7 +76,7 @@
             <div class="md-layout-item">
                 <label class="md-caption">Pose Pitch</label>
                 <vue-slider
-                    v-model="panoData.posePitch"
+                    v-model="sphereCorrection.pitch"
                     :min="-90"
                     :max="90"
                     :marks="[-90, 0, 90]"
@@ -87,7 +87,7 @@
             <div class="md-layout-item">
                 <label class="md-caption">Pose Roll</label>
                 <vue-slider
-                    v-model="panoData.poseRoll"
+                    v-model="sphereCorrection.roll"
                     :min="-180"
                     :max="180"
                     :marks="[-180, -90, 0, 90, 180]"
@@ -138,10 +138,12 @@ export default {
             croppedHeight: null,
             croppedX: null,
             croppedY: null,
-            poseHeading: null,
-            posePitch: null,
-            poseRoll: null,
         },
+        sphereCorrection: {
+            pan: null,
+            pitch: null,
+            roll: null,
+        }
     }),
     mounted() {
         // ugly hack to load PSV from jsdelivr as an ES module
@@ -227,9 +229,9 @@ __s.remove();
             this.panoData.croppedHeight = height;
             this.panoData.croppedX = croppedX;
             this.panoData.croppedY = croppedY;
-            this.panoData.poseHeading = 0;
-            this.panoData.posePitch = 0;
-            this.panoData.poseRoll = 0;
+            this.sphereCorrection.pan = 0;
+            this.sphereCorrection.pitch = 0;
+            this.sphereCorrection.roll = 0;
         },
 
         updateOutput() {
@@ -244,9 +246,9 @@ __s.remove();
       <GPano:CroppedAreaImageHeightPixels>${this.panoData.croppedHeight}</GPano:CroppedAreaImageHeightPixels>
       <GPano:CroppedAreaLeftPixels>${this.panoData.croppedX}</GPano:CroppedAreaLeftPixels>
       <GPano:CroppedAreaTopPixels>${this.panoData.croppedY}</GPano:CroppedAreaTopPixels>
-      <GPano:PoseHeadingDegrees>${this.panoData.poseHeading}</GPano:PoseHeadingDegrees>
-      <GPano:PosePitchDegrees>${this.panoData.posePitch}</GPano:PosePitchDegrees>
-      <GPano:PoseRollDegrees>${this.panoData.poseRoll}</GPano:PoseRollDegrees>
+      <GPano:PoseHeadingDegrees>${this.sphereCorrection.pan}</GPano:PoseHeadingDegrees>
+      <GPano:PosePitchDegrees>${this.sphereCorrection.pitch}</GPano:PosePitchDegrees>
+      <GPano:PoseRollDegrees>${this.sphereCorrection.roll}</GPano:PoseRollDegrees>
     </rdf:Description>
   </rdf:RDF>
 </x:xmpmeta>
@@ -254,15 +256,25 @@ __s.remove();
         },
 
         loadViewer() {
+            const sphereCorrection = {
+                pan: -this.sphereCorrection.pan,
+                pitch: -this.sphereCorrection.pitch,
+                roll: -this.sphereCorrection.roll,
+            };
+
             if (this.viewer) {
-                this.viewer.setPanorama(this.imageData, { panoData: this.panoData });
+                this.viewer.setPanorama(this.imageData, {
+                    panoData: this.panoData,
+                    sphereCorrection: sphereCorrection,
+                });
             } else {
                 this.viewer = new this.Viewer({
                     panorama: this.imageData,
                     container: 'viewer',
                     loadingImg: 'https://photo-sphere-viewer-data.netlify.app/assets/loader.gif',
                     panoData: this.panoData,
-                    navbar: ['zoom', 'fullscreen'],
+                    sphereCorrection: sphereCorrection,
+                    navbar: ['zoom', 'move', 'fullscreen'],
                     size: {
                         height: 500,
                     },
