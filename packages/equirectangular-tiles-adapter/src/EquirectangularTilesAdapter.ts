@@ -270,17 +270,17 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
     /**
      * Applies the base texture and starts the loading of tiles
      */
-    setTexture(mesh: EquirectangularMesh, textureData: EquirectangularTexture, transition: boolean) {
+    setTexture(mesh: EquirectangularMesh, textureData: EquirectangularTexture, transition?: boolean) {
         const { texture } = textureData;
 
         if (transition) {
             this.state.inTransition = true;
-            this.__setTexture(mesh, texture);
+            this.__setTexture(mesh, texture, true);
             return;
         }
 
         this.__cleanup();
-        this.__setTexture(mesh, texture);
+        this.__setTexture(mesh, texture, false);
 
         this.state.materials = mesh.material;
         this.state.geom = mesh.geometry;
@@ -295,12 +295,17 @@ export class EquirectangularTilesAdapter extends AbstractAdapter<
         setTimeout(() => this.__refresh());
     }
 
-    private __setTexture(mesh: EquirectangularMesh, texture: Texture) {
+    private __setTexture(mesh: EquirectangularMesh, texture: Texture, transition: boolean) {
         let material;
         if (texture) {
             material = new MeshBasicMaterial({ map: texture });
         } else {
             material = new MeshBasicMaterial({ color: this.config.backgroundColor });
+        }
+
+        if (transition) {
+            material.depthTest = false;
+            material.depthWrite = false;
         }
 
         for (let i = 0; i < this.NB_GROUPS; i++) {

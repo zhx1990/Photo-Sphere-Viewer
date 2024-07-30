@@ -359,10 +359,10 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
             materials.push(new MeshBasicMaterial());
         }
 
-        return new Mesh(geometry, materials);
+        return new Mesh(geometry, []);
     }
 
-    setTexture(mesh: CubemapMesh, textureData: CubemapTexture) {
+    setTexture(mesh: CubemapMesh, textureData: CubemapTexture, transition?: boolean) {
         const { texture, panoData } = textureData;
 
         for (let i = 0; i < 6; i++) {
@@ -371,7 +371,16 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
                 texture[i].rotation = Math.PI;
             }
 
-            mesh.material[i].map = texture[i];
+            const material = new MeshBasicMaterial();
+
+            material.map = texture[i];
+
+            if (transition) {
+                material.depthTest = false;
+                material.depthWrite = false;
+            }
+
+            mesh.material.push(material);
         }
     }
 

@@ -193,12 +193,12 @@ export class CubemapTilesAdapter extends AbstractAdapter<
     setTexture(mesh: CubemapMesh, textureData: CubemapTexture, transition: boolean) {
         if (transition) {
             this.state.inTransition = true;
-            this.__setTexture(mesh, textureData);
+            this.__setTexture(mesh, textureData, true);
             return;
         }
 
         this.__cleanup();
-        this.__setTexture(mesh, textureData);
+        this.__setTexture(mesh, textureData, false);
 
         this.state.materials = mesh.material;
         this.state.geom = mesh.geometry;
@@ -213,7 +213,7 @@ export class CubemapTilesAdapter extends AbstractAdapter<
         setTimeout(() => this.__refresh());
     }
 
-    private __setTexture(mesh: CubemapMesh, { texture, panoData }: CubemapTexture) {
+    private __setTexture(mesh: CubemapMesh, { texture, panoData }: CubemapTexture, transition: boolean) {
         for (let i = 0; i < 6; i++) {
             let material;
             if (texture) {
@@ -225,6 +225,11 @@ export class CubemapTilesAdapter extends AbstractAdapter<
                 material = new MeshBasicMaterial({ map: texture[i] });
             } else {
                 material = new MeshBasicMaterial({ opacity: 0, transparent: true });
+            }
+
+            if (transition) {
+                material.depthTest = false;
+                material.depthWrite = false;
             }
 
             for (let j = 0; j < NB_GROUPS_BY_FACE; j++) {

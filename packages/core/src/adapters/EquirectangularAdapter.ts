@@ -367,11 +367,20 @@ export class EquirectangularAdapter extends AbstractAdapter<string, Texture, Pan
             -Math.PI / 2
         ).scale(-1, 1, 1);
 
-        return new Mesh(geometry, new MeshBasicMaterial());
+        return new Mesh(geometry);
     }
 
-    setTexture(mesh: EquirectangularMesh, textureData: EquirectangularTexture) {
-        (mesh.material as MeshBasicMaterial).map = textureData.texture;
+    setTexture(mesh: EquirectangularMesh, textureData: EquirectangularTexture, transition?: boolean) {
+        const material = new MeshBasicMaterial();
+
+        material.map = textureData.texture;
+
+        if (transition) {
+            material.depthTest = false;
+            material.depthWrite = false;
+        }
+
+        mesh.material = material;
     }
 
     setTextureOpacity(mesh: EquirectangularMesh, opacity: number) {

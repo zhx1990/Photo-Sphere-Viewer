@@ -300,10 +300,6 @@ export class Renderer extends AbstractService {
 
         const group = new Group();
         const mesh = this.viewer.adapter.createMesh();
-        mesh.onBeforeRender = function (renderer) {
-            // must be drawn on top
-            renderer.clearDepth();
-        };
         this.viewer.adapter.setTexture(mesh, textureData, true);
         this.viewer.adapter.setTextureOpacity(mesh, 0);
         this.setPanoramaPose(textureData.panoData, mesh);
