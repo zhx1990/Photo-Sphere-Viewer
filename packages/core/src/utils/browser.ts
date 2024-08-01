@@ -77,7 +77,7 @@ export function getClosest(el: HTMLElement, selector: string): HTMLElement | nul
 }
 
 /**
- * Gets the position of an element in the viewer without reflow
+ * Gets the position of an element in the viewport without reflow
  * Will gives the same result as getBoundingClientRect() as soon as there are no CSS transforms
  */
 export function getPosition(el: HTMLElement): Point {
@@ -90,6 +90,9 @@ export function getPosition(el: HTMLElement): Point {
         y += test.offsetTop - test.scrollTop + test.clientTop;
         test = test.offsetParent as HTMLElement;
     }
+
+    x -= window.scrollX;
+    y -= window.scrollY;
 
     return { x, y };
 }
