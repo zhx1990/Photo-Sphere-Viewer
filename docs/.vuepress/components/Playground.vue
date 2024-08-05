@@ -661,7 +661,8 @@
 const { cloneDeep, omit, debounce, isEqual, pickBy, range } = require('lodash');
 import EDIT_SVG from '!raw-loader!./edit.svg';
 
-const DEFAULT_IMAGE = 'https://photo-sphere-viewer-data.netlify.app/assets/sphere.jpg';
+const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
+const DEFAULT_IMAGE = baseUrl + 'sphere.jpg';
 
 const TEMP_ID = 'marker-temp';
 
@@ -737,10 +738,10 @@ export default {
     created() {
         this.EDIT_SVG = EDIT_SVG;
         this.CLIPBOARD_AVAILABLE = !!window.navigator.clipboard;
-        this.PIN_RED_URL = 'https://photo-sphere-viewer-data.netlify.app/assets/pictos/pin-red.png';
-        this.PIN_BLUE_URL = 'https://photo-sphere-viewer-data.netlify.app/assets/pictos/pin-blue.png';
-        this.TARGET_URL = 'https://photo-sphere-viewer-data.netlify.app/assets/pictos/target.png';
-        this.TENT_URL = 'https://photo-sphere-viewer-data.netlify.app/assets/pictos/tent.png';
+        this.PIN_RED_URL = baseUrl + 'pictos/pin-red.png';
+        this.PIN_BLUE_URL = baseUrl + 'pictos/pin-blue.png';
+        this.TARGET_URL = baseUrl + 'pictos/target.png';
+        this.TENT_URL = baseUrl + 'pictos/tent.png';
         this.FONT_SIZES = range(10, 31).map((i) => `${i}px`);
         this.FONT_SIZES_2 = range(10, 31, 5).map((i) => `${i}px`);
     },
@@ -851,7 +852,7 @@ __s.remove();
         initViewer() {
             this.viewer = new this.Viewer({
                 container: 'viewer',
-                loadingImg: 'https://photo-sphere-viewer-data.netlify.app/assets/loader.gif',
+                loadingImg: baseUrl + 'loader.gif',
                 adapter: [this.EquirectangularAdapter, this.adapterOptions],
                 plugins: [this.MarkersPlugin],
             });
@@ -877,29 +878,15 @@ __s.remove();
                 this.options.caption = null;
             } else if (this.imageData) {
                 URL.revokeObjectURL(this.imageData);
-                this.imageData = null;
             }
+            this.imageData = null;
 
             if (files && files[0]) {
                 const reader = new FileReader();
 
                 reader.onload = (event) => {
                     this.imageData = event.target.result;
-
-                    const image = new Image();
-
-                    image.onload = () => {
-                        this.setPanorama(image.width, image.height);
-                    };
-
-                    image.onerror = () => {
-                        URL.revokeObjectURL(this.imageData);
-                        this.imageData = null;
-                        this.error = true;
-                        this.setPanorama();
-                    };
-
-                    image.src = event.target.result;
+                    this.setPanorama();
                 };
 
                 reader.readAsDataURL(files[0]);
@@ -909,34 +896,20 @@ __s.remove();
         loadDefaultFile() {
             this.error = false;
 
-            if (this.imageData) {
+            if (this.imageData && this.imageData !== DEFAULT_IMAGE) {
                 URL.revokeObjectURL(this.imageData);
             }
 
             this.imageData = DEFAULT_IMAGE;
             this.file = null;
-            this.setPanorama(6000, 3000);
+            this.setPanorama();
             this.options.caption = 'Parc national du Mercantour <b>&copy; Damien Sorel</b>';
         },
 
-        setPanorama(width, height) {
+        setPanorama() {
             if (this.imageData) {
-                const fullWidth = Math.max(width, height * 2);
-                const fullHeight = Math.round(fullWidth / 2);
-                const croppedX = Math.round((fullWidth - width) / 2);
-                const croppedY = Math.round((fullHeight - height) / 2);
-
-                const panoData = {
-                    fullWidth: fullWidth,
-                    fullHeight: fullHeight,
-                    croppedWidth: width,
-                    croppedHeight: height,
-                    croppedX: croppedX,
-                    croppedY: croppedY,
-                };
-
                 this.viewer.overlay.hide();
-                this.viewer.setPanorama(this.imageData, { panoData });
+                this.viewer.setPanorama(this.imageData);
             } else {
                 this.viewer.loader.hide();
                 this.viewer.overlay.show({
