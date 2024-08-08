@@ -286,12 +286,6 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     panorama: node.panorama,
                     name: node.name,
                     thumbnail: node.thumbnail,
-                    options: {
-                        caption: node.caption,
-                        panoData: node.panoData,
-                        sphereCorrection: node.sphereCorrection,
-                        description: node.description,
-                    },
                 })),
                 (id) => {
                     this.setCurrentNode(id as string);
@@ -359,6 +353,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                 const transitionOptions: VirtualTourTransitionOptions = {
                     ...getConfig.defaults.transitionOptions,
                     rotateTo: fromLinkPosition,
+                    zoomTo: fromLinkPosition ? this.viewer.getZoomLevel() : null, // prevents the adapter to apply InitialHorizontalFOVDegrees
                     ...(typeof this.config.transitionOptions === 'function'
                         ? this.config.transitionOptions(node, fromNode, fromLink)
                         : this.config.transitionOptions),
@@ -369,6 +364,7 @@ export class VirtualTourPlugin extends AbstractConfigurablePlugin<
                     return this.viewer
                         .animate({
                             ...transitionOptions.rotateTo,
+                            zoom: transitionOptions.zoomTo,
                             speed: transitionOptions.speed,
                         })
                         .then(() => [node, transitionOptions] as [VirtualTourNode, VirtualTourTransitionOptions]);

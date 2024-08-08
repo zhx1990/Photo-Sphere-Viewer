@@ -296,7 +296,7 @@ export class DataHelper extends AbstractService {
     /**
      * Parse the pose angles of the pano data
      */
-    cleanPanoramaPose(panoData: PanoData): SphereCorrection {
+    cleanPanoramaPose(panoData: PanoData): SphereCorrection<number> {
         return {
             pan: MathUtils.degToRad(panoData?.poseHeading || 0),
             tilt: MathUtils.degToRad(panoData?.posePitch || 0),

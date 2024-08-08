@@ -31,8 +31,8 @@ import {
     ZoomUpdatedEvent,
 } from '../events';
 import { PanoData, PanoramaOptions, Point, SphereCorrection, TextureData } from '../model';
-import { Animation, isNil } from '../utils';
-import type { Viewer } from '../Viewer';
+import { Animation, isNil, logWarn } from '../utils';
+import { Viewer } from '../Viewer';
 import { AbstractService } from './AbstractService';
 
 // https://discourse.threejs.org/t/updates-to-color-management-in-three-js-r152/50791
@@ -267,11 +267,19 @@ export class Renderer extends AbstractService {
      * @internal
      */
     setPanoramaPose(panoData: PanoData, mesh: Mesh = this.mesh) {
-        // By Google documentation the angles are applied on the camera in order : heading, pitch, roll
-        // here we apply the reverse transformation on the sphere
         const cleanCorrection = this.viewer.dataHelper.cleanPanoramaPose(panoData);
 
-        mesh.rotation.set(-cleanCorrection.tilt, -cleanCorrection.pan, -cleanCorrection.roll, 'ZXY');
+        const i = (cleanCorrection.pan ? 1 : 0) + (cleanCorrection.tilt ? 1 : 0) + (cleanCorrection.roll ? 1 : 0);
+        if (!Viewer.useNewAnglesOrder && i > 1) {
+            logWarn(`'panoData' Euler angles will change in version 5.11.0.`);
+            logWarn(`Set 'Viewer.useNewAnglesOrder = true;' to remove this warning (you might have to adapt your poseHeading/posePitch/poseRoll parameters).`);
+        }
+
+        if (Viewer.useNewAnglesOrder) {
+            mesh.rotation.set(cleanCorrection.tilt, cleanCorrection.pan, cleanCorrection.roll, 'YXZ');
+        } else {
+            mesh.rotation.set(-cleanCorrection.tilt, -cleanCorrection.pan, -cleanCorrection.roll, 'ZXY');
+        }
     }
 
     /**
@@ -281,7 +289,17 @@ export class Renderer extends AbstractService {
     setSphereCorrection(sphereCorrection: SphereCorrection, group: Object3D = this.meshContainer) {
         const cleanCorrection = this.viewer.dataHelper.cleanSphereCorrection(sphereCorrection);
 
-        group.rotation.set(cleanCorrection.tilt, cleanCorrection.pan, cleanCorrection.roll, 'ZXY');
+        const i = (cleanCorrection.pan ? 1 : 0) + (cleanCorrection.tilt ? 1 : 0) + (cleanCorrection.roll ? 1 : 0);
+        if (!Viewer.useNewAnglesOrder && i > 1) {
+            logWarn(`'sphereCorrection' Euler angles will change in version 5.11.0.`);
+            logWarn(`Set 'Viewer.useNewAnglesOrder = true;' to remove this warning (you might have to adapt your pan/tilt/roll parameters).`);
+        }
+
+        if (Viewer.useNewAnglesOrder) {
+            group.rotation.set(cleanCorrection.tilt, cleanCorrection.pan, cleanCorrection.roll, 'YXZ');
+        } else {
+            group.rotation.set(cleanCorrection.tilt, cleanCorrection.pan, cleanCorrection.roll, 'ZXY');
+        }
     }
 
     /**
