@@ -9,7 +9,7 @@ export type Cubemap = { [K in CubemapFaces]: string };
  * Object defining a cubemap as separated files
  * images order is : left, front, right, back, top, bottom
  */
-export type CubemapArray = string[6];
+export type CubemapArray = string[];
 
 /**
  * Object defining a cubemap as separated files

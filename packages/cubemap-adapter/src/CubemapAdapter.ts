@@ -95,7 +95,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
         // @ts-ignore
         const mesh = this.viewer.renderer.mesh;
         raycaster.set(ORIGIN, this.viewer.dataHelper.sphericalCoordsToVector3(position));
-        const point = raycaster.intersectObject(mesh)[0].point.multiplyScalar(1 / CONSTANTS.SPHERE_RADIUS);
+        const point = raycaster.intersectObject(mesh)[0].point.divideScalar(CONSTANTS.SPHERE_RADIUS);
 
         function mapUV(x: number, a1: number, a2: number): number {
             return Math.round(MathUtils.mapLinear(x, a1, a2, 0, data.faceSize));
@@ -274,7 +274,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
             const ctx = buffer.getContext('2d');
 
             if (this.config.blur) {
-                ctx.filter = 'blur(1px)';
+                ctx.filter = `blur(${buffer.width / 512}px)`;
             }
 
             ctx.drawImage(
@@ -329,7 +329,7 @@ export class CubemapAdapter extends AbstractAdapter<CubemapPanorama, Texture[], 
             const ctx = buffer.getContext('2d');
 
             if (this.config.blur) {
-                ctx.filter = 'blur(1px)';
+                ctx.filter = `blur(${buffer.width / 512}px)`;
             }
 
             ctx.drawImage(

@@ -10,7 +10,7 @@ This adapter is available in the [@photo-sphere-viewer/cubemap-video-adapter](ht
 const viewer = new PhotoSphereViewer.Viewer({
     adapter: PhotoSphereViewer.CubemapVideoAdapter,
     panorama: {
-        source: 'path/video.mp4', // also supports webm
+        source: 'path/video.mp4',
     },
     plugins: [PhotoSphereViewer.VideoPlugin],
 });

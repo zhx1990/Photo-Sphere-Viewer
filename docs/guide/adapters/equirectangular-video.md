@@ -10,7 +10,7 @@ This adapter is available in the [@photo-sphere-viewer/equirectangular-video-ada
 const viewer = new PhotoSphereViewer.Viewer({
     adapter: PhotoSphereViewer.EquirectangularVideoAdapter,
     panorama: {
-        source: 'path/video.mp4', // also supports webm
+        source: 'path/video.mp4',
     },
     plugins: [PhotoSphereViewer.VideoPlugin],
 });
@@ -113,6 +113,23 @@ When using this adapter, the `panorama` option and the `setPanorama()` method ac
 
 #### `source` (required)
 
--   type: `string`
+-   type: `string | MediaStream`
 
 Path of the video file. The video must not be larger than 4096 pixels or it won't be displayed on handled devices.
+
+It can also be an existing `MediaStream`, for example to display the feed of an USB 360° camera.
+
+```js
+const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+
+const viewer = new Viewer({
+    container: 'photosphere',
+    adapter: [EquirectangularVideoAdapter, {
+        autoplay: true,
+        muted: true,
+    }],
+    panorama: {
+        source: stream,
+    },
+});
+```

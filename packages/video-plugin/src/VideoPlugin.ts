@@ -147,12 +147,11 @@ export class VideoPlugin extends AbstractConfigurablePlugin<
 
         this.video = (textureData as TextureData<Texture>).texture.image;
 
-        // lib.d.ts is invalid ??
-        this.video.addEventListener('play', this as any);
-        this.video.addEventListener('pause', this as any);
-        this.video.addEventListener('progress', this as any);
-        this.video.addEventListener('volumechange', this as any);
-        this.video.addEventListener('timeupdate', this as any);
+        this.video.addEventListener('play', this);
+        this.video.addEventListener('pause', this);
+        this.video.addEventListener('progress', this);
+        this.video.addEventListener('volumechange', this);
+        this.video.addEventListener('timeupdate', this);
     }
 
     private __onKeyPress(e: events.KeypressEvent) {

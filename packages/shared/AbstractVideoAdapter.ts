@@ -4,7 +4,7 @@ import { BufferGeometry, Material, Mesh, VideoTexture } from 'three';
 import { createVideo } from './video-utils';
 
 export type AbstractVideoPanorama = {
-    source: string;
+    source: string | MediaStream;
 };
 
 export type AbstractVideoAdapterConfig = {

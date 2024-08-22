@@ -7,7 +7,7 @@ export function createVideo({
     muted,
     autoplay,
 }: {
-    src: string;
+    src: string | MediaStream;
     withCredentials: boolean;
     muted: boolean;
     autoplay: boolean;
@@ -19,6 +19,10 @@ export function createVideo({
     video.autoplay = autoplay;
     video.muted = muted;
     video.preload = 'metadata';
-    video.src = src;
+    if (src instanceof MediaStream) {
+        video.srcObject = src;
+    } else {
+        video.src = src;
+    }
     return video;
 }
