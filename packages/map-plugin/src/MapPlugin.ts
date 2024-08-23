@@ -36,6 +36,7 @@ const getConfig = utils.getConfigParser<MapPluginConfig, ParsedMapPluginConfig>(
         minZoom: 20,
         maxZoom: 200,
         hotspots: [],
+        minimizeOnHotspotClick: true,
         buttons: {
             maximize: true,
             close: true,

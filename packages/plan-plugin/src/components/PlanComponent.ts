@@ -467,7 +467,7 @@ export class PlanComponent extends AbstractComponent {
             this.viewer.getPlugin<MarkersPlugin>('markers').gotoMarker(markerId);
         }
 
-        if (this.maximized) {
+        if (this.maximized && this.config.minimizeOnHotspotClick) {
             this.toggleMaximized();
         }
     }

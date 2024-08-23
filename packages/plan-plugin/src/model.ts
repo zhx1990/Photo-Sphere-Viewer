@@ -141,6 +141,11 @@ export type PlanPluginConfig = {
     hotspots?: PlanHotspot[];
 
     /**
+     * Always minimize the map when an hotspot/marker is clicked
+     */
+    minimizeOnHotspotClick?: boolean;
+
+    /**
      * Configuration of map buttons
      */
     buttons?: {

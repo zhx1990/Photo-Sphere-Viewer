@@ -46,13 +46,14 @@ export class TimeCaption extends AbstractButton {
     handleEvent(e: Event) {
         switch (e.type) {
             case events.PanoramaLoadedEvent.type:
-            case ProgressEvent.type:
+            case ProgressEvent.type: {
                 let caption = `<strong>${formatTime(this.plugin.getTime())}</strong>`;
                 if (isFinite(this.plugin.getDuration())) {
                     caption += ` / ${formatTime(this.plugin.getDuration())}`;
                 }
                 this.contentElt.innerHTML = caption;
                 break;
+            }
         }
     }
 

@@ -289,6 +289,15 @@ Default zoom level of the map.
 
 Displays the map when loading the first panorama.
 
+
+#### `minimizeOnHotspotClick`
+
+-   type: `boolean`
+-   default: `true`
+-   updatable: yes
+
+Always minimize the map when an hotspot/marker is clicked.
+
 #### `buttons`
 
 -   type: `object`

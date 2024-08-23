@@ -34,6 +34,7 @@ const getConfig = utils.getConfigParser<PlanPluginConfig>(
         }],
         configureLeaflet: null,
         hotspots: [],
+        minimizeOnHotspotClick: true,
         buttons: {
             maximize: true,
             close: true,
