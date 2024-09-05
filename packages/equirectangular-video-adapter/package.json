@@ -1,13 +1,13 @@
 {
   "name": "@photo-sphere-viewer/equirectangular-video-adapter",
-  "version": "0.0.0",
+  "version": "5.9.0",
   "description": "Photo Sphere Viewer adapter to display equirectangular videos.",
   "homepage": "https://photo-sphere-viewer.js.org/guide/adapters/equirectangular-video",
   "license": "MIT",
   "main": "./src/index.ts",
   "types": "./src/index.ts",
   "peerDependencies": {
-    "@photo-sphere-viewer/core": "0.0.0"
+    "@photo-sphere-viewer/core": "5.9.0"
   },
   "scripts": {
     "build": "tsup",

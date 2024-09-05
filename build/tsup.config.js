@@ -12,8 +12,9 @@ import { readme } from './templates/readme';
 export default function createConfig(pkg) {
     const banner = `/*!
  * ${pkg.psv.title} ${pkg.version}
-${pkg.name === '@photo-sphere-viewer/core' ? ' * @copyright 2014-2015 Jérémy Heleine\n' : ''
-        } * @copyright 2015-${new Date().getFullYear()} Damien "Mistic" Sorel
+${
+    pkg.name === '@photo-sphere-viewer/core' ? ' * @copyright 2014-2015 Jérémy Heleine\n' : ''
+} * @copyright 2015-${new Date().getFullYear()} Damien "Mistic" Sorel
  * @licence MIT (https://opensource.org/licenses/MIT)
  */`;
 
@@ -45,14 +46,14 @@ ${pkg.name === '@photo-sphere-viewer/core' ? ' * @copyright 2014-2015 Jérémy H
                 ...(dev
                     ? []
                     : [
-                        scssBundlePlugin(),
-                        assetsPlugin({
-                            'LICENSE': license(),
-                            '.npmrc': npmrc(),
-                            'README.md': readme(pkg),
-                            'package.json': packageJson(pkg),
-                        }),
-                    ]),
+                          scssBundlePlugin(),
+                          assetsPlugin({
+                              'LICENSE': license(),
+                              '.npmrc': npmrc(),
+                              'README.md': readme(pkg),
+                              'package.json': packageJson(pkg),
+                          }),
+                      ]),
             ],
             esbuildOptions(options, context) {
                 options.banner = {

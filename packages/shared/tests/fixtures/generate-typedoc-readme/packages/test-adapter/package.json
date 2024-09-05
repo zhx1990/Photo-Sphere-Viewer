@@ -1,6 +1,6 @@
 {
   "name": "@photo-sphere-viewer/test-adapter",
-  "version": "0.0.0",
+  "version": "5.9.0",
   "description": "Photo Sphere Viewer adapter for tests.",
   "homepage": "https://photo-sphere-viewer.js.org/adapters/test",
   "license": "MIT"
