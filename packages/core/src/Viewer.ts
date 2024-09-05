@@ -1,6 +1,7 @@
 import { PSVError } from './PSVError';
 import type { AbstractAdapter } from './adapters/AbstractAdapter';
 import type { AbstractComponent } from './components/AbstractComponent';
+import type { ShaderMaterial, MeshBasicMaterial } from 'three';
 import { Loader } from './components/Loader';
 import { Navbar } from './components/Navbar';
 import { Notification } from './components/Notification';
@@ -185,6 +186,20 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
     }
 
     /**
+     * 设置全景球材质
+     */
+    setSphereMeshMaterial(material: MeshBasicMaterial | ShaderMaterial) {
+        this.renderer.setMeshMaterial(material);
+    }
+
+    /**
+     * 重置全景球材质
+     */
+    resetSphereMeshMaterial() {
+        this.renderer.resetMeshMaterial();
+    }
+
+    /**
      * Destroys the viewer
      */
     destroy() {
@@ -318,8 +333,8 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
      */
     autoSize() {
         if (
-            this.container.clientWidth !== this.state.size.width
-            || this.container.clientHeight !== this.state.size.height
+            this.container.clientWidth !== this.state.size.width ||
+            this.container.clientHeight !== this.state.size.height
         ) {
             this.state.size.width = Math.round(this.container.clientWidth);
             this.state.size.height = Math.round(this.container.clientHeight);
@@ -405,24 +420,26 @@ export class Viewer extends TypedEventTarget<ViewerEvents> {
 
         this.dispatchEvent(new PanoramaLoadEvent(path));
 
-        const loadingPromise = this.adapter.loadTexture(this.config.panorama, true, options.panoData).then((textureData) => {
-            // check if another panorama was requested
-            if (textureData.panorama !== this.config.panorama) {
-                this.adapter.disposeTexture(textureData);
-                throw getAbortError();
-            }
+        const loadingPromise = this.adapter
+            .loadTexture(this.config.panorama, true, options.panoData)
+            .then((textureData) => {
+                // check if another panorama was requested
+                if (textureData.panorama !== this.config.panorama) {
+                    this.adapter.disposeTexture(textureData);
+                    throw getAbortError();
+                }
 
-            const cleanOptions = this.dataHelper.cleanPanoramaOptions(options, textureData.panoData);
+                const cleanOptions = this.dataHelper.cleanPanoramaOptions(options, textureData.panoData);
 
-            if (!isNil(cleanOptions.zoom) || !isNil(cleanOptions.position)) {
-                this.stopAll();
-            }
+                if (!isNil(cleanOptions.zoom) || !isNil(cleanOptions.position)) {
+                    this.stopAll();
+                }
 
-            return {
-                textureData,
-                cleanOptions,
-            };
-        });
+                return {
+                    textureData,
+                    cleanOptions,
+                };
+            });
 
         if (!options.transition || !this.state.ready || !this.adapter.supportsTransition(this.config.panorama)) {
             this.state.loadingPromise = loadingPromise

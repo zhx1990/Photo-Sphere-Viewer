@@ -1,4 +1,4 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="utf-8" />
@@ -31,6 +31,7 @@
 
         <script type="module">
             import { Viewer } from '@photo-sphere-viewer/core';
+            import * as THREE from 'three';
             import { EquirectangularVideoAdapter } from '@photo-sphere-viewer/equirectangular-video-adapter';
             import { AutorotatePlugin } from '@photo-sphere-viewer/autorotate-plugin';
             import { MarkersPlugin } from '@photo-sphere-viewer/markers-plugin';
@@ -40,61 +41,104 @@
 
             const baseUrl = 'https://photo-sphere-viewer-data.netlify.app/assets/';
 
+            const material = new THREE.ShaderMaterial({
+                uniforms: {
+                    uTime: { value: 0 },
+                },
+                vertexShader: `
+                    varying vec2 vUv;
+
+                    void main() {
+                        vUv = uv;
+                        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+                    }
+                `,
+                fragmentShader: `
+                    uniform float uTime;
+                    varying vec2 vUv;
+
+                    void main() {
+                        gl_FragColor = vec4(vUv, 0.5 + 0.5 * sin(uTime), 1.0);
+                    }
+                `,
+            });
+
             const viewer = new Viewer({
                 container: 'photosphere',
-                adapter: [EquirectangularVideoAdapter, {
-                    autoplay: false,
-                    muted: true,
-                }],
+                adapter: [
+                    EquirectangularVideoAdapter,
+                    {
+                        autoplay: false,
+                        muted: true,
+                        // meshMaterial: material,
+                    },
+                ],
                 caption: 'Ayutthaya <b>&copy; meetle</b>',
                 loadingImg: baseUrl + 'loader.gif',
                 navbar: 'autorotate video zoom move caption settings fullscreen',
                 plugins: [
-                    [VideoPlugin, {
-                        progressbar: true,
-                        bigbutton: true,
-                        keypoints: [
-                            { time: 0, position: { yaw: 0, pitch: 0 } },
-                            { time: 5, position: { yaw: -Math.PI / 4, pitch: Math.PI / 8 } },
-                            { time: 10, position: { yaw: -Math.PI / 2, pitch: 0 } },
-                            { time: 15, position: { yaw: (-3 * Math.PI) / 4, pitch: -Math.PI / 8 } },
-                            { time: 20, position: { yaw: -Math.PI, pitch: 0 } },
-                            { time: 25, position: { yaw: (-5 * Math.PI) / 4, pitch: Math.PI / 8 } },
-                            { time: 30, position: { yaw: (-3 * Math.PI) / 2, pitch: 0 } },
-                            { time: 35, position: { yaw: (-7 * Math.PI) / 4, pitch: -Math.PI / 8 } },
-                        ],
-                    }],
+                    [
+                        VideoPlugin,
+                        {
+                            progressbar: true,
+                            bigbutton: true,
+                            keypoints: [
+                                { time: 0, position: { yaw: 0, pitch: 0 } },
+                                { time: 5, position: { yaw: -Math.PI / 4, pitch: Math.PI / 8 } },
+                                { time: 10, position: { yaw: -Math.PI / 2, pitch: 0 } },
+                                { time: 15, position: { yaw: (-3 * Math.PI) / 4, pitch: -Math.PI / 8 } },
+                                { time: 20, position: { yaw: -Math.PI, pitch: 0 } },
+                                { time: 25, position: { yaw: (-5 * Math.PI) / 4, pitch: Math.PI / 8 } },
+                                { time: 30, position: { yaw: (-3 * Math.PI) / 2, pitch: 0 } },
+                                { time: 35, position: { yaw: (-7 * Math.PI) / 4, pitch: -Math.PI / 8 } },
+                            ],
+                        },
+                    ],
                     AutorotatePlugin,
                     MarkersPlugin,
                     SettingsPlugin,
-                    [ResolutionPlugin, {
-                        defaultResolution: 'FHD',
-                        resolutions: [
-                            {
-                                id: 'UHD',
-                                label: 'Ultra high',
-                                panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_UHD.mp4' },
-                            },
-                            {
-                                id: 'FHD',
-                                label: 'High',
-                                panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_FHD.mp4' },
-                            },
-                            {
-                                id: 'HD',
-                                label: 'Standard',
-                                panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_HD.mp4' },
-                            },
-                            {
-                                id: 'SD',
-                                label: 'Low',
-                                panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_SD.mp4' },
-                            },
-                        ],
-                    }],
+                    [
+                        ResolutionPlugin,
+                        {
+                            defaultResolution: 'FHD',
+                            resolutions: [
+                                {
+                                    id: 'UHD',
+                                    label: 'Ultra high',
+                                    panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_UHD.mp4' },
+                                },
+                                {
+                                    id: 'FHD',
+                                    label: 'High',
+                                    panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_FHD.mp4' },
+                                },
+                                {
+                                    id: 'HD',
+                                    label: 'Standard',
+                                    panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_HD.mp4' },
+                                },
+                                {
+                                    id: 'SD',
+                                    label: 'Low',
+                                    panorama: { source: baseUrl + 'equirectangular-video/Ayutthaya_SD.mp4' },
+                                },
+                            ],
+                        },
+                    ],
                 ],
             });
 
+            // setTimeout(() => {
+            viewer.setSphereMeshMaterial(material);
+            // }, 2000);
+            // setInterval(() => {
+            //     material.uniforms.uTime.value = performance.now() / 1000;
+            //     console.log('performance.now() / 1000 :>> ', performance.now() / 1000);
+            // }, 1000);
+
+            // setTimeout(() => {
+            //     viewer.resetSphereMeshMaterial();
+            // }, 5000);
             window.viewer = viewer;
         </script>
     </body>

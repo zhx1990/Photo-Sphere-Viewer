@@ -1,10 +1,10 @@
 import type { PanoData, PanoramaPosition, Position, TextureData, Viewer } from '@photo-sphere-viewer/core';
 import { CONSTANTS, EquirectangularAdapter, PSVError, utils } from '@photo-sphere-viewer/core';
-import { MathUtils, Mesh, MeshBasicMaterial, SphereGeometry, VideoTexture } from 'three';
+import { MathUtils, Mesh, MeshBasicMaterial, SphereGeometry, VideoTexture, ShaderMaterial } from 'three';
 import { AbstractVideoAdapter } from '../../shared/AbstractVideoAdapter';
 import { EquirectangularVideoAdapterConfig, EquirectangularVideoPanorama } from './model';
 
-type EquirectangularMesh = Mesh<SphereGeometry, MeshBasicMaterial>;
+type EquirectangularMesh = Mesh<SphereGeometry, MeshBasicMaterial | ShaderMaterial>;
 type EquirectangularTexture = TextureData<VideoTexture, EquirectangularVideoPanorama, PanoData>;
 
 const getConfig = utils.getConfigParser<EquirectangularVideoAdapterConfig>(
@@ -12,6 +12,7 @@ const getConfig = utils.getConfigParser<EquirectangularVideoAdapterConfig>(
         resolution: 64,
         autoplay: false,
         muted: false,
+        meshMaterial: new MeshBasicMaterial(),
     },
     {
         resolution: (resolution) => {
@@ -26,10 +27,7 @@ const getConfig = utils.getConfigParser<EquirectangularVideoAdapterConfig>(
 /**
  * Adapter for equirectangular videos
  */
-export class EquirectangularVideoAdapter extends AbstractVideoAdapter<
-    EquirectangularVideoPanorama,
-    PanoData
-> {
+export class EquirectangularVideoAdapter extends AbstractVideoAdapter<EquirectangularVideoPanorama, PanoData> {
     static override readonly id = 'equirectangular-video';
     static override readonly VERSION = PKG_VERSION;
 
@@ -42,7 +40,6 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<
 
     constructor(viewer: Viewer, config: EquirectangularVideoAdapterConfig) {
         super(viewer);
-
         this.config = getConfig(config);
 
         this.SPHERE_SEGMENTS = this.config.resolution;
@@ -94,12 +91,13 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<
         ).scale(-1, 1, 1);
 
         const material = new MeshBasicMaterial();
+        // const material = this.config.meshMaterial;
 
         return new Mesh(geometry, material);
     }
 
     setTexture(mesh: EquirectangularMesh, textureData: EquirectangularTexture) {
-        mesh.material.map = textureData.texture;
+        (mesh.material as MeshBasicMaterial).map = textureData.texture;
 
         this.switchVideo(textureData.texture);
     }
@@ -109,8 +107,8 @@ export class EquirectangularVideoAdapter extends AbstractVideoAdapter<
      */
     getAdapter() {
         if (!this.adapter) {
-            this.adapter = new EquirectangularAdapter(this.viewer, { 
-                interpolateBackground: false, 
+            this.adapter = new EquirectangularAdapter(this.viewer, {
+                interpolateBackground: false,
                 resolution: this.config.resolution,
             });
         }

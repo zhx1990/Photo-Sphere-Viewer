@@ -17,6 +17,7 @@ import {
     Vector3,
     WebGLRenderTarget,
     WebGLRenderer,
+    type MeshBasicMaterial,
 } from 'three';
 import { SPHERE_RADIUS, VIEWER_DATA } from '../data/constants';
 import { SYSTEM } from '../data/system';
@@ -63,6 +64,7 @@ export class Renderer extends AbstractService {
     private timestamp?: number;
     private frustumNeedsUpdate = true;
     private customRenderer?: CustomRenderer;
+    private meshOldMaterial?: MeshBasicMaterial;
 
     get panoramaPose(): Euler {
         return this.mesh.rotation;
@@ -91,6 +93,7 @@ export class Renderer extends AbstractService {
 
         this.mesh = this.viewer.adapter.createMesh();
         this.mesh.userData = { [VIEWER_DATA]: true };
+        this.meshOldMaterial = this.mesh.material as MeshBasicMaterial;
 
         this.meshContainer = new Group();
         this.meshContainer.add(this.mesh);
@@ -119,6 +122,14 @@ export class Renderer extends AbstractService {
     init() {
         this.show();
         this.renderer.setAnimationLoop((t) => this.__renderLoop(t));
+    }
+
+    setMeshMaterial(material: any) {
+        this.mesh.material = material;
+    }
+
+    resetMeshMaterial() {
+        this.mesh.material = this.meshOldMaterial;
     }
 
     /**
@@ -272,7 +283,9 @@ export class Renderer extends AbstractService {
         const i = (cleanCorrection.pan ? 1 : 0) + (cleanCorrection.tilt ? 1 : 0) + (cleanCorrection.roll ? 1 : 0);
         if (!Viewer.useNewAnglesOrder && i > 1) {
             logWarn(`'panoData' Euler angles will change in version 5.11.0.`);
-            logWarn(`Set 'Viewer.useNewAnglesOrder = true;' to remove this warning (you might have to adapt your poseHeading/posePitch/poseRoll parameters).`);
+            logWarn(
+                `Set 'Viewer.useNewAnglesOrder = true;' to remove this warning (you might have to adapt your poseHeading/posePitch/poseRoll parameters).`
+            );
         }
 
         if (Viewer.useNewAnglesOrder) {
@@ -292,7 +305,9 @@ export class Renderer extends AbstractService {
         const i = (cleanCorrection.pan ? 1 : 0) + (cleanCorrection.tilt ? 1 : 0) + (cleanCorrection.roll ? 1 : 0);
         if (!Viewer.useNewAnglesOrder && i > 1) {
             logWarn(`'sphereCorrection' Euler angles will change in version 5.11.0.`);
-            logWarn(`Set 'Viewer.useNewAnglesOrder = true;' to remove this warning (you might have to adapt your pan/tilt/roll parameters).`);
+            logWarn(
+                `Set 'Viewer.useNewAnglesOrder = true;' to remove this warning (you might have to adapt your pan/tilt/roll parameters).`
+            );
         }
 
         if (Viewer.useNewAnglesOrder) {

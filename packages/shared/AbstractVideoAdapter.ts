@@ -26,10 +26,11 @@ type AbstractVideoTexture = TextureData<VideoTexture>;
 /**
  * Base video adapters class
  */
-export abstract class AbstractVideoAdapter<
-    TPanorama extends AbstractVideoPanorama,
+export abstract class AbstractVideoAdapter<TPanorama extends AbstractVideoPanorama, TData> extends AbstractAdapter<
+    TPanorama,
+    VideoTexture,
     TData
-> extends AbstractAdapter<TPanorama, VideoTexture, TData> {
+> {
     static override readonly supportsDownload = false;
 
     protected abstract readonly config: AbstractVideoAdapterConfig;

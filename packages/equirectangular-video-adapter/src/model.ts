@@ -1,4 +1,5 @@
 import type { AbstractVideoAdapterConfig, AbstractVideoPanorama } from '../../shared/AbstractVideoAdapter';
+import type { MeshBasicMaterial, ShaderMaterial } from 'three';
 
 /**
  * Configuration of an equirectangular video
@@ -11,4 +12,5 @@ export type EquirectangularVideoAdapterConfig = AbstractVideoAdapterConfig & {
      * @default 64
      */
     resolution?: number;
+    meshMaterial?: MeshBasicMaterial | ShaderMaterial;
 };
